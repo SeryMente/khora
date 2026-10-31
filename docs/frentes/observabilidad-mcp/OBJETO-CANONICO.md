@@ -337,3 +337,63 @@ La excepción DCR para clientes nativos acepta solamente http://127.0.0.1:<puert
 Implementación local, 572/572 pruebas y build de producción local con 78/78 páginas: PASS. Preview remoto de la rama: PENDIENTE; no se ha desplegado Production ni realizado consentimiento OAuth real o aceptación end-to-end.
 
 Siguiente secuencia controlada por ChatGPT mediante RDC y herramientas conectadas: terminar la verificación de diff/OCP; publicar la rama y actualizar PR #347; generar Preview remoto con la configuración real de Vercel; comprobar build y endpoints OAuth/DCR; integrar a main y desplegar Production solo tras el Preview correcto; iniciar el puente por RDC; obtener consentimiento OAuth del propietario en el navegador; verificar tools/list y una lectura real de fuentes/sesiones Jules. La autorización humana no se reemplaza por extracción de sesión ni por emisión manual de Bearer. No se crea ni aprueba una tarea Jules real durante el smoke test de lectura.
+
+
+## 23. Nueva sesión RDC y reconstrucción integral de General — 2026-10-31
+
+### 23.1 Reentrada y fuentes
+
+- Instrucción del operador: asumir perdida la totalidad del entorno local anterior y reiniciar desde las fuentes persistentes. No se reutilizaron procesos, clones, archivos temporales, variables de entorno, credenciales ni resultados de PC-14.
+- Dispositivo RDC nuevo: PC10RCIF4EI4, UUID d0bbb2a3-d7b4-45e1-8870-652c2c3844fc, Windows, usuario central\mantenimientorci, perfil C:\Users\MantenimientoRCI, Desktop Commander 0.3.1, Node 24.0.0, Git 2.45.2, PowerShell 5.1.26100.9711. GitHub CLI se encontró instalado y autenticado como 1interprete1; solo se usó para comprobar acceso Git, no se mostró ni copió el token.
+- Clon limpio materializado desde GitHub en C:\Temp\khora-general-mcp-custodia-pc10-20261031. Rama local: work/obs-mcp-custodia-tools-20261030-01a18dcb; base recibida desde el ref remoto 649e417b7cc1074c7097c9c3c570085a21292cf. main observado: bbe50f61866aca2a676fc3f1b89ce49e64979e3c. Merge-base: d82952a17192787f49b4c804b4ae3ca7847288e0.
+- DUG releído desde SeryMente/metodologia/main: Samantha v373 · NX-373m, Metacanon 1.26, GOW 2.14, HTML Blob SHA cac4525de77d4f47a8a59c25201968ecf2056b90; commit metodológico más reciente observado f74082148d28b575c232e8fc291607bef8861794. §ARR leído antes de los principios; MCP normativo continúa DESACTIVADO. Principios aplicados: P001, P004, P005, P037, P038, P041, P042 y P043.
+- Control vigente de Khora MCP releído desde main: generación 4, titular chatgpt-khora-mcp-01a18f79-2078-7501-bc18-5ce14475d245, owner_thread=null; no se efectuó transferencia ni se incrementó la generación.
+
+### 23.2 Reconciliación selectiva de main
+
+La primera comparación del grafo indicó 43 commits propios y nueve commits exclusivos de main, sobre la base común d82952a…. Después main avanzó dos commits adicionales de Harmonia. Se revisaron las once rutas antes de seleccionar la incorporación.
+
+Nueve commits permitidos fueron reaplicados en la rama General mediante cherry-pick, sin reutilizar artefactos de PC-14:
+
+- Harmonia, control generación 10: b00a5d7683fec8d4474fefd237e3389cbbf66a6e → commit local 30721d0bb0b343f3d46bd1d5918c337acdf6e51a.
+- Archivo original de Harmonia: 97c4e5c56e6db0cef144cfdf0542138efd67f7a6 → b30c220d8714fdcfa85ba9f87dbf01d060bf533f.
+- Procedencia Harmonia: 12c719e3e2bdb4416cc81039c1e2ac24cc781ef4 → b6ce3e6cf16bae2a6d6142577174828c8856a0f4.
+- OCP Harmonia generación 10: 5e20dc61eebf4c686e7edc46d42daa4f1cad6808 → 9b803f45203bd7ed8b50e4c94ec06c82b3273831.
+- Puente Jules RDC + OAuth 2.1/PKCE: 4530e03a33c5e1743ab9646eb6c862b3c458c605 → 8957b8e0435fe8023aad8c1e8b763001b8eccdec. El único conflicto fue en este OCP; se conservó §22 para el puente y se mantuvo el registro técnico de Custodia para §23. Ruta MCP, DCR, configuración, pruebas y control de responsabilidad se combinaron conservando el contrato de las herramientas Custodia.
+- Evidencia CI/RDC de Harmonia: 702ac339a2ded3f890c3a06319e1047fb40073a5 → 047608f5fc8a0b6f424cbd7b651f04cff6f8da93.
+- Versión OCP Harmonia 0.37: bbe50f61866aca2a676fc3f1b89ce49e64979e3c → 0a2af8537068f722ec42cc32112e459b452cab83.
+- Transferencia documental Harmonia a generación 11 en PC-10: d742e13b4d2ccc1a07a72eb1205b38a65d1a120c → 64054333bdf7ea86b11fdc07decc01875c1c9b10.
+- OCP Harmonia v0.38 y cierre de sesión PC-10: a99784b9ae49b946d48318f0f0f8fb115e43c8cc → bce72856ba660fac9f519e57051258049066e8b6.
+
+Dos commits se excluyeron deliberadamente por el límite de autorización que prohíbe modificar el frente Custodia:
+- 97700994b72ce0f06f0b17c1b848a42f610e82e2: cambia frentes/custodia/CONTROL-RESPONSABILIDAD.json a generación 5.
+- f87ca6c5c8d75eeb23eeb80a5309c360314c73a8: cambia frentes/custodia/OBJETO-CANONICO.md a CUSTODIA-v0.13.
+No se cherry-pickearon, editaron, revertieron ni sobrescribieron esos dos archivos.
+
+Después de los cherry-picks, y antes de este último registro OCP, el grafo local informaba 52 commits propios y once commits de main no antecesores (resultado de cherry-picks, no de equivalencia de árboles). Nueve de esos once cambios permitidos ya están reaplicados bajo nuevos SHA locales; solo se excluyeron los dos commits de Custodia. El commit documental de §23 será el commit adicional de continuidad sobre ese corte. La comparación de árbol mantiene exactamente las dos rutas de Custodia citadas como divergencia documental excluida; el resto del delta corresponde a las herramientas Custodia de General, scopes/contratos, puente Jules, migración 034, pruebas y OCP Khora. La rama local permanece nueve commits por delante del ref remoto original 649e417… .
+
+### 23.3 Validación reproducida en PC-10
+
+- Restauración limpia npm ci --no-audit --no-fund: PASS; 683 paquetes añadidos desde el lockfile. No se ejecutó npm audit fix ni se actualizaron dependencias.
+- Pruebas focalizadas MCP/Custodia/Jules/OAuth/DCR/migración: 63/63 PASS, 0 fallos, 0 omitidas.
+- npm run typecheck: PASS.
+- npm run ui-review:check: PASS.
+- npm run ui:contract: PASS.
+- npm run test:unit: 589/589 PASS, 0 fallos, 0 omitidas. Incluyó methodology_contract_sync.test.ts, que en PC-14 no se pudo ejecutar por ausencia de GitHub CLI.
+- npm run build: código 0. El prebuild repitió TypeScript, UI Review, contrato de navegación y 589/589 tests; Experience preflight indicó not_requested; la extensión Harmonia v0.3.5 se construyó. Next.js 16.4.0 compiló y generó 78/78 páginas.
+- Warnings no bloqueantes del build: convención middleware deprecada y APIs Edge Runtime de process.cwd, CompressionStream y DecompressionStream en dependencias Next/Auth/Jose. No se ejecutó codemod ni se modificaron esas dependencias.
+- node --check tools/jules-rdc-bridge/bridge.mjs: PASS.
+- Parser PowerShell 5.1 para jules.ps1 y credential.ps1: PASS.
+- .khora-local/ está cubierto por .gitignore; no existe directorio de credenciales locales en el workspace nuevo. No se realizó OAuth real, no se creó refresh token DPAPI y no se leyó ni escribió ninguna credencial de proveedor.
+- AUTH_SECRET fue generado aleatoriamente solo en el proceso del build y eliminado en el bloque finally; en una shell nueva AUTH_SECRET está ausente.
+- Pruebas Blob utilizaron bytes cifrados sintéticos y mocks HTTP. No se conectó a DB, Blob ni endpoints productivos. La migración 034_custodia_mcp_read_contract.sql no se ejecutó en Neon ni Production.
+
+### 23.4 Estado y compuerta de integración
+
+- Implementación y validación local reproducidas desde cero en PC-10: VERIFICADAS en el alcance de §23.3.
+- OCP único de Khora MCP actualizado a v0.3.8. Control de responsabilidad permanece en generación 4.
+- La rama aún no se publicó después de la reconstrucción; su ref remoto se mantiene en 649e417… hasta el push controlado. Antes de este commit documental la rama local estaba nueve commits por delante de ese ref; §23 añade el décimo. El main observado al último cotejo es a99784b9ae49b946d48318f0f0f8fb115e43c8cc.
+- No se creó PR, no se fusionó en main, no se desplegó y no se ejecutó la migración 034.
+- La integración a PR/main está bloqueada por las dos revisiones documentales actuales de Custodia en main (generación 5 y v0.13), frente a las copias históricas gen4 de la rama. Abrir una PR sin resolver esa diferencia podría revertirlas. Resolverlo exige actuación del titular de Custodia o una autorización expresa adicional; este frente no tocará esos archivos.
+- El puente Jules local está probado estáticamente y por contrato/DCR; consentimiento OAuth en navegador, persistencia DPAPI real, conexión autenticada a Production, tools/list con credencial real y lectura real de fuentes Jules siguen PENDIENTES. No se declara disponible ni aceptado end-to-end.
+- El siguiente paso prioritario es persistir fast-forward el estado validado únicamente en la rama General tras cotejar el SHA remoto, sin abrir PR ni tocar main; después solicitar revisión de ChatGPT sobre esta iteración y sus bloqueos.
