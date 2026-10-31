@@ -48,3 +48,15 @@ La consulta viva de RDC de este ciclo confirma que el UUID autorizado de PC-14 `
 - `main` v0.3.0; candidata v0.4.0 en rama separada. Sin cambio de código, merge ni aceptación funcional. Reintento CI falló sin runner, pasos, logs ni artefactos; causa no determinada. Autosync local→GitHub no implementado.
 - Inventario RDC del 2026-10-29: UUID autorizado `345f64ee-5d6a-429f-a97c-dab44f44cddb` ausente. Dos entradas PC-14 están offline con UUID distintos; PC-4 está online pero pertenece a otra tarea y no se usó. Ninguna operación remota/local se ejecutó para Harmonia.
 - E2E real sigue **ABIERTA**; paquete/raíz cargable y perfil físico NO VERIFICADOS. La acción bloqueante es restaurar el UUID exacto y aportar handshake de conectividad y cuenta → SID → perfil, sin secretos. Si se inicia RDC de nuevo, el único comando normativo de Metacanon §13 es `npx @wonderwhy-er/desktop-commander@latest remote --no-persist-session`.
+ 
+## Estado vigente · 2026-10-31
+
+La única fuente actual de estado del frente es el OCP [OBJETO-CANONICO.md](OBJETO-CANONICO.md), versión **0.39 / HARMONIA-v0.39**, especialmente §45. El control exclusivo está en generación **12**, registrado en [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json); el folio de sesión sigue sin asignarse porque FOL1 no está activa.
+
+La exportación completa [ChatGPT-HARMONIA-20261031-1349.txt](originales/ChatGPT-HARMONIA-20261031-1349.txt) está incorporada en originales y su transferencia binaria fue verificada por blob SHA. Su procedencia se registra en [PROCEDENCIA.md](originales/PROCEDENCIA.md).
+
+NCL-OCP queda como adaptador Playwright auxiliar, manual, opt-in, de alto alcance sobre el perfil OCP y desconectado por defecto. No es navegador independiente del agente, no aísla pestañas y no es dependencia de arranque de Harmonia. El reporte EP sigue únicamente en el equipo local; no se ha transferido a EP.
+
+La PR #346 continúa abierta en borrador y sin merge. La prueba productiva autorizada de un único evento sintético Cora/Neon y su lectura de vuelta continúa pendiente; no se ha escrito en producción, ni se ha modificado Chrome, fusionado o desplegado.
+
+**Nota de lectura:** los apartados históricos que siguen conservan fotografías de estados anteriores. Si discrepan con el OCP v0.39 y el control vigente, prevalece el OCP; no interpretes sus referencias de generación, dispositivo o versiones anteriores como estado actual.
