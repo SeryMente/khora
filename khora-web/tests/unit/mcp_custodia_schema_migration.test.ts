@@ -248,6 +248,36 @@ test("034 upgrades a preexisting Dictado schema without rewriting existing recor
   }
 });
 
+test("effective-role guard rejects privileged DATABASE_URL fallback and unrelated login roles", async () => {
+  const db = await fixture(false);
+  try {
+    await db.exec(migration);
+    await assert.rejects(assertCustodiaReadOnlyRole(db as any), /custodia_readonly_role_invalid/);
+    await db.exec("CREATE ROLE khora_unrelated_login LOGIN");
+    await db.exec("SET ROLE khora_unrelated_login");
+    await assert.rejects(assertCustodiaReadOnlyRole(db as any), /custodia_readonly_role_invalid/);
+    await db.exec("RESET ROLE");
+  } finally {
+    await db.close();
+  }
+});
+
+test("effective-role guard rejects DML privileges outside the Custodia tables", async () => {
+  const db = await fixture(false);
+  try {
+    await db.exec(migration);
+    await db.exec("CREATE TABLE public.unrelated_write_surface(id INTEGER)");
+    await db.exec("GRANT INSERT ON public.unrelated_write_surface TO khora_lector");
+    await db.exec("CREATE SEQUENCE public.unrelated_write_sequence");
+    await db.exec("GRANT USAGE, UPDATE ON SEQUENCE public.unrelated_write_sequence TO khora_lector");
+    await db.exec("SET ROLE khora_readonly_test");
+    await assert.rejects(assertCustodiaReadOnlyRole(db as any), /custodia_readonly_role_invalid/);
+    await db.exec("RESET ROLE");
+  } finally {
+    await db.close();
+  }
+});
+
 test("effective-role guard rejects inherited PUBLIC access to archive payload", async () => {
   const db = await fixture(false);
   try {

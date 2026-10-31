@@ -4,7 +4,7 @@
 - Frente único vigente: **Khora MCP**; identidad canónica `KHORA-MCP`.
 - Nombre e identidad histórica: **Observabilidad MCP** / `OBSERVABILIDAD-MCP`. La ruta heredada `docs/frentes/observabilidad-mcp/` se conserva; no se migra ni duplica el OCP o su control.
 - Repositorio: `SeryMente/khora`; OCP único: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`; control único: `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`.
-- OCP: **v0.3.8**. Control de responsabilidad: **generación 4**, titular operativo `chatgpt-khora-mcp-01a18f79-2078-7501-bc18-5ce14475d245`.
+- OCP: **v0.3.9**. Control de responsabilidad: **generación 4**, titular operativo `chatgpt-khora-mcp-01a18f79-2078-7501-bc18-5ce14475d245`.
 - La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local de continuidad: `01a18f79-2078-7501-bc18-5ce14475d245`; no es un ID nativo.
 - Folio nuevo de conversación: **PENDIENTE / NO ASIGNADO**; FOL1 no ha sido cotejado ni activado. Se conserva el folio anterior en la generación archivada.
 - Las tareas provisionales «General» y «Jules» pertenecen a este mismo frente; no crean OCP, frente ni control paralelos.
@@ -168,7 +168,7 @@ Este documento en `main` es el objeto canónico único del frente. El control in
 - **Estado Git en el corte de código:** head `fd266c6d818902eaa120d1b5afd3592e80bcb51c`; comparación con la base verificada `8f9b98b61d58aa5c1dd1afee0c128c7ed4592ff7`: **11 commits ahead, 0 behind**. `main` no fue modificado.
 - **Toolchain:** Node.js v26.13.0, Git 2.56.0, GitHub CLI 2.103.3, npm 11.20.0. El binario local FFmpeg 6.1.1 existe en `node_modules`; dependencias locales no se incorporan al repositorio.
 - **Pruebas focalizadas:** Jules retry, concordancia MCP/Jules y metadata OAuth/UI: **35/35 pass**.
-- **Suite unitaria completa:** `npm run test:unit`, **568/568 pass**, 0 fail, 0 skipped.
+- Suite unitaria completa: npm run test:unit, 568/568 pass, 0 fail, 0 skipped.
 - **Validaciones:** `npm run typecheck`, `npm run ui-review:check` y `npm run ui:contract` terminaron con código 0.
 - **Build:** `npm run build` terminó con código 0. El build requirió un `AUTH_SECRET` aleatorio y efímero definido solo en el proceso local; el proceso lo eliminó al finalizar. No existe `.env` ni `.env.local`, y la verificación posterior del entorno no encontró la variable activa. Next.js compiló, pasó TypeScript, generó **78/78** páginas y terminó la optimización/trazas. Warnings pendientes: convención `middleware` deprecada y APIs de ciertas dependencias no compatibles con Edge Runtime; no bloquearon el build.
 - **Cambios correctivos en esta rama:** redacción completa del sufijo de rutas `/sources/...` en observabilidad Jules; aserciones alineadas con `isError` opcional del SDK MCP; normalización CRLF en prueba documental; validación estructural de `sourceContext`; retirada de la segunda copia del bloque «Documentos canónicos» en README. Commits correctivos `348f3776e9854a484aea535ea541e4c1dd1e3245` y `fd266c6d818902eaa120d1b5afd3592e80bcb51c`.
@@ -390,10 +390,73 @@ Después de los cherry-picks, y antes de este último registro OCP, el grafo loc
 
 ### 23.4 Estado y compuerta de integración
 
-- Implementación y validación local reproducidas desde cero en PC-10: VERIFICADAS en el alcance de §23.3.
-- OCP único de Khora MCP actualizado a v0.3.8. Control de responsabilidad permanece en generación 4.
-- La rama aún no se publicó después de la reconstrucción; su ref remoto se mantiene en 649e417… hasta el push controlado. Antes de este commit documental la rama local estaba nueve commits por delante de ese ref; §23 añade el décimo. El main observado al último cotejo es a99784b9ae49b946d48318f0f0f8fb115e43c8cc.
-- No se creó PR, no se fusionó en main, no se desplegó y no se ejecutó la migración 034.
-- La integración a PR/main está bloqueada por las dos revisiones documentales actuales de Custodia en main (generación 5 y v0.13), frente a las copias históricas gen4 de la rama. Abrir una PR sin resolver esa diferencia podría revertirlas. Resolverlo exige actuación del titular de Custodia o una autorización expresa adicional; este frente no tocará esos archivos.
-- El puente Jules local está probado estáticamente y por contrato/DCR; consentimiento OAuth en navegador, persistencia DPAPI real, conexión autenticada a Production, tools/list con credencial real y lectura real de fuentes Jules siguen PENDIENTES. No se declara disponible ni aceptado end-to-end.
-- El siguiente paso prioritario es persistir fast-forward el estado validado únicamente en la rama General tras cotejar el SHA remoto, sin abrir PR ni tocar main; después solicitar revisión de ChatGPT sobre esta iteración y sus bloqueos.
+- La reconstrucción local PC-10 fue publicada mediante fast-forward en la rama General. En el cotejo de entrada a esta iteración, el ref remoto y HEAD local coincidían en \`370a874ba8253f68cfbf2a11bb44badeb727b035\`, hijo de \`b197137737262c94bdb5564ee9181c978f27d60f\`; el ref de \`main\` era \`a99784b9ae49b946d48318f0f0f8fb115e43c8cc\`.
+- OCP único de Khora MCP: v0.3.9 en la iteración actual. Control de responsabilidad permanece en generación 4; titular operativo sin transferencia ni cambio de generación.
+- El diff directo de árbol entre la rama y \`main\` conserva diferencias históricas en las dos rutas de Custodia. El diff de contribuciones desde el merge-base \`d82952a17192787f49b4c804b4ae3ca7847288e0\` demuestra que la rama no ha añadido, editado, cherry-pickeado ni revertido ninguna de esas dos rutas.
+- Se preparó \`REVISION-TITULAR-CUSTODIA-LECTURA.md\` con los puntos de dictamen, evidencia y límites. Estado: **PREPARADO PARA REVISIÓN; NO ACEPTADO POR EL TITULAR**. El criterio de revisión/aceptación del titular sigue pendiente.
+- No se creó PR, no se fusionó en \`main\`, no se desplegó y no se ejecutó la migración 034 en Neon.
+- La simulación de merge de tres vías detecta conflicto de contenido únicamente en este OCP; el árbol candidato conserva literalmente las dos rutas canónicas de Custodia de \`main\`. No se creó merge commit ni se aplicó la simulación al workspace.
+- Los cinco checks remotos Vercel del commit \`370a874…\` fallan con un destino que solicita \`upgradeToPro=github-private-org-to-hobby\`. Es un gate remoto de cuenta/plan y no evidencia de fallo del build local.
+- OAuth real, conexión Neon/rol efectivo de \`KHORA_READONLY_DATABASE_URL\`, lectura real de Blob y aceptación del titular siguen **PENDIENTES**.
+- El siguiente paso prioritario es obtener el dictamen expreso del titular de Custodia sobre el documento de revisión; no interpretar el silencio como aceptación ni integrar a \`main\` antes de resolver el conflicto documental del OCP.
+
+## 24. Contrato de lectura Custodia — iteración 2026-10-31
+
+### 24.1 Defectos técnicos identificados y corregidos en General
+
+- **Propiedad:** `owns()` utilizaba `OWNER=$1` aunque el array de parámetros era `[sessionId, actor]`; $1 era la sesión y no el actor. El predicado ahora compara con $2. La prueba de regresión verifica los parámetros exactos y la denegación de un actor distinto.
+- **Aislamiento de las lecturas secundarias:** la lectura de partes en Revisiones e Integridad ahora une sesión/archivo y repite el predicado de titular en la misma sentencia SQL que recupera metadata de partes.
+- **Presupuesto físico acumulado:** `khora_custodia_verificar_integridad` limita cada invocación/página a 32 MiB de respuesta Blob y 45 s de recorrido físico; cada fetch tiene un máximo individual de 30 s limitado por el tiempo restante. El presupuesto no se reinicia entre partes de una misma página. Si el tamaño declarado excede los bytes restantes, la siguiente lectura no se inicia.
+- **Límite de stream:** sin Content-Length, el último bloque del stream puede hacer que el contador observado exceda el presupuesto nominal hasta el tamaño de ese bloque; el bloque que rebasa el saldo no se copia al buffer cifrado ni se descifra. El proveedor/stream no ofrece en este punto un límite de transporte más estricto.
+- **Contabilidad:** el resultado informa bytes efectivamente recibidos, tiempo de Blob y estado agotado también cuando la lectura siguiente se evita anticipadamente por tamaño declarado. El presupuesto de 45 s comienza antes del recorrido de partes Blob y no incluye el guard de rol, la autorización de sesión o las consultas de metadata SQL.
+- **Alcance temporal:** el presupuesto se aplica a una invocación MCP/página. Se reinicia en una nueva llamada con cursor; no existe aún presupuesto de extremo a extremo para todas las páginas de una sesión. Ese límite de recorrido completo queda sujeto a dictamen del titular.
+
+### 24.2 Privilegios efectivos y alcance del lector
+
+- La migración 034 verifica que `khora_lector` esté preaprovisionado como rol de grupo `NOLOGIN`, no privilegiado. No crea login, secreto ni credencial.
+- Los grants se expresan por columna para las cuatro tablas Dictado y cuatro columnas de `volcado`; se limpian grants anteriores directos a nivel de tabla/columna del rol y grants `PUBLIC` para las cuatro tablas Dictado.
+- No se revocan los grants `PUBLIC` de la tabla global `volcado` para no afectar otras superficies Khora sin autorización. El guard falla cerrado si esos permisos heredados dan a la conexión lectura de columnas fuera del contrato.
+- El guard del runtime exige pertenencia heredante al grupo lector, rol seguro, SELECT por columna de la allowlist, ausencia de SELECT de tabla completa o columnas adicionales en las cinco relaciones Custodia y ausencia de DML/privilegios de secuencia efectivos en los esquemas de aplicación visibles. Los catálogos internos de PostgreSQL se excluyen de la inspección de DML.
+- Esto demuestra el contrato del guard y los grants en fixtures PostgreSQL aislados; no demuestra qué rol usa la variable desplegada `KHORA_READONLY_DATABASE_URL`. El usuario efectivo de esa conexión productiva permanece **NO VERIFICADO**.
+
+### 24.3 Migración y conservación
+
+- `034_custodia_mcp_read_contract.sql` se ejecutó dos veces en PostgreSQL aislado con esquema nuevo y con esquema Dictado preexistente, preservando el registro sintético histórico. Ambas variantes comprobaron idempotencia y permisos efectivos.
+- Los tests verifican SELECT de columnas permitidas, ausencia de SELECT de tabla completa/columnas prohibidas, ausencia de INSERT/UPDATE/DELETE/TRUNCATE y secuencias; además, el guard rechaza fallback privilegiado, login ajeno, DML en una tabla de otro módulo y lectura heredada de `volcado.payload`.
+- La prueba FK confirma `ON DELETE SET NULL` para el vínculo a `volcado`, `ON DELETE CASCADE` de sesión a filas de partes y bloqueo por referencias de checkpoint/MP3 mientras existan. La cascada relacional no elimina el objeto físico de Vercel Blob; puede dejar objetos huérfanos. La política de retención/limpieza queda a decisión del titular.
+- No se alteraron FKs ni datos reales; la migración no se ejecutó en Neon.
+
+### 24.4 Evidencia local y gates remotos — separados
+
+**Evidencia local reproducible de esta iteración**
+
+- `npm run typecheck`: PASS.
+- Pruebas focalizadas Custodia + migración: 23/23 PASS, sin fallos ni omitidas.
+- npm run test:unit: 597/597 PASS, 0 fallos, 0 omitidas.
+- Build Next.js: **NO EJECUTADO** en esta iteración.
+- npm run ui-review:check: PASS. npm run ui:contract: PASS; ambos reejecutados en esta iteración.
+- PGlite usa un motor PostgreSQL aislado en memoria con fixtures sintéticos. No es Neon Production y las pruebas mock no son lecturas físicas de Vercel Blob.
+
+**Gates remotos y evidencia productiva pendientes**
+
+- Vercel/GitHub: los cinco contextos del commit `370a874ba8253f68cfbf2a11bb44badeb727b035` aparecen en failure y sus destinos apuntan al requisito de upgrade de cuenta `github-private-org-to-hobby`. Este resultado remoto no contradice el éxito del TypeScript ni de las pruebas locales; tampoco acredita Preview/CI aprobado.
+- OAuth real end-to-end: PENDIENTE.
+- Identidad/privilegios efectivos de `KHORA_READONLY_DATABASE_URL` en entorno autorizado: PENDIENTE; no se leyó su valor ni se usó credencial productiva.
+- Neon Production, ejecución de 034 y consultas de datos Custodia: PENDIENTES y no realizadas.
+- Lectura/descifrado de Blob reales de Production: PENDIENTE y no realizada.
+- Dictamen del titular de Custodia: PENDIENTE.
+
+### 24.5 Diff, simulación de merge y límite de autorización
+
+- Rama aislada: `work/obs-mcp-custodia-tools-20261030-01a18dcb`; ref observado al inicio `370a874ba8253f68cfbf2a11bb44badeb727b035`; `main` `a99784b9ae49b946d48318f0f0f8fb115e43c8cc`; merge-base `d82952a17192787f49b4c804b4ae3ca7847288e0`.
+- `git diff --name-status $(git merge-base origin/main HEAD) HEAD -- frentes/custodia/CONTROL-RESPONSABILIDAD.json frentes/custodia/OBJETO-CANONICO.md` no devuelve rutas: la rama no contribuye cambios a esos objetos.
+- El diff directo `origin/main` ↔ rama sí muestra el snapshot anterior de ambos objetos en la rama. No confundir esa diferencia de árbol heredada con modificaciones de la rama en esta iteración.
+- `git merge-tree --write-tree origin/main HEAD` produjo el árbol candidato `01166dcc92c169d5ee01aedf49483326fadf8d52` y un único conflicto textual en `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`. No se aplicó el árbol candidato.
+- En ese árbol candidato, los blobs de Custodia son exactamente los de main: control `1917f056e8fc084f2f6f023ebf73e167e8a41467`; OCP Custodia `c4f715f0fd91905f5d380b5d3e8dbf677ce7b813`. El cotejo de árbol contra `origin/main` para esas dos rutas retorna igualdad.
+- No se creó PR, merge commit ni deployment. El conflicto pendiente pertenece al OCP de Khora MCP y exige conservar el contenido válido de §22/§23/§24 sin tocar los objetos canónicos de Custodia.
+
+### 24.6 Dictamen requerido y estado de aceptación
+
+El expediente `REVISION-TITULAR-CUSTODIA-LECTURA.md` concentra los puntos abiertos: autoridad/fallback de titular, igualdad/normalización de actor, acceso indirecto a snapshot cifrado, scope y gate MCP, política KHC1/legado, presupuesto por página y entre páginas, cascada/retención física y privilegios reales del rol de conexión.
+
+**Estado del criterio de cierre:** código corregido en General y pruebas reproducibles preparadas/verificadas; diff de Custodia conciliado en simulación; OCP actualizado. Sin embargo, el contrato aún no ha sido revisado/aceptado por el titular. Por ello la aceptación funcional de Custodia permanece **PENDIENTE**, no se declara cierre total y no se habilita integración a `main`.

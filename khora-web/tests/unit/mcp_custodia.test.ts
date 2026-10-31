@@ -310,7 +310,7 @@ test("integrity applies one cumulative Blob byte budget across all parts in a pa
       return { rows: [
         { owner_rows: 1, stored_total: 2, invalid_indexes: 0, extra_parts: 0 },
         partRow(1, { bytes: clear.length, sha256: sha, blob_url: "https://one.blob.vercel-storage.com/o" }),
-        partRow(2, { bytes: clear.length, sha256: sha, blob_url: "https://two.blob.vercel-storage.com/o" }),
+        partRow(2, { bytes: 5, sha256: sha, blob_url: "https://two.blob.vercel-storage.com/o" }),
       ] };
     }
     return { rows: [] };
@@ -322,7 +322,7 @@ test("integrity applies one cumulative Blob byte budget across all parts in a pa
     db,
     async (url, _bytes, _sha, options) => {
       seen.push(url);
-      options?.onBytesRead?.(8);
+      options?.onBytesRead?.(4);
       return Buffer.from(clear);
     },
     { maxBytes: 8, maxMs: 10_000 },
@@ -332,8 +332,9 @@ test("integrity applies one cumulative Blob byte budget across all parts in a pa
   assert.equal(result.items[1].status, "UNVERIFIABLE");
   assert.equal(result.items[1].reason, "CUMULATIVE_BLOB_BYTE_BUDGET_EXCEEDED");
   assert.equal(result.items[1].blobRead, "NOT_ATTEMPTED");
-  assert.equal(result.summary.blobReadBudget.responseBytesRead, 8);
+  assert.equal(result.summary.blobReadBudget.responseBytesRead, 4);
   assert.equal(result.summary.blobReadBudget.maxResponseBytes, 8);
+  assert.equal(result.summary.blobReadBudget.exhausted, true);
   clear.fill(0);
 });
 

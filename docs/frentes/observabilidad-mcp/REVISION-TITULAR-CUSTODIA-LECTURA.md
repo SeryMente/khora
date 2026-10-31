@@ -3,7 +3,7 @@
 **Frente:** Khora MCP / Observabilidad MCP
 **Rama:** work/obs-mcp-custodia-tools-20261030-01a18dcb
 **Base de esta iteración:** b197137737262c94bdb5564ee9181c978f27d60f
-**OCP:** v0.3.8 al iniciar; actualización a v0.3.9 en esta iteración.
+**OCP:** v0.3.9.
 **Estado:** PREPARADO PARA REVISIÓN · NO ACEPTADO POR EL TITULAR.
 **Datos utilizados:** solo fixtures sintéticos; no se consultaron registros reales, Neon Production ni Blob Production.
 
@@ -74,7 +74,7 @@ La rama corrige la ausencia previa de límite agregado: el lector ya no puede de
 
 **Límites implementados por invocación de khora_custodia_verificar_integridad (una página MCP):**
 - Máximo agregado: **32 MiB de respuesta Blob**.
-- Tiempo transcurrido máximo: **45 segundos**, desde el inicio de la herramienta, incluidas las comprobaciones de rol/propiedad y consultas SQL.
+- Tiempo transcurrido máximo: **45 segundos**, medido desde inmediatamente antes de comenzar el recorrido físico de partes Blob. No consume ese presupuesto el guard de rol, la comprobación de propiedad ni las consultas de metadatos SQL.
 - Máximo por lectura individual: **30 segundos**, acotado por el tiempo restante.
 - Máximo de página: 50 partes.
 - Si una parte supera los bytes restantes, se clasifica UNVERIFIABLE y no se inicia la lectura si el tamaño declarado o Content-Length permite detectarlo anticipadamente.
@@ -112,7 +112,7 @@ Concede SELECT por columna y no SELECT de tabla completa:
 - dictado_mp3: sesión, estado, captura completa, partes fuente y fecha de actualización.
 - volcado: únicamente id, folio, usuario y session_id.
 
-Revoca privilegios previos de tabla y columna para PUBLIC y khora_lector antes de aplicar la lista permitida. El guard de runtime valida privilegios efectivos de la conexión: pertenencia al grupo, ausencia de atributos privilegiados, SELECT requerido, ausencia de SELECT fuera de la allowlist y ausencia de INSERT/UPDATE/DELETE/TRUNCATE. Si no puede demostrarlo, falla cerrado antes de consultar registros.
+Revoca privilegios previos de tabla y columna para PUBLIC en las cuatro tablas Dictado y para khora_lector en las cinco tablas/relaciones del contrato antes de aplicar la lista permitida. El guard de runtime valida el usuario efectivo de la conexión: pertenencia heredante al grupo khora_lector, rol de grupo NOLOGIN y sin atributos privilegiados; SELECT por columna requerido; ausencia de SELECT de tabla completa o columnas adicionales en las cinco relaciones Custodia; y ausencia de INSERT/UPDATE/DELETE/TRUNCATE, privilegios de columna INSERT/UPDATE y privilegios de uso/actualización de secuencias en todos los esquemas de aplicación visibles (excluye catálogos internos PostgreSQL). Si no puede demostrarlo, falla cerrado antes de consultar registros. No se revocan permisos PUBLIC de la tabla global volcado por el posible impacto ajeno a Custodia; cualquier acceso heredado de ese tipo hace fallar el guard.
 
 **Dictamen solicitado:** comprobar/provisionar que el login al que apunta KHORA_READONLY_DATABASE_URL es miembro heredante de khora_lector y no posee privilegios directos o heredados adicionales. Confirmar que la conexión no es superusuario ni BYPASSRLS. La conexión real no se abrió ni se leyó su URL/credencial; el rol efectivo en Production sigue NO VERIFICADO.
 
@@ -121,12 +121,12 @@ Revoca privilegios previos de tabla y columna para PUBLIC y khora_lector antes d
 | Evidencia local reproducible | Resultado |
 |---|---|
 | TypeScript: npm run typecheck | PASS |
-| Unitarias completas | PASS, 594/594 |
+| Unitarias completas | PASS, 597/597 |
 | Migración 034 en PGlite: esquema nuevo | PASS |
 | Migración 034 en PGlite: esquema preexistente | PASS |
 | Idempotencia, grants/columnas, ausencia DML y FKs | PASS |
-| ui-review:check y ui:contract | PASS |
-| Build Next.js | PASÓ con AUTH_SECRET aleatorio y efímero limitado al proceso local; 78/78 páginas |
+| ui-review:check y ui:contract | PASS, ambos reejecutados en esta iteración |
+| Build Next.js | NO EJECUTADO en esta iteración; no se declara gate de build local para los cambios de §4/§6 |
 
 PGlite ejecuta PostgreSQL aislado en memoria con fixtures sintéticos; no acredita el estado real de Neon Production. Las pruebas mock de Blob no son lecturas reales de Vercel Blob.
 

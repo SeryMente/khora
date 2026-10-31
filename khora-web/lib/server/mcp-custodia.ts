@@ -28,7 +28,7 @@ const MAX_PART_METADATA_ROWS = 10000;
 const MAX_DECLARED_PARTS = 2147483647;
 export const CUSTODIA_BLOB_READ_BUDGET = Object.freeze({ maxBytes: 32 * 1024 * 1024, maxMs: 45_000 });
 type BlobBudgetLimits = { maxBytes: number; maxMs: number };
-type BlobBudgetState = BlobBudgetLimits & { startedAt: number; bytesRead: number };
+type BlobBudgetState = BlobBudgetLimits & { startedAt: number; bytesRead: number; exhausted: boolean };
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const SHA = /^[0-9a-f]{64}$/i;
 const ARCHIVE = "LEFT JOIN LATERAL (" +
@@ -101,7 +101,9 @@ const CUSTODIA_READONLY_ROLE_CHECK = [
   " pg_catalog.has_table_privilege(current_user,'public.dictado_audio_parte','INSERT') OR pg_catalog.has_table_privilege(current_user,'public.dictado_audio_parte','UPDATE') OR pg_catalog.has_table_privilege(current_user,'public.dictado_audio_parte','DELETE') OR pg_catalog.has_table_privilege(current_user,'public.dictado_audio_parte','TRUNCATE') OR pg_catalog.has_any_column_privilege(current_user,'public.dictado_audio_parte','INSERT') OR pg_catalog.has_any_column_privilege(current_user,'public.dictado_audio_parte','UPDATE') OR",
   " pg_catalog.has_table_privilege(current_user,'public.dictado_checkpoint','INSERT') OR pg_catalog.has_table_privilege(current_user,'public.dictado_checkpoint','UPDATE') OR pg_catalog.has_table_privilege(current_user,'public.dictado_checkpoint','DELETE') OR pg_catalog.has_table_privilege(current_user,'public.dictado_checkpoint','TRUNCATE') OR pg_catalog.has_any_column_privilege(current_user,'public.dictado_checkpoint','INSERT') OR pg_catalog.has_any_column_privilege(current_user,'public.dictado_checkpoint','UPDATE') OR",
   " pg_catalog.has_table_privilege(current_user,'public.dictado_mp3','INSERT') OR pg_catalog.has_table_privilege(current_user,'public.dictado_mp3','UPDATE') OR pg_catalog.has_table_privilege(current_user,'public.dictado_mp3','DELETE') OR pg_catalog.has_table_privilege(current_user,'public.dictado_mp3','TRUNCATE') OR pg_catalog.has_any_column_privilege(current_user,'public.dictado_mp3','INSERT') OR pg_catalog.has_any_column_privilege(current_user,'public.dictado_mp3','UPDATE') OR",
-  " pg_catalog.has_table_privilege(current_user,'public.volcado','INSERT') OR pg_catalog.has_table_privilege(current_user,'public.volcado','UPDATE') OR pg_catalog.has_table_privilege(current_user,'public.volcado','DELETE') OR pg_catalog.has_table_privilege(current_user,'public.volcado','TRUNCATE') OR pg_catalog.has_any_column_privilege(current_user,'public.volcado','INSERT') OR pg_catalog.has_any_column_privilege(current_user,'public.volcado','UPDATE')",
+  " pg_catalog.has_table_privilege(current_user,'public.volcado','INSERT') OR pg_catalog.has_table_privilege(current_user,'public.volcado','UPDATE') OR pg_catalog.has_table_privilege(current_user,'public.volcado','DELETE') OR pg_catalog.has_table_privilege(current_user,'public.volcado','TRUNCATE') OR pg_catalog.has_any_column_privilege(current_user,'public.volcado','INSERT') OR pg_catalog.has_any_column_privilege(current_user,'public.volcado','UPDATE') OR",
+  " EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_toast%' AND c.relkind IN ('r','p','v','m','f') AND (pg_catalog.has_table_privilege(current_user,c.oid,'INSERT') OR pg_catalog.has_table_privilege(current_user,c.oid,'UPDATE') OR pg_catalog.has_table_privilege(current_user,c.oid,'DELETE') OR pg_catalog.has_table_privilege(current_user,c.oid,'TRUNCATE') OR pg_catalog.has_any_column_privilege(current_user,c.oid,'INSERT') OR pg_catalog.has_any_column_privilege(current_user,c.oid,'UPDATE'))) OR",
+  " EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_toast%' AND c.relkind='S' AND (pg_catalog.has_sequence_privilege(current_user,c.oid,'USAGE') OR pg_catalog.has_sequence_privilege(current_user,c.oid,'UPDATE')))",
   ") AS has_no_dml",
   "FROM pg_catalog.pg_roles r WHERE r.rolname=current_user",
 ].join(" ");
@@ -543,6 +545,7 @@ async function verifyRegisteredPart(
   const remainingMs = budget.maxMs - (Date.now() - budget.startedAt);
   const remainingBytes = budget.maxBytes - budget.bytesRead;
   if (remainingMs <= 0) {
+    budget.exhausted = true;
     return {
       partIndex, registration: "REGISTERED", storedVerificationState,
       expectedBytes: bytes, expectedSha256: sha, status: "UNVERIFIABLE",
@@ -550,6 +553,7 @@ async function verifyRegisteredPart(
     };
   }
   if (remainingBytes <= 0 || bytes > remainingBytes) {
+    budget.exhausted = true;
     return {
       partIndex, registration: "REGISTERED", storedVerificationState,
       expectedBytes: bytes, expectedSha256: sha, status: "UNVERIFIABLE",
@@ -598,6 +602,10 @@ async function verifyRegisteredPart(
         : isTimeout
           ? "BLOB_READ_TIMEOUT"
           : integrityReason(code);
+    if (reason === "CUMULATIVE_BLOB_BYTE_BUDGET_EXCEEDED" ||
+        reason === "CUMULATIVE_BLOB_TIME_BUDGET_EXCEEDED") {
+      budget.exhausted = true;
+    }
     return {
       partIndex,
       registration: "REGISTERED",
@@ -629,6 +637,7 @@ export async function toolKhoraCustodiaVerificarIntegridad(
     maxMs: budgetLimits.maxMs,
     startedAt: 0,
     bytesRead: 0,
+    exhausted: false,
   };
   await assertCustodiaReadOnlyRole(db);
   const sessionId = args.session_id;
@@ -768,7 +777,7 @@ export async function toolKhoraCustodiaVerificarIntegridad(
         responseBytesRead: budget.bytesRead,
         maxElapsedMs: budget.maxMs,
         elapsedMs,
-        exhausted: elapsedMs >= budget.maxMs || budget.bytesRead >= budget.maxBytes,
+        exhausted: budget.exhausted || elapsedMs >= budget.maxMs || budget.bytesRead >= budget.maxBytes,
       },
     },
     page: {
