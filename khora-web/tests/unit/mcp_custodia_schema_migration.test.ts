@@ -278,6 +278,20 @@ test("effective-role guard rejects DML privileges outside the Custodia tables", 
   }
 });
 
+test("effective-role guard rejects effective sequence privileges in application schemas", async () => {
+  const db = await fixture(false);
+  try {
+    await db.exec(migration);
+    await db.exec("CREATE SEQUENCE public.unrelated_application_seq");
+    await db.exec("GRANT USAGE, SELECT ON SEQUENCE public.unrelated_application_seq TO khora_lector");
+    await db.exec("SET ROLE khora_readonly_test");
+    await assert.rejects(assertCustodiaReadOnlyRole(db as any), /custodia_readonly_role_invalid/);
+    await db.exec("RESET ROLE");
+  } finally {
+    await db.close();
+  }
+});
+
 test("effective-role guard rejects inherited PUBLIC access to archive payload", async () => {
   const db = await fixture(false);
   try {

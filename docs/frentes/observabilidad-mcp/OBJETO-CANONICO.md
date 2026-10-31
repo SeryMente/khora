@@ -4,7 +4,7 @@
 - Frente único vigente: **Khora MCP**; identidad canónica `KHORA-MCP`.
 - Nombre e identidad histórica: **Observabilidad MCP** / `OBSERVABILIDAD-MCP`. La ruta heredada `docs/frentes/observabilidad-mcp/` se conserva; no se migra ni duplica el OCP o su control.
 - Repositorio: `SeryMente/khora`; OCP único: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`; control único: `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`.
-- OCP: **v0.3.9**. Control de responsabilidad: **generación 4**, titular operativo `chatgpt-khora-mcp-01a18f79-2078-7501-bc18-5ce14475d245`.
+- OCP: **v0.3.10**. Control de responsabilidad: **generación 4**, titular operativo `chatgpt-khora-mcp-01a18f79-2078-7501-bc18-5ce14475d245`.
 - La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local de continuidad: `01a18f79-2078-7501-bc18-5ce14475d245`; no es un ID nativo.
 - Folio nuevo de conversación: **PENDIENTE / NO ASIGNADO**; FOL1 no ha sido cotejado ni activado. Se conserva el folio anterior en la generación archivada.
 - Las tareas provisionales «General» y «Jules» pertenecen a este mismo frente; no crean OCP, frente ni control paralelos.
@@ -390,8 +390,8 @@ Después de los cherry-picks, y antes de este último registro OCP, el grafo loc
 
 ### 23.4 Estado y compuerta de integración
 
-- La reconstrucción local PC-10 fue publicada mediante fast-forward en la rama General. En el cotejo de entrada a esta iteración, el ref remoto y HEAD local coincidían en \`370a874ba8253f68cfbf2a11bb44badeb727b035\`, hijo de \`b197137737262c94bdb5564ee9181c978f27d60f\`; el ref de \`main\` era \`a99784b9ae49b946d48318f0f0f8fb115e43c8cc\`.
-- OCP único de Khora MCP: v0.3.9 en la iteración actual. Control de responsabilidad permanece en generación 4; titular operativo sin transferencia ni cambio de generación.
+- Base de esta iteración indicada por el usuario: `b197137737262c94bdb5564ee9181c978f27d60f`. Durante la iteración se publicaron, en orden, `370a874ba8253f68cfbf2a11bb44badeb727b035`, `821784087388e7bb687f642a97dbe421f7940c9e` y `62f52003960b790d48b4c703392dd0961d28aa69`. Al cierre, HEAD local y ref remoto General coinciden en `62f52003960b790d48b4c703392dd0961d28aa69`; `main` permanece en `a99784b9ae49b946d48318f0f0f8fb115e43c8cc`.
+- OCP único de Khora MCP: v0.3.10 al cierre de la iteración. Control de responsabilidad permanece en generación 4; titular operativo sin transferencia ni cambio de generación. Control de responsabilidad permanece en generación 4; titular operativo sin transferencia ni cambio de generación.
 - El diff directo de árbol entre la rama y \`main\` conserva diferencias históricas en las dos rutas de Custodia. El diff de contribuciones desde el merge-base \`d82952a17192787f49b4c804b4ae3ca7847288e0\` demuestra que la rama no ha añadido, editado, cherry-pickeado ni revertido ninguna de esas dos rutas.
 - Se preparó \`REVISION-TITULAR-CUSTODIA-LECTURA.md\` con los puntos de dictamen, evidencia y límites. Estado: **PREPARADO PARA REVISIÓN; NO ACEPTADO POR EL TITULAR**. El criterio de revisión/aceptación del titular sigue pendiente.
 - No se creó PR, no se fusionó en \`main\`, no se desplegó y no se ejecutó la migración 034 en Neon.
@@ -431,15 +431,15 @@ Después de los cherry-picks, y antes de este último registro OCP, el grafo loc
 **Evidencia local reproducible de esta iteración**
 
 - `npm run typecheck`: PASS.
-- Pruebas focalizadas Custodia + migración: 23/23 PASS, sin fallos ni omitidas.
-- npm run test:unit: 597/597 PASS, 0 fallos, 0 omitidas.
+- Pruebas focalizadas Custodia + migración: 24/24 PASS, sin fallos ni omitidas.
+- npm run test:unit: 598/598 PASS, 0 fallos, 0 omitidas.
 - Build Next.js: **NO EJECUTADO** en esta iteración.
 - npm run ui-review:check: PASS. npm run ui:contract: PASS; ambos reejecutados en esta iteración.
 - PGlite usa un motor PostgreSQL aislado en memoria con fixtures sintéticos. No es Neon Production y las pruebas mock no son lecturas físicas de Vercel Blob.
 
 **Gates remotos y evidencia productiva pendientes**
 
-- Vercel/GitHub: los cinco contextos del commit técnico `821784087388e7bb687f642a97dbe421f7940c9e` aparecen en failure y sus destinos apuntan al requisito de upgrade de cuenta `github-private-org-to-hobby`. Este resultado remoto no contradice el éxito del TypeScript ni de las pruebas locales; tampoco acredita Preview/CI aprobado.
+- Vercel/GitHub: los cinco contextos del HEAD `62f52003960b790d48b4c703392dd0961d28aa69` aparecen en failure y sus destinos apuntan al requisito de upgrade de cuenta `github-private-org-to-hobby`. Este resultado remoto no contradice el éxito del TypeScript ni de las pruebas locales; tampoco acredita Preview/CI aprobado.
 - OAuth real end-to-end: PENDIENTE.
 - Identidad/privilegios efectivos de `KHORA_READONLY_DATABASE_URL` en entorno autorizado: PENDIENTE; no se leyó su valor ni se usó credencial productiva.
 - Neon Production, ejecución de 034 y consultas de datos Custodia: PENDIENTES y no realizadas.
@@ -448,10 +448,10 @@ Después de los cherry-picks, y antes de este último registro OCP, el grafo loc
 
 ### 24.5 Diff, simulación de merge y límite de autorización
 
-- Rama aislada: `work/obs-mcp-custodia-tools-20261030-01a18dcb`; ref al inicio de la revisión `370a874ba8253f68cfbf2a11bb44badeb727b035`; commit técnico publicado y validado `821784087388e7bb687f642a97dbe421f7940c9e`; `main` `a99784b9ae49b946d48318f0f0f8fb115e43c8cc`; merge-base `d82952a17192787f49b4c804b4ae3ca7847288e0`.
+- Rama aislada: `work/obs-mcp-custodia-tools-20261030-01a18dcb`; base indicada `b197137737262c94bdb5564ee9181c978f27d60f`; commits de esta iteración `370a874ba8253f68cfbf2a11bb44badeb727b035` → `821784087388e7bb687f642a97dbe421f7940c9e` → HEAD/ref remoto actual `62f52003960b790d48b4c703392dd0961d28aa69`; `main` `a99784b9ae49b946d48318f0f0f8fb115e43c8cc`; merge-base `d82952a17192787f49b4c804b4ae3ca7847288e0`.
 - `git diff --name-status $(git merge-base origin/main HEAD) HEAD -- frentes/custodia/CONTROL-RESPONSABILIDAD.json frentes/custodia/OBJETO-CANONICO.md` no devuelve rutas: la rama no contribuye cambios a esos objetos.
 - El diff directo `origin/main` ↔ rama sí muestra el snapshot anterior de ambos objetos en la rama. No confundir esa diferencia de árbol heredada con modificaciones de la rama en esta iteración.
-- Repetida sobre el HEAD publicado `821784087388e7bb687f642a97dbe421f7940c9e`, la simulación `git merge-tree --write-tree origin/main HEAD` detectó un único conflicto de contenido en `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`; las rutas de código MCP y configuración se auto-mergean. El conflicto documental corresponde a la versión/continuidad de §1 y a las secciones agregadas por esta rama. No se aplicó el árbol candidato ni se creó merge commit.
+- Repetida sobre el HEAD remoto actual `62f52003960b790d48b4c703392dd0961d28aa69`, la simulación `git merge-tree --write-tree origin/main HEAD` produjo el árbol candidato `9ce7d176c307b9471a57c86a2a716f0b9e5b8bc1` y detectó un único conflicto de contenido en `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`; las rutas de código MCP y configuración se auto-mergean. El conflicto documental corresponde a la versión/continuidad de §1 y a las secciones agregadas por esta rama. No se aplicó el árbol candidato ni se creó merge commit.
 - En ese árbol candidato, los blobs de Custodia son exactamente los de main: control `1917f056e8fc084f2f6f023ebf73e167e8a41467`; OCP Custodia `c4f715f0fd91905f5d380b5d3e8dbf677ce7b813`. El cotejo de árbol contra `origin/main` para esas dos rutas retorna igualdad.
 - No se creó PR, merge commit ni deployment. El conflicto pendiente pertenece al OCP de Khora MCP y exige conservar el contenido válido de §22/§23/§24 sin tocar los objetos canónicos de Custodia.
 

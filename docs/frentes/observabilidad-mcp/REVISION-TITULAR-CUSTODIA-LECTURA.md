@@ -3,7 +3,7 @@
 **Frente:** Khora MCP / Observabilidad MCP
 **Rama:** work/obs-mcp-custodia-tools-20261030-01a18dcb
 **Base de esta iteración:** b197137737262c94bdb5564ee9181c978f27d60f
-**OCP:** v0.3.9.
+**OCP de referencia:** v0.3.10.
 **Estado:** PREPARADO PARA REVISIÓN · NO ACEPTADO POR EL TITULAR.
 **Datos utilizados:** solo fixtures sintéticos; no se consultaron registros reales, Neon Production ni Blob Production.
 
@@ -121,7 +121,7 @@ Revoca privilegios previos de tabla y columna para PUBLIC en las cuatro tablas D
 | Evidencia local reproducible | Resultado |
 |---|---|
 | TypeScript: npm run typecheck | PASS |
-| Unitarias completas | PASS, 597/597 |
+| Unitarias completas | PASS, 598/598 |
 | Migración 034 en PGlite: esquema nuevo | PASS |
 | Migración 034 en PGlite: esquema preexistente | PASS |
 | Idempotencia, grants/columnas, ausencia DML y FKs | PASS |
