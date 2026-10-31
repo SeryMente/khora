@@ -8,9 +8,9 @@
   "snapshotCommit": "e6bd69d0b48e9d268e8cbc372b48646ecc264cb9",
   "treeSha": "79d1ea8b7839a18516c1be738a271222c11e6a38",
   "readback": {
-    "pathsExpected": 14,
-    "filesFoundInTree": 14,
-    "fileReadsFromGitHub": 14,
+    "pathsExpected": 15,
+    "filesFoundInTree": 15,
+    "fileReadsFromGitHub": 15,
     "blobShaMatchedTree": true,
     "treeTruncated": false
   },
@@ -84,6 +84,11 @@
       "path": "docs/frentes/harmonia/README.md",
       "sha": "868af5a80659dd846ec8e2f90198bd20f52a7b2a",
       "bytes": 8402
+    },
+    {
+      "path": "apps/harmonia-observability/tests/service-worker-remote-sync.test.js",
+      "sha": "5b9ae7a35e94439cfe2fa4270b263bf3488cecdd",
+      "bytes": 14209
     }
   ],
   "automation": {
@@ -178,9 +183,8 @@
     "neonReadbackPerformed": false,
     "normalChromeProfileModified": false
   },
-  "state": "LOCAL_CI_PASS_NODE_22_23_4;SIMULATED_SERVICE_WORKER_E2E_PASS;CORAS_SCHEMA_VALIDATION_PASS;AUTHENTICATED_CHROME_NEON_E2E_PENDING;NOT_MERGED_NOT_DEPLOYED_NOT_ACCEPTED",
+  "state": "FRESH_RDC_LOCAL_CI_PASS_NODE_22_23_4;GIT_BLOB_READBACK_9_OF_9;SIMULATED_SERVICE_WORKER_E2E_PASS;CORAS_SCHEMA_VALIDATION_PREVIOUSLY_PASS_LOCAL_ONLY;AUTHENTICATED_CHROME_NEON_E2E_PENDING;NOT_MERGED_NOT_DEPLOYED_NOT_ACCEPTED",
   "validationObservedOn": "2026-10-30",
-  "currentPrHead": "047f74331da323c26e02d723fefbfbf1005b10f0",
   "localE2E": {
     "status": "PASS_LOCAL_ONLY",
     "device": "PC-14",
@@ -278,15 +282,15 @@
     }
   },
   "latestAutomation": {
-    "observedHead": "047f74331da323c26e02d723fefbfbf1005b10f0",
+    "observedHead": "be6cd6a86119806ef67f4d8d8a0550e9460e59f5",
     "runs": [
       {
         "name": "Harmonia · provisional Cora persistence",
-        "runId": 41146241825,
+        "runId": 41146710433,
         "conclusion": "failure",
         "jobs": [
           {
-            "id": 124371902332,
+            "id": 124373399301,
             "name": "validation",
             "steps": 0
           }
@@ -294,50 +298,50 @@
       },
       {
         "name": "CI",
-        "runId": 41146241745,
+        "runId": 41146710585,
         "conclusion": "failure",
         "jobs": [
           {
-            "id": 124371902097,
+            "id": 124373400025,
             "name": "calidad",
             "steps": 0
           },
           {
-            "id": 124371902205,
-            "name": "api-tests",
+            "id": 124373400333,
+            "name": "khora-web-gate",
             "steps": 0
           },
           {
-            "id": 124371902228,
-            "name": "khora-web-gate",
+            "id": 124373400436,
+            "name": "api-tests",
             "steps": 0
           }
         ]
       },
       {
         "name": "UI Quality",
-        "runId": 41146241943,
+        "runId": 41146710495,
         "conclusion": "failure",
         "jobs": [
           {
-            "id": 124371905216,
-            "name": "UI E2E",
+            "id": 124373400139,
+            "name": "UI Contract",
             "steps": 0
           },
           {
-            "id": 124371905342,
-            "name": "UI Contract",
+            "id": 124373400365,
+            "name": "UI E2E",
             "steps": 0
           }
         ]
       },
       {
         "name": "khora-ok / gate",
-        "runId": 41146241765,
+        "runId": 41146710527,
         "conclusion": "failure",
         "jobs": [
           {
-            "id": 124371902183,
+            "id": 124373399898,
             "name": "khora-ok",
             "steps": 0
           }
@@ -366,10 +370,11 @@
   },
   "branchDrift": {
     "comparisonStatus": "diverged",
-    "aheadBy": 25,
+    "aheadBy": 28,
     "behindBy": 2,
     "mergeBase": "c6860f1501419239b4eef540150f934a5e20f2a3",
     "mainHead": "9570247339c99cf194c434d2b726493d8abd69b4",
+    "capturedPrHead": "be6cd6a86119806ef67f4d8d8a0550e9460e59f5",
     "pullRequestMergeable": true,
     "updatedOrRebased": false,
     "merged": false
@@ -388,5 +393,76 @@
     "forbiddenMetricsTextRejected": true,
     "endpointInvoked": false,
     "productionWritePerformed": false
+  },
+  "capturedPrHead": "be6cd6a86119806ef67f4d8d8a0550e9460e59f5",
+  "freshRdcValidation": {
+    "observedDate": "2026-10-30",
+    "device": "PC-14",
+    "deviceId": "f28d6a64-9e51-4ef2-8071-9145a43f7680",
+    "workspace": "C:\\Users\\PC 13\\AppData\\Local\\Temp\\Harmonia-PR346-Fresh\\khora",
+    "workspaceMode": "isolated reconstruction of the exact changed source and test files from the private GitHub branch; not a full git clone",
+    "sourceBranch": "feat/harmonia-cora-provisional-persistence-20261030",
+    "sourceHead": "be6cd6a86119806ef67f4d8d8a0550e9460e59f5",
+    "runtime": {
+      "node": "v22.23.4",
+      "platform": "win-x64",
+      "officialArchive": "https://nodejs.org/dist/v22.23.4/node-v22.23.4-win-x64.zip",
+      "archiveSha256": "cbc74b5e0982c9dbb41525fd8fb5dcd32fbee237863f7829072f4639a1ce5f20",
+      "nodeExeSha256": "dccc52de28d8df2ee22d2062424f8c563070d95d8ad70c54c4bf01d590dec14f",
+      "systemNodeChanged": false
+    },
+    "gitBlobVerification": {
+      "algorithm": "Git blob SHA-1",
+      "filesChecked": 9,
+      "allMatched": true,
+      "paths": [
+        "apps/harmonia-observability/collector/server.js",
+        "apps/harmonia-observability/extension/manifest.json",
+        "apps/harmonia-observability/extension/popup.js",
+        "apps/harmonia-observability/extension/service-worker.js",
+        "apps/harmonia-observability/extension/remote-sync.js",
+        "apps/harmonia-observability/tests/collector-remote-sync.integration.test.js",
+        "apps/harmonia-observability/tests/remote-sync.test.js",
+        "apps/harmonia-observability/tests/service-worker-remote-sync.test.js",
+        "apps/harmonia-observability/coverage-catalog.json"
+      ]
+    },
+    "syntax": {
+      "files": [
+        "apps/harmonia-observability/collector/server.js",
+        "apps/harmonia-observability/extension/service-worker.js",
+        "apps/harmonia-observability/extension/remote-sync.js",
+        "apps/harmonia-observability/extension/popup.js"
+      ],
+      "passed": 4,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "testSuite": {
+      "command": "node --test apps/harmonia-observability/tests/*.test.js",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "exitCode": 0
+    },
+    "serviceWorkerOrchestration": {
+      "coraMode": "SIMULATED",
+      "responses": [
+        401,
+        200
+      ],
+      "attempts": 2,
+      "pendingOutboxAfterEachStage": [
+        1,
+        1,
+        0
+      ],
+      "acceptedAfterAck": 1,
+      "stableEventUuidAcrossRetry": true,
+      "privateFieldsAbsentFromRemoteBatch": true,
+      "originalsAndFullSurfaceRetainedLocally": true,
+      "productionWritePerformed": false,
+      "neonReadbackPerformed": false
+    }
   }
 }
