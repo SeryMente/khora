@@ -135,9 +135,10 @@ async function loadReferences(pool: Pool): Promise<Map<string, Candidate>> {
     WHERE source_url LIKE 'https://%.blob.vercel-storage.com/%'
     ORDER BY source_url, ref_kind
   `;
-  const result = await pool.query<RefRow>(sql);
+  const result = await pool.query(sql);
+  const rows = result.rows as RefRow[];
   const candidates = new Map<string, Candidate>();
-  for (const row of result.rows) {
+  for (const row of rows) {
     if (!row.source_url) continue;
     let item = candidates.get(row.source_url);
     if (!item) {
