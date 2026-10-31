@@ -8,7 +8,7 @@ import { list as listVercelBlobs } from "@vercel/blob";
 import { GetObjectCommand, HeadObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { Pool } from "pg";
 import { descifrarBytes } from "../lib/server/cripto";
-import { b2ObjectUrl, safeObjectKey } from "../lib/storage/object-reference";
+import { b2ObjectUrl, safeObjectKey, legacyBlobUrl } from "../lib/storage/object-reference";
 import { createB2Client, storageLocation } from "../lib/server/object-storage";
 
 const CONFIRM = "KHORA_BLOB_TO_B2";
@@ -161,6 +161,7 @@ async function loadReferences(pool: Pool): Promise<Map<string, Candidate>> {
 }
 
 function quarantineReason(item: Candidate): string | null {
+  if (!legacyBlobUrl(item.url)) return "source_url_not_allowlisted";
   if (item.hashes.size > 1 || item.lengths.size > 1) return "metadata_conflict";
   if (!item.sha256 || !item.bytes) return "metadata_incomplete";
   return null;
