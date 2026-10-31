@@ -318,3 +318,86 @@ Al cerrar las tres tareas, registrar la aceptación y el estado final, y dejar e
 ---
 
 **Regla de oro:** dos frentes, un coordinador, una solicitud activa por frente, cada iteración justificada por un bloqueo material, y ninguna declaración de cierre superior a la evidencia. Alcanzar el MVP de CUSTODIA-01, CUSTODIA-03 y CUSTODIA-04 con el menor trabajo necesario, sin sacrificar autorización, integridad ni recuperación demostrable.
+
+
+---
+
+## 11. Actualización de continuidad y evaluación de recuperabilidad · 2026-10-31
+
+> Esta sección añade el delta posterior a la fotografía inicial de §6. No reescribe el historial ni sustituye el OCP, el control o la lista de tareas. Los estados locales informados por otro frente se distinguen de los commits y lecturas efectivamente observados en GitHub.
+
+### 11.1 Dictamen del titular de Custodia sobre el contrato MCP
+
+**Estado: DICTAMEN TÉCNICO EMITIDO EN ESTA conversación; no equivale a autorización operativa productiva.**
+
+| Área | Decisión emitida | Consecuencia que debe implementarse |
+|---|---|---|
+| Titularidad | ACEPTO CON MODIFICACIONES | `custodia_owner` canónico; no atribución automática por COALESCE; discrepancias/históricos sin procedencia quedan sin atribuir; el titular de sesión puede consultar checkpoints de esa sesión aunque el autor sea otro. |
+| Identidad del actor | ACEPTO CON MODIFICACIONES | Igualdad exacta/sensible a mayúsculas sobre principal estable; JWT usa `sub`; token manual no accede a Custodia sin vinculación canónica demostrable. |
+| Snapshot | RECHAZO | No descifrar `dictado_checkpoint.snapshot` para obtener manifiesto; crear manifiesto mínimo independiente; legado sin manifiesto = `LEGACY_UNAVAILABLE`. |
+| Scopes | ACEPTO CON MODIFICACIONES | metadata usa `custodia:metadata:read`; integridad usa `custodia:integrity:verify`; retirar `norm:turn` solo de las tres herramientas Custodia. |
+| KHC1/legacy | ACEPTO CON MODIFICACIONES | Audio nuevo KHC1; legacy solo con procedencia acreditada y estados separados de integridad/cifrado; sin procedencia = `UNVERIFIABLE`. |
+| Presupuesto | ACEPTO CON MODIFICACIONES | Por página 32 MiB/45 s; acumulado por ejecución 512 MiB/12 min activos; máximo 30 min y 15 min de inactividad; estado server-side no reiniciable por cursor. |
+| Retención | RECHAZO | No CASCADE para partes; RESTRICT/NO ACTION/tombstone; sin TTL/purgas; preservar originales, partes, checkpoints, derivados y Blob. |
+| Rol efectivo | ACEPTO CON MODIFICACIONES | `khora_lector` NOLOGIN y solo SELECT mínimo; verificar `session_user`, `current_user`, membresías y privilegios efectivos; no conceder snapshot. |
+
+Este dictamen orienta la implementación y no modifica por sí solo la política canónica ni la lista de tareas. Permanecen fuera de autorización: migración productiva, provisionamiento/cambio de roles o credenciales, lectura de registros reales, lectura física de Blob Production, recuperación, merge y deployment.
+
+### 11.2 Rama limpia del frente Khora MCP: estado contrastado
+
+- Rama reportada por el frente: `work/mcp-custodia-read-contract-20261031`.
+- Base reportada: `4463009fdf8ebd7f5e6e0fd493dba93efa9868d6`.
+- GitHub fue consultado después de recibir el reporte: la rama existe en remoto, pero su HEAD sigue en `4463009fdf8ebd7f5e6e0fd493dba93efa9868d6`.
+- Comparación GitHub `main...work/mcp-custodia-read-contract-20261031`: `identical`, 0 ahead, 0 behind, 0 archivos cambiados.
+- El frente informó modificaciones locales (borrador de migración 034 y helper `custodia-audio-manifest.ts`), pero no hay commit de implementación ni lectura remota que permita verificar esos archivos. Las modificaciones locales quedan **REPORTADAS · NO VERIFICADAS EN GITHUB**.
+- El código lector, route, scopes, KHC1, guard, pruebas adaptadas, typecheck y build permanecen pendientes según el reporte recibido. No se informó prueba ejecutada con el nuevo contrato.
+- Bloqueo material identificado: presupuesto acumulado entre páginas necesita estado server-side atómico; no puede escribirse mediante `KHORA_READONLY_DATABASE_URL`. No se debe fingir que una variable de proceso o cursor firmado satisface ese requisito. Investigar mecanismo de escritura existente con privilegio mínimo; si no existe, mantener ese bloque separado como bloqueado sin contaminar el lector.
+
+**Siguiente entrega técnica prioritaria informada:** completar el manifiesto separado de extremo a extremo: escritores normal y recuperación dentro de la transacción del checkpoint, lectura MCP desde el manifiesto sin seleccionar/descifrar snapshot, permisos mínimos y pruebas. Al finalizar ese bloque, exigir commit publicado y read-back de GitHub antes de declararlo entregado.
+
+### 11.3 Evidencia local previa relevante para la posibilidad de recuperación
+
+El inventario `INVENTARIO-RECUPERABILIDAD-INGRESOS.md`, v0.9, blob `c14900bb0d594b3d07199de3963e341718f1677c`, conserva una auditoría anterior de una **copia de trabajo de IndexedDB** obtenida de un perfil Chrome distinto del perfil de mantenimiento. En esa copia se informó:
+
+- 998 registros: 5 snapshots y 993 registros de audio independientes.
+- 5 sesiones locales distintas con audio.
+- Las 993 partes se descifraron con autenticación AES-GCM satisfactoria (993/993).
+- Índices consecutivos 1…N, sin duplicados ni índices ausentes en los grupos examinados.
+- 81.100.193 bytes de audio descifrado (aprox. 77,3 MiB).
+- Los cinco snapshots tenían `audioPartes.length = 0`, a pesar de existir filas de audio independientes. Esto demuestra que el patrón de audio presente/manifiesto vacío existe en al menos esa copia.
+- Las cinco concatenaciones se sometieron a prueba FFmpeg; la de 707 partes generó avisos de DTS no monótonas y requiere reconstrucción temporal específica. Otro grupo de 53 partes dio duración aproximada 4:29,45 frente a 4:30 declarados. Un grupo contenía audio con texto vacío.
+- La copia no se modificó ni se subió durante aquella auditoría. Sus reconstrucciones temporales no constituyeron una recuperación oficial.
+
+**Límites:** esa auditoría no emparejó las cinco sesiones con las unidades reales de la interfaz; no probó que las 20/21 unidades reportadas tengan el mismo patrón; no demuestra que los objetos Blob remotos sigan accesibles; tampoco certifica ahora que el perfil/copia local siga disponible. La correspondencia temporal aproximada con una unidad del 24-10-2026 no equivale a identidad demostrada.
+
+### 11.4 Evaluación honesta de la recuperación total
+
+- El número real de unidades visibles sigue sin adquirirse: 20 fue el reporte inicial y aproximadamente 21 una estimación posterior; ninguno es denominador verificado.
+- Unidades productivas cotejadas individualmente: **0**.
+- Objetos Blob Production leídos y comparados con SHA-256: **0** en la evidencia disponible.
+- Recuperaciones productivas verificadas con lectura de vuelta: **0**.
+- La diferencia 40→20 es compatible con los defectos de concatenación/deduplicación en hidratación local/remota y con un contador que cuenta elementos cargados, no el total global; no demuestra que las veinte entradas de diferencia sean pérdidas ni que todas sean duplicados.
+- Hay evidencia favorable concreta de que existieron cinco sesiones locales con 993 fragmentos autenticables en una copia de IndexedDB y que el manifiesto vacío puede ocultar audio. Esto hace razonable investigar rescate de audio en esas unidades en lugar de asumir que falta.
+- **No hay base para prometer que se recuperará todo el catálogo.** La posibilidad de recuperar la mayoría o incluso todas las unidades visibles es plausible, pero sigue sin cuantificarse por falta de inventario real y lectura física de objetos. Algunas pueden estar incompletas, tener objetos no disponibles, problemas temporales de decodificación o ausencia de fuente/clave.
+- La captura denunciada después de 2026-10-28 17:08 continúa en estado **NO LOCALIZADA / NO DETERMINADA**. No se obtuvo el acuse remoto de checkpoint ni se verificó si IndexedDB sobrevivió al cierre/reinicio del perfil del cibercafé. No se ha demostrado pérdida definitiva.
+- No convertir el estado histórico `verificado` ni el manifiesto, el contador o la fila DB en prueba de bytes actuales. La prueba requiere lectura física, descifrado cuando aplique, tamaño y SHA recalculados, reconstrucción/decodificación cuando corresponda, recuperación a destino separado y lectura de vuelta, conservando el origen.
+
+### 11.5 Control de contexto para hilos frescos y tareas del operador
+
+Al cierre de **cada ciclo**, el coordinador debe preguntarse y contestar explícitamente:
+
+1. ¿Un hilo nuevo puede identificar el objetivo y las tareas activas CUSTODIA-01/03/04 sin depender de la conversación anterior?
+2. ¿Están enlazados el OCP, control, lista provisional, inventario, informe de incidente, contrato de Dictado y coordinación sprint, con SHA/versión observados?
+3. ¿Constan rama, HEAD base, HEAD actual, commits, PR y qué estado fue verificado remotamente frente a lo meramente reportado localmente?
+4. ¿Constan decisiones del titular, autorizaciones operativas y límites que continúan pendientes?
+5. ¿Están diferenciados datos reales verificados, pruebas sintéticas, hipótesis, evidencia local histórica y ausencia de evidencia?
+6. ¿El bloqueo P0 actual y la única siguiente acción están escritos de forma ejecutable?
+7. ¿Se distingue prompt preparado, reenviado, respuesta recibida, cambio ejecutado y cambio aceptado?
+8. ¿La tarea del operador contiene el objetivo, enlaces a las fuentes de recuperación y la instrucción para releer/validar estado actual? Si no puede inspeccionarse la aplicación de tareas, consignar **TAREA PERSONAL NO VERIFICADA**; no afirmar que está actualizada.
+
+**Resultado de esta comprobación al 2026-10-31:** los artefactos de GitHub permiten reconstruir el objetivo, las decisiones, los criterios de aceptación, los principales hallazgos y los límites. Sin embargo, la lista provisional v0.11 conserva estado obsoleto respecto de PR #339 (GitHub la muestra cerrada sin merge), y la fotografía inicial de este protocolo aún no contenía el dictamen ni la nueva rama. Esta actualización cierra esa brecha de continuidad en GitHub sin modificar el OCP, el control ni la lista de tareas.
+
+**Tareas personales/Todoist:** no se inspeccionaron. La integración Todoist no está conectada en esta sesión; por tanto, no se afirma que el título o descripción de la tarea personal contenga ya estos enlaces/contextos. No copiar secretos, transcripciones, audio, UUID privados ni URLs privadas a la tarea.
+
+**Paquete mínimo que debe abrir un hilo fresco:** DUG vigente; este protocolo (incluida esta sección); OCP + control + lista de tareas de Custodia; inventario + informe del incidente; contrato Custodia de Dictados; HEAD actual de `main` y rama MCP nueva; dictamen de §11.1; y una nueva lectura de GitHub para distinguir cambios publicados de cambios locales. Después, ejecutar solo la siguiente acción focalizada indicada en §11.2.
+
