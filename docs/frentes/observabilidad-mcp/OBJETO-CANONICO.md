@@ -4,7 +4,7 @@
 - Frente único vigente: **Khora MCP**; identidad canónica `KHORA-MCP`.
 - Nombre e identidad histórica: **Observabilidad MCP** / `OBSERVABILIDAD-MCP`. La ruta heredada `docs/frentes/observabilidad-mcp/` se conserva; no se migra ni duplica el OCP o su control.
 - Repositorio: `SeryMente/khora`; OCP único: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`; control único: `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`.
-- OCP: **v0.3.6**. Control de responsabilidad: **generación 4**, titular operativo `chatgpt-khora-mcp-01a18f79-2078-7501-bc18-5ce14475d245`.
+- OCP: **v0.3.7**. Control de responsabilidad: **generación 4**, titular operativo `chatgpt-khora-mcp-01a18f79-2078-7501-bc18-5ce14475d245`.
 - La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local de continuidad: `01a18f79-2078-7501-bc18-5ce14475d245`; no es un ID nativo.
 - Folio nuevo de conversación: **PENDIENTE / NO ASIGNADO**; FOL1 no ha sido cotejado ni activado. Se conserva el folio anterior en la generación archivada.
 - Las tareas provisionales «General» y «Jules» pertenecen a este mismo frente; no crean OCP, frente ni control paralelos.
@@ -265,7 +265,8 @@ Se verificó la fuente canónica actual de Metodología: DUG v368 · NX-368m, Me
 - Repositorio: SeryMente/khora. Rama General existente: work/obs-mcp-custodia-tools-20261030-01a18dcb. Head recibido: 55908ab78b4b6f70096d24878a6ddba8ae8dd494.
 - main reconstruido antes de la integración local: d82952a17192787f49b4c804b4ae3ca7847288e0. Merge-base: d6c9911615a3633f6ce38c1b8a2459f1e4823df5. Divergencia inicial recalculada: 41 commits exclusivos de General y 16 exclusivos de main; el handoff 41/7 y SHA c6860f... eran antecedentes obsoletos.
 - Se descargó un clon temporal completo en PC-14, separado del clon concurrente Jules (feat/mcp-jules-clean-main-20261030). Se reconcilió localmente main dentro de General. En los conflictos compartidos se preservó la versión de main para ruta MCP, OAuth, UI, contratos y fixtures de Jules; se mantuvo el módulo Custodia de General y se reinsertaron sus tres registros. Las siete herramientas, política de propietario y ACL Jules de main no se sustituyeron.
-- La reconciliación permanece en la rama General. No se abrió PR, no se fusionó en main, no se desplegó y no se ejecutaron escrituras productivas. El clon original Jules no se modificó.
+- Merge commit local en General: `e0e044af77eb1470a8c6fa01bf83778876e73c41`; padres `55908ab78b4b6f70096d24878a6ddba8ae8dd494` (General) y `d82952a17192787f49b4c804b4ae3ca7847288e0` (main). La rama queda 42 commits ahead / 0 behind respecto de `origin/main`, con merge-base `d82952a17192787f49b4c804b4ae3ca7847288e0`.
+- El head remoto de General fue cotejado antes de publicar y permanecía en `55908ab78b4b6f70096d24878a6ddba8ae8dd494`; el avance local es fast-forward. La publicación se limita a esta misma rama. No se abrió PR, no se fusionó en main, no se desplegó y no se ejecutaron escrituras productivas. El clon original Jules no se modificó.
 
 ### Implementación de las tres herramientas
 
