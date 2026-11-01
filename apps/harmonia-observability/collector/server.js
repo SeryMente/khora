@@ -166,9 +166,12 @@ function safeSessionUrl(raw){try{const u=new URL(raw);if(u.protocol!=='https:'||
 function pruneSeenEventIds(){const ids=Object.keys(index.seenEventIds);if(ids.length>MAX_SEEN_EVENTS){for(const id of ids.slice(0,ids.length-MAX_SEEN_EVENTS))delete index.seenEventIds[id];}}
 
 function appendDurable(file,line){
- fs.mkdirSync(path.dirname(file),{recursive:true});
+ const directory=path.dirname(file);
+ fs.mkdirSync(directory,{recursive:true});
+ const existed=fs.existsSync(file);
  const fd=fs.openSync(file,'a');
  try{const data=Buffer.from(line,'utf8');let offset=0;while(offset<data.length)offset+=fs.writeSync(fd,data,offset,data.length-offset);fs.fsyncSync(fd);}finally{fs.closeSync(fd);}
+ if(!existed){try{const dir=fs.openSync(directory,'r');try{fs.fsyncSync(dir);}finally{fs.closeSync(dir);}}catch{}}
 }
 function listFiles(directory,extension){
  if(!fs.existsSync(directory))return [];
