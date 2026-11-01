@@ -400,7 +400,7 @@ c93f62364fca15a8956a32e49a326f09e87e74c272424d58f65fe3b1909e501b  ./khora-web/li
 8ea8db7015fad0bcc63d321ca95cfdc85e77b270e9893619ca0c7c5b252b85bc  ./khora-web/lib/server/dictado.ts
 cdf6901d41c5f3139be7fa44dd415f2fb047aee9ddc6c3a6b5143bb4f9b0ba45  ./khora-web/lib/server/domainAudio.ts
 f47682677e1bede3437e518e4af642fc6203e1ae2328dc0aefa4e538a176cba7  ./khora-web/lib/server/ep.ts
-d6de8693874ea68920eb89ed73675cd2280599515debeb925185a3e6da3ae27a  ./khora-web/lib/server/ep-bootstrap-content.ts
+fef8ff2f5751a63f530a52cc951a6eca15547bedc91745158a87f9f2630a53b6  ./khora-web/lib/server/ep-bootstrap-content.ts
 a07bd679df43f4d298db4356424bdbb877d89570cec897cef889769221f3f5ae  ./khora-web/lib/server/espejoNotion.test.ts
 c8c8f4437796eac17ba9567129076516e3e80715222899bdde1d76afb50469f3  ./khora-web/lib/server/espejoNotion.ts
 40f0a28e40a43d8e8f8fe4e56fd41f64e1ef02ce37e92032329f5eb3a33e9cb5  ./khora-web/lib/server/eventos.ts
@@ -555,7 +555,7 @@ d0b69ccc072e4695292e790fa90d5ad9f70f721ce96fa6f4d18636a5e54d1e71  ./push.sh
 c8a7ba9b693b4880db9bcd43983d591ea37d2f49c0edf9e6026042b6b7e3a67f  ./scripts/generar_manifiesto_integridad.sh
 e7c121427568dd344018434d560f5a35302aeb5a71758b03ea45390502306ae4  ./scripts/khora/env-vault.ps1
 adb40b1287302032a0d63a3abb8c68e27d90342185cb2efab9ff23256cd6548a  ./scripts/khora/khora.barrel.ps1
-e4307a6501843edfcd5e0a48bf5fcaaa2d280f0758d0baaebbb9a157435f4a41  ./scripts/khora/khora.ps1
+a48c57f7faa937caf4d4ff15d00c309ff6c802c06c5efc0072cc45ffdbf9c4d7  ./scripts/khora/khora.ps1
 ac9f1e8d1492c135b4629447896164e35c9f866b6293bda21f985eb90640ccf5  ./scripts/khora/llave/ARRANCAR.cmd
 f79bdd048e2ed9bab946dd88f17b1d09a920e3abd883a394d38a29485111cbb8  ./scripts/khora/modules/00-config.ps1
 713c6a99f766da6364e004ce6af182e1e13fbf0115ed5fce833c335aaf1f1eab  ./scripts/khora/modules/01-realuser.ps1
