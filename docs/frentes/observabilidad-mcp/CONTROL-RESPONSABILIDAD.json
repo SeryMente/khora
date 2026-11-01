@@ -9,7 +9,7 @@
   "owner_alias": "chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8",
   "owner_alias_type": "operational_alias_not_native_thread_id",
   "instance": "chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8",
-  "session_folio": "SES-20261031-890A36C8",
+  "session_folio": null,
   "generation": 5,
   "expiry": null,
   "authorization_ref": "Instrucción expresa del operador en esta conversación, 2026-10-31 (America/Mexico_City): «Se perdió sesión anterior local, asume trabajo de ese entorno local perdido. Usa conexión actual para segtuir resolviendo de extremo a extremo.» La autorización se interpreta dentro del mismo frente KHORA-MCP y del alcance previamente autorizado; no amplía permisos de terceros ni elimina las compuertas OAuth, seguridad, pruebas o despliegue.",
@@ -244,7 +244,7 @@
   },
   "legacy_identity": "OBSERVABILIDAD-MCP",
   "display_name": "Khora MCP",
-  "folio_status": "GLOBAL_FOL1_PREPARED_NOT_ACTIVE; OCP_SESSION_FOLIO_ASSIGNED",
+  "folio_status": "PENDIENTE/NO ASIGNADO; FOL1 PREPARADO NO ACTIVO",
   "transfer_record": {
     "event_id": "01a19499-caec-7e19-beb9-bb5b890a36c8",
     "event": "KHORA-MCP-TRANSFER-20261031-890A36C8",
@@ -257,7 +257,7 @@
     "authorization_ref": "Instrucción expresa del operador en esta conversación, 2026-10-31 (America/Mexico_City): «Se perdió sesión anterior local, asume trabajo de ese entorno local perdido. Usa conexión actual para segtuir resolviendo de extremo a extremo.» La autorización se interpreta dentro del mismo frente KHORA-MCP y del alcance previamente autorizado; no amplía permisos de terceros ni elimina las compuertas OAuth, seguridad, pruebas o despliegue.",
     "source_control_blob_sha": "c0d7731bad4701f5d7e69235ae23ef0bdd039964",
     "attachment_commit_sha": null,
-    "result": "VERIFIED: generation 5, new titular, previous generation 4 archived, OCP session folio and absence of native conversation ID confirmed by immediate read-back from main.",
+    "result": "VERIFIED: generation 5 and holder transfer confirmed by read-back; no native conversation ID; no global or OCP session folio is issued.",
     "authorization_scope": "Transfer responsibility for the single Khora MCP front and continue the already authorized implementation/E2E closure after local-session loss. No separate OCP, task owner, or global folio is created. Existing scope and safety gates remain binding.",
     "verification": {
       "verified_at_local": "2026-10-31T18:55:18-06:00",
@@ -268,11 +268,17 @@
         "owner_alias",
         "owner_thread=null",
         "uuidv7_local",
-        "session_folio=SES-20261031-890A36C8",
         "previous_owner generation 4 preserved",
         "previous_control_generation generation 3 archive preserved",
-        "folio_status=GLOBAL_FOL1_PREPARED_NOT_ACTIVE; OCP_SESSION_FOLIO_ASSIGNED"
+        "session_folio=null; no OCP session folio or global folio issued"
       ]
+    },
+    "folio_correction": {
+      "corrected_on": "2026-10-31",
+      "status": "CORRECTED; NO FOLIO ISSUED",
+      "prior_value": "SES-20261031-890A36C8",
+      "disposition": "Preserved solely as a historical proposed candidate; not an issued session folio and not to be used as an identifier.",
+      "reason": "FOL1 is PREPARADO, NO ACTIVO. The foliation rule prohibits assigning any folio before activation."
     }
   }
 }
