@@ -79,7 +79,8 @@ function assertIsolatedE2ETarget(): void {
   } catch {
     throw new Error("migration_database_url_invalid");
   }
-  const databaseName = decodeURIComponent(databaseUrl.pathname.replace(/^\\/+/, ""));
+  const databasePath = databaseUrl.pathname.startsWith("/") ? databaseUrl.pathname.slice(1) : databaseUrl.pathname;
+  const databaseName = decodeURIComponent(databasePath);
   if (databaseUrl.hostname !== REQUIRED_DATABASE_HOST || databaseName !== REQUIRED_DATABASE) {
     throw new Error("migration_database_target_not_allowlisted");
   }
