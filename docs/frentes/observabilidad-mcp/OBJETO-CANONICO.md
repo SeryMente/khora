@@ -4,10 +4,10 @@
 - Frente único vigente: **Khora MCP**; identidad canónica `KHORA-MCP`.
 - Nombre e identidad histórica: **Observabilidad MCP** / `OBSERVABILIDAD-MCP`. La ruta heredada `docs/frentes/observabilidad-mcp/` se conserva; no se migra ni duplica el OCP o su control.
 - Repositorio: `SeryMente/khora`; OCP único: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`; control único: `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`.
-- OCP: **v0.3.6**. Control de responsabilidad: **generación 4**, titular operativo `chatgpt-khora-mcp-01a18f79-2078-7501-bc18-5ce14475d245`.
-- La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local de continuidad: `01a18f79-2078-7501-bc18-5ce14475d245`; no es un ID nativo.
-- Folio nuevo de conversación: **PENDIENTE / NO ASIGNADO**; FOL1 no ha sido cotejado ni activado. Se conserva el folio anterior en la generación archivada.
-- Las tareas provisionales «General» y «Jules» pertenecen a este mismo frente; no crean OCP, frente ni control paralelos.
+- OCP: **v0.3.7**. Control de responsabilidad: **generación 5**, titular operativo `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`.
+- La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local de continuidad: `01a19499-caec-7e19-beb9-bb5b890a36c8`; no es un ID nativo.
+- Folio global y folio de sesión: **PENDIENTE / NO ASIGNADO**; FOL1 está PREPARADO, NO ACTIVO. El control vigente tiene `session_folio: null`; el candidato anterior se conserva solo como antecedente no emitido en el registro de corrección.
+- Las tareas provisionales «Continuidad», «General» y «Jules» pertenecen a este mismo frente y se registran en [Tareas provisionales](./📁%20🧭%20-%20Tareas%20provisionales/README.md); no crean frentes ni controles paralelos.
 - `MCP-OBS-DICTADO` permanece como identidad histórica del objeto agregado anterior, no como otro frente activo.
 
 ## 2. LEER PRIMERO
@@ -22,7 +22,7 @@ Leer README, DUG vigente, este OCP y `CONTROL-RESPONSABILIDAD.json`. La titulari
 **Interpretación operativa separada:** el repositorio denomina MCP al servidor/protocolo y herramientas de Khora; «MSP» se conserva en la cita original. El frente cubre el acceso de modelos/agentes autorizados a observabilidad y la integración controlada con Jules.
 
 ## 3. Referencia metodológica
-- DUG consultado en `SeryMente/metodologia/main`: **Samantha v372 · NX-372m**; HTML canónico Blob SHA `28d0f255cdb3371a60310b0da45ca049dea05fdb`; último commit de `main` verificado `f225fc521b4c7ba77db7570dd3c3a035438ea9b9` (`2026-10-31T01:02:35Z`, UTC; `2026-10-30 19:02:35` America/Mexico_City). Metacanon **1.26**; GOW **2.14**.
+- DUG consultado directamente desde `SeryMente/metodologia/main`: **Samantha v373 · NX-373m**; HTML canónico Blob SHA `cac4525de77d4f47a8a59c25201968ecf2056b90`; `main` verificado en `3a443d6d50778f1ed75493e93977bab108a40d39` (2026-11-01T01:36:02Z). Metacanon **1.26**; GOW **2.14**. §ARR y la cascada vigente fueron consultados; MCP normativo permanece desactivado.
 - Metacanon **1.26**; GOW **2.14**.
 - CNP vigente (categoría A): P001, P004, P005, P038 y P043; consideración explícita en cada turno. MCP normativo: DESACTIVADO.
 - Fuente normativa: `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`.
@@ -144,7 +144,7 @@ Se autenticó GitHub CLI mediante el flujo interactivo del dispositivo PC-14 com
 Continuar en el OCP y control únicos `docs/frentes/observabilidad-mcp/`. Leer el control generación vigente, comprobar SHA de `main`, rama/PR, estado de Neon/Vercel y evidencia de aceptación. No crear OCP paralelo para Jules ni asumir grant por defecto. No confundir uso de RDC con integración nativa ChatGPT.
 
 ## 13. Persistencia y revisión
-Este documento en `main` es el objeto canónico único del frente. El control independiente reside en `CONTROL-RESPONSABILIDAD.json`. Las tareas provisionales General/Jules no tienen autoridad para crear objetos canónicos separados. La metodología general de `SeryMente/metodologia` prevalece en definiciones transversales.
+Este documento en `main` es el objeto canónico único del frente. El control independiente reside en `CONTROL-RESPONSABILIDAD.json`. Las tareas provisionales Continuidad/General/Jules se agrupan en el registro enlazado en §1; heredan el mismo control y no tienen autoridad para crear objetos canónicos o controles independientes. La metodología general de `SeryMente/metodologia` prevalece en definiciones transversales.
 
 ## 14. Primer corte de reinstanciación RDC PC-14 — histórico · 2026-10-30
 
@@ -338,3 +338,40 @@ La excepción DCR para clientes nativos acepta solamente http://127.0.0.1:<puert
 Implementación local, 572/572 pruebas y build de producción local con 78/78 páginas: PASS. Preview remoto de la rama: PENDIENTE; no se ha desplegado Production ni realizado consentimiento OAuth real o aceptación end-to-end.
 
 Siguiente secuencia controlada por ChatGPT mediante RDC y herramientas conectadas: terminar la verificación de diff/OCP; publicar la rama y actualizar PR #347; generar Preview remoto con la configuración real de Vercel; comprobar build y endpoints OAuth/DCR; integrar a main y desplegar Production solo tras el Preview correcto; iniciar el puente por RDC; obtener consentimiento OAuth del propietario en el navegador; verificar tools/list y una lectura real de fuentes/sesiones Jules. La autorización humana no se reemplaza por extracción de sesión ni por emisión manual de Bearer. No se crea ni aprueba una tarea Jules real durante el smoke test de lectura.
+
+
+## 23. Retoma de sesión, orden provisional de trabajo y estado — 2026-10-31
+
+### 23.1 Instrucción de retoma y procedencia
+
+El operador instruyó asumir el trabajo del entorno local perdido y continuar con la conexión RDC/GitHub disponible. El texto literal y sus mensajes posteriores de orden se conservan en `📁 🧭 - Tareas provisionales/📁 🧩 - KHORA-MCP-TASK-001 - Continuidad y reconstrucción del workspace/originales/INSTRUCCION-RETOMA-KHORA-MCP-2026-10-31.md`. No se reconstruyen marcas de tiempo que la plataforma no expone.
+
+### 23.2 Registro y orden de tareas
+
+Se materializó el registro provisional según el patrón observado en Gobernanza: índice del frente y un README por tarea. La secuencia de trabajo es:
+1. **KHORA-MCP-TASK-001 — Continuidad:** recuperar el expediente, restaurar el workspace local y comprobar checkout/entorno.
+2. **KHORA-MCP-TASK-002 — General:** verificar contrato base MCP, endpoint, catálogo, OAuth/scopes, gates y lecturas de observabilidad.
+3. **KHORA-MCP-TASK-003 — Jules:** retomar el puente ya fusionado, validar Preview de forma segura, obtener consentimiento OAuth y comprobar las siete herramientas con lecturas autenticadas reales.
+
+Las tres tareas heredan este OCP y control; no tienen control, sesión, titularidad ni folio propios. Su estado y criterio de cierre están en el índice y sus núcleos individuales.
+
+### 23.3 Control y foliación
+
+La responsabilidad vigente es generación **5**, alias `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`; `owner_thread=null`. El control leído de vuelta en main registra `session_folio=null` y `folio_status=PENDIENTE/NO ASIGNADO; FOL1 PREPARADO NO ACTIVO`. Se detectó y corrigió la asignación improcedente de un candidato `SES-20261031-890A36C8`: permanece únicamente como valor histórico no emitido, nunca como folio. Control blob SHA tras corrección: `92f4f6ab864c19e52a123b6358d94c5a8e7a9474`; commit de corrección `00707eff11312bc45fd5855ab86a8297a10b068b`.
+
+### 23.4 Preservación del expediente original
+
+La exportación `ChatGPT-Khora MCP-20261031-1846.md` quedó vinculada bajo `historial/`. El archivo original tenía **134,984 bytes** y SHA-256 `B087AA56DDF20A0E737DCE9614BD6E406F872B540D9C2964440A93F7A5B94464`; el Git blob `d0ae42a0ed816d120239cae6dd29eadb0a2ddc24` fue leído de vuelta y coincide. El equipo RDC confirmó desde el contenido recuperado por GitHub el tamaño y el mismo SHA-256. La exportación antecede la instrucción de retoma y no la contiene; los mensajes posteriores fueron guardados separadamente como originales.
+
+### 23.5 Estado técnico heredado
+
+- PR #347 está **fusionado** en `main`, merge commit `4530e03a33c5e1743ab9646eb6c862b3c458c605`. El cliente puente local fue validado históricamente en PC-14: 572/572 unitarias, typecheck, contratos, parseo del puente/PowerShell y build local 78/78 páginas. Son resultados del entorno anterior; no están repetidos en el nuevo perfil.
+- El despliegue Preview anterior de la rama devolvió HTTP 503 (`MCP authorization server not configured` / `MCP_CONFIG_MISSING`) por ausencia de configuración de entorno Preview observada. No copiar secretos de Production para resolverlo.
+- Los metadatos OAuth de Production y de recurso protegido se habían observado con HTTP 200. La invocación autenticada real de `tools/list` y de las herramientas Jules aún no está verificada en esta retoma.
+- No se ha creado ni aprobado una sesión Jules real en este smoke test; la lectura de fuentes/sesiones precede a cualquier operación de escritura.
+
+### 23.6 Entorno local vigente y siguiente paso
+
+La instancia PC-14 anterior está desconectada. La conexión RDC actual corresponde a `015RENTA01`; GitHub CLI está autenticado, pero no se presume que el workspace anterior ni su DPAPI existan en este perfil. La ruta local de trabajo se debe verificar antes de crearla; el checkout nuevo, dependencias, DPAPI CurrentUser y consentimiento OAuth son pendientes de TASK-001/TASK-003.
+
+**Siguiente actuación:** terminar TASK-001 mediante verificación del perfil Windows y clon limpio de `main`; continuar después con General y, finalmente, con la aceptación de lectura autenticada de Jules. No desplegar Production ni copiar secretos sin pasar los controles documentados.
