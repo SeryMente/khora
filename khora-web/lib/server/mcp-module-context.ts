@@ -1,5 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { describeMcpTool, type McpToolName, type McpToolScope } from "@/lib/server/mcp-tool-contract";
+import { describeMcpTool, type McpToolScope } from "@/lib/server/mcp-tool-contract";
 
 /**
  * Shared host context supplied to every functional MCP module.
@@ -14,4 +14,3 @@ export type McpModuleContext = {
   requireScope: (scope: McpToolScope) => unknown | null;
 };
 
-export type { McpToolName, McpToolScope };
