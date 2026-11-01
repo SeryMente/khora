@@ -77,8 +77,11 @@ test("Jules scopes flow through OAuth metadata, consent, token exchange, manual 
   const page = fs.readFileSync(path.join(root, "app/sistema/mcp/page.tsx"), "utf8");
   assert.ok(page.includes('const DEFAULT_SCOPES = ["runtime:read", "volcados:read", "norm:turn", "jules:read", "jules:write"] as const;'));
   const route = fs.readFileSync(path.join(root, "app/api/mcp/route.ts"), "utf8");
-  assert.match(route, /registerJulesMcpModule\\(\\{/);
+  assert.match(route, /registerMcpModules\\(\\{/);
   assert.doesNotMatch(route, /julesTool\\(/);
+  const registry = fs.readFileSync(path.join(root, "lib/server/mcp-module-registry.ts"), "utf8");
+  assert.match(registry, /id: "jules"/);
+  assert.match(registry, /register: registerJulesMcpModule/);
   const module = fs.readFileSync(path.join(root, "lib/server/mcp-jules.ts"), "utf8");
   assert.match(module, /export function registerJulesMcpModule/);
   assert.equal((module.match(/julesTool\\("jules_/g) || []).length, 7);
