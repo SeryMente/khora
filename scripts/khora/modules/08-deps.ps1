@@ -414,8 +414,17 @@ function Start-KhoraDependencyHydration {
     }
 }
 function Wait-KhoraDependencyHydration {
-    foreach($name in @($script:DependencyJobs.Keys)){$job=$script:DependencyJobs[$name];Wait-Job $job|Out-Null;$output=@(Receive-Job $job -ErrorAction SilentlyContinue);$output|ForEach-Object{Info ("dependency ${name}: "+[string]$_)};if($job.State-ne'Completed'){throw "Dependencias $name fallaron."};Remove-Job $job -Force}
+    foreach($name in @($script:DependencyJobs.Keys)){
+        $job=$script:DependencyJobs[$name]
+        $completed=Wait-Job -Job $job -Timeout 2700
+        if(-not $completed){Stop-Job -Job $job -ErrorAction SilentlyContinue;Remove-Job -Job $job -Force -ErrorAction SilentlyContinue;throw "Timeout de 45 minutos en dependencias $name; se detuvo el job."}
+        $output=@(Receive-Job $job -ErrorAction SilentlyContinue)
+        $output|ForEach-Object{Info ("dependency ${name}: "+(Mask-Token ([string]$_)))}
+        if($job.State-ne'Completed'){Remove-Job $job -Force -ErrorAction SilentlyContinue;throw "Dependencias $name fallaron."}
+        Remove-Job $job -Force
+    }
     $script:DependencyJobs=@{}
+    return $true
 }
 function Start-DepsPreload {
     Start-KhoraPrefetch
