@@ -4,8 +4,8 @@
 **Estado:** implementación modular en curso; no aceptado end-to-end.  
 **FT padre:** KHORA-MCP.  
 **OCP heredado:** `docs/frentes/observabilidad-mcp/`.  
-**Control heredado:** `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`, generación 7. No existe control de responsabilidad independiente para el módulo.  
-**Titular del FT padre:** `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`.  
+**Control heredado:** `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`, generación 8. No existe control de responsabilidad independiente para el módulo.  
+**Titular del FT padre:** `chatgpt-khora-mcp-01a19962-c730-7308-975-5bb49e2d`.  
 **Corresponsabilidad acotada al módulo:** `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314` (alias operativo local; no es ID nativo).  
 **Evento de incorporación:** `KHORA-MCP-ADD-CO-RESPONSIBLE-JULES-20261101-8585E314`.
 
