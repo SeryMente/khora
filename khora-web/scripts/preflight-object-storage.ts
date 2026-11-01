@@ -3,7 +3,6 @@ import { randomUUID, createHash } from "node:crypto";
 import {
   S3Client,
   GetBucketCorsCommand,
-  PutBucketCorsCommand,
   ListObjectVersionsCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
@@ -99,19 +98,7 @@ async function main() {
         header === "*" || header.toLowerCase() === "x-amz-server-side-encryption")
     );
     if (!matchingRule) {
-      const nextRules = [
-        ...currentRules,
-        {
-          AllowedOrigins: [ORIGIN],
-          AllowedMethods: ["PUT"],
-          AllowedHeaders: ["content-type", "x-amz-server-side-encryption"],
-          MaxAgeSeconds: 300,
-        },
-      ];
-      await client.send(new PutBucketCorsCommand({
-        Bucket: location.bucket,
-        CORSConfiguration: { CORSRules: nextRules },
-      }));
+      throw new Error("storage_cors_rule_missing_manual_configuration_required");
     }
 
     stage = "signed_upload";
