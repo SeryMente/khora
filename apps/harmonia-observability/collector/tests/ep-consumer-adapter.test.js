@@ -65,6 +65,32 @@ test('duplicate enqueue keeps the same operation identity', async t => {
   assert.equal(second.duplicate, true);
 });
 
+test('operation identity survives a collector restart', async t => {
+  const f = fixture();
+  t.after(() => fs.rmSync(f.root, { recursive: true, force: true }));
+  const firstAdapter = createEpConsumerAdapter({ ...f, activationAt: '2026-01-01T00:00:00.000Z' });
+  await firstAdapter.reconcile();
+  const firstOperation = firstAdapter.findByEventId(f.event.eventId).operationRef;
+  const secondAdapter = createEpConsumerAdapter(f);
+  await secondAdapter.reconcile();
+  const secondOperation = secondAdapter.findByEventId(f.event.eventId).operationRef;
+  assert.equal(secondOperation, firstOperation);
+});
+
+test('same event identity with a different source hash is a conflict', async t => {
+  const f = fixture();
+  t.after(() => fs.rmSync(f.root, { recursive: true, force: true }));
+  const adapter = createEpConsumerAdapter({ ...f, activationAt: '2026-01-01T00:00:00.000Z' });
+  await adapter.reconcile();
+  const ref = 'originals/2026-11-01/' + f.event.sessionId + '.jsonl#' + f.event.eventId;
+  const changedEvent = { ...f.event, type: 'capture.stopped' };
+  const changedLine = JSON.stringify(changedEvent) + '\n';
+  assert.throws(
+    () => adapter.registerStoredEvent(ref, changedEvent, changedLine, 'c'.repeat(64)),
+    error => error.code === 'integrity-conflict'
+  );
+});
+
 test('flush never attempts network without the official EP contract and allowlist', async t => {
   const f = fixture();
   t.after(() => fs.rmSync(f.root, { recursive: true, force: true }));
