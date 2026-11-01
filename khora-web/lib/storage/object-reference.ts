@@ -49,5 +49,5 @@ export function isKnownStoredObjectUrl(value: string, location: B2Location): boo
 export function stagingKeyForSession(key: string, sessionId: string): boolean {
   return /^[0-9a-f-]{36}$/i.test(sessionId)
     && safeObjectKey(key).startsWith(`khora/staging/audio/${sessionId}/`)
-    && /^[-a-zA-Z0-9.]+\\.khstaging$/.test(key.split("/").at(-1) || "");
+    && /^[-a-zA-Z0-9.]+\.khstaging$/.test(key.split("/").at(-1) || "");
 }
