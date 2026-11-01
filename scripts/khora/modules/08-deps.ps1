@@ -1,30 +1,123 @@
 ﻿function Find-KhoraHostExecutable {
-    param([Parameter(Mandatory=$true)][string]$Name)
+    param([Parameter(Mandatory=$true)][ValidateSet('git','gh','node','npm','python')][string]$Name)
     $programFiles=[Environment]::GetEnvironmentVariable('ProgramFiles')
     $programFilesX86=[Environment]::GetEnvironmentVariable('ProgramFiles(x86)')
     $localAppData=[Environment]::GetEnvironmentVariable('LOCALAPPDATA')
-    $candidates=@()
+    $candidates=New-Object 'System.Collections.Generic.List[string]'
     switch($Name){
-        'git' {$candidates=@((Join-Path $programFiles 'Git\cmd\git.exe'),(Join-Path $programFiles 'Git\bin\git.exe'),(Join-Path $localAppData 'Programs\Git\cmd\git.exe'))}
-        'gh' {$candidates=@((Join-Path $programFiles 'GitHub CLI\gh.exe'),(Join-Path $localAppData 'Programs\GitHub CLI\gh.exe'))}
-        'node' {$candidates=@((Join-Path $programFiles 'nodejs\node.exe'),(Join-Path $localAppData 'Programs\nodejs\node.exe'))}
-        'npm' {$candidates=@((Join-Path $programFiles 'nodejs\npm.cmd'),(Join-Path $localAppData 'Programs\nodejs\npm.cmd'))}
-        'python' {$candidates=@((Join-Path $localAppData 'Programs\Python\Python311\python.exe'),(Join-Path $localAppData 'Programs\Python\Python312\python.exe'),(Join-Path $programFiles 'Python311\python.exe'),(Join-Path $programFiles 'Python312\python.exe'))}
-    }
-    foreach($candidate in $candidates){
-        if($candidate -and (Test-Path -LiteralPath $candidate -PathType Leaf)){return [IO.Path]::GetFullPath($candidate)}
-    }
-    $commandNames=if($Name -eq 'npm'){@('npm.cmd','npm')}else{@($Name)}
-    foreach($commandName in $commandNames){
-        $cmd=Get-Command $commandName -ErrorAction SilentlyContinue
-        if($cmd){
-            $path=[string]$cmd.Source
-            if($Name -eq 'python' -and $path -match '\\WindowsApps\\'){continue}
-            if($Name -eq 'npm' -and $path -match '\\npm\.ps1$'){$cmd=Get-Command npm.cmd -ErrorAction SilentlyContinue;if(-not $cmd){continue};$path=[string]$cmd.Source}
-            if($path -and (Test-Path -LiteralPath $path -PathType Leaf)){return [IO.Path]::GetFullPath($path)}
+        'git' {
+            foreach($base in @($programFiles,$programFilesX86)){
+                if(-not [string]::IsNullOrWhiteSpace([string]$base)){
+                    [void]$candidates.Add((Join-Path $base 'Git\cmd\git.exe'))
+                    [void]$candidates.Add((Join-Path $base 'Git\bin\git.exe'))
+                }
+            }
+            if(-not [string]::IsNullOrWhiteSpace([string]$localAppData)){[void]$candidates.Add((Join-Path $localAppData 'Programs\Git\cmd\git.exe'))}
+        }
+        'gh' {
+            foreach($base in @($programFiles,$localAppData)){
+                if(-not [string]::IsNullOrWhiteSpace([string]$base)){
+                    $suffix=if($base -eq $programFiles){'GitHub CLI\gh.exe'}else{'Programs\GitHub CLI\gh.exe'}
+                    [void]$candidates.Add((Join-Path $base $suffix))
+                }
+            }
+        }
+        'node' {
+            foreach($base in @($programFiles,$localAppData)){
+                if(-not [string]::IsNullOrWhiteSpace([string]$base)){
+                    $suffix=if($base -eq $programFiles){'nodejs\node.exe'}else{'Programs\nodejs\node.exe'}
+                    [void]$candidates.Add((Join-Path $base $suffix))
+                }
+            }
+        }
+        'npm' {
+            foreach($base in @($programFiles,$localAppData)){
+                if(-not [string]::IsNullOrWhiteSpace([string]$base)){
+                    $suffix=if($base -eq $programFiles){'nodejs\npm.cmd'}else{'Programs\nodejs\npm.cmd'}
+                    [void]$candidates.Add((Join-Path $base $suffix))
+                }
+            }
+        }
+        'python' {
+            if(-not [string]::IsNullOrWhiteSpace([string]$localAppData)){
+                foreach($version in @('Python311','Python312','Python313')){
+                    [void]$candidates.Add((Join-Path $localAppData ('Programs\Python\'+$version+'\python.exe')))
+                }
+            }
+            if(-not [string]::IsNullOrWhiteSpace([string]$programFiles)){
+                foreach($version in @('Python311','Python312','Python313')){
+                    [void]$candidates.Add((Join-Path $programFiles ($version+'\python.exe')))
+                }
+            }
         }
     }
+    foreach($candidate in $candidates){
+        if(-not [string]::IsNullOrWhiteSpace([string]$candidate) -and (Test-Path -LiteralPath $candidate -PathType Leaf)){
+            return [IO.Path]::GetFullPath($candidate)
+        }
+    }
+    $commandNames=if($Name -eq 'npm'){@('npm.cmd')}else{@($Name)}
+    foreach($commandName in $commandNames){
+        $cmd=Get-Command $commandName -ErrorAction SilentlyContinue | Select-Object -First 1
+        if(-not $cmd){continue}
+        if($cmd.CommandType -notin @('Application','ExternalScript')){continue}
+        $path=[string]$cmd.Source
+        if([string]::IsNullOrWhiteSpace($path)){continue}
+        if($Name -eq 'python' -and $path -match '(?i)\\WindowsApps\\'){continue}
+        if($Name -eq 'npm' -and $path -match '(?i)\\npm\.ps1$'){continue}
+        if(Test-Path -LiteralPath $path -PathType Leaf){return [IO.Path]::GetFullPath($path)}
+    }
     return $null
+}
+
+function Invoke-KhoraNativeProbe {
+    param([Parameter(Mandatory=$true)][string]$Path,[string[]]$Arguments=@())
+    if(-not (Test-Path -LiteralPath $Path -PathType Leaf)){throw ('Ejecutable ausente: '+$Path)}
+    $previousPreference=$ErrorActionPreference
+    $output=@()
+    $exitCode=1
+    try{
+        $ErrorActionPreference='Continue'
+        $output=@(& $Path @Arguments 2>&1)
+        $exitCode=$LASTEXITCODE
+    } catch {
+        $output+= $_.Exception.Message
+        $exitCode=1
+    } finally {
+        $ErrorActionPreference=$previousPreference
+    }
+    return [pscustomobject]@{Path=$Path;Code=[int]$exitCode;Output=@($output|ForEach-Object{[string]$_})}
+}
+
+function Get-KhoraToolchainInventory {
+    $specs=@(
+        [pscustomobject]@{Name='git';Arguments=@('--version');Minimum='2.30';Pattern='git version\s+([0-9]+(?:\.[0-9]+){1,3})'},
+        [pscustomobject]@{Name='gh';Arguments=@('--version');Minimum='2.0';Pattern='gh version\s+([0-9]+(?:\.[0-9]+){1,3})'},
+        [pscustomobject]@{Name='node';Arguments=@('--version');Minimum='20.0';Pattern='v?([0-9]+(?:\.[0-9]+){1,3})'},
+        [pscustomobject]@{Name='npm';Arguments=@('--version');Minimum='9.0';Pattern='([0-9]+(?:\.[0-9]+){1,3})'},
+        [pscustomobject]@{Name='python';Arguments=@('--version');Minimum='3.11';Pattern='Python\s+([0-9]+(?:\.[0-9]+){1,3})'}
+    )
+    $inventory=New-Object 'System.Collections.Generic.List[object]'
+    foreach($spec in $specs){
+        $path=Find-KhoraHostExecutable -Name $spec.Name
+        if(-not $path){
+            $inventory.Add([pscustomobject]@{name=$spec.Name;status='MISSING';path=$null;version=$null;exitCode=$null;source='unavailable'})
+            continue
+        }
+        $probe=Invoke-KhoraNativeProbe -Path $path -Arguments $spec.Arguments
+        $text=($probe.Output -join ' ')
+        $match=[regex]::Match($text,$spec.Pattern,[Text.RegularExpressions.RegexOptions]::IgnoreCase)
+        $version=if($match.Success){$match.Groups[1].Value}else{$null}
+        $compatible=($probe.Code -eq 0 -and $match.Success)
+        if($compatible -and $spec.Name -eq 'node'){$compatible=([version]$version -ge [version]'20.0')}
+        if($compatible -and $spec.Name -eq 'npm'){$compatible=([version]$version -ge [version]'9.0')}
+        if($compatible -and $spec.Name -eq 'python'){$compatible=([version]$version -ge [version]'3.11')}
+        if($compatible -and $spec.Name -eq 'git'){$compatible=([version]$version -ge [version]'2.30')}
+        if($compatible -and $spec.Name -eq 'gh'){$compatible=([version]$version -ge [version]'2.0')}
+        $parent=Split-Path -Parent $path
+        $inventory.Add([pscustomobject]@{name=$spec.Name;status=$(if($compatible){'AVAILABLE_COMPATIBLE'}else{'INCOMPATIBLE'});path=$path;version=$version;exitCode=$probe.Code;source=$parent})
+    }
+    return @($inventory)
 }
 
 ﻿# Toolchain efímero y precarga paralela.
@@ -39,14 +132,34 @@ function Add-KhoraPath {
 
 function Start-KhoraDownloadJob {
     param([string]$Name,[string]$Uri,[string]$Path)
-    if (Test-Path $Path) { return }
+    if(Test-Path -LiteralPath $Path -PathType Leaf){
+        $existing=Get-Item -LiteralPath $Path -ErrorAction Stop
+        if($existing.Length -gt 0){return}
+        Remove-Item -LiteralPath $Path -Force -ErrorAction Stop
+    }
     New-Item -ItemType Directory -Path (Split-Path -Parent $Path) -Force | Out-Null
-    $script:PrefetchPlan[$Name] = @{ Uri=$Uri; Path=$Path }
-    $script:PrefetchJobs[$Name] = Start-Job -ArgumentList @($Uri,$Path) -ScriptBlock {
+    $script:PrefetchPlan[$Name]=@{Uri=$Uri;Path=$Path}
+    $script:PrefetchJobs[$Name]=Start-Job -ArgumentList @($Uri,$Path) -ScriptBlock {
         param($source,$destination)
         $ProgressPreference='SilentlyContinue'
+        $ErrorActionPreference='Stop'
         [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12
-        Invoke-WebRequest -Uri $source -OutFile $destination -UseBasicParsing -TimeoutSec 1200
+        $partial=$destination+'.part'
+        $lastError=$null
+        foreach($attempt in 1..3){
+            try{
+                Remove-Item -LiteralPath $partial -Force -ErrorAction SilentlyContinue
+                Invoke-WebRequest -Uri $source -OutFile $partial -UseBasicParsing -TimeoutSec 1200 -ErrorAction Stop
+                if(-not(Test-Path -LiteralPath $partial -PathType Leaf) -or (Get-Item -LiteralPath $partial).Length -le 0){throw 'La descarga terminó sin un archivo válido.'}
+                Move-Item -LiteralPath $partial -Destination $destination -Force -ErrorAction Stop
+                return $destination
+            }catch{
+                $lastError=$_.Exception.Message
+                Remove-Item -LiteralPath $partial -Force -ErrorAction SilentlyContinue
+                if($attempt -lt 3){Start-Sleep -Seconds (2*$attempt)}
+            }
+        }
+        throw ('Descarga agotó los reintentos: '+$lastError)
     }
 }
 
@@ -100,15 +213,25 @@ function Wait-KhoraPrefetch {
 
 function Ensure-Git {
     $existing=Find-KhoraHostExecutable -Name 'git'
-    if($existing){Add-KhoraPath -Path (Split-Path -Parent $existing);return $existing}
+    if($existing){
+        $probe=Invoke-KhoraNativeProbe -Path $existing -Arguments @('--version')
+        if($probe.Code -ne 0 -or ($probe.Output -join ' ') -notmatch '(?i)git version'){throw 'Git del host no pasó la validación de versión.'}
+        Add-KhoraPath -Path (Split-Path -Parent $existing)
+        return $existing
+    }
     $installer=Wait-KhoraPrefetch -Name git
     if(-not$installer){throw 'PortableGit ausente.'}
     if((Get-AuthenticodeSignature $installer).Status -ne 'Valid'){throw 'Firma PortableGit inválida.'}
-    $target=Join-Path $WORK_DIR 'tools\git';New-Item -ItemType Directory -Path $target -Force|Out-Null
-    $process=Start-Process $installer -ArgumentList @("-o`"$target`"",'-y') -Wait -PassThru
-    if($process.ExitCode -ne 0){throw 'Extracción Git falló.'}
-    Add-KhoraPath -Path (Join-Path $target 'cmd')
-    return [bool](Get-Command git -ErrorAction SilentlyContinue)
+    $target=Join-Path $WORK_DIR 'tools\git'
+    New-Item -ItemType Directory -Path $target -Force|Out-Null
+    $process=Start-Process $installer -ArgumentList @('-o"'+$target+'"','-y') -Wait -PassThru
+    if($process.ExitCode -ne 0){throw ('Extracción Git falló: exit='+$process.ExitCode)}
+    $git=Get-ChildItem -LiteralPath $target -Filter git.exe -File -Recurse -ErrorAction Stop | Where-Object{$_.FullName -match '\\cmd\\git\.exe$'} | Select-Object -First 1
+    if(-not$git){throw 'PortableGit se extrajo pero no contiene cmd\git.exe.'}
+    Add-KhoraPath -Path $git.DirectoryName
+    $probe=Invoke-KhoraNativeProbe -Path $git.FullName -Arguments @('--version')
+    if($probe.Code -ne 0 -or ($probe.Output -join ' ') -notmatch '(?i)git version'){throw 'PortableGit no pasó la validación posterior a extracción.'}
+    return $git.FullName
 }
 
 function Ensure-GhCli {
@@ -129,26 +252,71 @@ function Confirm-GhCliAuth {
 }
 function Ensure-Node {
     $existing=Find-KhoraHostExecutable -Name 'node'
-    if($existing){Add-KhoraPath -Path (Split-Path -Parent $existing);return $existing}
-    $zip=Wait-KhoraPrefetch -Name node;$sumFile=Wait-KhoraPrefetch -Name nodeSums
+    if($existing){
+        $node=$existing
+        $npm=Find-KhoraHostExecutable -Name 'npm'
+        if(-not$npm){$candidate=Join-Path (Split-Path -Parent $node) 'npm.cmd';if(Test-Path -LiteralPath $candidate -PathType Leaf){$npm=$candidate}}
+        if(-not$npm){throw 'Node.js existe pero npm.cmd no está disponible; no se utilizará npm.ps1.'}
+        $nodeProbe=Invoke-KhoraNativeProbe -Path $node -Arguments @('--version')
+        $npmProbe=Invoke-KhoraNativeProbe -Path $npm -Arguments @('--version')
+        if($nodeProbe.Code -ne 0 -or $npmProbe.Code -ne 0){throw 'Node.js/npm.cmd del host no superó la validación de ejecución.'}
+        $nodeVersion=[regex]::Match(($nodeProbe.Output -join ' '),'v?([0-9]+(?:\.[0-9]+){1,2})')
+        $npmVersion=[regex]::Match(($npmProbe.Output -join ' '),'([0-9]+(?:\.[0-9]+){1,2})')
+        if(-not$nodeVersion.Success -or [version]$nodeVersion.Groups[1].Value -lt [version]'20.0'){throw 'Node.js del host requiere versión 20 o superior.'}
+        if(-not$npmVersion.Success -or [version]$npmVersion.Groups[1].Value -lt [version]'9.0'){throw 'npm.cmd del host requiere versión 9 o superior.'}
+        Add-KhoraPath -Path (Split-Path -Parent $node)
+        if((Split-Path -Parent $npm) -ne (Split-Path -Parent $node)){Add-KhoraPath -Path (Split-Path -Parent $npm)}
+        $script:NODE_PATH=$node
+        $script:NPM_PATH=$npm
+        return $node
+    }
+    $zip=Wait-KhoraPrefetch -Name node
+    $sumFile=Wait-KhoraPrefetch -Name nodeSums
     if(-not$zip-or-not$sumFile){throw 'Node.js ausente.'}
-    $line=Get-Content $sumFile|Where-Object{$_ -match [regex]::Escape((Split-Path $zip -Leaf))}|Select-Object -First 1
+    $line=Get-Content -LiteralPath $sumFile | Where-Object{$_ -match [regex]::Escape((Split-Path $zip -Leaf))} | Select-Object -First 1
     if(-not$line-or(Get-FileHash $zip -Algorithm SHA256).Hash -ine (($line.Trim() -split '\s+')[0])){throw 'Checksum Node.js inválido.'}
-    $target=Join-Path $WORK_DIR 'tools\node';Expand-Archive -LiteralPath $zip -DestinationPath $target -Force
-    $node=Get-ChildItem $target -Filter node.exe -Recurse|Select-Object -First 1;if(-not$node){throw 'node.exe ausente.'}
-    Add-KhoraPath -Path $node.DirectoryName;return $node.FullName
+    $target=Join-Path $WORK_DIR 'tools\node'
+    if(Test-Path -LiteralPath $target){Remove-Item -LiteralPath $target -Recurse -Force -ErrorAction Stop}
+    Expand-Archive -LiteralPath $zip -DestinationPath $target -Force
+    $node=Get-ChildItem -LiteralPath $target -Filter node.exe -File -Recurse -ErrorAction Stop | Select-Object -First 1
+    if(-not$node){throw 'node.exe ausente después de extraer Node.js.'}
+    $npm=Join-Path $node.DirectoryName 'npm.cmd'
+    if(-not(Test-Path -LiteralPath $npm -PathType Leaf)){throw 'npm.cmd ausente en el paquete Node.js descargado.'}
+    $nodeProbe=Invoke-KhoraNativeProbe -Path $node.FullName -Arguments @('--version')
+    $npmProbe=Invoke-KhoraNativeProbe -Path $npm -Arguments @('--version')
+    if($nodeProbe.Code -ne 0 -or $npmProbe.Code -ne 0){throw 'Node.js descargado no superó la validación post-instalación.'}
+    Add-KhoraPath -Path $node.DirectoryName
+    $script:NODE_PATH=$node.FullName
+    $script:NPM_PATH=$npm
+    return $node.FullName
 }
 
 function Ensure-Python311 {
-    $existing=Get-Command python -ErrorAction SilentlyContinue
-    if($existing -and $existing.Source -notmatch '\\WindowsApps\\'){if((& $existing.Source --version 2>&1) -match '^Python 3\.(1[1-9]|[2-9]\d)'){return $existing.Source}}
-    $installer=Wait-KhoraPrefetch -Name python;if(-not$installer){throw 'Python ausente.'}
+    $existing=Find-KhoraHostExecutable -Name 'python'
+    if($existing){
+        $probe=Invoke-KhoraNativeProbe -Path $existing -Arguments @('--version')
+        $match=[regex]::Match(($probe.Output -join ' '),'Python\s+([0-9]+(?:\.[0-9]+){1,2})')
+        if($probe.Code -eq 0 -and $match.Success -and [version]$match.Groups[1].Value -ge [version]'3.11'){
+            Add-KhoraPath -Path (Split-Path -Parent $existing)
+            $script:PYTHON_PATH=$existing
+            return $existing
+        }
+        Info 'Python del host existe pero no cumple el mínimo 3.11; se preparará una copia portátil.'
+    }
+    $installer=Wait-KhoraPrefetch -Name python
+    if(-not$installer){throw 'Python ausente.'}
     if((Get-AuthenticodeSignature $installer).Status -ne 'Valid'){throw 'Firma Python inválida.'}
-    $target=Join-Path $WORK_DIR 'tools\python311';New-Item -ItemType Directory -Path $target -Force|Out-Null
+    $target=Join-Path $WORK_DIR 'tools\python311'
+    New-Item -ItemType Directory -Path $target -Force|Out-Null
     $arguments='/quiet InstallAllUsers=0 PrependPath=0 Include_pip=1 Include_test=0 TargetDir="'+$target+'"'
     $process=Start-Process $installer -ArgumentList $arguments -Wait -PassThru -WindowStyle Hidden
-    $python=Join-Path $target 'python.exe';if($process.ExitCode -ne 0 -or -not(Test-Path $python)){throw 'Instalación Python falló.'}
-    Add-KhoraPath -Path $target;return $python
+    $python=Join-Path $target 'python.exe'
+    if($process.ExitCode -ne 0 -or -not(Test-Path -LiteralPath $python -PathType Leaf)){throw 'Instalación Python falló.'}
+    $probe=Invoke-KhoraNativeProbe -Path $python -Arguments @('--version')
+    if($probe.Code -ne 0 -or ($probe.Output -join ' ') -notmatch 'Python\s+3\.11'){throw 'Python portátil instalado no pasó la validación.'}
+    Add-KhoraPath -Path $target
+    $script:PYTHON_PATH=$python
+    return $python
 }
 
 function Ensure-VSCode {
@@ -218,11 +386,56 @@ function Wait-KhoraDependencyHydration {
     foreach($name in @($script:DependencyJobs.Keys)){$job=$script:DependencyJobs[$name];Wait-Job $job|Out-Null;$output=@(Receive-Job $job -ErrorAction SilentlyContinue);$output|ForEach-Object{Info ("dependency ${name}: "+[string]$_)};if($job.State-ne'Completed'){throw "Dependencias $name fallaron."};Remove-Job $job -Force}
     $script:DependencyJobs=@{}
 }
-function Start-DepsPreload{Start-KhoraPrefetch}
-function Wait-DepsPreload{}
-function Setup-Venv{}
-function Setup-KhoraWeb{}
-function Start-ProactiveDepPrep{}
-function Wait-ProactiveDepPrep{return $false}
-function Ensure-Docker{Info 'Docker bajo demanda.'}
-function Ensure-RenderCLI{Info 'Render bajo demanda.'}
+function Start-DepsPreload {
+    Start-KhoraPrefetch
+    return @($script:PrefetchJobs.Keys)
+}
+function Wait-DepsPreload {
+    foreach($name in @($script:PrefetchJobs.Keys)){[void](Wait-KhoraPrefetch -Name $name)}
+    return $true
+}
+function Setup-Venv {
+    $python=Ensure-Python311
+    $venv=Join-Path $WORK_DIR 'venv'
+    if(-not(Test-Path -LiteralPath (Join-Path $venv 'Scripts\python.exe') -PathType Leaf)){
+        $previousPreference=$ErrorActionPreference
+        try{$ErrorActionPreference='Continue';$output=@(& $python -m venv $venv 2>&1);$exit=$LASTEXITCODE}
+        finally{$ErrorActionPreference=$previousPreference}
+        if($exit -ne 0){throw ('No se pudo crear venv: '+(($output|ForEach-Object{[string]$_}) -join ' '))}
+    }
+    $venvPython=Join-Path $venv 'Scripts\python.exe'
+    if(Test-Path -LiteralPath (Join-Path $REPO_DIR 'pyproject.toml') -PathType Leaf){
+        $previousPreference=$ErrorActionPreference
+        try{$ErrorActionPreference='Continue';$output=@(& $venvPython -m pip install -e $REPO_DIR --disable-pip-version-check 2>&1);$exit=$LASTEXITCODE}
+        finally{$ErrorActionPreference=$previousPreference}
+        if($exit -ne 0){throw ('No se pudo hidratar Python: '+(($output|ForEach-Object{[string]$_}) -join ' '))}
+    }
+    return $venvPython
+}
+function Setup-KhoraWeb {
+    $web=Join-Path $REPO_DIR 'khora-web'
+    $lock=Join-Path $web 'package-lock.json'
+    if(-not(Test-Path -LiteralPath $lock -PathType Leaf)){return $false}
+    $node=Ensure-Node
+    $npm=if($script:NPM_PATH){$script:NPM_PATH}else{Find-KhoraHostExecutable -Name 'npm'}
+    if(-not$npm){$npm=Join-Path (Split-Path -Parent $node) 'npm.cmd'}
+    if(-not(Test-Path -LiteralPath $npm -PathType Leaf) -or $npm -match '(?i)\\npm\.ps1$'){throw 'Setup-KhoraWeb requiere npm.cmd válido.'}
+    $previousPreference=$ErrorActionPreference
+    try{
+        $ErrorActionPreference='Continue'
+        $output=@(& $npm --prefix $web ci --no-audit --no-fund 2>&1)
+        $exit=$LASTEXITCODE
+    }finally{$ErrorActionPreference=$previousPreference}
+    $output|ForEach-Object{Info ('npm ci: '+(Mask-Token ([string]$_)))}
+    if($exit -ne 0){throw ('npm ci falló; exit='+$exit)}
+    return $true
+}
+function Start-ProactiveDepPrep {
+    Start-KhoraPrefetch
+    return @($script:PrefetchJobs.Keys)
+}
+function Wait-ProactiveDepPrep {
+    return (Wait-DepsPreload)
+}
+function Ensure-Docker{Info 'Docker bajo demanda.';return $null}
+function Ensure-RenderCLI{Info 'Render bajo demanda.';return $null}
