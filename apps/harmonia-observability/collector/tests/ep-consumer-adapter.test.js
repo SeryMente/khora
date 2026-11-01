@@ -30,7 +30,7 @@ function fixture() {
 test('reconciles an original written before the ledger and creates a blocked durable reference', async t => {
   const f = fixture();
   t.after(() => fs.rmSync(f.root, { recursive: true, force: true }));
-  const adapter = createEpConsumerAdapter(f);
+  const adapter = createEpConsumerAdapter({ ...f, activationAt: '2026-01-01T00:00:00.000Z' });
   const result = await adapter.reconcile();
   assert.equal(result.discovered, 1);
   const row = adapter.findByEventId(f.event.eventId);
