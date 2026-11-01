@@ -1,0 +1,108 @@
+{
+  "schema": "harmonia-document-persistence-evidence/1",
+  "event_uuidv7_local": "01a19969-8e70-7dcb-b9fd-7db62736f279",
+  "front": "harmonia",
+  "repository": "SeryMente/khora",
+  "branch": "main",
+  "governance": {
+    "dug_version": "v377",
+    "dug_signature": "NX-377m",
+    "metacanon_version": "1.28",
+    "gow_version": "2.17"
+  },
+  "responsibility_transfer": {
+    "from_generation": 13,
+    "to_generation": 14,
+    "control_path": "docs/frentes/harmonia/CONTROL-RESPONSABILIDAD.json",
+    "control_blob_sha1": "41c4ace91267104eb472ffdec0fb27ed04651927",
+    "transfer_commit": "498c0ca6a0285949f62d8193e8919a076abb3c99",
+    "new_owner_alias": "chatgpt-harmonia-01a19969-8e70-7dcb-b9fd-7db62736f279",
+    "native_conversation_id": null,
+    "authorized_device": {
+      "name": "PC-8",
+      "device_id": "7595d30a-bd63-4bc0-a274-f4ae90928247",
+      "status": "authorized_for_harmonia_continuity",
+      "scope": "RDC access for HARMONIA continuity and ongoing work as needed on this exact device UUID only; identity is anchored to UUID, not display name. Use least privilege and verify paths.",
+      "observed_platform": "Windows",
+      "observed_user": "PC-8\\PC 8",
+      "observed_profile": "C:\\Users\\PC 8",
+      "sid": "S-1-5-21-2982808782-763814400-4126640191-1001",
+      "authorized_by": "explicit operator instruction: “PC 8 es la conexion activa, usala cuando la necesites. Si autorizo. PC 14 olvidalo.”",
+      "authorized_at": "2026-11-01T23:20:50.485Z"
+    },
+    "previous_device_status": "historical_superseded_not_currently_authorized"
+  },
+  "source": {
+    "local_path": "C:\\Users\\PC 8\\Downloads\\ChatGPT-HARMONIA-20261101-1709.md",
+    "device_id": "7595d30a-bd63-4bc0-a274-f4ae90928247",
+    "byte_size": 174033,
+    "line_count": 3540,
+    "encoding": "UTF-8",
+    "line_endings": "LF",
+    "sha256": "A3F10DAF7055B3B16B3F978909C9AFC77ECC6EA8486DF43FE50647297AAA00A6",
+    "exporter_created": "2026-10-31T13:48:09",
+    "exporter_updated": "2026-11-01T17:06:52",
+    "exporter_exported": "2026-11-01T17:09:57",
+    "exporter_conversation_url": "https://chatgpt.com/c/6ae645f8-b710-83e8-a16e-543029bbcb5e"
+  },
+  "original_persistence": {
+    "path": "docs/frentes/harmonia/originales/ChatGPT-HARMONIA-20261101-1709.md",
+    "git_blob_sha1": "1e1ddd38fd4e3b7c6a1d6cb429467430e4d80ab5",
+    "commit": "c47324e9234d2a89c8211f4c1fa64707c93995ba",
+    "readback_method": "GitHub fetch_file on main compared exactly with RDC read_file content from the authorized PC-8 source",
+    "readback_exact": true,
+    "state": "PERSISTIDO_Y_VERIFICADO"
+  },
+  "documentary_artifacts": {
+    "ocp": {
+      "path": "docs/frentes/harmonia/OBJETO-CANONICO.md",
+      "blob_sha1": "57ec807b64299dab47425a6e51f18303c873cf84",
+      "commit": "12239782bf6639b6c9473f824c60729a21a17584",
+      "version": "0.41",
+      "section": "§47",
+      "readback_exact": true
+    },
+    "readme": {
+      "path": "docs/frentes/harmonia/README.md",
+      "blob_sha1": "f32ebf6cae16f229b0cadf6beb1357b1fc220d19",
+      "commit": "0c756183dfd1cb28d84598255b5537d9f145264b",
+      "readback_exact": true
+    },
+    "provenance": {
+      "path": "docs/frentes/harmonia/originales/PROCEDENCIA.md",
+      "blob_sha1": "2dffaee2a22d85947f4f6658211cf0074ce520d1",
+      "commit": "3abb9c7e7347b09aa6c585f7e8ad27cc966fad30",
+      "readback_exact": true
+    },
+    "manifest": {
+      "path": "docs/frentes/harmonia/documentos/MANIFIESTO-DOCUMENTAL.json",
+      "blob_sha1": "15a700a74d74c04cece651770953f30ad894c77f",
+      "entry_count": 26,
+      "readback_exact": true
+    },
+    "chronicle": {
+      "path": "docs/frentes/harmonia/cronica/HARMONIA-RETOMA-G14-20261101.md",
+      "blob_sha1": "41d381fc828add3fdfc72d0d9c197ec1df56a48e",
+      "last_visible_output_lines": 106,
+      "readback_exact": true
+    }
+  },
+  "technical_scope": {
+    "local_first_candidate_branch": "feat/harmonia-ep-local-first-adapter-20261101",
+    "candidate_head": "b1d007d63672bf06e50daa40d52bf1b228f398f3",
+    "dedicated_workflow_run": 41355059144,
+    "dedicated_workflow_conclusion": "success",
+    "merged": false,
+    "ep_remote_transport": "BLOCKED_CONTRACT_AND_ALLOWLIST",
+    "chrome_natural_acceptance": "PENDING",
+    "historical_backfill": false,
+    "deployment": false
+  },
+  "traceability": {
+    "folio1_active": false,
+    "conversation_folio": null,
+    "cycle_folio": null,
+    "entry_a_folio": null,
+    "exit_b_folio": null
+  }
+}
