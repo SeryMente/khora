@@ -1,10 +1,12 @@
 try { importScripts('local-auth.js'); } catch {}
+importScripts('durable-outbox.js');
 const COLLECTOR='http://127.0.0.1:47321';
 const TOKEN=String(globalThis.HARMONIA_TOKEN||'');
 const STORE={sessions:'harmoniaAutoSessions',enabled:'harmoniaAutoEnabled',events:'harmoniaEventCount',fingerprints:'harmoniaKnownSurfaceFingerprints',repositorySync:'harmoniaRepositorySync'};
 const REPO_BUILD_INFO='https://raw.githubusercontent.com/SeryMente/khora/main/apps/harmonia-observability/extension/build-info.json';
 const REPO_CATALOG='https://raw.githubusercontent.com/SeryMente/khora/main/apps/harmonia-observability/coverage-catalog.json';
 const REPO_SYNC_ALARM='harmonia-repository-sync';
+const OUTBOX_RETRY_ALARM='harmonia-outbox-retry';
 let sessions={};
 let autoEnabled=true;
 let eventCount=0;
@@ -12,6 +14,7 @@ let lastError=null;
 let collector=false;
 let knownFingerprints=new Set();
 let surfaceQueue=Promise.resolve();
+let outboxFlushPromise=null;
 const ready=(async()=>{
   const saved=await chrome.storage.local.get([STORE.sessions,STORE.enabled,STORE.events,STORE.fingerprints]);
   sessions=saved[STORE.sessions]||{};
@@ -26,6 +29,8 @@ const ready=(async()=>{
   await refreshKnownFingerprints();
   await syncRepository();
   chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});
+  chrome.alarms.create(OUTBOX_RETRY_ALARM,{delayInMinutes:1,periodInMinutes:1});
+  void flushOutbox();
 })();
 let storageQueue=Promise.resolve();
 function saveSessions(){
@@ -103,18 +108,60 @@ async function rememberFingerprint(fingerprint){
  while(knownFingerprints.size>5000)knownFingerprints.delete(knownFingerprints.values().next().value);
  await chrome.storage.local.set({[STORE.fingerprints]:[...knownFingerprints]});
 }
-async function postEvent(tabId,session,type,payload={},source='extension'){
- const event={schema:'harmonia.event.v1',eventId:crypto.randomUUID(),sessionId:session.id,conversation:`tab-${tabId}`,type,source,capturedAt:new Date().toISOString(),payload};
- if(!TOKEN){collector=false;lastError='No existe credencial local; evento no enviado.';return {ok:false};}
- try{
-  const response=await fetch(`${COLLECTOR}/events`,{method:'POST',headers:headers({'content-type':'application/json'}),body:JSON.stringify(event)});
-  if(!response.ok)throw new Error(`Colector HTTP ${response.status}`);
-  const ack=await response.json();
-  collector=true;lastError=null;eventCount++;session.events=(session.events||0)+1;session.lastAt=event.capturedAt;
-  await saveSessions();
-  return {ok:true,storedType:ack.storedType||type,deduplicated:!!ack.deduplicated,eventId:event.eventId};
- }catch(error){collector=false;lastError=String(error.message||error);return {ok:false,error:lastError};}
+async function flushOutbox(){
+ if(outboxFlushPromise)return outboxFlushPromise;
+ outboxFlushPromise=(async()=>{
+  const acknowledgedIds=[];
+  if(!TOKEN)return {acknowledgedIds,blocked:'local-auth-missing'};
+  const pending=await HarmoniaDurableOutbox.listPending(100);
+  for(const record of pending){
+   const event=record.event;
+   try{
+    const response=await fetch(COLLECTOR+'/events',{method:'POST',headers:headers({'content-type':'application/json'}),body:JSON.stringify(event)});
+    if(!response.ok){
+     await HarmoniaDurableOutbox.defer(event.eventId,'collector-http-'+response.status);
+     collector=false;lastError='Colector respondió HTTP '+response.status;
+     break;
+    }
+    const ack=await response.json();
+    if(!ack||ack.ok!==true||ack.eventId!==event.eventId){
+     await HarmoniaDurableOutbox.defer(event.eventId,'collector-ack-mismatch');
+     collector=false;lastError='Confirmación del colector no correlacionada.';
+     break;
+    }
+    await HarmoniaDurableOutbox.acknowledge(event.eventId);
+    acknowledgedIds.push(event.eventId);
+    collector=true;lastError=null;eventCount++;
+    const tabMatch=String(event.conversation||'').match(/^tab-(\d+)$/);
+    if(tabMatch){
+     const session=sessions[tabMatch[1]];
+     if(session&&session.id===event.sessionId){session.events=(session.events||0)+1;session.lastAt=event.capturedAt;}
+    }
+    await saveSessions();
+   }catch(error){
+    try{await HarmoniaDurableOutbox.defer(event.eventId,'collector-network-or-storage-error');}catch{}
+    collector=false;lastError='Entrega local pendiente: '+String(error.message||error);
+    break;
+   }
+  }
+  return {acknowledgedIds,pendingCount:(await HarmoniaDurableOutbox.status()).pendingCount};
+ })().finally(()=>{outboxFlushPromise=null;});
+ return outboxFlushPromise;
 }
+async function postEvent(tabId,session,type,payload={},source='extension'){
+ const event={schema:'harmonia.event.v1',eventId:crypto.randomUUID(),sessionId:session.id,conversation:'tab-'+tabId,type,source,capturedAt:new Date().toISOString(),payload};
+ try{
+  await HarmoniaDurableOutbox.enqueue(event);
+  session.lastAt=event.capturedAt;
+  await saveSessions();
+  const result=await flushOutbox();
+  return {ok:true,durable:true,collectorStored:result.acknowledgedIds.includes(event.eventId),eventId:event.eventId,pendingCount:result.pendingCount};
+ }catch(error){
+  collector=false;lastError='No se pudo confirmar la cola local durable: '+String(error.message||error);
+  return {ok:false,durable:false,error:lastError};
+ }
+}
+
 const sessionInitializers={};
 async function ensureSession(tab){
  const key=String(tab.id);
@@ -221,11 +268,15 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
   if(message.kind==='harmonia:sync-repository')return syncRepository();
   if(message.kind==='harmonia:get'){
    await checkHealth();
+   if(collector)await flushOutbox();
    const syncData=await chrome.storage.local.get([STORE.repositorySync]);
    let coverage=null;
    if(collector){try{const response=await fetch(`${COLLECTOR}/coverage`,{headers:headers(),cache:'no-store'});if(response.ok)coverage=await response.json();else throw new Error(`Colector HTTP ${response.status}`);}catch(error){lastError=String(error.message||error);}}
+   const localOutbox=await HarmoniaDurableOutbox.status();
+   let epStatus=null;
+   if(collector){try{const epResponse=await fetch(COLLECTOR+'/ep/status',{headers:headers(),cache:'no-store'});if(epResponse.ok)epStatus=await epResponse.json();}catch{}}
    return {version:'0.3.0',autoEnabled,active:autoEnabled&&Object.keys(sessions).length>0,activeTabs:Object.keys(sessions).length,
-    sessions:Object.entries(sessions).map(([tabId,session])=>({tabId,startedAt:session.startedAt,lastAt:session.lastAt,events:session.events})),
+    localOutbox,epStatus,sessions:Object.entries(sessions).map(([tabId,session])=>({tabId,startedAt:session.startedAt,lastAt:session.lastAt,events:session.events})),
     collector,lastError,events:eventCount,coverage,repositorySync:syncData[STORE.repositorySync]||null};
   }
   if(message.kind==='harmonia:set-auto')return setAutoEnabled(message.enabled);
@@ -242,6 +293,6 @@ chrome.tabs.onUpdated.addListener((tabId,changeInfo,tab)=>{
  });
 });
 void ready.then(async()=>{if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});
-chrome.alarms.onAlarm.addListener(alarm=>{if(alarm.name===REPO_SYNC_ALARM)void syncRepository();});
-chrome.runtime.onInstalled.addListener(()=>{void ready.then(async()=>{chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});await syncRepository();if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});});
+chrome.alarms.onAlarm.addListener(alarm=>{if(alarm.name===REPO_SYNC_ALARM)void syncRepository();if(alarm.name===OUTBOX_RETRY_ALARM)void flushOutbox();});
+chrome.runtime.onInstalled.addListener(()=>{void ready.then(async()=>{chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});chrome.alarms.create(OUTBOX_RETRY_ALARM,{delayInMinutes:1,periodInMinutes:1});await syncRepository();void flushOutbox();if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});});
 chrome.runtime.onStartup.addListener(()=>{void ready.then(async()=>{chrome.alarms.create(REPO_SYNC_ALARM,{delayInMinutes:1,periodInMinutes:360});await syncRepository();if(autoEnabled)await injectExistingTabs(await chrome.tabs.query({url:'https://chatgpt.com/*'}));});});
