@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: harmonia. Versión del objeto **0.39**; sello **HARMONIA-v0.39**; corte de estado **2026-10-31**. §§37–44 conservan antecedentes de paquetes, transferencias y validaciones previas. §45 registra la ingesta binaria de la exportación ChatGPT-HARMONIA-20261031-1349, el cierre operativo de NCL-OCP, la transferencia gen11→gen12 y el checkpoint de continuación. La titularidad vigente es generación 12; la aceptación natural de Chrome y el E2E productivo Cora/Neon siguen pendientes. Regla permanente §36.1-36.2: la única aceptación local es el uso real del operador; el asistente ejecuta todo lo demás.
+- Identificador del frente: harmonia. Versión del objeto **0.41**; sello **HARMONIA-v0.41**; corte de estado **2026-11-01**. §§37–45 conservan antecedentes históricos, incluida la transferencia gen12 y el cierre NCL-OCP. §46 conserva la fotografía técnica de la candidata local-first v0.40 en rama separada y la titularidad gen13, ambas supersedidas en responsabilidad por §47. §47 registra la transferencia gen13→gen14 a PC-8 y la captura documental del original ChatGPT-HARMONIA-20261101-1709.md. La capa local-first permanece en rama de revisión; transporte EP y aceptación Chrome siguen pendientes. La regla permanente §36.1-36.2 conserva la aceptación natural exclusivamente en manos del operador.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -1684,3 +1684,103 @@ En cada sesión Windows/RDC que corresponda al EP activo:
 - Identificador local de transferencia vigente: 01a19387-bd75-7479-acc8-bf1a92d4b04b. La plataforma no expuso ID nativo de conversación. Sin FOL1 activa, no se asignan folios globales nuevos.
 - Cierre del ciclo documental: exportación íntegra preservada; procedencia y control leídos de vuelta; NCL-OCP clasificado como auxiliar acotado y desconectado por defecto; responsabilidad del frente asumida en generación 12. La siguiente acción técnica de Harmonia requiere recuperar el canal autenticado de Cora para ejecutar el único evento sintético ya autorizado, o mantener ese gate explícitamente bloqueado hasta contar con esa interfaz.
 
+## 46. Transferencia generación 13 e implementación HARMONIA local-first · 2026-11-01
+
+### 46.1 Control y autoridad
+
+- Control autoritativo releído de `main`: generación 13, estado `assigned`, alias `chatgpt-harmonia-01a198f5-3be2-7aff-bf83-5d5b9e0d9189`, `owner_thread=null`, `session_folio=null`; blob del archivo `1591cc682dc30340296c3b9e71f0892c3f51adcc`.
+- Dispositivo vinculado a esta continuidad: `PC-14`, UUID exacto `a1fe1e75-ba92-48e0-8547-5df886baa33c`. Autorización recibida literalmente: «Si autorizo». No se realizó acceso RDC ni se materializó código en la máquina del operador.
+- Alcance de construcción: el operador autorizó expresamente esta implementación de consumidor mediante la instrucción posterior «Resuelve lo tuyo». Se limita a una rama aislada de HARMONIA; no amplía autorización para modificar infraestructura EP/B2, usar RDC, fusionar `main` o desplegar.
+- FOL1 continúa preparada/no activa. No se generan folios CV/CY/A/B.
+
+La transferencia de responsabilidad y el dispositivo PC-14 descritos en §46.1 son antecedentes de generación 13. Fueron sustituidos por la transferencia gen13→gen14 de §47; PC-14 queda solo como referencia histórica. La descripción técnica de esta sección corresponde a una rama candidata, no a una aceptación ni a un merge de código.
+
+### 46.2 Rama de implementación y preservación de main
+
+- Repositorio: `https://github.com/SeryMente/khora`.
+- Rama aislada: `feat/harmonia-ep-local-first-adapter-20261101`.
+- Base de rama: `main` SHA `ed442d78fae3b86d6747ee8d4bb347678a766576`.
+- Corte de código y pruebas: commit de workflow `3fc095557ca090e4d446a9caf375f6e0043ddf57`; ejecución HARMONIA local-first run `41355059144`, conclusión `success`.
+- No se modificó `main`; no se hizo merge, PR, despliegue, migración de esquema ni escritura en servicios productivos. El paquete local Chrome no se reconstruyó ni instaló. Esta rama es una implementación revisable, no una versión aceptada ni publicada.
+
+### 46.3 Capa 1 — navegador y colector local
+
+- `extension/durable-outbox.js`: IndexedDB `harmonia-local-first`, store `pendingEvents`, capacidad límite 10.000, identidad por `eventId`, rechazo de mismo ID con payload distinto, reintento exponencial y confirmación explícita.
+- `extension/service-worker.js`: persiste primero en IndexedDB; después intenta entregar al colector local `127.0.0.1:47321`. Solo elimina la operación del outbox cuando recibe ACK del colector con `ok=true` y el mismo `eventId`. El ACK solo confirma recepción durable local, nunca EP.
+- `collector/server.js`: anexado JSONL con `fsync` y sincronización del directorio al crear el archivo; escrituras de superficie/índice con temporal, `fsync` y rename. Si el total de bytes en disco no coincide con el índice persistido, reconstruye el índice desde JSONL y superficies sin reescribir originales.
+- Si el outbox no puede persistir, el evento no se declara durable en navegador. Si el colector está offline o responde con error, permanece pendiente en IndexedDB y se difiere con backoff.
+
+### 46.4 Ledger local de réplica y recuperación
+
+- `collector/ep-consumer-adapter.js` implementa métodos internos `enqueue(sourceRef)`, `flush(options)`, `getStatus()` y `recover(operationRef)`. No define rutas HTTP externas de EP.
+- El journal `ep-consumer-ledger.jsonl` es append-only y se escribe con `fsync`. Cada `SOURCE_REGISTERED` conserva referencia al original, tamaño, SHA-256 del JSONL, hash de superficie cuando aplica, `eventId`, `operationRef` estable y estados separados. No almacena el payload completo.
+- Identidad de operación: SHA-256 de `HARMONIA`, `eventId` y SHA-256 del registro local. Mismo ID/hash conserva la operación; mismo ID con hash distinto genera conflicto 409 no destructivo.
+- `ep-consumer-activation.json` fija el hito de activación. La reconciliación automática incluye registros recibidos a partir de ese instante y recupera el hueco de caída JSONL→ledger; los originales anteriores a la activación quedan excluidos. No se ejecuta backfill histórico.
+- `recover(operationRef)` lee de nuevo la fuente y valida su hash; si existe una superficie asociada, valida también su hash. No consulta almacenamiento remoto y devuelve `epVerified=false`.
+- Si el ledger falla durante una escritura, el colector queda degradado y rechaza nuevas escrituras con 503 hasta reinicio y reconciliación. Así evita confirmar un registro cuyo ledger no quedó durable.
+
+### 46.5 Estado remoto EP
+
+- Estado de cada referencia: `localState=LOCAL_DURABLE`, `cloudState=CLOUD_PENDING`, `eligibility=PENDING_ALLOWLIST_APPROVAL`.
+- `flush(options)` permanece bloqueado: `attempted=0`; no hay cliente remoto ni endpoint EP configurado.
+- No se verificó contrato oficial/versionado de consumidor EP, SDK/API de envío, autenticación/scopes, operación de lookup/read-back, recibo remoto, entorno E2E OCP-MSP ni allowlist de campos. La búsqueda de `OCP-MSP` en código visible no acreditó un servicio de objetos EP disponible.
+- El endpoint EP PostgreSQL de bitácora no se toma como servicio de objetos OCP-MSP. La PR #348 de Custodia/Blob→B2 tampoco constituye el contrato EP del consumidor. No se introducen App Keys B2 en la extensión ni acceso directo del consumidor a B2.
+- Los estados `CLOUD_PENDING` son obligaciones locales pendientes, no una afirmación de que la nube haya recibido o persistido dato alguno. No se borra ningún original por esta implementación.
+
+### 46.6 Evidencia de pruebas y límites
+
+- Workflow dedicado `.github/workflows/harmonia-local-first.yml`, Node 22. Ejecución `41355059144`: sintaxis y pruebas completadas con conclusión `success`.
+- Pruebas del outbox con `fake-indexeddb` cubren inserción, idempotencia, conflicto, diferimiento/backoff, lectura tras recarga del módulo y ACK explícito. El shim es una simulación IndexedDB en memoria; no reemplaza el runtime Chrome.
+- Pruebas del adaptador cubren reconciliación, identidad estable tras recrear el adaptador, exclusión de históricos, conflicto ID/hash, bloqueo de flush y recuperación local.
+- Pruebas HTTP del colector ejecutan un proceso Node en directorio temporal: POST local, duplicate, conflicto, lectura de status, persistencia JSONL/ledger y reconstrucción del índice/ledger tras simular un reinicio con el ledger ausente. No usan servicios externos ni datos de usuario.
+- La aceptación funcional en Chrome sigue **PENDIENTE**: no se cargó/recargó la extensión, no se probó IndexedDB real, suspensión/reinicio MV3, desconexión/reconexión en el perfil del operador ni retención bajo cuota del navegador. Tampoco se ejecutó E2E EP/OCP-MSP.
+
+### 46.7 Dictamen del corte
+
+- **Implementado en rama:** outbox local duradero del navegador; append durable de originales; reconciliación del índice; ledger local de referencias/hashes; identidad idempotente; recuperación local; señalización de estado; pruebas automáticas.
+- **No implementado:** transporte remoto EP, allowlist, recibo EP, read-back remoto, `EP_PERSISTED_VERIFIED`, migración histórica, aceptación Chrome y despliegue.
+- **Estado:** código de la capa local listo para revisión técnica en rama; no aceptado ni publicado. La capa 2 permanece correctamente bloqueada hasta recibir el contrato oficial EP y la autorización de allowlist correspondiente. La aceptación de HARMONIA y la de Signal Interpreter se mantienen independientes; el resultado de un consumidor no acredita el otro.
+
+
+## 47. Transferencia generación 14 e ingesta documental · 2026-11-01
+
+### 47.1 Responsabilidad y control
+
+- El operador autorizó expresamente «PC 8 es la conexion activa, usala cuando la necesites. Si autorizo. PC 14 olvidalo». La operación se registró como `TRANSFER_RESPONSIBILITY` desde generación 13 a generación 14; no se infirió identidad nativa de conversación.
+- Control autoritativo en `docs/frentes/harmonia/CONTROL-RESPONSABILIDAD.json`: generación **14**, estado `assigned`, alias operativo `chatgpt-harmonia-01a19969-8e70-7dcb-b9fd-7db62736f279`, `owner_thread=null`, `session_folio=null`, UUIDv7 local de evento `01a19969-8e70-7dcb-b9fd-7db62736f279`.
+- Dispositivo activo autorizado: **PC-8**, UUID `7595d30a-bd63-4bc0-a274-f4ae90928247`, usuario observado `PC-8\PC 8`, perfil `C:\Users\PC 8`. La identidad del dispositivo se vincula al UUID, no al nombre visible.
+- La transferencia se hizo en main con compare-and-swap sobre el blob anterior `1591cc682dc30340296c3b9e71f0892c3f51adcc`; commit `498c0ca6a0285949f62d8193e8919a076abb3c99`; blob posterior/read-back `41c4ace91267104eb472ffdec0fb27ed04651927`. La lectura de vuelta cotejó generación, alias, dispositivo, UUIDv7 local, evento de autorización y conservación de gen13.
+- Generación 13 y PC-14 permanecen únicamente en `previous_owner`/historial. PC-14 está marcado `historical_superseded_not_currently_authorized`; no es el dispositivo operativo vigente.
+- FOL1 continúa no activa. No se asignan folios globales CV/CY/A/B; el UUIDv7 local no se declara folio.
+
+### 47.2 Original recibido y metadatos observados
+
+- Original: `ChatGPT-HARMONIA-20261101-1709.md`.
+- Origen: `C:\Users\PC 8\Downloads\ChatGPT-HARMONIA-20261101-1709.md`, leído mediante RDC sobre el dispositivo autorizado PC-8.
+- Contexto Windows observado: `PC-8\PC 8`; perfil `C:\Users\PC 8`; SID observado en la sesión RDC: `S-1-5-21-2982808782-763814400-4126640191-1001`.
+- Metadatos del encabezado del exportador: conversación `HARMONIA`; creada `2026-10-31 13:48:09`; actualizada `2026-11-01 17:06:52`; exportada `2026-11-01 17:09:57`; URL declarada por el exportador: `https://chatgpt.com/c/6ae645f8-b710-83e8-a16e-543029bbcb5e`. Estos valores se atribuyen al exportador.
+- Tamaño local: **174.033 bytes**; **3.540 líneas**; UTF-8 sin BOM y con LF; SHA-256 local `A3F10DAF7055B3B16B3F978909C9AFC77ECC6EA8486DF43FE50647297AAA00A6`.
+- Git blob SHA-1 calculado sobre la serialización UTF-8 exacta (prefijo Git `blob <size>\0`): `1e1ddd38fd4e3b7c6a1d6cb429467430e4d80ab5`.
+
+### 47.3 Persistencia documental
+
+- Ruta canónica heredada, sin migración: `docs/frentes/harmonia/originales/ChatGPT-HARMONIA-20261101-1709.md`.
+- Commit de incorporación: `c47324e9234d2a89c8211f4c1fa64707c93995ba`; Git blob `1e1ddd38fd4e3b7c6a1d6cb429467430e4d80ab5`.
+- La lectura de vuelta desde la ruta publicada en `main` coincidió exactamente con el original recuperado por RDC: mismo contenido UTF-8, 174.033 bytes y 3.540 líneas. La verificación se realizó mediante lectura de archivo en main, no solo mediante creación de blob.
+- Procedencia: `originales/PROCEDENCIA.md`; manifiesto: `documentos/MANIFIESTO-DOCUMENTAL.json`; crónica de continuidad: `cronica/HARMONIA-RETOMA-G14-20261101.md`; evidencia de lectura de vuelta: `evidencias/EV-HARMONIA-G14-20261101.json`.
+
+### 47.4 Estado técnico reconciliado
+
+- El OCP principal queda en **v0.41 / HARMONIA-v0.41**. La §46 mantiene la fotografía técnica de la rama candidata v0.40 y de generación 13; no representa un cambio de código integrado.
+- Rama de candidato local-first: `feat/harmonia-ep-local-first-adapter-20261101`, head observado `b1d007d63672bf06e50daa40d52bf1b228f398f3`; OCP de rama v0.40 / §46.
+- Workflow dedicado HARMONIA local-first `41355059144`: conclusión `success` para el corte `3fc095557ca090e4d446a9caf375f6e0043ddf57`. Es evidencia de esa suite; no equivale a aceptación general, prueba runtime en Chrome o aceptación de producción.
+- La capa local-first candidata está descrita en §46: outbox IndexedDB, entrega al colector local, JSONL durable, ledger local y recuperación. No ha sido fusionada ni aceptada en main.
+- Sigue bloqueada la capa 2: no está verificado el contrato/SDK/API oficial de consumidor EP, scopes, allowlist, recibo remoto, ni read-back en OCP-MSP. No hay envío remoto, no hay `EP_PERSISTED_VERIFIED`, no se ejecuta backfill histórico ni acceso directo del consumidor a B2.
+- La aceptación natural en Chrome sigue pendiente; no se cargó ni recargó la extensión en el perfil del operador en este ciclo.
+- Próximo paso técnico: resolver el contrato oficial EP y sus compuertas de identidad, autorización, allowlist, envío, idempotencia, recuperación y recibo; solo entonces conectar la segunda capa. Conservar la aceptación Chrome como compuerta separada a cargo del operador.
+
+### 47.5 Alcance y límites
+
+- La ingesta documental y la transferencia de responsabilidad no certifican el funcionamiento integral de Harmonia.
+- No se fusionó la rama candidata, no se creó ni cerró una PR, no se desplegó, no se modificó Chrome, no se ejecutó escritura productiva Cora/Neon ni se realizaron cambios de infraestructura EP/B2.
+- Las versiones y dispositivos de secciones previas son fotografías históricas; la autoridad vigente de responsabilidad corresponde al control gen14 releído en main.
