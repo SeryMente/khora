@@ -22,7 +22,7 @@
   },
   "README": {
     "path": "docs/frentes/harmonia/README.md",
-    "git_blob_sha1": "f32ebf6cae16f229b0cadf6beb1357b1fc220d19",
+    "git_blob_sha1": "c316044df956b9b3d133f3e6880bf9968819543f",
     "state": "PERSISTIDO_Y_VERIFICADO",
     "readback_exact": true
   },
@@ -333,5 +333,18 @@
       "readback_exact": true,
       "revalidated_this_cycle": true
     }
-  ]
+  ],
+  "chronicle": {
+    "path": "docs/frentes/harmonia/cronica/HARMONIA-RETOMA-G14-20261101.md",
+    "git_blob_sha1": "41d381fc828add3fdfc72d0d9c197ec1df56a48e",
+    "state": "PERSISTIDO_Y_VERIFICADO",
+    "last_visible_output_reproduced": true,
+    "readback_exact": true
+  },
+  "evidence": {
+    "path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-G14-20261101.json",
+    "git_blob_sha1": "b90a5fc2663b98c7f193b435a0266b2403f6df9b",
+    "state": "PERSISTIDO_Y_VERIFICADO",
+    "readback_exact": true
+  }
 }
