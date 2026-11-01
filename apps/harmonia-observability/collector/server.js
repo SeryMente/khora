@@ -13,6 +13,7 @@ fs.mkdirSync(root,{recursive:true});
 const idxPath=path.join(root,'index.json'),surfacesDir=path.join(root,'surfaces'),originalsDir=path.join(root,'originals');
 fs.mkdirSync(surfacesDir,{recursive:true});fs.mkdirSync(originalsDir,{recursive:true});
 const epAdapter=createEpConsumerAdapter({root,originalsDir,surfacesDir});
+let ledgerHealthy=true;
 const catalogPath=path.join(__dirname,'..','coverage-catalog.json');
 const catalog=JSON.parse(fs.readFileSync(catalogPath,'utf8'));
 let index={schema:'harmonia.index.v1',updatedAt:null,sessions:{},surfaceFingerprints:{},seenEventIds:{},coverage:null,uniqueSurfaceCount:0,totalBytes:0,stopped:false};
@@ -132,7 +133,7 @@ function recordEvent(event,res){
   const keys=Object.keys(index.surfaceFingerprints);
   if(keys.length>MAX_INDEXED_SURFACES){for(const oldKey of keys.slice(0,keys.length-MAX_INDEXED_SURFACES))delete index.surfaceFingerprints[oldKey];}
   const storedType=isNewSurface?'ui.surface.scan':'ui.surface.reused';
-  const stored={...event,type:storedType,payload:compactReference(surface,record)};
+  const stored={...event,type:storedType,payload:compactReference(surface,record),collectorReceivedAt:new Date().toISOString(),sourceRequestSha256:requestSha256};
   const file=path.join(originalsDir,day,event.sessionId+'.jsonl'),line=JSON.stringify(stored)+'\n',bytes=Buffer.byteLength(line);
   const surfaceBytes=isNewSurface?Buffer.byteLength(JSON.stringify(surface,null,2),'utf8'):0;
   if(index.totalBytes+surfaceBytes+bytes>MAX){index.stopped=true;persist();return {tooLarge:true};}
@@ -149,10 +150,10 @@ function recordEvent(event,res){
   return {duplicate:false,storedType,ordinal:session.events,deduplicated:!isNewSurface,surfaceRef:record.surfaceFile,operationRef:registration.operationRef};
  }
  const day=new Date(when).toISOString().slice(0,10),file=path.join(originalsDir,day,event.sessionId+'.jsonl');
- const stored={schema:'harmonia.event.v1',eventId:event.eventId,sessionId:event.sessionId,conversation:typeof event.conversation==='string'?event.conversation.slice(0,80):null,type:event.type,source:text(event.source,40),capturedAt:new Date(when).toISOString(),payload:event.type==='capture.started'?{url:safeSessionUrl(event.payload&&event.payload.url),version:text(event.payload&&event.payload.version,24),mode:text(event.payload&&event.payload.mode,60),privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true}}:event.type==='capture.stopped'?{reason:text(event.payload&&event.payload.reason,80),durationMs:Math.max(0,number(event.payload&&event.payload.durationMs))}:{reason:'event-suppressed'}};
+ const stored={schema:'harmonia.event.v1',eventId:event.eventId,sessionId:event.sessionId,conversation:typeof event.conversation==='string'?event.conversation.slice(0,80):null,type:event.type,source:text(event.source,40),capturedAt:new Date(when).toISOString(),collectorReceivedAt:new Date().toISOString(),sourceRequestSha256:requestSha256,payload:event.type==='capture.started'?{url:safeSessionUrl(event.payload&&event.payload.url),version:text(event.payload&&event.payload.version,24),mode:text(event.payload&&event.payload.mode,60),privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true}}:event.type==='capture.stopped'?{reason:text(event.payload&&event.payload.reason,80),durationMs:Math.max(0,number(event.payload&&event.payload.durationMs))}:{reason:'event-suppressed'}};
  const line=JSON.stringify(stored)+'\n',bytes=Buffer.byteLength(line);
  if(index.totalBytes+bytes>MAX){index.stopped=true;persist();return {tooLarge:true};}
- fs.appendFileSync(file,line,'utf8');index.totalBytes+=bytes;
+ appendDurable(file,line);index.totalBytes+=bytes;
  const session=index.sessions[event.sessionId]||{firstAt:stored.capturedAt,lastAt:stored.capturedAt,events:0,types:{},file:path.relative(root,file).split(path.sep).join('/'),lastEventSha256:null};
  session.lastAt=stored.capturedAt;session.events++;session.types[stored.type]=(session.types[stored.type]||0)+1;
  session.lastEventSha256=crypto.createHash('sha256').update(line).digest('hex');index.sessions[event.sessionId]=session;
@@ -250,6 +251,7 @@ const server=http.createServer((req,res)=>{
  if(req.method==='POST'&&req.url==='/shutdown'){if(!authOK(req))return reply(req,res,401,{error:'unauthorized'});persist();reply(req,res,200,{ok:true,stopping:true});setTimeout(()=>server.close(()=>console.log('HARMONIA_COLLECTOR_STOPPED')),80);return;}
  if(req.method!=='POST'||req.url!=='/events')return reply(req,res,404,{error:'not-found'});
  if(!authOK(req))return reply(req,res,401,{error:'unauthorized'});
+ if(!ledgerHealthy)return reply(req,res,503,{error:'local-ledger-degraded-restart-required'});
  if(index.stopped)return reply(req,res,507,{error:'storage-limit-stop-no-deletion'});
  let body='',size=0,tooLarge=false;
  req.on('data',chunk=>{size+=chunk.length;if(size>MAX_REQUEST){tooLarge=true;return;}body+=chunk.toString('utf8');});
@@ -260,14 +262,15 @@ const server=http.createServer((req,res)=>{
    if(result.tooLarge)return reply(req,res,507,{error:'storage-limit-stop-no-deletion'});
    if(result.duplicate)return reply(req,res,200,{ok:true,eventId:event.eventId,duplicate:true,storedType:result.storedType,ordinal:result.ordinal});
    return reply(req,res,201,{ok:true,eventId:event.eventId,ordinal:result.ordinal,storedType:result.storedType,deduplicated:result.deduplicated,surfaceRef:result.surfaceRef||null,operationRef:result.operationRef||null,localState:'LOCAL_DURABLE',cloudState:'CLOUD_PENDING'});
-  }catch(error){const code=error.code==='integrity-conflict'?409:error.code==='integrity-error'?422:error.code==='ledger-unavailable'?503:400;return reply(req,res,code,{error:String(error.code||error.message||error)});}
+  }catch(error){if(error.code==='ledger-unavailable')ledgerHealthy=false;const code=error.code==='integrity-conflict'?409:error.code==='integrity-error'?422:error.code==='ledger-unavailable'?503:400;return reply(req,res,code,{error:String(error.code||error.message||error)});}
  });
 });
 (async()=>{
  try{
   const ledger=await epAdapter.reconcile();
   await reconcileIndex();
+  ledgerHealthy=ledger.integrityErrors===0;
   console.log('HARMONIA_LOCAL_RECONCILIATION',JSON.stringify(ledger));
- }catch(error){console.error('HARMONIA_LOCAL_RECONCILIATION_BLOCKED',String(error.code||error.message||error));}
+ }catch(error){ledgerHealthy=false;console.error('HARMONIA_LOCAL_RECONCILIATION_BLOCKED',String(error.code||error.message||error));}
  server.listen(PORT,HOST,()=>console.log('HARMONIA_COLLECTOR_ONLINE http://'+HOST+':'+PORT+' data='+root));
 })();
