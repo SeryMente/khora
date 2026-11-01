@@ -3,13 +3,13 @@
 **Estado:** materialización operativa provisional; no modifica ni sustituye el OCP único ni crea un sistema general de gestión de tareas.  
 **Contenedor:** `docs/frentes/observabilidad-mcp/📁 🧭 - Tareas provisionales/`  
 **OCP padre y fuente de estado:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md)  
-**Control heredado:** [CONTROL-RESPONSABILIDAD.json](../CONTROL-RESPONSABILIDAD.json), generación **5**, titular operativo `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`; blob leído de vuelta `92f4f6ab864c19e52a123b6358d94c5a8e7a9474`.  
+**Control heredado:** [CONTROL-RESPONSABILIDAD.json](../CONTROL-RESPONSABILIDAD.json), generación **7**, titular de KHORA-MCP `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`; corresponsable limitado al módulo Jules `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; blob leído de vuelta `62b38ee17feae7d3028eff8747dfe746a8f1979a`.  
 **Evento de creación:** instrucción expresa del operador en esta conversación · 2026-10-31.  
-**Fuente normativa vigente:** [DUG Samantha v374 · NX-374m](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), Metacanon **1.26**, GOW **2.14**.
+**Fuente normativa vigente:** [DUG Samantha v375 · NX-375m](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), Metacanon **1.26**, GOW **2.16**.
 
 ## Naturaleza y límites
 
-Este contenedor organiza tres objetos provisionales de tarea del frente Khora MCP. No son frentes independientes ni unidades de una taxonomía global de tareas. Cada tarea conserva un identificador local estable, un directorio y un README propio con enunciado, fuente de origen, estado, límites, siguiente actuación y criterio de cierre.
+Este contenedor organiza tres tareas provisionales del frente Khora MCP. No son frentes independientes ni unidades taxonómicas ni controles de responsabilidad. Cada tarea conserva un identificador local estable, un directorio y un README propio con enunciado, fuente de origen, estado, límites, siguiente actuación y criterio de cierre. Jules se ha materializado como módulo funcional interno en [modulos/jules](../modulos/jules/README.md); KHORA-MCP-TASK-003 continúa como tarea de implementación y aceptación de ese módulo.
 
 La responsabilidad, titularidad, autorización, generación y sesión se heredan del único OCP/control del frente. Las tareas no crean controles, responsables, sesiones, conversaciones ni folios propios. Los IDs `KHORA-MCP-TASK-###` son locales a este registro; no se declara unicidad global. **FOL1 permanece PREPARADO, NO ACTIVO; no se asignan folios globales ni de sesión.**
 
@@ -21,13 +21,13 @@ El patrón reproduce el índice de frente y un núcleo README por tarea empleado
 |---:|---|---|---|---|
 | 1 | KHORA-MCP-TASK-001 | en_curso | Reconstruir workspace y recuperar continuidad documental | [núcleo](./%F0%9F%93%81%20%F0%9F%A7%A9%20-%20KHORA-MCP-TASK-001%20-%20Continuidad%20y%20reconstrucci%C3%B3n%20del%20workspace/README.md) |
 | 2 | KHORA-MCP-TASK-002 | en_curso | General — acceso MCP, catálogo, scopes y observabilidad | [núcleo](./%F0%9F%93%81%20%F0%9F%A7%A9%20-%20KHORA-MCP-TASK-002%20-%20General%20-%20acceso%20y%20observabilidad/README.md) |
-| 3 | KHORA-MCP-TASK-003 | en_curso | Jules — puente local OAuth/RDC y aceptación E2E | [núcleo](./%F0%9F%93%81%20%F0%9F%A7%A9%20-%20KHORA-MCP-TASK-003%20-%20Jules%20-%20puente%20local%20OAuth%20y%20RDC/README.md) |
+| 3 | KHORA-MCP-TASK-003 | en_curso | Módulo Jules — puente local OAuth/RDC y aceptación E2E | [núcleo](./%F0%9F%93%81%20%F0%9F%A7%A9%20-%20KHORA-MCP-TASK-003%20-%20Jules%20-%20puente%20local%20OAuth%20y%20RDC/README.md) |
 
 ## Secuencia y criterio de orden
 
 1. **Continuidad primero:** conservar los originales, reinstanciar el workspace en el equipo Windows RDC realmente conectado y comprobar el checkout. El PC-14 anterior está fuera de línea y no se presupone que su perfil o DPAPI sean transferibles.
 2. **General después:** asegurar la base MCP compartida —endpoint, transporte, autenticación, catálogo, scopes, consultas y límites—. Jules depende de esta base y no debe validarse contra un contrato MCP no comprobado.
-3. **Jules al final:** continuar desde el puente ya integrado, completar el Preview/configuración no sensible, obtener consentimiento OAuth del propietario en el navegador y verificar las siete herramientas y lecturas reales. La prueba de humo es de lectura; no crea sesiones ni aprueba planes.
+3. **Módulo Jules al final:** completar la separación modular del servicio MCP, el Preview/configuración no sensible, el consentimiento OAuth del propietario y la aceptación de lectura autenticada de las siete herramientas. TASK-003 conserva el trabajo de puente local. La prueba de humo es de lectura; no crea sesiones ni aprueba planes.
 
 El orden es operativo, no introduce prioridad universal, fecha límite ni responsable independiente. No se crean tareas paralelas para cada defecto de Preview, despliegue o consentimiento: esos puntos pertenecen al objeto Jules o a General según el contrato afectado.
 
