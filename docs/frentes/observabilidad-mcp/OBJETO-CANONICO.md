@@ -394,3 +394,43 @@ El operador presentó un nuevo handshake para `PC-14` (`--no-persist-session`) y
 El control único permanece en generación 5, alias `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`, `owner_thread=null`, `session_folio=null`; FOL1 PREPARADO, NO ACTIVO. El nuevo handshake RDC no cambia la titularidad del frente ni crea un control o folio adicional.
 
 **Estado:** TASK-001 sigue `en_curso`; el clon aislado está materializado y el puente pasa verificaciones estáticas, pero faltan dependencias y pruebas.
+
+
+## 25. Transferencia de titularidad global y autoridad modular Jules — 2026-11-01
+
+### 25.1 Transferencia verificada
+
+Por autorización expresa del operador en la sesión del 2026-11-01 («Si transfer responsiblioty y toma en cuienta promtp de modulo jules»), se ejecutó `TRANSFER_RESPONSIBILITY` sobre el control único KHORA-MCP, con compare-and-swap contra el blob de generación 7. La generación vigente pasa a **8**.
+
+- Titular global: `chatgpt-khora-mcp-01a19962-c730-7308-975-5bb49e2d`.
+- UUIDv7 local: `01a19962-c730-7308-975-5bb49e2d`; no es ID nativo de conversación.
+- `owner_thread=null`; la plataforma no expuso un ID nativo.
+- Titular anterior preservado íntegramente en `previous_owner`.
+- Corresponsable del módulo Jules preservado como segunda y única otra responsable activa.
+- `session_folio=null`; FOL1 continúa **PREPARADO, NO ACTIVO**; no se emitió folio.
+- Evento: `KHORA-MCP-TRANSFER-20261101-5BB49E2D`.
+- Commit que registra la transferencia: `908994264fc5b5964e347f1f9b969473a87b8d2e`.
+- Commit de consolidación/read-back: `f11a246859b38d2af7722ee84d9d319be14e7200`.
+- Control SHA actual leído de vuelta desde `main`: `68ca6e46db82453839a0cac7ca03fbcd7a26d912`.
+
+La transferencia solo cambia la titularidad global del frente y registra la distribución modular indicada abajo. No autoriza por sí misma cambios productivos, secretos, bases de datos, migraciones aplicadas, despliegues ni otras operaciones irreversibles.
+
+### 25.2 Autoridad arquitectónica especializada de Jules
+
+El responsable del módulo funcional Jules es la autoridad de diseño y arquitectura de Jules, no un mero colaborador ni proveedor de requisitos. Decide la arquitectura interna, contratos, interfaces, seguridad específica, scopes, ACL, comportamiento de las herramientas, estrategia de pruebas y criterios de aceptación del módulo.
+
+Se preservan las siete herramientas del módulo y sus scopes funcionales:
+
+- Lectura con `jules:read`: `jules_list_sources`, `jules_list_sessions`, `jules_get_session`, `jules_list_activities`.
+- Escritura con `jules:write`: `jules_create_session`, `jules_send_message`, `jules_approve_plan`.
+- Las herramientas Jules no requieren `norm:turn`; los demás contratos normativos del host conservan su propia compuerta.
+
+El titular global KHORA-MCP gobierna la arquitectura del servidor completo, host compartido, registro de módulos, contratos transversales, coordinación entre módulos, integración técnica, documentación y validación global. Puede proponer alternativas para Jules, pero no sustituye ni modifica unilateralmente decisiones internas de su responsable arquitectónico. Los cambios en host, registro o contratos compartidos se coordinan con Jules antes de implementarse cuando afecten sus interfaces o garantías.
+
+Las decisiones que afecten simultáneamente a varios módulos requieren coordinación con sus responsables respectivos. Las autorizaciones productivas, cambios irreversibles y modificaciones de gobierno permanecen reservadas al operador. La titularidad global no implica subordinación arquitectónica de Jules.
+
+### 25.3 Estado del entorno de trabajo de esta sesión
+
+Esta sesión se inició sin el workspace, procesos ni estado local anterior. La máquina RDC PC-14 previamente documentada está Offline. El dispositivo PC-8 está Online, pero el perfil comprobado no contiene los clones KHORA conocidos; Git no está disponible en PATH y GitHub CLI no tiene sesión autenticada. El conector GitHub permite lectura y escritura del repositorio y se utilizó para el cambio de control; no equivale a tener un checkout local ni a disponer de credenciales locales.
+
+Por tanto, el estado de implementación Custodia MCP no se declara recuperado ni validado en PC-8. La rama autorizada `work/mcp-custodia-read-contract-20261031` permanece sin cambios de código publicados respecto de `main` en la última comparación observada. La implementación funcional, pruebas y publicación de esa rama siguen pendientes. No se modificó la rama de Custodia B2, el PR #349 de Jules ni Production.
