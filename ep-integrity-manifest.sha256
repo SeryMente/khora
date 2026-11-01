@@ -565,7 +565,7 @@ acdebce7b73a6680e2c0383cda0f735f3e8ff40237ada04988df7c41442e26e4  ./scripts/khor
 86afee6e77d32729c43a6f5aa0d962de4f394211347bb5c7bf7c463ae9635331  ./scripts/khora/modules/05-efs.ps1
 b1ad0e005cf51baf56fa7ccc281cb2b59cf4d3edc6142f5dfe8d726b91a2174f  ./scripts/khora/modules/06-token.ps1
 7903170ba2557889772a3f7c73a9e598cc5cb4ec1b4a828da7aa1652f3f74768  ./scripts/khora/modules/07-git-wip.ps1
-922b4ff650a3e83e89557a8850d798e0e2239dce266ac5eabb408688adcaba76  ./scripts/khora/modules/08-deps.ps1
+e0deb43567547b6be30a9c7409df087b90d7ee5dd4c31b9bbb6d350aff418f45  ./scripts/khora/modules/08-deps.ps1
 b7939a12d10637fd7046ed0c03307b27a1dbb5eb26b7c4ef02c19e4bd6d32da2  ./scripts/khora/modules/09-chrome.ps1
 41b25443537427ad9f7ceedf5dade61b08e556e8bacc14ce756de826c1a5d08b  ./scripts/khora/modules/10-guardian.ps1
 d1b66ed1e9bd1a07df21d92c290401e9dc45155d8a12d4ab1604d86c4d6b87d3  ./scripts/khora/modules/11-cleanup.ps1
