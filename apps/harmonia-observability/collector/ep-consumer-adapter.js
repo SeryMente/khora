@@ -33,6 +33,7 @@ function createEpConsumerAdapter({ root, originalsDir, surfacesDir, activationAt
   const surfaceRoot = path.resolve(surfacesDir);
   const ledgerPath = path.join(dataRoot, 'ep-consumer-ledger.jsonl');
   let ledgerIntegrityErrors = 0;
+  let degradedReason = null;
   const activationPath = path.join(dataRoot, 'ep-consumer-activation.json');
   let activatedAt = null;
   try {
@@ -53,6 +54,7 @@ function createEpConsumerAdapter({ root, originalsDir, surfacesDir, activationAt
     }
   } catch (error) {
     ledgerIntegrityErrors++;
+    degradedReason = 'activation-manifest-invalid-or-unavailable';
     activatedAt = activationAt || new Date().toISOString();
   }
 
@@ -62,7 +64,13 @@ function createEpConsumerAdapter({ root, originalsDir, surfacesDir, activationAt
   let lastReconciledAt = null;
 
   function applyRow(row) {
-    if (row.recordType !== 'SOURCE_REGISTERED' || !UUID.test(String(row.eventId || ''))) return;
+    if (row.recordType !== 'SOURCE_REGISTERED' || !UUID.test(String(row.eventId || '')) ||
+        !/^[0-9a-f]{64}$/.test(String(row.sourceSha256 || '')) ||
+        row.operationRef !== sha256('HARMONIA\n' + row.eventId + '\n' + row.sourceSha256)) {
+      ledgerIntegrityErrors++;
+      degradedReason = 'ledger-record-invalid';
+      return;
+    }
     const existing = byEventId.get(row.eventId);
     if (existing && (existing.sourceSha256 !== row.sourceSha256 || existing.operationRef !== row.operationRef)) {
       ledgerIntegrityErrors++;
@@ -103,6 +111,8 @@ function createEpConsumerAdapter({ root, originalsDir, surfacesDir, activationAt
       while (offset < data.length) offset += fs.writeSync(fd, data, offset, data.length - offset);
       fs.fsyncSync(fd);
     } catch (cause) {
+      ledgerIntegrityErrors++;
+      degradedReason = 'ledger-unavailable';
       const error = new Error('ledger-unavailable');
       error.code = 'ledger-unavailable';
       error.cause = cause;
@@ -228,6 +238,12 @@ function createEpConsumerAdapter({ root, originalsDir, surfacesDir, activationAt
     return { scannedFiles: files.length, discovered, conflicts, integrityErrors: ledgerIntegrityErrors, reconciledAt: lastReconciledAt };
   }
 
+  function markDegraded(reason) {
+    degradedReason = String(reason || 'ledger-degraded').slice(0, 80);
+    ledgerIntegrityErrors++;
+    return getStatus();
+  }
+
   function findByEventId(eventId) {
     return byEventId.get(eventId) || null;
   }
@@ -237,7 +253,7 @@ function createEpConsumerAdapter({ root, originalsDir, surfacesDir, activationAt
     return {
       schema: 'harmonia.ep-consumer-status.v1',
       consumer: 'harmonia',
-      localLedger: ledgerIntegrityErrors > 0 ? 'DEGRADED' : 'READY',
+      localLedger: ledgerIntegrityErrors > 0 || degradedReason ? 'DEGRADED' : 'READY',
       localRecords: rows.length,
       localDurableCount: rows.filter(row => row.localState === 'LOCAL_DURABLE').length,
       cloudPendingCount: rows.filter(row => row.cloudState === 'CLOUD_PENDING').length,
@@ -245,7 +261,7 @@ function createEpConsumerAdapter({ root, originalsDir, surfacesDir, activationAt
       epTransportEnabled: false,
       epContractVersion: null,
       remoteState: 'NOT_CONNECTED',
-      blockers: ['ALLOWLIST_NOT_APPROVED', 'EP_OFFICIAL_CONTRACT_UNAVAILABLE'],
+      blockers: [...(degradedReason ? [degradedReason] : []), 'ALLOWLIST_NOT_APPROVED', 'EP_OFFICIAL_CONTRACT_UNAVAILABLE'],
       ledgerIntegrityErrors,
       activatedAt,
       lastReconciledAt
@@ -273,6 +289,16 @@ function createEpConsumerAdapter({ root, originalsDir, surfacesDir, activationAt
       const source = await readSource(row.sourceRef);
       localVerified = sha256(source.line) === row.sourceSha256;
       if (!localVerified) error = 'source-hash-mismatch';
+      if (localVerified && row.surfaceRef) {
+        const fullSurface = path.resolve(dataRoot, ...row.surfaceRef.replace(/\\/g, '/').split('/'));
+        if (!inside(dataRoot, fullSurface) || !inside(surfaceRoot, fullSurface) || !fs.existsSync(fullSurface)) {
+          localVerified = false;
+          error = 'surface-reference-integrity-error';
+        } else if (sha256(fs.readFileSync(fullSurface)) !== row.surfaceSha256) {
+          localVerified = false;
+          error = 'surface-hash-mismatch';
+        }
+      }
     } catch (cause) {
       error = String(cause.message || cause);
     }
@@ -287,7 +313,7 @@ function createEpConsumerAdapter({ root, originalsDir, surfacesDir, activationAt
     };
   }
 
-  return Object.freeze({ enqueue, registerStoredEvent, reconcile, findByEventId, getStatus, flush, recover });
+  return Object.freeze({ enqueue, registerStoredEvent, reconcile, findByEventId, getStatus, markDegraded, flush, recover });
 }
 
 module.exports = { createEpConsumerAdapter };
