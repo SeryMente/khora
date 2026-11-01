@@ -333,11 +333,23 @@ function Ensure-VSCode {
 
 function Get-CodeCli {$code=Ensure-VSCode;return (Join-Path (Split-Path -Parent $code) 'bin\code.cmd')}
 function Ensure-VercelCLI {
-    $node=Ensure-Node;$npm=Find-KhoraHostExecutable -Name 'npm'
-    if(-not $npm){$npm=Join-Path (Split-Path -Parent $node) 'npm.cmd'}
-    if(-not(Test-Path -LiteralPath $npm -PathType Leaf)){throw 'npm.cmd ausente.'}
-    $target=Join-Path $WORK_DIR 'tools\vercel';$vercel=Join-Path $target 'node_modules\.bin\vercel.cmd'
-    if(-not(Test-Path $vercel)){& $npm install --prefix $target --no-save --no-audit --no-fund vercel@59.3.0 2>&1|ForEach-Object{Info ('npm vercel: '+[string]$_)};if($LASTEXITCODE -ne 0){throw 'Instalación Vercel CLI falló.'}}
+    $node=Ensure-Node
+    $npm=if($script:NPM_PATH){[string]$script:NPM_PATH}else{Find-KhoraHostExecutable -Name 'npm'}
+    if(-not$npm){$npm=Join-Path (Split-Path -Parent $node) 'npm.cmd'}
+    if(-not(Test-Path -LiteralPath $npm -PathType Leaf) -or $npm -match '(?i)\\npm\.ps1$'){throw 'Vercel requiere npm.cmd; npm.ps1 no se ejecutará.'}
+    $target=Join-Path $WORK_DIR 'tools\vercel'
+    $vercel=Join-Path $target 'node_modules\.bin\vercel.cmd'
+    if(-not(Test-Path -LiteralPath $vercel)){
+        New-Item -ItemType Directory -Path $target -Force|Out-Null
+        $previousPreference=$ErrorActionPreference
+        try{
+            $ErrorActionPreference='Continue'
+            $output=@(& $npm install --prefix $target --no-save --no-audit --no-fund vercel@59.3.0 2>&1)
+            $exit=$LASTEXITCODE
+        }finally{$ErrorActionPreference=$previousPreference}
+        $output|ForEach-Object{Info ('npm vercel: '+(Mask-Token ([string]$_)))}
+        if($exit -ne 0 -or -not(Test-Path -LiteralPath $vercel -PathType Leaf)){throw ('Instalación Vercel CLI falló; exit='+$exit)}
+    }
     return $vercel
 }
 
@@ -376,11 +388,30 @@ function Start-KhoraVSCode {
 }
 
 function Start-KhoraDependencyHydration {
-    $python=Ensure-Python311;$node=Ensure-Node;$venv=Join-Path $WORK_DIR 'venv';$web=Join-Path $REPO_DIR 'khora-web';$npm=Find-KhoraHostExecutable -Name 'npm'
-    if(-not $npm){$npm=Join-Path (Split-Path -Parent $node) 'npm.cmd'}
-    if(-not(Test-Path -LiteralPath $npm -PathType Leaf)){throw 'npm.cmd ausente.'}
-    if(Test-Path(Join-Path $REPO_DIR 'pyproject.toml')){$script:DependencyJobs['python']=Start-Job -ArgumentList @($python,$venv,$REPO_DIR) -ScriptBlock {param($py,$ve,$repo)& $py -m venv $ve;if($LASTEXITCODE-ne0){throw 'venv falló'};& (Join-Path $ve 'Scripts\python.exe') -m pip install -e $repo --disable-pip-version-check;if($LASTEXITCODE-ne0){throw 'pip falló'}}}
-    if(Test-Path(Join-Path $web 'package-lock.json')){$script:DependencyJobs['node']=Start-Job -ArgumentList @($npm,$web) -ScriptBlock {param($npmPath,$directory)& $npmPath --prefix $directory ci --no-audit --no-fund;if($LASTEXITCODE-ne0){throw 'npm ci falló'}}}
+    $python=Ensure-Python311
+    $node=Ensure-Node
+    $venv=Join-Path $WORK_DIR 'venv'
+    $web=Join-Path $REPO_DIR 'khora-web'
+    $npm=if($script:NPM_PATH){[string]$script:NPM_PATH}else{Find-KhoraHostExecutable -Name 'npm'}
+    if(-not$npm){$npm=Join-Path (Split-Path -Parent $node) 'npm.cmd'}
+    if(-not(Test-Path -LiteralPath $npm -PathType Leaf) -or $npm -match '(?i)\\npm\.ps1$'){throw 'La hidratación requiere npm.cmd verificado.'}
+    if(Test-Path -LiteralPath (Join-Path $REPO_DIR 'pyproject.toml') -PathType Leaf){
+        $script:DependencyJobs['python']=Start-Job -ArgumentList @($python,$venv,$REPO_DIR) -ScriptBlock {
+            param($py,$ve,$repo)
+            & $py -m venv $ve
+            if($LASTEXITCODE -ne 0){throw 'venv falló'}
+            $venvPython=Join-Path $ve 'Scripts\python.exe'
+            & $venvPython -m pip install -e $repo --disable-pip-version-check
+            if($LASTEXITCODE -ne 0){throw 'pip falló'}
+        }
+    }
+    if(Test-Path -LiteralPath (Join-Path $web 'package-lock.json') -PathType Leaf){
+        $script:DependencyJobs['node']=Start-Job -ArgumentList @($npm,$web) -ScriptBlock {
+            param($npmPath,$directory)
+            & $npmPath --prefix $directory ci --no-audit --no-fund
+            if($LASTEXITCODE -ne 0){throw 'npm ci falló'}
+        }
+    }
 }
 function Wait-KhoraDependencyHydration {
     foreach($name in @($script:DependencyJobs.Keys)){$job=$script:DependencyJobs[$name];Wait-Job $job|Out-Null;$output=@(Receive-Job $job -ErrorAction SilentlyContinue);$output|ForEach-Object{Info ("dependency ${name}: "+[string]$_)};if($job.State-ne'Completed'){throw "Dependencias $name fallaron."};Remove-Job $job -Force}
