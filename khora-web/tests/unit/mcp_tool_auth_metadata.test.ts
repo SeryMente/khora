@@ -82,6 +82,14 @@ test("Jules scopes flow through OAuth metadata, consent, token exchange, manual 
   const registry = fs.readFileSync(path.join(root, "lib/server/mcp-module-registry.ts"), "utf8");
   assert.ok(registry.includes('id: "jules"'));
   assert.ok(registry.includes("register: registerJulesMcpModule"));
+  assert.ok(registry.includes('from "./mcp-module-context"'));
+  assert.ok(registry.includes("register: (context: McpModuleContext) => void"));
+  const sharedContext = fs.readFileSync(path.join(root, "lib/server/mcp-module-context.ts"), "utf8");
+  assert.ok(sharedContext.includes("requireScope: (scope: McpToolScope)"));
+  assert.ok(sharedContext.includes("MCP_TOOL_SCOPES contract"));
+  const toolContract = fs.readFileSync(path.join(root, "lib/server/mcp-tool-contract.ts"), "utf8");
+  assert.ok(toolContract.includes("export type McpToolScope = (typeof MCP_TOOL_SCOPES)[McpToolName][number]"));
+  assert.ok(route.includes("scope: McpToolScope"));
   const module = fs.readFileSync(path.join(root, "lib/server/mcp-jules.ts"), "utf8");
   assert.ok(module.includes("export function registerJulesMcpModule"));
   assert.equal(module.split('julesTool("jules_').length - 1, 7);
