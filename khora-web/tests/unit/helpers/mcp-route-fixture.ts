@@ -143,6 +143,20 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
   }, { timeout: 1000, filename: "mcp-jules-module-fixture.cjs" });
   modules["@/lib/server/mcp-jules"] = julesModuleExports;
 
+  const registrySource = fs.readFileSync(path.join(root, "lib/server/mcp-module-registry.ts"), "utf8");
+  const registryCode = ts.transpileModule(registrySource, {
+    compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS },
+  }).outputText;
+  const registryExports: Record<string, unknown> = {};
+  vm.runInNewContext(registryCode, {
+    exports: registryExports,
+    require: (name: string) => {
+      if (name === "./mcp-jules") return julesModuleExports;
+      throw new Error("Unexpected MCP module registry dependency: " + name);
+    },
+  }, { timeout: 1000, filename: "mcp-module-registry-fixture.cjs" });
+  modules["@/lib/server/mcp-module-registry"] = registryExports;
+
   const exported: Record<string, (request: Request) => Promise<Response>> = {};
   vm.runInNewContext(code, { exports: exported, process: { env: {} }, require: (name: string) => {
     if (!Object.hasOwn(modules, name)) throw new Error("Unexpected route dependency: " + name);
