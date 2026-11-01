@@ -23,6 +23,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Install IndexedDB test shim
+        run: npm install --no-save --ignore-scripts fake-indexeddb@6.2.7
       - name: JavaScript syntax
         run: |
           node --check apps/harmonia-observability/extension/durable-outbox.js
@@ -31,5 +33,5 @@ jobs:
           node --check apps/harmonia-observability/collector/ep-consumer-adapter.js
           node --check apps/harmonia-observability/collector/server.js
           node --check apps/harmonia-observability/collector/tests/ep-consumer-adapter.test.js
-      - name: Durable local EP ledger tests
-        run: node --test apps/harmonia-observability/collector/tests/ep-consumer-adapter.test.js
+      - name: Durable local outbox and EP ledger tests
+        run: node --test apps/harmonia-observability/extension/tests/durable-outbox.test.js apps/harmonia-observability/collector/tests/ep-consumer-adapter.test.js
