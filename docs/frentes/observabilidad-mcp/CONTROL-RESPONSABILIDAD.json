@@ -402,11 +402,22 @@
     "source_control_blob_sha": "92f4f6ab864c19e52a123b6358d94c5a8e7a9474",
     "base_main_sha": "ec40407107d8e0275811c183f2a79fb29b618e39",
     "attachment_commit_sha": null,
-    "result": "WRITTEN_PENDING_READBACK",
+    "result": "VERIFIED: generation 6 and new holder confirmed by exact read-back; previous generation 5 and earlier owner history preserved; no native conversation ID or OCP/session folio issued.",
     "authorization_scope": "Responsibility for the single KHORA-MCP front is transferred to this conversation, generation 6. Strategic direction: Cora's deployed MCP surface is to remain limited to cognitive-prosthesis capabilities. Jules runtime functions and development/methodology tooling are to be migrated out of Cora into a separate local-only subproject named OCP MCP; it must not be exposed to the public Internet, and only models expressly authorized by the operator may connect through its local API. Prepare Jules removal in an isolated branch of SeryMente/khora only after the OCP MCP implementation and required code/data migration have been verified for completeness, integrity, tests and read-back. Preserve historical PRs, migrations and source records; do not rewrite history. Until the local migration is validated and accepted: do not deploy or alter Production, do not change production secrets or configuration, do not write/delete live database data or schema, and do not remove JULES_API_KEY. Do not export provider/Vercel secrets to Windows. Do not claim OCP MCP is implemented until Constructor evidence is reviewed. Continue the explicitly authorized iterative Constructor ↔ ChatGPT prompt handoff, requiring a return prompt from Constructor and review before each next iteration.",
     "verification": {
-      "status": "PENDING",
-      "confirmed": []
+      "status": "VERIFIED",
+      "verified_at_local": "2026-11-01T15:31:00-06:00",
+      "transfer_commit": "bbd891c989643b852cd34d30cffe08fae1e28dac",
+      "readback_blob_sha": "d73249e95b76f3db56d8e4577536fccc0993fb0d",
+      "confirmed": [
+        "generation=6",
+        "owner_alias matches this local UUIDv7 operational alias",
+        "owner_thread=null; native conversation ID not exposed",
+        "previous_owner generation 5 preserved with earlier history",
+        "session_folio=null",
+        "folio_status remains PENDIENTE/NO ASIGNADO; FOL1 PREPARADO NO ACTIVO",
+        "OCP MCP spelling and local-only scope recorded"
+      ]
     }
   },
   "strategic_redirection": {
