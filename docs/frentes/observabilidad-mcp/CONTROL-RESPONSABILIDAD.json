@@ -257,13 +257,22 @@
     "authorization_ref": "Instrucción expresa del operador en esta conversación, 2026-10-31 (America/Mexico_City): «Se perdió sesión anterior local, asume trabajo de ese entorno local perdido. Usa conexión actual para segtuir resolviendo de extremo a extremo.» La autorización se interpreta dentro del mismo frente KHORA-MCP y del alcance previamente autorizado; no amplía permisos de terceros ni elimina las compuertas OAuth, seguridad, pruebas o despliegue.",
     "source_control_blob_sha": "c0d7731bad4701f5d7e69235ae23ef0bdd039964",
     "attachment_commit_sha": null,
-    "result": "CONTROL UPDATE WRITTEN; verification pending immediate read-back.",
+    "result": "VERIFIED: generation 5, new titular, previous generation 4 archived, OCP session folio and absence of native conversation ID confirmed by immediate read-back from main.",
     "authorization_scope": "Transfer responsibility for the single Khora MCP front and continue the already authorized implementation/E2E closure after local-session loss. No separate OCP, task owner, or global folio is created. Existing scope and safety gates remain binding.",
     "verification": {
-      "verified_at_local": null,
-      "transfer_commit": null,
-      "readback_blob_sha": null,
-      "confirmed": []
+      "verified_at_local": "2026-10-31T18:55:18-06:00",
+      "transfer_commit": "34a274431af1d8a070f1a86b857d1468b9cf1ae7",
+      "readback_blob_sha": "48ee9d99d9c6a802ef272744e1d6aec1ff263aff",
+      "confirmed": [
+        "generation=5",
+        "owner_alias",
+        "owner_thread=null",
+        "uuidv7_local",
+        "session_folio=SES-20261031-890A36C8",
+        "previous_owner generation 4 preserved",
+        "previous_control_generation generation 3 archive preserved",
+        "folio_status=GLOBAL_FOL1_PREPARED_NOT_ACTIVE; OCP_SESSION_FOLIO_ASSIGNED"
+      ]
     }
   }
 }
