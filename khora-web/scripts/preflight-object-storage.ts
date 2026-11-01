@@ -44,7 +44,7 @@ async function main() {
   });
   const ownedKeys: string[] = [];
   let stage = "encrypted_roundtrip";
-  const check = (value: unknown, code: string): asserts value => {
+  const check = (value: unknown, code: string): void => {
     if (!value) throw new Error(code);
   };
   const digest = (value: Buffer) => createHash("sha256").update(value).digest("hex");
@@ -58,7 +58,9 @@ async function main() {
       { access: "public", contentType: "application/octet-stream", addRandomSuffix: true },
     );
     const diagnosticKey = parseB2ObjectUrl(stored.url, location);
-    check(diagnosticKey?.startsWith("khora/diagnostics/"), "storage_probe_locator");
+    if (!diagnosticKey?.startsWith("khora/diagnostics/")) {
+      throw new Error("storage_probe_locator");
+    }
     ownedKeys.push(diagnosticKey);
 
     const privateRead = await fetchStoredObject(stored.url);
@@ -83,7 +85,9 @@ async function main() {
     const sessionId = randomUUID();
     const staging = await prepareStagedUpload(sessionId, encrypted.length);
     const stagingKey = parseB2ObjectUrl(staging.url, location);
-    check(stagingKey?.startsWith("khora/staging/audio/" + sessionId + "/"), "storage_probe_staging_locator");
+    if (!stagingKey?.startsWith("khora/staging/audio/" + sessionId + "/")) {
+      throw new Error("storage_probe_staging_locator");
+    }
     ownedKeys.push(stagingKey);
 
     stage = "cors_configuration";
