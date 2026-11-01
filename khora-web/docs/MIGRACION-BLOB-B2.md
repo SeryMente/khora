@@ -220,3 +220,39 @@ Una consulta exclusivamente de conteos confirmó cero filas en cada tabla. No se
 El destino de prueba Neon está preparado y vacío. El origen Vercel Blob aislado no se puede provisionar por el límite de uso de la cuenta. El destino Backblaze B2 no tiene en este momento credenciales ni bucket de prueba disponibles en PC-8 o en los entornos no productivos del proyecto. No es seguro sustituirlos por el único token Blob compartido entre producción/preview/development ni por las claves B2 exclusivamente productivas.
 
 Por tanto, el bloqueo no es una tarea de código ni de SQL: son dos recursos externos no productivos que no pueden crearse con los permisos/cuotas actuales. No se intentará sortearlo mediante cuentas o proyectos alternativos, acceso a producción, extracción de secretos productivos o cambios de credenciales/configuración. La migración física permanece pendiente de un Blob test store/token dedicado y un bucket B2 de prueba con su Application Key restringida al prefijo `khora-custodia-e2e-`.
+
+### Continuidad de cuenta y endurecimiento del auditor — actualización 2026-11-01
+
+#### Identidad de inicio de sesión declarada
+
+El usuario del proyecto identificó `the.willfreeman@gmail.com` como username/correo de inicio de sesión previsto para la cuenta Backblaze B2 de KHORA. Este dato queda registrado como **declaración del usuario**, no como resultado de autenticación ni como prueba independiente de titularidad. No se usó navegador; la revisión de PC-8 se realizó por CLI headless.
+
+La autenticación técnica del adaptador KHORA no utiliza ese correo: `KHORA_B2_KEY_ID` y `KHORA_B2_APPLICATION_KEY` son las credenciales de Application Key que consume el cliente S3-compatible, junto con `KHORA_B2_BUCKET_NAME` y `KHORA_B2_REGION`. No hay una variable `B2_USERNAME` ni se debe introducir el correo como sustituto de una Application Key.
+
+La inspección de la bóveda canónica local encontró nueve entradas y ninguna variable cuyo nombre coincida con `B2`, `BACKBLAZE`, `BLOB` o `KHORA_OBJECT_STORAGE`. No existe archivo temporal DPAPI para importar la llave maestra. En PC-8 tampoco están instalados los ejecutables `b2`, `aws`, `rclone` o `s5cmd`. El archivo `C:\Users\PC 8\.b2_account_info` sigue con cero cuentas y cero buckets en modo de inspección solo lectura. No se leyó ni se mostró ningún secreto.
+
+#### Corrección de inventario forense
+
+Se corrigió `lib/server/reconciliation.ts` para evitar falsos dictámenes de ausencia:
+
+- El resultado incluye estado por proveedor (`not_configured`, `incomplete` o `complete`), cantidad enumerada, proveedores comprobados y advertencias.
+- El inventario global solo se considera completo cuando se han enumerado completamente Vercel Blob **y** Backblaze B2. Un error de listado, credenciales incompletas, cursor inválido o ausencia de configuración permanece explícito.
+- Un volcado con bytes/duración de audio sin referencia solo se clasifica `MISSING` cuando ambos inventarios están completos y las referencias lógicas pudieron interpretarse. En cualquier otra circunstancia se clasifica `AMBIGUOUS` y se impide afirmar que el audio se perdió.
+- La reconciliación detecta objetos físicos no referenciados por URL/path, incluidos objetos B2 migrados cuyo nombre determinista `khora/dictado/migrated/vercel-blob/<hash>.khc` no contiene `sessionId`. Los objetos huérfanos se conservan para revisión y nunca se eliminan.
+- El inventario B2 de este auditor se limita al prefijo `khora/dictado/`, que corresponde al alcance de audios; el tope de 10.000 objetos del adaptador provoca estado incompleto, no un dictamen de ausencia.
+- `scripts/reconcile_forensics.ts` muestra integridad global y por proveedor, además de cada advertencia.
+
+#### Verificación local de esta corrección
+
+- `node --import tsx --test tests/unit/object-storage.test.ts` — PASS, 22/22.
+- Tres pruebas nuevas de inventario incompleto, configuración B2 parcial y detección de objetos B2 migrados (S3 simulado) — PASS, 3/3.
+- `npm.cmd run typecheck` — PASS.
+- `npm.cmd run ui:contract` — PASS.
+- `npm.cmd run ui-review:check` — PASS.
+- `npx.cmd next build --webpack` — PASS; compilación, TypeScript, recopilación de rutas y generación de 78 páginas estáticas.
+
+La suite completa `node --import tsx --test tests/traceability_session.test.ts` — PASS, 6/6. Se alinearon fixtures anteriores con el contrato vigente: `partIndex` inicia en 1, cada parte conserva SHA-256 y estado de verificación, y el archivado rechaza una captura sin `sessionId`. La base de datos se simula en memoria y la llamada S3 se sustituye por una respuesta sintética; no se realizó tráfico a proveedores.
+
+#### Estado de proveedor
+
+La identidad `the.willfreeman@gmail.com` ya está documentada, pero no se ha autenticado CLI contra Backblaze, no se ha obtenido una Application Key, no se ha enumerado el bucket productivo y no se ha provisionado un bucket de pruebas. Las variables productivas de Vercel no se descifraron ni se consultaron. Permanecen pendientes la verificación de acceso a la cuenta, el identificador/nombre del bucket de destino y una Application Key de pruebas de mínimo privilegio. No se ejecutaron escrituras, borrados, CORS, backfill, migración real, deploy ni merge.

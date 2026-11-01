@@ -17,6 +17,12 @@ async function main() {
   console.log(`Total Volcados analizados: ${resultado.totalVolcados}`);
   console.log(`Total Sesiones analizadas: ${resultado.totalSessions}`);
   console.log(`Total Blobs físicos: ${resultado.totalBlobs}`);
+  console.log(`Inventario físico completo: ${resultado.inventory.complete ? "SÍ" : "NO"}`);
+  console.log(`Vercel Blob: ${resultado.inventory.vercelBlob.status} (${resultado.inventory.vercelBlob.objects} objetos)`);
+  console.log(`Backblaze B2: ${resultado.inventory.backblazeB2.status} (${resultado.inventory.backblazeB2.objects} objetos)`);
+  for (const warning of resultado.inventory.warnings) {
+    console.warn(`ADVERTENCIA DE INVENTARIO: ${warning}`);
+  }
   console.log(`\nDesglose de Clasificación:`);
   console.log(` - EXACT_MATCH:     ${resultado.classifications.EXACT_MATCH}`);
   console.log(` - PROBABLE_MATCH:  ${resultado.classifications.PROBABLE_MATCH}`);

@@ -26,12 +26,23 @@ export type AuditItemResult = {
   applied?: boolean;
 };
 
+export type InventoryProviderState = "not_configured" | "complete" | "incomplete";
+
+export type AuditInventory = {
+  complete: boolean;
+  checkedProviders: ("vercelBlob" | "backblazeB2")[];
+  vercelBlob: { status: InventoryProviderState; objects: number };
+  backblazeB2: { status: InventoryProviderState; objects: number };
+  warnings: string[];
+};
+
 export type AuditSummary = {
   mode: "DRY_RUN" | "APPLY";
   timestamp: string;
   totalVolcados: number;
   totalSessions: number;
   totalBlobs: number;
+  inventory: AuditInventory;
   classifications: Record<ClassificationType, number>;
   items: AuditItemResult[];
   preStateReportFile?: string;
@@ -62,11 +73,27 @@ export async function ejecutarReconciliacionForense(modo: "DRY_RUN" | "APPLY" = 
   );
   const partesList = partesRes.rows;
 
-  // 4. Enumerar todas las páginas de Blob y B2; nunca inferir exhaustividad desde una sola página.
+  // 4. Enumerar todos los proveedores configurados y exponer cualquier inventario incompleto.
+  // Una lista fallida o no disponible nunca debe convertirse en evidencia de ausencia física.
   let blobsFisicos: { url: string; pathname: string; size: number; uploadedAt: Date }[] = [];
   const physicalUrls = new Set<string>();
-  try {
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
+  const inventory: AuditInventory = {
+    complete: false,
+    checkedProviders: [],
+    vercelBlob: { status: "not_configured", objects: 0 },
+    backblazeB2: { status: "not_configured", objects: 0 },
+    warnings: [],
+  };
+  const providerErrorCode = (err: unknown) => {
+    const message = err instanceof Error ? err.message : String(err);
+    const match = message.match(/[a-z][a-z0-9_]{2,63}/i);
+    return match?.[0] || "provider_inventory_failed";
+  };
+
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    inventory.checkedProviders.push("vercelBlob");
+    inventory.vercelBlob.status = "incomplete";
+    try {
       let cursor: string | undefined;
       let hasMore = true;
       let pages = 0;
@@ -76,6 +103,7 @@ export async function ejecutarReconciliacionForense(modo: "DRY_RUN" | "APPLY" = 
           if (!physicalUrls.has(b.url)) {
             physicalUrls.add(b.url);
             blobsFisicos.push({ url: b.url, pathname: b.pathname, size: b.size, uploadedAt: b.uploadedAt });
+            inventory.vercelBlob.objects += 1;
           }
         }
         pages += 1;
@@ -85,23 +113,47 @@ export async function ejecutarReconciliacionForense(modo: "DRY_RUN" | "APPLY" = 
         hasMore = page.hasMore;
         cursor = page.hasMore ? page.cursor : undefined;
       }
+      inventory.vercelBlob.status = "complete";
+    } catch (err) {
+      const code = providerErrorCode(err);
+      inventory.warnings.push("vercel_blob_inventory_failed:" + code);
+      console.warn("No se pudo completar el inventario Vercel Blob:", code);
     }
-  } catch (err) {
-    console.warn("No se pudo completar el inventario Vercel Blob:", String(err));
+  } else {
+    inventory.warnings.push("vercel_blob_not_configured");
   }
-  try {
-    if (process.env.KHORA_B2_BUCKET_NAME && process.env.KHORA_B2_KEY_ID) {
-      const b2Objects = await listB2Objects("khora/");
-      for (const b of b2Objects) {
-        if (!physicalUrls.has(b.url)) {
-          physicalUrls.add(b.url);
-          blobsFisicos.push(b);
+
+  const b2VariableNames = ["KHORA_B2_BUCKET_NAME", "KHORA_B2_KEY_ID", "KHORA_B2_APPLICATION_KEY"];
+  const b2ConfiguredCount = b2VariableNames.filter((name) => Boolean(process.env[name])).length;
+  if (b2ConfiguredCount > 0) {
+    inventory.checkedProviders.push("backblazeB2");
+    inventory.backblazeB2.status = "incomplete";
+    if (b2ConfiguredCount !== b2VariableNames.length) {
+      inventory.warnings.push("backblaze_b2_configuration_incomplete");
+    } else {
+      try {
+        const b2Objects = await listB2Objects("khora/dictado/");
+        for (const b of b2Objects) {
+          if (!physicalUrls.has(b.url)) {
+            physicalUrls.add(b.url);
+            blobsFisicos.push(b);
+            inventory.backblazeB2.objects += 1;
+          }
         }
+        inventory.backblazeB2.status = "complete";
+      } catch (err) {
+        const code = providerErrorCode(err);
+        inventory.warnings.push("backblaze_b2_inventory_failed:" + code);
+        console.warn("No se pudo completar el inventario Backblaze B2:", code);
       }
     }
-  } catch (err) {
-    console.warn("No se pudo completar el inventario Backblaze B2:", String(err));
+  } else {
+    inventory.warnings.push("backblaze_b2_not_configured");
   }
+
+  // Para esta auditoría de migración deben estar enumerados ambos lados del traslado.
+  inventory.complete = inventory.vercelBlob.status === "complete"
+    && inventory.backblazeB2.status === "complete";
 
   // Indexar blobs por sessionId extraído del pathname (e.g., dictado/<sessionId>/<parte>.webm...)
   const blobsPorSesion = new Map<string, { url: string; pathname: string; size: number }[]>();
@@ -115,6 +167,7 @@ export async function ejecutarReconciliacionForense(modo: "DRY_RUN" | "APPLY" = 
     }
   }
 
+  let logicalReferencesComplete = true;
   const items: AuditItemResult[] = [];
   const classifications: Record<ClassificationType, number> = {
     EXACT_MATCH: 0,
@@ -195,19 +248,26 @@ export async function ejecutarReconciliacionForense(modo: "DRY_RUN" | "APPLY" = 
       continue;
     }
 
-    // C. Volcado con duración de audio o bytes conocidos, pero sin URL ni sessionId
+    // C. Volcado con duración de audio o bytes conocidos, pero sin URL ni sessionId.
+    // Si el inventario de proveedores no es completo, no se puede afirmar que el objeto esté ausente.
     if ((v.duracion_seg && v.duracion_seg > 0) || (v.audio_bytes && v.audio_bytes > 0)) {
+      const evidenceComplete = inventory.complete && logicalReferencesComplete;
+      const classification: ClassificationType = evidenceComplete ? "MISSING" : "AMBIGUOUS";
       items.push({
         volcadoId: vId,
         folio,
         sessionId: null,
         candidateBlobs: [],
-        classification: "MISSING",
-        confidence: 0.8,
-        evidence: `Volcado indica duracion_seg=${v.duracion_seg}s o bytes=${v.audio_bytes}, pero la referencia lógica al Blob fue perdiendo previo a la migración`,
-        proposedAction: "Marcar como audio no recuperable salvo hallazgo forense adicional",
+        classification,
+        confidence: evidenceComplete ? 0.8 : 0.5,
+        evidence: evidenceComplete
+          ? `Volcado indica duracion_seg=${v.duracion_seg}s o bytes=${v.audio_bytes}, sin referencia lógica ni objeto localizado en los proveedores enumerados`
+          : `Volcado indica duracion_seg=${v.duracion_seg}s o bytes=${v.audio_bytes}, pero no hay evidencia suficiente de ausencia física: ${inventory.warnings.join(", ")}`,
+        proposedAction: evidenceComplete
+          ? "Marcar como audio no recuperable salvo hallazgo forense adicional"
+          : "No declarar el audio perdido; completar inventario y referencias lógicas y repetir la reconciliación",
       });
-      classifications.MISSING++;
+      classifications[classification]++;
       continue;
     }
 
@@ -225,22 +285,85 @@ export async function ejecutarReconciliacionForense(modo: "DRY_RUN" | "APPLY" = 
     classifications.NO_MATCH++;
   }
 
-  // Evaluar Blobs huérfanos en Vercel Blob que no pertenezcan a ningún volcado
-  for (const [sId, blobList] of blobsPorSesion.entries()) {
-    const yaEvaluado = items.some((it) => it.sessionId === sId);
-    if (!yaEvaluado) {
-      items.push({
-        volcadoId: null,
-        folio: null,
-        sessionId: sId,
-        candidateBlobs: blobList.map((b) => b.url),
-        classification: "AMBIGUOUS",
-        confidence: 0.5,
-        evidence: `Blob físico con sessionId ${sId} no tiene volcado correspondiente registrado`,
-        proposedAction: "Conservar blob huérfano sin asociar hasta revisión manual",
-      });
-      classifications.AMBIGUOUS++;
+  // Detectar objetos físicos sin referencia lógica. Incluye claves B2 migradas que no contienen sessionId.
+  const referencedPhysicalUrls = new Set<string>();
+  const referencedPhysicalPaths = new Set<string>();
+  const addPhysicalReference = (value: unknown) => {
+    if (typeof value !== "string" || !value.trim()) return;
+    referencedPhysicalUrls.add(value);
+    try {
+      const parsed = new URL(value);
+      referencedPhysicalPaths.add(parsed.pathname.replace(/^\/+/, ""));
+    } catch {
+      referencedPhysicalPaths.add(value.replace(/^\/+/, ""));
     }
+  };
+
+  for (const part of partesList) {
+    addPhysicalReference(part.blob_url);
+    addPhysicalReference(part.blob_path);
+  }
+  for (const v of volcados) {
+    addPhysicalReference(v.audio_url);
+    if (v.audio_partes) {
+      try {
+        const audioParts = typeof v.audio_partes === "string" ? JSON.parse(v.audio_partes) : v.audio_partes;
+        if (Array.isArray(audioParts)) {
+          for (const part of audioParts) {
+            addPhysicalReference(part?.url);
+            addPhysicalReference(part?.pathname);
+            addPhysicalReference(part?.path);
+          }
+        }
+      } catch {
+        logicalReferencesComplete = false;
+        inventory.warnings.push("volcado_audio_partes_unreadable");
+      }
+    }
+  }
+
+  const orphanBySession = new Map<string, typeof blobsFisicos>();
+  for (const blob of blobsFisicos) {
+    const key = blob.pathname.replace(/^\/+/, "");
+    const keyWithRoot = key.startsWith("khora/") ? key : `khora/${key}`;
+    if (referencedPhysicalUrls.has(blob.url)
+      || referencedPhysicalPaths.has(key)
+      || referencedPhysicalPaths.has(keyWithRoot)) continue;
+
+    const match = key.match(/^dictado\/([a-f0-9-]+)\/(\d+)\.webm/i);
+    if (match) {
+      const sId = match[1];
+      const group = orphanBySession.get(sId) || [];
+      group.push(blob);
+      orphanBySession.set(sId, group);
+      continue;
+    }
+
+    items.push({
+      volcadoId: null,
+      folio: null,
+      sessionId: null,
+      candidateBlobs: [blob.url],
+      classification: "AMBIGUOUS",
+      confidence: 0.5,
+      evidence: `Objeto físico de dictado sin referencia lógica detectada (pathname=${key})`,
+      proposedAction: "Conservar el objeto sin asociar ni eliminar hasta revisión manual",
+    });
+    classifications.AMBIGUOUS++;
+  }
+
+  for (const [sId, blobList] of orphanBySession.entries()) {
+    items.push({
+      volcadoId: null,
+      folio: null,
+      sessionId: sId,
+      candidateBlobs: blobList.map((b) => b.url),
+      classification: "AMBIGUOUS",
+      confidence: 0.5,
+      evidence: `Objeto(s) físico(s) de la sesión ${sId} sin referencia lógica detectada`,
+      proposedAction: "Conservar blob(s) huérfano(s) sin asociar hasta revisión manual",
+    });
+    classifications.AMBIGUOUS++;
   }
 
   // Si modo es APPLY, guardar reporte de pre-estado e impactar únicamente los EXACT_MATCH
@@ -257,6 +380,7 @@ export async function ejecutarReconciliacionForense(modo: "DRY_RUN" | "APPLY" = 
     const preStateData = {
       timestamp: new Date().toISOString(),
       modo,
+      inventory,
       volcadosCount: volcados.length,
       sesionesCount: sesionesMap.size,
       items,
@@ -300,6 +424,7 @@ export async function ejecutarReconciliacionForense(modo: "DRY_RUN" | "APPLY" = 
     totalVolcados: volcados.length,
     totalSessions: sesionesMap.size,
     totalBlobs: blobsFisicos.length,
+    inventory,
     classifications,
     items,
     preStateReportFile,
