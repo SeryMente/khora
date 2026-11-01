@@ -90,7 +90,7 @@ export async function putEncryptedObject(
 
   const location = storageLocation();
   const key = safeObjectKey(pathname.startsWith("khora/") ? pathname : `khora/${pathname}`);
-  const unique = key.replace(/(\\.[^/.]+)?$/, `-${randomUUID()}$1`);
+  const unique = key.replace(/(\.[^/.]+)?$/, `-${randomUUID()}$1`);
   const client = createB2Client();
   try {
     await client.send(new PutObjectCommand({
