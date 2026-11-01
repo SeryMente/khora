@@ -162,3 +162,23 @@ El bloqueo para completar la aceptación E2E de almacenamiento sigue siendo de r
 ### Acciones expresamente no realizadas
 
 No se modificó `KHORA_OBJECT_STORAGE`; no se cambiaron variables de Vercel; no se copiaron secretos; no se aprovisionaron buckets ni claves; no se modificó CORS; no se aplicó SQL ni backfill productivo; no se copiaron/reapuntaron/eliminaron objetos; no se desplegó ni fusionó la PR #348. El origen Blob permanece intacto.
+
+
+### Revisión de los flujos de lectura privada y del inventario físico
+
+Se inspeccionaron los consumidores del adaptador en el árbol B2:
+
+- `/api/audio/[id]`, `/api/audio/[id]/parte/[index]`, `/api/audio/importar/procesar`, `/api/audio/sesion/[id]/exportar`, `/api/audio`, `/api/transcribir/archivo`, `audio-mp3.ts` y `transcribirSesion.ts` usan `fetchStoredObject` para recuperar el objeto.
+- El manifiesto de `/api/audio/[id]/manifiesto` entrega `download_path` interno `/api/audio/{volcado}/parte/{index}`; la pantalla Custodia reproduce ese endpoint interno, no una URL B2 directa. Las rutas de reproducción/exportación verifican identidad/propiedad y, donde corresponde, el desbloqueo de bóveda antes de leer.
+- La política de staging se obtiene desde `/api/audio/importar/token`, que comprueba sesión autenticada, origen exacto, identidad de sesión y tamaño permitido antes de devolver una capacidad PUT de cinco minutos. El localizador persistido no contiene el query firmado; la lectura posterior vuelve a pasar por el servidor.
+
+**Limitación del inventario forense identificada, no modificada ni ejecutada:** `listB2Objects("khora/")` pagina el API S3 con 1.000 claves por respuesta, pero impone un techo acumulado de 10.000 objetos. En `reconciliation.ts`, el error de listado B2 se captura como advertencia y la función continúa construyendo el informe con los objetos reunidos hasta ese momento. Si el listado falla o excede el techo, ese resumen no es prueba de inventario físico completo y no debe utilizarse para clasificar objetos ausentes. El migrador Blob→B2 es una vía distinta: pagina la fuente Blob, exige cursor válido y verifica cada destino B2 mediante GET/descifrado/hash; su resumen solo es válido si finaliza sin errores, cuarentenas inesperadas ni faltantes. No se ejecutó la ruta `/api/auditoria` ni modo APPLY.
+
+### Comprobación explícita de guardas sin recursos de proveedor
+
+Se ejecutaron dos comprobaciones deliberadas con el entorno de proveedor vacío:
+
+- `KHORA_B2_PREFLIGHT=1 node --import tsx scripts/preflight-object-storage.ts`: terminó con exit 1 y código `storage_preflight_credentials_missing`; no creó cliente S3 ni objetos de diagnóstico.
+- `npm run migrate:blob-to-b2 -- --target-branch=custodia-b2-migration-test-20261031`: terminó con exit 1 y `DATABASE_URL_UNPOOLED_required`; el guard abortó antes de crear el pool PostgreSQL o listar Blob.
+
+Son pruebas negativas de fail-closed, no pruebas de proveedor. Confirman que la ausencia de recursos no deriva en una conexión accidental ni en una migración parcial.
