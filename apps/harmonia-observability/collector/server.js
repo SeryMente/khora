@@ -265,7 +265,7 @@ const server=http.createServer((req,res)=>{
    if(result.tooLarge)return reply(req,res,507,{error:'storage-limit-stop-no-deletion'});
    if(result.duplicate)return reply(req,res,200,{ok:true,eventId:event.eventId,duplicate:true,storedType:result.storedType,ordinal:result.ordinal});
    return reply(req,res,201,{ok:true,eventId:event.eventId,ordinal:result.ordinal,storedType:result.storedType,deduplicated:result.deduplicated,surfaceRef:result.surfaceRef||null,operationRef:result.operationRef||null,localState:'LOCAL_DURABLE',cloudState:'CLOUD_PENDING'});
-  }catch(error){if(error.code==='ledger-unavailable')ledgerHealthy=false;const code=error.code==='integrity-conflict'?409:error.code==='integrity-error'?422:error.code==='ledger-unavailable'?503:400;return reply(req,res,code,{error:String(error.code||error.message||error)});}
+  }catch(error){if(error.code==='ledger-unavailable'){ledgerHealthy=false;epAdapter.markDegraded(error.code);}const code=error.code==='integrity-conflict'?409:error.code==='integrity-error'?422:error.code==='ledger-unavailable'?503:400;return reply(req,res,code,{error:String(error.code||error.message||error)});}
  });
 });
 (async()=>{
@@ -274,6 +274,6 @@ const server=http.createServer((req,res)=>{
   await reconcileIndex();
   ledgerHealthy=ledger.integrityErrors===0;
   console.log('HARMONIA_LOCAL_RECONCILIATION',JSON.stringify(ledger));
- }catch(error){ledgerHealthy=false;console.error('HARMONIA_LOCAL_RECONCILIATION_BLOCKED',String(error.code||error.message||error));}
+ }catch(error){ledgerHealthy=false;epAdapter.markDegraded(error.code||'startup-reconciliation-failed');console.error('HARMONIA_LOCAL_RECONCILIATION_BLOCKED',String(error.code||error.message||error));}
  server.listen(PORT,HOST,()=>console.log('HARMONIA_COLLECTOR_ONLINE http://'+HOST+':'+PORT+' data='+root));
 })();
