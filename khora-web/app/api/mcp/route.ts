@@ -14,7 +14,7 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 import { ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { describeMcpTool, type McpToolName } from "@/lib/server/mcp-tool-contract";
-import { registerJulesMcpModule } from "@/lib/server/mcp-jules";
+import { registerMcpModules } from "@/lib/server/mcp-module-registry";
 import { normativeReceiptSchema } from "@/lib/server/normative-receipt-schema";
 import {
   toolKhoraResumen,
@@ -247,7 +247,7 @@ async function handleMcpRequest(req: NextRequest) {
     );
   };
 
-  registerJulesMcpModule({ mcpServer, toolsList, actor, correlation_id, requireScope });
+  registerMcpModules({ mcpServer, toolsList, actor, correlation_id, requireScope });
   // Herramienta 1: khora_resumen
   gatedTool(
     "khora_resumen",
