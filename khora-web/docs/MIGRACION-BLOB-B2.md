@@ -182,3 +182,41 @@ Se ejecutaron dos comprobaciones deliberadas con el entorno de proveedor vacío:
 - `npm run migrate:blob-to-b2 -- --target-branch=custodia-b2-migration-test-20261031`: terminó con exit 1 y `DATABASE_URL_UNPOOLED_required`; el guard abortó antes de crear el pool PostgreSQL o listar Blob.
 
 Son pruebas negativas de fail-closed, no pruebas de proveedor. Confirman que la ausencia de recursos no deriva en una conexión accidental ni en una migración parcial.
+
+
+### Verificación de dependencias externas — actualización de 2026-11-01
+
+#### Vercel Blob
+
+Se intentó provisionar, de forma independiente del proyecto `khora-web`, un Blob privado llamado `khora-custodia-e2e-20261101` en `iad1`, sin asociarlo a un proyecto ni generar variables de entorno. Vercel rechazó la operación:
+
+- Endpoint: `POST /storage/stores/blob`.
+- Error: `usage_threshold_limits_reached`.
+- Mensaje: no se puede crear otro store mientras se alcanza el límite de uso.
+- Resultado: no se creó ningún store y no se cambió ninguna variable.
+
+La inspección de metadatos del proyecto `khora-web` (sin descifrar valores) confirma que `BLOB_READ_WRITE_TOKEN` está configurado en un único registro con targets `production`, `preview` y `development`. Al no acreditarse que sea un almacén sintético aislado, no se usa para el migrador. No se solicitó ni expuso su valor.
+
+#### Backblaze B2
+
+En PC-8 se inspeccionó el archivo local `C:\\Users\\PC 8\\.b2_account_info` como SQLite en modo solo lectura. El esquema contiene tablas de cuenta y buckets, pero ambas están vacías (`account=0`, `bucket=0`). No existe una sesión local autenticada de B2 ni buckets registrados en esa configuración. No se leyó ningún campo secreto ni se intentó autenticar con ese archivo.
+
+En Vercel, los metadatos de variables (sin descifrar valores) muestran que `KHORA_OBJECT_STORAGE`, `KHORA_B2_BUCKET_NAME`, `KHORA_B2_BUCKET_ID`, `KHORA_B2_APPLICATION_KEY` y `KHORA_B2_KEY_ID` tienen target exclusivamente `production`. No existe configuración B2 para Preview o Development. No se copiaron ni consultaron los valores cifrados.
+
+#### Neon no productivo
+
+La rama autorizada `custodia-b2-migration-test-20261031` existe y está `ready` en el proyecto `still-sunset-02412999` (branch `br-dawn-violet-ahd0yrki`). En esa rama existe la base `custodia_b2_e2e`; la lectura de catálogo confirma exactamente las cinco tablas esperadas:
+
+- `dictado_audio_parte`
+- `dictado_mp3`
+- `dictado_mp3_historial`
+- `volcado`
+- `custodia_blob_b2_migration`
+
+Una consulta exclusivamente de conteos confirmó cero filas en cada tabla. No se consultó la base heredada `neondb`, no se copiaron filas de producción y no se ejecutó ninguna escritura.
+
+#### Dictamen de bloqueo actualizado
+
+El destino de prueba Neon está preparado y vacío. El origen Vercel Blob aislado no se puede provisionar por el límite de uso de la cuenta. El destino Backblaze B2 no tiene en este momento credenciales ni bucket de prueba disponibles en PC-8 o en los entornos no productivos del proyecto. No es seguro sustituirlos por el único token Blob compartido entre producción/preview/development ni por las claves B2 exclusivamente productivas.
+
+Por tanto, el bloqueo no es una tarea de código ni de SQL: son dos recursos externos no productivos que no pueden crearse con los permisos/cuotas actuales. No se intentará sortearlo mediante cuentas o proyectos alternativos, acceso a producción, extracción de secretos productivos o cambios de credenciales/configuración. La migración física permanece pendiente de un Blob test store/token dedicado y un bucket B2 de prueba con su Application Key restringida al prefijo `khora-custodia-e2e-`.
