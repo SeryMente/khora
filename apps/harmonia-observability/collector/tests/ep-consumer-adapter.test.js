@@ -19,6 +19,8 @@ function fixture() {
     sessionId: 'f2c19d80-49b5-4d21-8c8a-41c66c6bcf4f',
     type: 'capture.started',
     capturedAt: '2026-11-01T20:00:00.000Z',
+    collectorReceivedAt: '2026-11-01T20:00:01.000Z',
+    sourceRequestSha256: 'b'.repeat(64),
     payload: { version: '0.3.0' }
   };
   const line = JSON.stringify(event) + '\n';
