@@ -33,5 +33,7 @@ jobs:
           node --check apps/harmonia-observability/collector/ep-consumer-adapter.js
           node --check apps/harmonia-observability/collector/server.js
           node --check apps/harmonia-observability/collector/tests/ep-consumer-adapter.test.js
+          node --check apps/harmonia-observability/collector/tests/server-local-first.integration.test.js
+          node --check apps/harmonia-observability/extension/tests/durable-outbox.test.js
       - name: Durable local outbox and EP ledger tests
-        run: node --test apps/harmonia-observability/extension/tests/durable-outbox.test.js apps/harmonia-observability/collector/tests/ep-consumer-adapter.test.js
+        run: node --test apps/harmonia-observability/extension/tests/durable-outbox.test.js apps/harmonia-observability/collector/tests/ep-consumer-adapter.test.js apps/harmonia-observability/collector/tests/server-local-first.integration.test.js
