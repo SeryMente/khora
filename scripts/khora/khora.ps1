@@ -265,7 +265,7 @@ function Register-KhoraRebootCleanup {
     $escapedVhd=$Vhd.Replace("'","''")
     $escapedOuter=$Outer.Replace("'","''")
     $escapedTask=$Task.Replace("'","''")
-    $body="\$ErrorActionPreference='Stop';Start-Sleep -Seconds 10;\$vhd='$escapedVhd';\$outer='$escapedOuter';\$task='$escapedTask';if(Test-Path -LiteralPath \$vhd){Remove-Item -LiteralPath \$vhd -Force -ErrorAction Stop};if(Test-Path -LiteralPath \$outer){Remove-Item -LiteralPath \$outer -Recurse -Force -ErrorAction Stop};if((Test-Path -LiteralPath \$vhd) -or (Test-Path -LiteralPath \$outer)){throw 'KHORA_STARTUP_CLEANUP_RESIDUALS'};Unregister-ScheduledTask -TaskName \$task -Confirm:\$false -ErrorAction Stop"
+    $body="`$ErrorActionPreference='Stop';Start-Sleep -Seconds 10;`$vhd='$escapedVhd';`$outer='$escapedOuter';`$task='$escapedTask';if(Test-Path -LiteralPath `$vhd){Remove-Item -LiteralPath `$vhd -Force -ErrorAction Stop};if(Test-Path -LiteralPath `$outer){Remove-Item -LiteralPath `$outer -Recurse -Force -ErrorAction Stop};if((Test-Path -LiteralPath `$vhd) -or (Test-Path -LiteralPath `$outer)){throw 'KHORA_STARTUP_CLEANUP_RESIDUALS'};Unregister-ScheduledTask -TaskName `$task -Confirm:`$false -ErrorAction Stop"
     $encoded=[Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($body))
     $action=New-ScheduledTaskAction -Execute 'powershell.exe' -Argument ('-NoProfile -NonInteractive -WindowStyle Hidden -EncodedCommand '+$encoded)
     $trigger=New-ScheduledTaskTrigger -AtStartup
