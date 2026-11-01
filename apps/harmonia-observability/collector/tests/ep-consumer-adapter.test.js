@@ -56,7 +56,7 @@ test('does not auto-enqueue pre-activation historical originals', async t => {
 test('duplicate enqueue keeps the same operation identity', async t => {
   const f = fixture();
   t.after(() => fs.rmSync(f.root, { recursive: true, force: true }));
-  const adapter = createEpConsumerAdapter(f);
+  const adapter = createEpConsumerAdapter({ ...f, activationAt: '2026-01-01T00:00:00.000Z' });
   await adapter.reconcile();
   const ref = 'originals/2026-11-01/' + f.event.sessionId + '.jsonl#' + f.event.eventId;
   const first = await adapter.enqueue(ref);
@@ -68,7 +68,7 @@ test('duplicate enqueue keeps the same operation identity', async t => {
 test('flush never attempts network without the official EP contract and allowlist', async t => {
   const f = fixture();
   t.after(() => fs.rmSync(f.root, { recursive: true, force: true }));
-  const adapter = createEpConsumerAdapter(f);
+  const adapter = createEpConsumerAdapter({ ...f, activationAt: '2026-01-01T00:00:00.000Z' });
   await adapter.reconcile();
   const result = await adapter.flush();
   assert.equal(result.blocked, true);
@@ -78,7 +78,7 @@ test('flush never attempts network without the official EP contract and allowlis
 test('recover verifies the local source but does not claim EP verification', async t => {
   const f = fixture();
   t.after(() => fs.rmSync(f.root, { recursive: true, force: true }));
-  const adapter = createEpConsumerAdapter(f);
+  const adapter = createEpConsumerAdapter({ ...f, activationAt: '2026-01-01T00:00:00.000Z' });
   await adapter.reconcile();
   const row = adapter.findByEventId(f.event.eventId);
   const result = await adapter.recover(row.operationRef);
