@@ -1691,6 +1691,7 @@ En cada sesión Windows/RDC que corresponda al EP activo:
 
 - Control autoritativo releído de `main`: generación 13, estado `assigned`, alias `chatgpt-harmonia-01a198f5-3be2-7aff-bf83-5d5b9e0d9189`, `owner_thread=null`, `session_folio=null`; blob del archivo `1591cc682dc30340296c3b9e71f0892c3f51adcc`.
 - Dispositivo vinculado a esta continuidad: `PC-14`, UUID exacto `a1fe1e75-ba92-48e0-8547-5df886baa33c`. Autorización recibida literalmente: «Si autorizo». No se realizó acceso RDC ni se materializó código en la máquina del operador.
+- Alcance de construcción: el operador autorizó expresamente esta implementación de consumidor mediante la instrucción posterior «Resuelve lo tuyo». Se limita a una rama aislada de HARMONIA; no amplía autorización para modificar infraestructura EP/B2, usar RDC, fusionar `main` o desplegar.
 - FOL1 continúa preparada/no activa. No se generan folios CV/CY/A/B.
 
 ### 46.2 Rama de implementación y preservación de main
