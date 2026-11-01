@@ -2,6 +2,8 @@ const http=require('http');
 const fs=require('fs');
 const path=require('path');
 const crypto=require('crypto');
+const readline=require('readline');
+const {createEpConsumerAdapter}=require('./ep-consumer-adapter');
 const HOST='127.0.0.1',PORT=Number(process.env.HARMONIA_PORT||47321),MAX=1024**3,MAX_REQUEST=1_000_000,MAX_SEEN_EVENTS=20000,MAX_INDEXED_SURFACES=5000;
 const TOKEN=String(process.env.HARMONIA_TOKEN||'');
 if(!TOKEN)throw new Error('HARMONIA_TOKEN is required; load the local auth config first.');
@@ -10,6 +12,7 @@ const root=process.env.HARMONIA_DATA||'C:\\Users\\fila4\\AppData\\Local\\Harmoni
 fs.mkdirSync(root,{recursive:true});
 const idxPath=path.join(root,'index.json'),surfacesDir=path.join(root,'surfaces'),originalsDir=path.join(root,'originals');
 fs.mkdirSync(surfacesDir,{recursive:true});fs.mkdirSync(originalsDir,{recursive:true});
+const epAdapter=createEpConsumerAdapter({root,originalsDir,surfacesDir});
 const catalogPath=path.join(__dirname,'..','coverage-catalog.json');
 const catalog=JSON.parse(fs.readFileSync(catalogPath,'utf8'));
 let index={schema:'harmonia.index.v1',updatedAt:null,sessions:{},surfaceFingerprints:{},seenEventIds:{},coverage:null,uniqueSurfaceCount:0,totalBytes:0,stopped:false};
@@ -88,8 +91,10 @@ function updateCoverage(event,details={}){
 function atomicWrite(file,value){
  fs.mkdirSync(path.dirname(file),{recursive:true});
  const temp=file+'.'+process.pid+'.'+crypto.randomBytes(6).toString('hex')+'.tmp';
- fs.writeFileSync(temp,JSON.stringify(value,null,2),'utf8');
+ const fd=fs.openSync(temp,'w');
+ try{fs.writeFileSync(fd,JSON.stringify(value,null,2),'utf8');fs.fsyncSync(fd);}finally{fs.closeSync(fd);}
  fs.renameSync(temp,file);
+ try{const dir=fs.openSync(path.dirname(file),'r');try{fs.fsyncSync(dir);}finally{fs.closeSync(dir);}}catch{}
 }
 function persist(){index.updatedAt=new Date().toISOString();atomicWrite(idxPath,index);}
 function originOK(origin){return !origin||/^chrome-extension:\/\/[a-p]{32}$/.test(origin);}
@@ -103,8 +108,15 @@ function reply(req,res,code,obj){
 function validUUID(value){return typeof value==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);}
 function recordEvent(event,res){
  if(!validUUID(event.eventId)||!validUUID(event.sessionId)||typeof event.type!=='string'||!event.type||!event.capturedAt)throw Error('invalid-event-identity');
+ const requestSha256=crypto.createHash('sha256').update(JSON.stringify(event)).digest('hex');
+ const known=epAdapter.findByEventId(event.eventId);
+ if(known){
+  if(known.requestSha256&&known.requestSha256!==requestSha256){const error=new Error('event-id-integrity-conflict');error.code='integrity-conflict';throw error;}
+  persist();
+  return {duplicate:true,storedType:known.eventType||event.type,ordinal:index.seenEventIds[event.eventId]?.ordinal||0,operationRef:known.operationRef};
+ }
  const replay=index.seenEventIds[event.eventId];
- if(replay)return {duplicate:true,storedType:replay.storedType||event.type,ordinal:replay.ordinal||0};
+ if(replay)return {duplicate:true,storedType:replay.storedType||event.type,ordinal:replay.ordinal||0,operationRef:null};
  if(!/^ui\.surface\.(scan|reused)$|^capture\./.test(event.type))throw Error('event-type-out-of-scope');
  const when=Date.parse(event.capturedAt);if(!Number.isFinite(when))throw Error('invalid-event-date');
  if(event.type==='ui.surface.scan'||event.type==='ui.surface.reused'){
@@ -125,14 +137,16 @@ function recordEvent(event,res){
   const surfaceBytes=isNewSurface?Buffer.byteLength(JSON.stringify(surface,null,2),'utf8'):0;
   if(index.totalBytes+surfaceBytes+bytes>MAX){index.stopped=true;persist();return {tooLarge:true};}
   if(isNewSurface){atomicWrite(surfaceFile,surface);index.uniqueSurfaceCount=(index.uniqueSurfaceCount||0)+1;index.totalBytes+=surfaceBytes;}
-  fs.appendFileSync(file,line,'utf8');index.totalBytes+=bytes;
+  appendDurable(file,line);index.totalBytes+=bytes;
   const session=index.sessions[event.sessionId]||{firstAt:event.capturedAt,lastAt:event.capturedAt,events:0,types:{},file:path.relative(root,file).split(path.sep).join('/'),lastEventSha256:null};
   session.lastAt=event.capturedAt;session.events++;session.types[storedType]=(session.types[storedType]||0)+1;
   session.lastEventSha256=crypto.createHash('sha256').update(line).digest('hex');index.sessions[event.sessionId]=session;
   updateCoverage(stored,{features:record.features,unknownControlSignatures:record.unknownControlSignatures,controlCount:record.controlCount,nodeCount:record.nodeCount,stylesheetCount:record.stylesheetCount});
   index.seenEventIds[event.eventId]={capturedAt:event.capturedAt,sessionId:event.sessionId,storedType,ordinal:session.events};
+  const sourceRef=path.relative(root,file).split(path.sep).join('/')+'#'+event.eventId;
+  const registration=epAdapter.registerStoredEvent(sourceRef,stored,line,requestSha256);
   pruneSeenEventIds();persist();
-  return {duplicate:false,storedType,ordinal:session.events,deduplicated:!isNewSurface,surfaceRef:record.surfaceFile};
+  return {duplicate:false,storedType,ordinal:session.events,deduplicated:!isNewSurface,surfaceRef:record.surfaceFile,operationRef:registration.operationRef};
  }
  const day=new Date(when).toISOString().slice(0,10),file=path.join(originalsDir,day,event.sessionId+'.jsonl');
  const stored={schema:'harmonia.event.v1',eventId:event.eventId,sessionId:event.sessionId,conversation:typeof event.conversation==='string'?event.conversation.slice(0,80):null,type:event.type,source:text(event.source,40),capturedAt:new Date(when).toISOString(),payload:event.type==='capture.started'?{url:safeSessionUrl(event.payload&&event.payload.url),version:text(event.payload&&event.payload.version,24),mode:text(event.payload&&event.payload.mode,60),privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true}}:event.type==='capture.stopped'?{reason:text(event.payload&&event.payload.reason,80),durationMs:Math.max(0,number(event.payload&&event.payload.durationMs))}:{reason:'event-suppressed'}};
@@ -143,18 +157,94 @@ function recordEvent(event,res){
  session.lastAt=stored.capturedAt;session.events++;session.types[stored.type]=(session.types[stored.type]||0)+1;
  session.lastEventSha256=crypto.createHash('sha256').update(line).digest('hex');index.sessions[event.sessionId]=session;
  index.seenEventIds[event.eventId]={capturedAt:stored.capturedAt,sessionId:stored.sessionId,storedType:stored.type,ordinal:session.events};
- pruneSeenEventIds();persist();return {duplicate:false,storedType:stored.type,ordinal:session.events,deduplicated:false};
+ const sourceRef=path.relative(root,file).split(path.sep).join('/')+'#'+event.eventId;
+ const registration=epAdapter.registerStoredEvent(sourceRef,stored,line,requestSha256);
+ pruneSeenEventIds();persist();return {duplicate:false,storedType:stored.type,ordinal:session.events,deduplicated:false,operationRef:registration.operationRef};
 }
 function safeSessionUrl(raw){try{const u=new URL(raw);if(u.protocol!=='https:'||u.hostname!=='chatgpt.com')return null;return u.origin+u.pathname.replace(/\/c\/[^/]+/,'/c/[conversation]').replace(/\/g\/[^/]+/,'/g/[gpt]');}catch{return null;}}
 function pruneSeenEventIds(){const ids=Object.keys(index.seenEventIds);if(ids.length>MAX_SEEN_EVENTS){for(const id of ids.slice(0,ids.length-MAX_SEEN_EVENTS))delete index.seenEventIds[id];}}
+
+function appendDurable(file,line){
+ fs.mkdirSync(path.dirname(file),{recursive:true});
+ const fd=fs.openSync(file,'a');
+ try{const data=Buffer.from(line,'utf8');let offset=0;while(offset<data.length)offset+=fs.writeSync(fd,data,offset,data.length-offset);fs.fsyncSync(fd);}finally{fs.closeSync(fd);}
+}
+function listFiles(directory,extension){
+ if(!fs.existsSync(directory))return [];
+ const found=[];
+ for(const entry of fs.readdirSync(directory,{withFileTypes:true})){
+  const full=path.join(directory,entry.name);
+  if(entry.isDirectory())found.push(...listFiles(full,extension));
+  else if(entry.isFile()&&entry.name.toLowerCase().endsWith(extension))found.push(full);
+ }
+ return found.sort();
+}
+function storedDiskBytes(){
+ return [...listFiles(originalsDir,'.jsonl'),...listFiles(surfacesDir,'.json')].reduce((sum,file)=>sum+fs.statSync(file).size,0);
+}
+async function rebuildIndexFromSources(){
+ const wasStopped=!!index.stopped;
+ const originalFiles=listFiles(originalsDir,'.jsonl'),surfaceFiles=listFiles(surfacesDir,'.json');
+ index={schema:'harmonia.index.v1',updatedAt:null,sessions:{},surfaceFingerprints:{},seenEventIds:{},coverage:null,
+  uniqueSurfaceCount:surfaceFiles.length,totalBytes:0,stopped:wasStopped};
+ const surfaces=new Map();
+ for(const file of surfaceFiles){
+  try{const surface=JSON.parse(fs.readFileSync(file,'utf8'));if(/^[0-9a-f]{64}$/.test(surface.fingerprint||''))surfaces.set(surface.fingerprint,surface);}catch{}
+ }
+ for(const file of originalFiles){
+  const relative=path.relative(root,file).split(path.sep).join('/');
+  const reader=readline.createInterface({input:fs.createReadStream(file,{encoding:'utf8'}),crlfDelay:Infinity});
+  for await(const line of reader){
+   if(!line)continue;
+   let event;try{event=JSON.parse(line);}catch{continue;}
+   if(!event||!validUUID(event.eventId)||!validUUID(event.sessionId)||!event.capturedAt)continue;
+   if(index.seenEventIds[event.eventId])continue;
+   const session=index.sessions[event.sessionId]||{firstAt:event.capturedAt,lastAt:event.capturedAt,events:0,types:{},file:relative,lastEventSha256:null};
+   if(Date.parse(event.capturedAt)<Date.parse(session.firstAt))session.firstAt=event.capturedAt;
+   session.lastAt=event.capturedAt;session.events++;session.types[event.type]=(session.types[event.type]||0)+1;
+   session.lastEventSha256=crypto.createHash('sha256').update(line+'\n').digest('hex');
+   index.sessions[event.sessionId]=session;
+   index.seenEventIds[event.eventId]={capturedAt:event.capturedAt,sessionId:event.sessionId,storedType:event.type,ordinal:session.events};
+   if(event.type==='ui.surface.scan'||event.type==='ui.surface.reused'){
+    const p=event.payload||{},fingerprint=p.fingerprint;
+    if(/^[0-9a-f]{64}$/.test(fingerprint||'')){
+     const surface=surfaces.get(fingerprint)||{};
+     const surfaceRef=typeof p.surfaceRef==='string'?p.surfaceRef:('surfaces/'+fingerprint+'.json');
+     const record=index.surfaceFingerprints[fingerprint]||{
+      fingerprint,surfaceFile:surfaceRef,firstAt:surface.firstObservedAt||event.capturedAt,
+      firstSessionId:surface.firstSessionId||event.sessionId,firstEventId:surface.firstEventId||event.eventId,
+      features:listStrings(surface.features||p.features),controlCount:Array.isArray(surface.controls)?surface.controls.length:number(p.controlCount),
+      nodeCount:number(surface.structure&&surface.structure.total,p.nodeCount),stylesheetCount:Array.isArray(surface.stylesheets)?surface.stylesheets.length:number(p.stylesheetCount),
+      viewport:surface.viewport||p.viewport,unknownControlSignatures:Array.isArray(surface.controls)?surface.controls.filter(c=>!c.testId&&!c.label).map(c=>[c.tag,c.role,c.type].join('|')):[],
+      seenCount:0,sessionIds:[]
+     };
+     record.lastSeenAt=event.capturedAt;record.seenCount++;
+     if(!record.sessionIds.includes(event.sessionId))record.sessionIds=[...record.sessionIds,event.sessionId].slice(-100);
+     index.surfaceFingerprints[fingerprint]=record;
+     updateCoverage(event,{features:record.features,unknownControlSignatures:record.unknownControlSignatures,
+      controlCount:record.controlCount,nodeCount:record.nodeCount,stylesheetCount:record.stylesheetCount});
+    }
+   }
+   pruneSeenEventIds();
+  }
+ }
+ index.totalBytes=storedDiskBytes();
+ persist();
+}
+async function reconcileIndex(){
+ const actual=storedDiskBytes();
+ if(actual!==Number(index.totalBytes||0))await rebuildIndexFromSources();
+}
+
 const server=http.createServer((req,res)=>{
  const origin=req.headers.origin;if(!originOK(origin))return reply(req,res,403,{error:'origin-not-allowed'});
  if(req.method==='OPTIONS'){if(!origin||req.headers['access-control-request-method']!=='POST')return reply(req,res,403,{error:'preflight-not-allowed'});return reply(req,res,204,{});}
- if(req.method==='GET'&&['/health','/index','/coverage','/fingerprints'].includes(req.url)){
+ if(req.method==='GET'&&['/health','/index','/coverage','/fingerprints','/ep/status'].includes(req.url)){
   if(!authOK(req))return reply(req,res,401,{error:'unauthorized'});
   if(req.url==='/health')return reply(req,res,200,{ok:true,root,maxBytes:MAX,totalBytes:index.totalBytes,stopped:index.stopped,updatedAt:index.updatedAt,sessions:Object.keys(index.sessions).length,uniqueSurfaces:index.uniqueSurfaceCount});
   if(req.url==='/coverage')return reply(req,res,200,index.coverage||{schema:'harmonia.coverage-index.v1',observedFeatureIds:[],unknownControls:[],scanCount:0,uniqueSurfaceCount:index.uniqueSurfaceCount});
   if(req.url==='/fingerprints')return reply(req,res,200,{fingerprints:Object.keys(index.surfaceFingerprints),count:index.uniqueSurfaceCount});
+  if(req.url==='/ep/status')return reply(req,res,200,epAdapter.getStatus());
   return reply(req,res,200,index);
  }
  if(req.method==='POST'&&req.url==='/shutdown'){if(!authOK(req))return reply(req,res,401,{error:'unauthorized'});persist();reply(req,res,200,{ok:true,stopping:true});setTimeout(()=>server.close(()=>console.log('HARMONIA_COLLECTOR_STOPPED')),80);return;}
@@ -169,8 +259,15 @@ const server=http.createServer((req,res)=>{
    const event=JSON.parse(body),result=recordEvent(event,res);
    if(result.tooLarge)return reply(req,res,507,{error:'storage-limit-stop-no-deletion'});
    if(result.duplicate)return reply(req,res,200,{ok:true,eventId:event.eventId,duplicate:true,storedType:result.storedType,ordinal:result.ordinal});
-   return reply(req,res,201,{ok:true,eventId:event.eventId,ordinal:result.ordinal,storedType:result.storedType,deduplicated:result.deduplicated,surfaceRef:result.surfaceRef||null});
-  }catch(error){return reply(req,res,400,{error:String(error.message||error)});}
+   return reply(req,res,201,{ok:true,eventId:event.eventId,ordinal:result.ordinal,storedType:result.storedType,deduplicated:result.deduplicated,surfaceRef:result.surfaceRef||null,operationRef:result.operationRef||null,localState:'LOCAL_DURABLE',cloudState:'CLOUD_PENDING'});
+  }catch(error){const code=error.code==='integrity-conflict'?409:error.code==='integrity-error'?422:error.code==='ledger-unavailable'?503:400;return reply(req,res,code,{error:String(error.code||error.message||error)});}
  });
 });
-server.listen(PORT,HOST,()=>console.log('HARMONIA_COLLECTOR_ONLINE http://'+HOST+':'+PORT+' data='+root));
+(async()=>{
+ try{
+  const ledger=await epAdapter.reconcile();
+  await reconcileIndex();
+  console.log('HARMONIA_LOCAL_RECONCILIATION',JSON.stringify(ledger));
+ }catch(error){console.error('HARMONIA_LOCAL_RECONCILIATION_BLOCKED',String(error.code||error.message||error));}
+ server.listen(PORT,HOST,()=>console.log('HARMONIA_COLLECTOR_ONLINE http://'+HOST+':'+PORT+' data='+root));
+})();
