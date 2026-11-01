@@ -27,11 +27,34 @@ function walkJsonl(directory) {
   return result.sort();
 }
 
-function createEpConsumerAdapter({ root, originalsDir, surfacesDir }) {
+function createEpConsumerAdapter({ root, originalsDir, surfacesDir, activationAt = null }) {
   const dataRoot = path.resolve(root);
   const sourceRoot = path.resolve(originalsDir);
   const surfaceRoot = path.resolve(surfacesDir);
   const ledgerPath = path.join(dataRoot, 'ep-consumer-ledger.jsonl');
+  const activationPath = path.join(dataRoot, 'ep-consumer-activation.json');
+  let activatedAt = null;
+  try {
+    if (fs.existsSync(activationPath)) {
+      const manifest = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+      if (manifest.schema !== 'harmonia.ep-activation.v1' || manifest.consumer !== 'harmonia' ||
+          !Number.isFinite(Date.parse(manifest.activatedAt))) throw new Error('activation-manifest-invalid');
+      activatedAt = manifest.activatedAt;
+    } else {
+      activatedAt = activationAt || new Date().toISOString();
+      const manifest = { schema: 'harmonia.ep-activation.v1', consumer: 'harmonia', activatedAt };
+      const temp = activationPath + '.' + process.pid + '.tmp';
+      const fd = fs.openSync(temp, 'w');
+      try { fs.writeFileSync(fd, JSON.stringify(manifest, null, 2), 'utf8'); fs.fsyncSync(fd); }
+      finally { fs.closeSync(fd); }
+      fs.renameSync(temp, activationPath);
+      try { const dir = fs.openSync(dataRoot, 'r'); try { fs.fsyncSync(dir); } finally { fs.closeSync(dir); } } catch {}
+    }
+  } catch (error) {
+    ledgerIntegrityErrors++;
+    activatedAt = activationAt || new Date().toISOString();
+  }
+
   const byEventId = new Map();
   const byOperationRef = new Map();
   let ledgerLoaded = false;
@@ -72,14 +95,20 @@ function createEpConsumerAdapter({ root, originalsDir, surfacesDir }) {
 
   function appendDurable(row) {
     fs.mkdirSync(dataRoot, { recursive: true });
-    const fd = fs.openSync(ledgerPath, 'a');
+    let fd;
     try {
+      fd = fs.openSync(ledgerPath, 'a');
       const data = Buffer.from(JSON.stringify(row) + '\n', 'utf8');
       let offset = 0;
       while (offset < data.length) offset += fs.writeSync(fd, data, offset, data.length - offset);
       fs.fsyncSync(fd);
+    } catch (cause) {
+      const error = new Error('ledger-unavailable');
+      error.code = 'ledger-unavailable';
+      error.cause = cause;
+      throw error;
     } finally {
-      fs.closeSync(fd);
+      if (fd !== undefined) fs.closeSync(fd);
     }
   }
 
@@ -183,9 +212,11 @@ function createEpConsumerAdapter({ root, originalsDir, surfacesDir }) {
         let event;
         try { event = JSON.parse(line); } catch { ledgerIntegrityErrors++; continue; }
         if (!UUID.test(String(event.eventId || ''))) continue;
+        const persistedAt = Date.parse(event.collectorReceivedAt || '');
+        if (!Number.isFinite(persistedAt) || persistedAt < Date.parse(activatedAt)) continue;
         if (byEventId.has(event.eventId)) continue;
         try {
-          registerStoredEvent(relative + '#' + event.eventId, event, line + '\n');
+          registerStoredEvent(relative + '#' + event.eventId, event, line + '\n', event.sourceRequestSha256 || null);
           discovered++;
         } catch {
           conflicts++;
@@ -206,7 +237,7 @@ function createEpConsumerAdapter({ root, originalsDir, surfacesDir }) {
     return {
       schema: 'harmonia.ep-consumer-status.v1',
       consumer: 'harmonia',
-      localLedger: 'READY',
+      localLedger: ledgerIntegrityErrors > 0 ? 'DEGRADED' : 'READY',
       localRecords: rows.length,
       localDurableCount: rows.filter(row => row.localState === 'LOCAL_DURABLE').length,
       cloudPendingCount: rows.filter(row => row.cloudState === 'CLOUD_PENDING').length,
@@ -216,6 +247,7 @@ function createEpConsumerAdapter({ root, originalsDir, surfacesDir }) {
       remoteState: 'NOT_CONNECTED',
       blockers: ['ALLOWLIST_NOT_APPROVED', 'EP_OFFICIAL_CONTRACT_UNAVAILABLE'],
       ledgerIntegrityErrors,
+      activatedAt,
       lastReconciledAt
     };
   }
