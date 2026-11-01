@@ -5,6 +5,7 @@ param(
     [switch]$BootstrapStage2,
     [switch]$CleanupOnly,
     [switch]$GuardianOnly,
+    [switch]$SelfTest,
     [string]$Reason='manual',
     [string]$SessionManifest,
     [int]$WatchPid=0,
@@ -14,8 +15,8 @@ param(
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
-$script:EP_VERSION = '1.0.2'
-$script:SCRIPT_VERSION = '7.5.4'
+$script:EP_VERSION = '1.0.3'
+$script:SCRIPT_VERSION = '7.5.5'
 $script:GATE_PATH=$PSCommandPath
 $script:GATE_DIR=if($PSCommandPath){Split-Path -Parent $PSCommandPath}else{$null}
 $script:SESSION_MANIFEST_ARG=$SessionManifest
@@ -385,6 +386,82 @@ function Start-KhoraBootstrap {
     finally{$KhoraToken=$null;$vault=$null;$pat=$null}
 }
 
+function Invoke-KhoraSelfTest {
+    if ([string]::IsNullOrWhiteSpace([string]$script:GATE_PATH) -or -not (Test-Path -LiteralPath $script:GATE_PATH -PathType Leaf)) {
+        throw 'MOD_SCRIPTPWS_SELFTEST_REQUIRES_FILE: ejecuta khora.ps1 desde archivo.'
+    }
+    $repoRoot = [IO.Path]::GetFullPath((Join-Path $script:GATE_DIR '..\..'))
+    $moduleDir = Join-Path $script:GATE_DIR 'modules'
+    $barrelPath = Join-Path $script:GATE_DIR 'khora.barrel.ps1'
+    if (-not (Test-Path -LiteralPath $barrelPath -PathType Leaf)) { throw 'MOD_SCRIPTPWS_SELFTEST_BARREL_MISSING' }
+    $barrelText = Get-Content -LiteralPath $barrelPath -Raw
+    $moduleMatches = [regex]::Matches($barrelText, "'([0-9]{2}-[^']+\.ps1)'")
+    $moduleNames = @()
+    foreach ($match in $moduleMatches) { $moduleNames += $match.Groups[1].Value }
+    if ($moduleNames.Count -ne 18) { throw ('MOD_SCRIPTPWS_SELFTEST_MODULE_COUNT: expected=18 actual=' + $moduleNames.Count) }
+
+    $sourceFiles = New-Object 'System.Collections.Generic.List[string]'
+    [void]$sourceFiles.Add($script:GATE_PATH)
+    [void]$sourceFiles.Add($barrelPath)
+    foreach ($name in $moduleNames) {
+        $modulePath = Join-Path $moduleDir $name
+        if (-not (Test-Path -LiteralPath $modulePath -PathType Leaf)) { throw ('MOD_SCRIPTPWS_SELFTEST_MODULE_MISSING: ' + $name) }
+        [void]$sourceFiles.Add($modulePath)
+    }
+    $testDir = Join-Path $script:GATE_DIR 'tests'
+    if (-not (Test-Path -LiteralPath $testDir -PathType Container)) { throw 'MOD_SCRIPTPWS_SELFTEST_TESTS_DIRECTORY_MISSING' }
+    foreach ($testFile in @(Get-ChildItem -LiteralPath $testDir -Filter '*.ps1' -File -ErrorAction Stop)) {
+        [void]$sourceFiles.Add($testFile.FullName)
+    }
+
+    $parseCount = 0
+    foreach ($sourceFile in $sourceFiles) {
+        $tokens = $null
+        $parseErrors = $null
+        [void][System.Management.Automation.Language.Parser]::ParseFile($sourceFile, [ref]$tokens, [ref]$parseErrors)
+        if ($parseErrors -and $parseErrors.Count -gt 0) {
+            $first = $parseErrors | Select-Object -First 1
+            throw ('MOD_SCRIPTPWS_SELFTEST_PARSE_ERROR: ' + $sourceFile + ':' + $first.Extent.StartLineNumber + ': ' + $first.Message)
+        }
+        $parseCount++
+    }
+
+    $configPath = Join-Path $moduleDir '00-config.ps1'
+    $configText = Get-Content -LiteralPath $configPath -Raw
+    if ($configText -notmatch "SCRIPT_VERSION\s+-ne\s+'7\.5\.5'" -or $configText -notmatch "EP_VERSION\s+-ne\s+'1\.0\.3'") {
+        throw 'MOD_SCRIPTPWS_SELFTEST_VERSION_GUARD_MISSING'
+    }
+    $validatorPath = Join-Path $repoRoot 'tests\validate_ep.py'
+    if (-not (Test-Path -LiteralPath $validatorPath -PathType Leaf)) { throw 'MOD_SCRIPTPWS_SELFTEST_VALIDATOR_MISSING' }
+    $validatorText = Get-Content -LiteralPath $validatorPath -Raw
+    if ($validatorText -notmatch "SCRIPT_VERSION = '7\.5\.5'" -or $validatorText -notmatch "EP_VERSION = '1\.0\.3'") {
+        throw 'MOD_SCRIPTPWS_SELFTEST_VALIDATOR_VERSION_MISMATCH'
+    }
+
+    $moduleSources = @(Get-ChildItem -LiteralPath $moduleDir -Filter '*.ps1' -File -ErrorAction Stop | ForEach-Object { Get-Content -LiteralPath $_.FullName -Raw })
+    $allSource = ($moduleSources -join [Environment]::NewLine)
+    foreach ($requiredToken in @('Find-KhoraHostExecutable','Get-KhoraToolchainInventory','npm.cmd','Invoke-KhoraCleanupStageSafe','Test-KhoraEncryptedWorkspace','Start-GuardianLoop','Materialize-OepWorkspaceRepositories','Sync-OepWorkspaceWip','Send-KhoraRemoteEvent','Write-KhoraEvent')) {
+        if ($allSource.IndexOf($requiredToken, [StringComparison]::OrdinalIgnoreCase) -lt 0) {
+            throw ('MOD_SCRIPTPWS_SELFTEST_CAPABILITY_MISSING: ' + $requiredToken)
+        }
+    }
+    if ($allSource -match '(?i)git\s+add\s+-A') { throw 'MOD_SCRIPTPWS_SELFTEST_FORBIDDEN_GIT_ADD_ALL' }
+
+    $embeddedPath = Join-Path $repoRoot 'khora-web\lib\server\ep-bootstrap-content.ts'
+    if (-not (Test-Path -LiteralPath $embeddedPath -PathType Leaf)) { throw 'MOD_SCRIPTPWS_SELFTEST_EMBEDDED_BOOTSTRAP_MISSING' }
+    $embeddedText = Get-Content -LiteralPath $embeddedPath -Raw
+    $embeddedMatch = [regex]::Match($embeddedText, 'BOOTSTRAP_PS1_BASE64\s*=\s*"([A-Za-z0-9+/=]+)"')
+    if (-not $embeddedMatch.Success) { throw 'MOD_SCRIPTPWS_SELFTEST_EMBEDDED_BOOTSTRAP_FORMAT' }
+    $gateBytes = [IO.File]::ReadAllBytes($script:GATE_PATH)
+    if ([Convert]::ToBase64String($gateBytes) -cne $embeddedMatch.Groups[1].Value) {
+        throw 'MOD_SCRIPTPWS_SELFTEST_EMBEDDED_BOOTSTRAP_DIVERGENCE'
+    }
+
+    Write-Host ('MOD-SCRIPTPWS SELFTEST: PASS · PowerShell ' + $PSVersionTable.PSVersion.ToString() + ' · ' + $parseCount + ' archivos parseados · SCRIPT ' + $script:SCRIPT_VERSION + ' · EP ' + $script:EP_VERSION + ' · bootstrap byte-equivalente') -ForegroundColor Green
+    return [pscustomobject]@{status='PASS';scriptVersion=$script:SCRIPT_VERSION;epVersion=$script:EP_VERSION;parsedFiles=$parseCount;embeddedBytes=$gateBytes.Length}
+}
+
+if($SelfTest){Invoke-KhoraSelfTest;return }
 if($Bootstrap){Start-KhoraBootstrap;return }
 if(-not$script:GATE_DIR){throw 'Este modo requiere el punto de entrada clonado.'}
 . (Join-Path $script:GATE_DIR 'khora.barrel.ps1')
