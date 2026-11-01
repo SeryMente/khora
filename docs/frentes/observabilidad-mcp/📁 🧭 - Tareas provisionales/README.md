@@ -5,7 +5,7 @@
 **OCP padre y fuente de estado:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md)  
 **Control heredado:** [CONTROL-RESPONSABILIDAD.json](../CONTROL-RESPONSABILIDAD.json), generación **5**, titular operativo `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`; blob leído de vuelta `92f4f6ab864c19e52a123b6358d94c5a8e7a9474`.  
 **Evento de creación:** instrucción expresa del operador en esta conversación · 2026-10-31.  
-**Fuente normativa vigente:** [DUG Samantha v373 · NX-373m](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), Metacanon **1.26**, GOW **2.14**.
+**Fuente normativa vigente:** [DUG Samantha v374 · NX-374m](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), Metacanon **1.26**, GOW **2.14**.
 
 ## Naturaleza y límites
 
@@ -47,3 +47,8 @@ El orden es operativo, no introduce prioridad universal, fecha límite ni respon
 5. No mover la ruta heredada `docs/frentes/observabilidad-mcp/`, ni crear otro OCP/control/frente para General, Jules o la retoma.
 6. El cierre requiere atender el enunciado, recuperar evidencia y leer de vuelta el resultado desde la fuente canónica pertinente.
 7. Una compilación, prueba sintética, Preview sin variables requeridas o metadato OAuth disponible no sustituye una lectura autenticada real ni la aceptación E2E.
+
+
+## Corte RDC · 2026-11-01
+
+Se asumió pérdida total del estado volátil de la sesión local anterior. Dispositivo `PC-14` Online, perfil `C:\Users\PC 13`, SID `S-1-5-21-1094932887-1468116028-2730151477-1002`. El checkout `khora-main` quedó intacto en rama de Custodia. El clon dedicado de Khora MCP está en `C:\Users\PC 13\Desktop\Khora\khora-mcp-main`, rama `main`; HEAD de creación `5318f6e21bcd7eaf1d6e45754786d5d58f67d94d`, limpio. El puente pasa comprobaciones estáticas Node/PowerShell. `npm ci` fue bloqueado por seguridad; las pruebas completas del clon permanecen pendientes. Production y Preview se resumen en el §24 del OCP.

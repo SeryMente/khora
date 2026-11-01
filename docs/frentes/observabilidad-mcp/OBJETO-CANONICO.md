@@ -4,7 +4,7 @@
 - Frente único vigente: **Khora MCP**; identidad canónica `KHORA-MCP`.
 - Nombre e identidad histórica: **Observabilidad MCP** / `OBSERVABILIDAD-MCP`. La ruta heredada `docs/frentes/observabilidad-mcp/` se conserva; no se migra ni duplica el OCP o su control.
 - Repositorio: `SeryMente/khora`; OCP único: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`; control único: `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`.
-- OCP: **v0.3.7**. Control de responsabilidad: **generación 5**, titular operativo `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`.
+- OCP: **v0.3.9**. Control de responsabilidad: **generación 5**, titular operativo `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`.
 - La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local de continuidad: `01a19499-caec-7e19-beb9-bb5b890a36c8`; no es un ID nativo.
 - Folio global y folio de sesión: **PENDIENTE / NO ASIGNADO**; FOL1 está PREPARADO, NO ACTIVO. El control vigente tiene `session_folio: null`; el candidato anterior se conserva solo como antecedente no emitido en el registro de corrección.
 - Las tareas provisionales «Continuidad», «General» y «Jules» pertenecen a este mismo frente y se registran en [Tareas provisionales](./📁%20🧭%20-%20Tareas%20provisionales/README.md); no crean frentes ni controles paralelos.
@@ -22,7 +22,7 @@ Leer README, DUG vigente, este OCP y `CONTROL-RESPONSABILIDAD.json`. La titulari
 **Interpretación operativa separada:** el repositorio denomina MCP al servidor/protocolo y herramientas de Khora; «MSP» se conserva en la cita original. El frente cubre el acceso de modelos/agentes autorizados a observabilidad y la integración controlada con Jules.
 
 ## 3. Referencia metodológica
-- DUG consultado directamente desde `SeryMente/metodologia/main`: **Samantha v373 · NX-373m**; HTML canónico Blob SHA `cac4525de77d4f47a8a59c25201968ecf2056b90`; `main` verificado en `3a443d6d50778f1ed75493e93977bab108a40d39` (2026-11-01T01:36:02Z). Metacanon **1.26**; GOW **2.14**. §ARR y la cascada vigente fueron consultados; MCP normativo permanece desactivado.
+- DUG consultado desde `SeryMente/metodologia/main`: **Samantha v374 · NX-374m**; HTML canónico Blob SHA `2827d6edc3c07613c59dabf90ddea918e84bb06a`; `main` verificado en `4b9a6d99239e4f1a9bc87de18d1a2c06f05d232f` (`2026-11-01T21:21:59Z`). Metacanon **1.26**; GOW **2.14**. Se revisaron cascada, CNP y principios de responsabilidad, continuidad, persistencia y foliación; el cuerpo enlazado de §ARR no estuvo disponible en la extracción estática y queda pendiente de lectura completa. MCP normativo permanece DESACTIVADO.
 - Metacanon **1.26**; GOW **2.14**.
 - CNP vigente (categoría A): P001, P004, P005, P038 y P043; consideración explícita en cada turno. MCP normativo: DESACTIVADO.
 - Fuente normativa: `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`.
@@ -375,3 +375,22 @@ La exportación `ChatGPT-Khora MCP-20261031-1846.md` quedó vinculada bajo `hist
 La instancia PC-14 anterior está desconectada. La conexión RDC actual corresponde a `015RENTA01`; GitHub CLI está autenticado, pero no se presume que el workspace anterior ni su DPAPI existan en este perfil. La ruta local de trabajo se debe verificar antes de crearla; el checkout nuevo, dependencias, DPAPI CurrentUser y consentimiento OAuth son pendientes de TASK-001/TASK-003.
 
 **Siguiente actuación:** terminar TASK-001 mediante verificación del perfil Windows y clon limpio de `main`; continuar después con General y, finalmente, con la aceptación de lectura autenticada de Jules. No desplegar Production ni copiar secretos sin pasar los controles documentados.
+
+
+## 24. Nuevo handshake RDC y pérdida de estado de sesión — 2026-11-01
+
+El operador presentó un nuevo handshake para `PC-14` (`--no-persist-session`) y ordenó asumir pérdida total del estado de sesión local anterior. Los dos mensajes literales se conservan en [RDC-HANDSHAKE-2026-11-01-150949.md](./📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20KHORA-MCP-TASK-001%20-%20Continuidad%20y%20reconstrucción%20del%20workspace/originales/RDC-HANDSHAKE-2026-11-01-150949.md). No se reutilizan procesos, terminales, handles ni variables anteriores; los archivos persistentes se verifican individualmente.
+
+- **RDC:** `PC-14`, Device ID `a1fe1e75-ba92-48e0-8547-5df886baa33c`, Online; Windows x64, PowerShell, Node v26.13.0.
+- **Perfil:** `PC-14\PC 13`; SID `S-1-5-21-1094932887-1468116028-2730151477-1002`; `C:\Users\PC 13`.
+- **Checkout previo:** `Desktop\Khora\khora-main` en `feat/custodia-b2-cutover-20261031`, commit `e6c96cbc5c70128380aea0dfddc0835f45b9e0d6`, limpio. No se tocó para evitar colisión con otro frente.
+- **Clon dedicado:** `Desktop\Khora\khora-mcp-main`; remoto Khora; rama `main`; HEAD inicial `5318f6e21bcd7eaf1d6e45754786d5d58f67d94d`, igual al `main` remoto en el momento del clon; árbol limpio.
+- **Validaciones:** `bridge.mjs` pasa `node --check`; `jules.ps1` y `credential.ps1` pasan el parser PowerShell. `node_modules`, `.env.local` y `.khora-local` no existen en el clon dedicado.
+- **Instalación:** `npm ci` y `npm ci --ignore-scripts` fueron bloqueados por los controles de seguridad antes de ejecutarse. No se eludió el bloqueo. Tests, typecheck, UI Review, contrato y build del clon dedicado siguen PENDIENTES. El build de la sesión anterior no tiene resultado final/read-back y se clasifica NO VERIFICADO.
+- **Production:** el despliegue activo observado está READY, pero apunta al commit `953e69484eabb4e8dc8221d1d8fc188373531bfa`. Los metadatos OAuth y de recurso protegido responden HTTP 200 e incluyen `jules:read` y `jules:write`.
+- **Preview Jules:** deployment READY para `feat/jules-rdc-local-bridge-20261030`, commit `cda38145fd74b109703be24b6e3eda4c0998b15a`; el filtro de variables Preview para esa rama devuelve una lista vacía. No copiar secretos de Production.
+- **OAuth/Jules:** no hubo consentimiento real, DPAPI ni llamadas Jules autenticadas. No se copiaron secretos ni se crearon sesiones Jules.
+
+El control único permanece en generación 5, alias `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`, `owner_thread=null`, `session_folio=null`; FOL1 PREPARADO, NO ACTIVO. El nuevo handshake RDC no cambia la titularidad del frente ni crea un control o folio adicional.
+
+**Estado:** TASK-001 sigue `en_curso`; el clon aislado está materializado y el puente pasa verificaciones estáticas, pero faltan dependencias y pruebas.
