@@ -134,7 +134,7 @@ function Start-KhoraDownloadJob {
     param([string]$Name,[string]$Uri,[string]$Path)
     if(Test-Path -LiteralPath $Path -PathType Leaf){
         $existing=Get-Item -LiteralPath $Path -ErrorAction Stop
-        if($existing.Length -gt 0){return}
+        if($existing.Length -gt 0){return }
         Remove-Item -LiteralPath $Path -Force -ErrorAction Stop
     }
     New-Item -ItemType Directory -Path (Split-Path -Parent $Path) -Force | Out-Null
