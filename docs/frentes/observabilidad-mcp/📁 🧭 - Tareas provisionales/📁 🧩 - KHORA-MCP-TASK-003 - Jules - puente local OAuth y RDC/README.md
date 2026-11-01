@@ -1,12 +1,16 @@
 # 📝 KHORA-MCP-TASK-003 · Jules — puente local OAuth y RDC
 
-**Naturaleza:** OCP provisional de tarea del frente Khora MCP; no es un frente independiente ni una unidad taxonómica canonizada.  
+**Naturaleza:** tarea de implementación del módulo funcional Jules dentro del frente Khora MCP; no es FT, OCP ni control independiente.  
 **Estado:** `en_curso`  
-**Responsabilidad:** heredada del control `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`, generación 5; sin control, titularidad, sesión ni folio propios.  
+**Responsabilidad:** hereda OCP y control `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`, generación 8. Corresponsable del módulo: `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; sin control, titularidad de FT ni folio propios.  
 **task_id:** `KHORA-MCP-TASK-003`  
-**scope_ref:** `docs/frentes/observabilidad-mcp/`
+**scope_ref:** `docs/frentes/observabilidad-mcp/`  
+**module_ref:** [Módulo funcional Jules](../../modulos/jules/README.md)
 
 ## Enunciado
+
+Esta tarea implementa y valida el módulo funcional Jules definido en el OCP padre. El módulo conserva propósito, estado, catálogo, seguridad, pruebas y entregables propios, pero hereda la autoridad y persistencia del frente KHORA-MCP.
+
 
 Habilitar el uso de las herramientas Jules del servidor MCP de Khora desde ChatGPT mediante un cliente MCP local por `stdio`, operado a través de la sesión RDC autorizada, autenticado contra Khora Production con OAuth 2.1 Authorization Code + PKCE. El flujo no exige crear, copiar o pegar Bearers, no extrae cookies ni credenciales de navegador y no convierte el puente local en una conexión MCP nativa de ChatGPT Free.
 
@@ -21,7 +25,7 @@ Habilitar el uso de las herramientas Jules del servidor MCP de Khora desde ChatG
 1. Cliente local `bridge.mjs` y lanzador `jules.ps1`, con transporte estándar `stdio`; sin servidor local adicional ni listener permanente.
 2. OAuth 2.1 Authorization Code + PKCE y registro dinámico del cliente, con callback exacto `http://127.0.0.1:<puerto>/oauth/callback` y validación de allowlist.
 3. Custodia del refresh token mediante DPAPI CurrentUser y ACL del perfil Windows vigente; access token solo en memoria; `JULES_API_KEY` solo en Vercel Production.
-4. Verificar `tools/list` y las siete herramientas: `jules_list_sources`, `jules_list_sessions`, `jules_get_session`, `jules_list_activities`, `jules_create_session`, `jules_send_message` y `jules_approve_plan`.
+4. Verificar `tools/list` y las siete herramientas; todas las creaciones deben usar `requirePlanApproval=true` y requieren aprobación explícita posterior mediante `jules_approve_plan`: `jules_list_sources`, `jules_list_sessions`, `jules_get_session`, `jules_list_activities`, `jules_create_session`, `jules_send_message` y `jules_approve_plan`.
 5. Confirmar `jules:read` y `jules:write` según herramienta y sujeto. Para el smoke test inicial, ejecutar solo lecturas autenticadas de fuentes/sesiones.
 6. Mantener documentado el riesgo T22: el proveedor Jules no ofrece aprobación condicional atómica por `plan_id`/ETag/If-Match; doble preflight no elimina toda la ventana de carrera.
 

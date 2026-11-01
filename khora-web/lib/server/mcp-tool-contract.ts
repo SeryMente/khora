@@ -30,6 +30,7 @@ export const MCP_TOOL_SCOPES = {
 } as const;
 
 export type McpToolName = keyof typeof MCP_TOOL_SCOPES;
+export type McpToolScope = (typeof MCP_TOOL_SCOPES)[McpToolName][number];
 
 export function describeMcpTool(
   name: McpToolName,
