@@ -93,3 +93,22 @@ No reutilizar variables de producción ni copiar credenciales productivas a Prev
 El SQL 035 y el fixture se encuentran preparados en el entorno Neon no productivo. El migrador está protegido por allowlist de branch, endpoint, base y almacenes de prueba. Sin embargo, **no se ha ejecutado el inventario, apply, preflight ni E2E contra proveedores reales** porque aún faltan un Vercel Blob test store/token y un bucket/clave B2 de prueba. Los checks de preview del proveedor también están bloqueados por la restricción del plan frente al repositorio privado.
 
 El script no cambia `KHORA_OBJECT_STORAGE`, no despliega, no elimina Blob y no tiene permiso para apuntar a producción. Cualquier cambio productivo o cutover exige una autorización posterior e independiente.
+
+## Verificación local de esta sesión RDC (2026-11-01)
+
+Repositorio local verificado en `PC-14`, rama `feat/custodia-b2-cutover-20261031`, sin cambios locales pendientes al iniciar la verificación.
+
+- `npm run typecheck`: PASS, exit code 0.
+- `npm run test:unit`: PASS, 594/594.
+- `npm run ui:contract`: PASS.
+- `npm run build`: PASS, exit code 0. Para el build de pruebas, `MCP_JWT_SECRET` debe establecerse solo al arrancar Next, no durante `prebuild`, porque contamina seis pruebas que usan su propia clave fija. La configuración Playwright quedó corregida para inyectarlo después del build.
+- Playwright: 16/20 PASS. Cuatro fallos preexistentes/no relacionados con la migración: recorrido global de navegación que esperaba un error de grafo que no apareció, accesibilidad del grafo en desktop y mobile, y navegación ARIA de pestañas en mobile. La primera ejecución no pudo iniciar Chromium porque el navegador no estaba instalado; se instaló Chromium/Headless Shell y se repitió la suite.
+- La prueba E2E de checkpoints de dictado pasó. No equivale a validar la migración Blob→B2.
+
+La punta de la rama se sincronizó con `main` mediante merge commit `918440be3e8c9933274bc730ea38ce9c6f70cbf7`; se cotejaron los cambios desde el ancestro común y no hubo rutas solapadas (23 rutas de la PR frente a 5 rutas de main).
+
+## Bloqueo restante para E2E de almacenamiento
+
+La cuenta Vercel rechazó la creación del Blob store privado dedicado por `usage_threshold_limits_reached`. No se conectó ningún store productivo ni se modificaron variables de producción. Sigue faltando además el bucket B2 de pruebas y su clave restringida. Por tanto no se ejecutó preflight real, inventario Blob, copia B2, lectura física ni repunte Neon. La base Neon `custodia_b2_e2e` sigue vacía (0 filas en las cuatro tablas y ledger) y aislada.
+
+La aceptación E2E de almacenamiento continúa **bloqueada por recursos de prueba de proveedor**; los checks de typecheck, build y unitarios no deben interpretarse como aceptación de la migración.
