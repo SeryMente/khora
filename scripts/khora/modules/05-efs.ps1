@@ -28,21 +28,30 @@ function Lock-KhoraEncryptedVolume {
 }
 function Dismount-KhoraVhd {
     if([string]::IsNullOrWhiteSpace([string]$VHD_PATH)){throw 'VHD_PATH ausente; se conserva el contenedor.'}
-    $file=Join-Path $env:SystemRoot ('Temp\khora-detach-'+[guid]::NewGuid().ToString('N')+'.txt')
-    [IO.File]::WriteAllLines($file,@("select vdisk file=`"$VHD_PATH`"",'detach vdisk noerr'),(New-Object Text.ASCIIEncoding))
-    $previousPreference=$ErrorActionPreference
-    $diskpartExit=1
-    $diskpartOutput=@()
-    try {
-        $ErrorActionPreference='Continue'
-        $diskpartOutput=@(& diskpart.exe /s $file 2>&1)
-        $diskpartExit=$LASTEXITCODE
-    } finally {
-        $ErrorActionPreference=$previousPreference
-        try{[IO.File]::Delete($file)}catch{}
+    if(-not(Test-Path -LiteralPath $VHD_PATH -PathType Leaf)){
+        if(-not [string]::IsNullOrWhiteSpace([string]$MOUNT_POINT) -and (Test-Path -LiteralPath ($MOUNT_POINT+'\'))){throw 'El VHDX no está en disco pero el punto de montaje sigue presente.'}
+        return $true
     }
-    if($diskpartExit -ne 0){throw ('DiskPart detach falló (exit '+$diskpartExit+'): '+(($diskpartOutput | ForEach-Object {[string]$_}) -join ' '))}
+    $diskImage=Get-DiskImage -ImagePath $VHD_PATH -ErrorAction Stop
+    if([bool]$diskImage.Attached){
+        $file=Join-Path $env:SystemRoot ('Temp\khora-detach-'+[guid]::NewGuid().ToString('N')+'.txt')
+        [IO.File]::WriteAllLines($file,@("select vdisk file=\`"$VHD_PATH\`"",'detach vdisk noerr'),(New-Object Text.ASCIIEncoding))
+        $previousPreference=$ErrorActionPreference
+        $diskpartExit=1
+        $diskpartOutput=@()
+        try {
+            $ErrorActionPreference='Continue'
+            $diskpartOutput=@(& diskpart.exe /s $file 2>&1)
+            $diskpartExit=$LASTEXITCODE
+        } finally {
+            $ErrorActionPreference=$previousPreference
+            try{[IO.File]::Delete($file)}catch{}
+        }
+        if($diskpartExit -ne 0){throw ('DiskPart detach falló (exit '+$diskpartExit+'): '+(($diskpartOutput | ForEach-Object {[string]$_}) -join ' '))}
+    }
     if(-not [string]::IsNullOrWhiteSpace([string]$MOUNT_POINT) -and (Test-Path -LiteralPath ($MOUNT_POINT+'\'))){throw 'El punto de montaje sigue presente; se conserva el VHDX y la tarea de limpieza.'}
+    $diskImage=Get-DiskImage -ImagePath $VHD_PATH -ErrorAction Stop
+    if([bool]$diskImage.Attached){throw 'Get-DiskImage confirma que el VHDX continúa adjunto.'}
     return $true
 }
 function Remove-KhoraContainer {
