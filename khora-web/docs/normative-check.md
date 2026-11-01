@@ -1,5 +1,7 @@
 # Servidor MCP de Khora — documento canónico
 
+**Alcance de esta rama:** Cora conserva 17 herramientas MCP cognitivas, de observabilidad y de ciclo normativo; el runtime Jules y sus scopes se retiran aquí. La rama es una propuesta no fusionada ni desplegada. OCP MCP local todavía no se declara implementado ni aceptado.
+
 **Estado:** [revisión #296](https://github.com/SeryMente/khora/pull/296) fusionada a main por autorización expresa del operador, commit `93b77fc0cc1b3fb62ca69fdc725d18f8730bc6ee`. Despliegue y recuperación de dictados no acreditados. **Base:** `dbc73afada1ad29abf46f4599d22cc3158a9a986`. Este documento reúne el contrato operativo del servidor multiuso; el [sprint](../../docs/SPRINT-MCP-OBSERVABILIDAD-DICTADO.md) conserva únicamente historia y evidencias. No acredita despliegue, recuperación completa ni compatibilidad no probada.
 
 **Orientación:** [conexión](#conexión) · [catálogo](#catálogo) · [contratos](#contratos) · [ciclo](#ciclo-normativo) · [seguridad](#autorización-y-configuración) · [datos](#datos-y-efectos) · [diagnóstico](#diagnóstico) · [compatibilidad](#compatibilidad) · [pruebas](#pruebas-y-mantenimiento).
@@ -35,15 +37,8 @@ Antes de ejecutar ese recorrido desde otra plataforma, resolver la identidad nor
 | `khora_eventos_recientes` / diagnóstico retrospectivo | `segundos?`, `limite?`, `session_id?`, `component?`, `severity?`, `outcome?`, `fase?`, `scope?`, `category?` | `ventana_segundos`, `limite`, `retornados`, `eventos`; ventana 1–86400 s (300 predeterminado), 1–200 eventos (50 predeterminado) |
 
 
-| `jules_list_sources` / fuentes conectadas a Jules | `page_size?` (1–100), `page_token?` | `jules:read` + `norm:turn`; devuelve fuentes y `nextPageToken` |
-| `jules_list_sessions` / sesiones Jules | `page_size?` (1–100), `page_token?` | `jules:read` + `norm:turn`; devuelve sesiones y token de paginación |
-| `jules_get_session` / estado de sesión | `session_id` | `jules:read` + `norm:turn`; devuelve estado, URL, outputs y tiempos reportados por Jules |
-| `jules_list_activities` / mensajes y retroalimentación | `session_id`, `page_size?` (1–100), `page_token?` | `jules:read` + `norm:turn`; mensajes del agente/usuario, plan, progreso, terminación y fallos |
-| `jules_create_session` / delegar desarrollo | `source`, `starting_branch`, `prompt`, `title?` | `jules:write` + `norm:turn`; fuerza `requirePlanApproval=true` y `AUTO_CREATE_PR` |
-| `jules_send_message` / responder a Jules | `session_id`, `prompt` | `jules:write` + `norm:turn`; el POST aceptado no prueba que Jules ya haya respondido |
-| `jules_approve_plan` / aprobar plan | `session_id`, `plan_id`, `plan_sha256` | `jules:write` + `norm:turn`; relee sesión/plan dos veces y exige ID/huella actuales + estado `AWAITING_PLAN_APPROVAL`; el API upstream no ofrece precondición atómica, por lo que T22 conserva un residual TOCTOU |
 
-**Permisos efectivos:** las ocho herramientas de contenido requieren `volcados:read` **y** `norm:turn`; las cuatro de observabilidad, `runtime:read` **y** `norm:turn`; las siete herramientas Jules requieren el scope `jules:read` o `jules:write` que corresponda **y** `norm:turn`. El permiso de negocio anunciado en `securitySchemes` se conserva; `norm:turn` es necesario para abrir/completar el ciclo, no una concesión implícita. La respuesta `tools/list` también oculta herramientas cuyos scopes o dependencia `norm:turn` no estén concedidos en el Bearer.
+**Permisos efectivos:** las ocho herramientas de contenido requieren `volcados:read` **y** `norm:turn`; las cuatro de observabilidad, `runtime:read` **y** `norm:turn`. El permiso de negocio anunciado en `securitySchemes` se conserva; `norm:turn` es necesario para abrir/completar el ciclo, no una concesión implícita. La respuesta `tools/list` también oculta herramientas cuyos scopes o dependencia `norm:turn` no estén concedidos en el Bearer.
 
 | Herramienta / propósito | Entradas (sin los tres controles sustantivos) | Permiso / salida y efecto |
 |---|---|---|
@@ -53,7 +48,7 @@ Antes de ejecutar ese recorrido desde otra plataforma, resolver la identidad nor
 | `khora_norm_verify_turn` / verificar y registrar | `turn_token`, `receipt` completo | `norm:turn`; `result`, `verification_record`, persistencia/cierre o siguiente intento; solo `VERIFIED` cierra |
 | `khora_norm_release_turn` / liberar salida verificada | `turn_token` | `norm:turn`; `VERIFIED_RELEASE`, salida/hashes, token de liberación y caducidad; no libera un intento incompleto |
 
-**ACL efectiva de Jules:** `jules:read` y `jules:write` son scopes necesarios, no concesiones globales. Cada llamada exige además una fila activa exacta en `khora_private.jules_source_acl` para el sujeto autenticado, el recurso `sources/...` y la rama literal. Fuentes, ramas y sesiones se filtran en servidor; una sesión sin contexto verificable se deniega. La creación consulta `sources.get` y confirma que la rama exista antes de `sessions.create`. El rol usado por `KHORA_READONLY_DATABASE_URL` solo necesita `USAGE` sobre `khora_private` y `SELECT` sobre la ACL, una vez identificado su rol real. Detalle: [JULES-ACCESS-CONTROL.md](./JULES-ACCESS-CONTROL.md).
+
 
 **No confundir capacidades:** listar/buscar no recupera verbatim; observabilidad no lee dictados; revisión devuelve representación, no una interfaz interactiva; salud diagnostica, no sustituye una operación. `DEGRADED` con permisos parciales no prueba caída total ni justifica conceder todos los permisos.
 
@@ -237,7 +232,9 @@ La misma sección permite introducir credenciales por uso, sin crear un gestor p
 Contrato y mantenimiento: [Custodia continua de dictados](./CUSTODIA-DICTADOS.md). Las dos herramientas de audio usan la conexión autenticada existente y `volcados:read`; no publican direcciones Blob, no incluyen credenciales y no omiten el ciclo normativo. No conceder automáticamente permisos nuevos. El contenido Base64 es privado: consumirlo como archivo, nunca copiarlo al registro de eventos. Un MP3 pendiente o fallido no es un audio disponible. Las capturas históricas sin propietario comprobable no se adjudican por inferencia.
 
 
-## Candidato · MCP Jules · 2026-10-25
+## Registro histórico · integración Jules (2026-10-25)
+
+> Archivo de trazabilidad, no catálogo ejecutable. Las herramientas, scopes y rutas Jules se retiran del runtime de Cora en `refactor/cora-cognitive-prosthesis-only-20261101`. Su traslado a OCP MCP local y la validación de datos siguen pendientes; este apéndice no acredita que OCP MCP esté implementado.
 
 **Estado de esta rama:** `feat/mcp-jules-mvp-20261025-a71c9e2`. Las siete herramientas nuevas y sus cambios de autorización están en una rama candidata; no se afirma merge, despliegue, credencial real validada ni conexión desde ChatGPT.
 
