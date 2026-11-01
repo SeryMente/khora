@@ -112,3 +112,53 @@ La punta de la rama se sincronizó con `main` mediante merge commit `918440be3e8
 La cuenta Vercel rechazó la creación del Blob store privado dedicado por `usage_threshold_limits_reached`. No se conectó ningún store productivo ni se modificaron variables de producción. Sigue faltando además el bucket B2 de pruebas y su clave restringida. Por tanto no se ejecutó preflight real, inventario Blob, copia B2, lectura física ni repunte Neon. La base Neon `custodia_b2_e2e` sigue vacía (0 filas en las cuatro tablas y ledger) y aislada.
 
 La aceptación E2E de almacenamiento continúa **bloqueada por recursos de prueba de proveedor**; los checks de typecheck, build y unitarios no deben interpretarse como aceptación de la migración.
+
+
+## Verificación adicional en PC-8 (2026-11-01) — checkout independiente y controles locales
+
+### Identidad del árbol inspeccionado
+
+- Equipo RDC: `PC-8` (Windows, PowerShell, Node.js 26.13.0).
+- Checkout independiente: `C:\\Users\\PC 8\\Desktop\\Khora\\khora-main`.
+- Rama: `feat/custodia-b2-cutover-20261031`.
+- HEAD inicial verificado: `a2f3f866fdf699eff67b32f2b0de480fa981b096`, coincidente con `origin/feat/custodia-b2-cutover-20261031`.
+- El árbol estaba limpio al iniciar. Se mantuvo separado del checkout `khora-mcp-main` que ya existía en el equipo.
+- Se actualizó la referencia remota de `main` a `be43574107f0dd6b5336b229a473e30556423ebd`. La rama B2 tiene 44 commits por delante y 9 por detrás de ese main; los 9 commits nuevos de main observados en esta comprobación son cambios de continuidad/gobernanza KHORA-MCP. No se incorporaron automáticamente para evitar mezclar cambios ajenos al alcance B2.
+
+### Instalación y validación reproducible
+
+La instalación se ejecutó con `npm ci --no-audit --no-fund` y terminó con código 0; instaló 602 paquetes a partir del lockfile. npm advirtió que cinco scripts de paquetes no se ejecutaron automáticamente (`@google/genai`, `esbuild`, `ffmpeg-static`, `protobufjs`, `unrs-resolver`). No se habilitaron scripts adicionales ni se modificó el lockfile.
+
+Resultados ejecutados sobre el árbol local de esta rama:
+
+| Control | Resultado | Alcance / limitación |
+|---|---|---|
+| `npm run typecheck` | PASS · exit 0 | `tsc --noEmit` sobre el checkout PC-8. |
+| `node --import tsx --test tests/unit/object-storage.test.ts` | PASS · 22/22 | Pruebas unitarias de localizadores, validación de claves/URLs, sobre cifrado y staging firmado; usa credenciales sintéticas y no contacta B2 real. |
+| `npm run ui:contract` | PASS · exit 0 | Contrato de navegación íntegro. |
+| `npm run ui-review:check` | PASS · exit 0 | Escenarios, identificadores UI y componentes compartidos íntegros. |
+| `npm run test:unit` | 593 PASS / 1 FAIL de 594 | Único fallo: `methodology_contract_sync.test.ts` no pudo invocar `gh api` porque GitHub CLI no tenía autenticación en PC-8 (`gh auth login` o `GH_TOKEN`). No se insertó un token ni se alteraron las credenciales. No se atribuye ese fallo a B2. |
+| `node --import tsx scripts/preflight-experience.ts` | NOT_REQUESTED | La prueba de almacenamiento de experiencia no se activó; no hubo conexión a Neon. |
+| `node scripts/build-extension.mjs` | PASS | Se generó `public/downloads/harmonia-v0.3.5.zip`; el artefacto está excluido por `.gitignore`. |
+| `npx next build --webpack` | PASS · exit 0 | Build optimizado completado; TypeScript finalizado y 78 páginas estáticas generadas. Se observaron advertencias existentes de middleware deprecado y APIs Node no soportadas por Edge Runtime en dependencias `next`/`jose`; no bloquearon el build. Se usaron únicamente secretos efímeros generados en memoria para la compilación y se retiraron al terminar. |
+
+Los logs locales de npm, typecheck, unitarias y build se conservaron fuera del repositorio en `C:\\Temp\\khora-b2-*.log`. `node_modules` y el ZIP de extensión están excluidos por `.gitignore`. No se versionan artefactos generados.
+
+### Inspección de recursos y límites de proveedor
+
+- En el proceso de PC-8 no estaban definidas variables de entorno de B2, Blob ni Neon.
+- Se inspeccionaron únicamente los nombres de entradas de la bóveda cifrada del repositorio: no contiene las variables necesarias para un entorno B2/Blob/Neon E2E de pruebas. No se descifraron entradas ni se expusieron secretos.
+- No había archivo de acceso temporal DPAPI a la bóveda. El archivo local `.b2_account_info` no se abrió ni se utilizó.
+- No se encontró un Vercel Blob test store/token ni un bucket B2 de pruebas con prefijo `khora-custodia-e2e-` y clave de aplicación restringida.
+- El fixture SQL y el migrador mantienen su allowlist para `custodia-b2-migration-test-20261031 / custodia_b2_e2e`. No se configuró una conexión ni se aplicó la migración 035, porque eso no sustituye ni resuelve la ausencia de los proveedores de prueba.
+- No se ejecutaron `KHORA_B2_PREFLIGHT=1`, el inventario real de Blob, `--apply`, la subida/lectura física real de B2 ni el repunte de referencias Neon. No hubo operaciones de red B2/Blob/Neon durante esta verificación local.
+
+### Dictamen técnico al cierre de esta revisión local
+
+El adaptador B2, las referencias de objetos, el migrador no destructivo, la migración SQL 035, el fixture sintético y el preflight permanecen presentes en la rama. El árbol compila y las 22 pruebas focalizadas de almacenamiento pasan. Eso demuestra integridad estática/local del código inspeccionado; **no demuestra conectividad, compatibilidad efectiva del bucket, CORS, lectura física, restauración ni migración E2E de objetos reales**.
+
+El bloqueo para completar la aceptación E2E de almacenamiento sigue siendo de recursos de prueba de proveedor: se requiere un Blob test store/token dedicado y un bucket B2 no productivo con clave restringida al prefijo de prueba, además de la conexión Neon no productiva allowlisted. No se deben sustituir por credenciales/almacenes de producción. Hasta que esos recursos existan y se verifiquen, la migración permanece **IMPLEMENTACIÓN LOCAL VALIDADA PARCIALMENTE · E2E DE PROVEEDOR BLOQUEADO**.
+
+### Acciones expresamente no realizadas
+
+No se modificó `KHORA_OBJECT_STORAGE`; no se cambiaron variables de Vercel; no se copiaron secretos; no se aprovisionaron buckets ni claves; no se modificó CORS; no se aplicó SQL ni backfill productivo; no se copiaron/reapuntaron/eliminaron objetos; no se desplegó ni fusionó la PR #348. El origen Blob permanece intacto.
