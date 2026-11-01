@@ -43,6 +43,16 @@ test('reconciles an original written before the ledger and creates a blocked dur
   assert.match(row.operationRef, /^[0-9a-f]{64}$/);
 });
 
+
+test('does not auto-enqueue pre-activation historical originals', async t => {
+  const f = fixture();
+  t.after(() => fs.rmSync(f.root, { recursive: true, force: true }));
+  const adapter = createEpConsumerAdapter({ ...f, activationAt: '2026-11-01T21:00:00.000Z' });
+  const result = await adapter.reconcile();
+  assert.equal(result.discovered, 0);
+  assert.equal(adapter.getStatus().localRecords, 0);
+});
+
 test('duplicate enqueue keeps the same operation identity', async t => {
   const f = fixture();
   t.after(() => fs.rmSync(f.root, { recursive: true, force: true }));
