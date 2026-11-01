@@ -1,7 +1,9 @@
 /**
  * Resumable, non-destructive Vercel Blob -> Backblaze B2 backfill.
- * Default mode is read-only. Applying requires --apply --confirm=KHORA_BLOB_TO_B2.
- * This script never deletes a source Blob object.
+ * Test-only E2E migrator. Requires an isolated Neon branch/database and dedicated
+ * Vercel Blob + Backblaze B2 test stores. It never targets production.
+ * Applying additionally requires --apply --target-branch=custodia-b2-migration-test-20261031
+ * --confirm=KHORA_BLOB_TO_B2_NONPROD. This script never deletes a source Blob object.
  */
 import { createHash } from "node:crypto";
 import { list as listVercelBlobs } from "@vercel/blob";
@@ -11,7 +13,11 @@ import { descifrarBytes } from "../lib/server/cripto";
 import { b2ObjectUrl, safeObjectKey, legacyBlobUrl } from "../lib/storage/object-reference";
 import { createB2Client, storageLocation } from "../lib/server/object-storage";
 
-const CONFIRM = "KHORA_BLOB_TO_B2";
+const CONFIRM = "KHORA_BLOB_TO_B2_NONPROD";
+const REQUIRED_BRANCH = "custodia-b2-migration-test-20261031";
+const REQUIRED_DATABASE = "custodia_b2_e2e";
+const REQUIRED_DATABASE_HOST = "ep-cool-pond-ahenbh4b.c-3.us-east-1.aws.neon.tech";
+const REQUIRED_B2_BUCKET_PREFIX = "khora-custodia-e2e-";
 const PAGE_SIZE = 1000;
 const MAX_ENCRYPTED_BYTES = 512 * 1024 * 1024;
 
@@ -59,6 +65,47 @@ function errorCode(error: unknown): string {
   const value = error instanceof Error ? error.message : String(error);
   return /^[a-z0-9_:-]{1,80}$/i.test(value) ? value : "migration_unexpected_error";
 }
+function assertIsolatedE2ETarget(): void {
+  const connectionString = process.env.DATABASE_URL_UNPOOLED;
+  if (!connectionString) throw new Error("DATABASE_URL_UNPOOLED_required");
+  if (process.env.NEON_BRANCH !== REQUIRED_BRANCH
+    || arg("target-branch") !== REQUIRED_BRANCH) {
+    throw new Error("migration_branch_not_allowlisted");
+  }
+
+  let databaseUrl: URL;
+  try {
+    databaseUrl = new URL(connectionString);
+  } catch {
+    throw new Error("migration_database_url_invalid");
+  }
+  const databaseName = decodeURIComponent(databaseUrl.pathname.replace(/^\\/+/, ""));
+  if (databaseUrl.hostname !== REQUIRED_DATABASE_HOST || databaseName !== REQUIRED_DATABASE) {
+    throw new Error("migration_database_target_not_allowlisted");
+  }
+
+  if (process.env.KHORA_BLOB_B2_E2E !== "1") {
+    throw new Error("migration_e2e_environment_marker_required");
+  }
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN || "";
+  const expectedStoreId = process.env.KHORA_BLOB_B2_SOURCE_STORE_ID || "";
+  const tokenStoreId = blobToken.split("_")[3] || "";
+  if (!blobToken.startsWith("vercel_blob_rw_") || !expectedStoreId
+    || tokenStoreId !== expectedStoreId) {
+    throw new Error("migration_blob_test_store_mismatch");
+  }
+
+  const actualBucket = process.env.KHORA_B2_BUCKET_NAME || "";
+  const expectedBucket = process.env.KHORA_B2_EXPECTED_TEST_BUCKET || "";
+  if (actualBucket && (!actualBucket.startsWith(REQUIRED_B2_BUCKET_PREFIX)
+    || !expectedBucket || actualBucket !== expectedBucket)) {
+    throw new Error("migration_b2_test_bucket_mismatch");
+  }
+  if (process.env.KHORA_B2_MIGRATION_ENV !== "nonproduction") {
+    throw new Error("migration_nonproduction_marker_required");
+  }
+}
+
 function numberValue(value: string | number | null): number | null {
   if (value === null || value === undefined || value === "") return null;
   const parsed = Number(value);
@@ -393,12 +440,13 @@ async function recordState(
 
 async function main() {
   const apply = flag("apply");
+  assertIsolatedE2ETarget();
   if (apply && arg("confirm") !== CONFIRM) throw new Error("apply_requires_confirm_flag");
-  if (!process.env.DATABASE_URL_UNPOOLED) throw new Error("DATABASE_URL_UNPOOLED_required");
   if (!process.env.X_KHORA_KEY || process.env.X_KHORA_KEY.length < 16) throw new Error("X_KHORA_KEY_required");
-  if (!process.env.BLOB_READ_WRITE_TOKEN) throw new Error("BLOB_READ_WRITE_TOKEN_required");
   if (apply && (!process.env.KHORA_B2_BUCKET_NAME || !process.env.KHORA_B2_KEY_ID
-    || !process.env.KHORA_B2_APPLICATION_KEY)) throw new Error("b2_credentials_required");
+    || !process.env.KHORA_B2_APPLICATION_KEY || !process.env.KHORA_B2_EXPECTED_TEST_BUCKET)) {
+    throw new Error("b2_test_credentials_required");
+  }
 
   const rawLimit = arg("limit");
   const limit = rawLimit ? Number(rawLimit) : Number.MAX_SAFE_INTEGER;
