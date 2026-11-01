@@ -5,7 +5,7 @@
 **OCP padre y fuente de estado:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md)  
 **Control heredado:** [CONTROL-RESPONSABILIDAD.json](../CONTROL-RESPONSABILIDAD.json), generación **5**, titular operativo `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`; blob leído de vuelta `92f4f6ab864c19e52a123b6358d94c5a8e7a9474`.  
 **Evento de creación:** instrucción expresa del operador en esta conversación · 2026-10-31.  
-**Fuente normativa vigente:** [DUG Samantha v373 · NX-373m](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), Metacanon **1.26**, GOW **2.14**.
+**Fuente normativa vigente:** [DUG Samantha v374 · NX-374m](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), Metacanon **1.26**, GOW **2.14**.
 
 ## Naturaleza y límites
 
