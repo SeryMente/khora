@@ -82,7 +82,7 @@ function Initialize-KhoraDataProfileContext {
     $script:KHORA_DATA_PROFILE_ROOT=[IO.Path]::GetFullPath([string]$env:USERPROFILE).TrimEnd('\')
     $script:KHORA_TARGET_DESKTOP=$null
     $script:KHORA_TARGET_TEMP=[IO.Path]::GetTempPath()
-    if($identity.Name -notmatch '(?i)(^|\\)mantenimientorci$'){return}
+    if($identity.Name -notmatch '(?i)(^|\\)mantenimientorci$'){return }
     $allProfiles=@(Get-CimInstance Win32_UserProfile -ErrorAction Stop | Where-Object {
         -not $_.Special -and -not [string]::IsNullOrWhiteSpace([string]$_.LocalPath) -and -not [string]::IsNullOrWhiteSpace([string]$_.SID)
     })
