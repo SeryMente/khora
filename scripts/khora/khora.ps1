@@ -262,7 +262,10 @@ function New-KhoraEncryptedWorkspace {
 }
 function Register-KhoraRebootCleanup {
     param([string]$Task,[string]$Outer,[string]$Vhd)
-    $body="Start-Sleep -Seconds 10;Remove-Item -LiteralPath '"+$Vhd.Replace("'","''")+"' -Force -ErrorAction SilentlyContinue;Remove-Item -LiteralPath '"+$Outer.Replace("'","''")+"' -Recurse -Force -ErrorAction SilentlyContinue;Unregister-ScheduledTask -TaskName '"+$Task.Replace("'","''")+"' -Confirm:`$false -ErrorAction SilentlyContinue"
+    $escapedVhd=$Vhd.Replace("'","''")
+    $escapedOuter=$Outer.Replace("'","''")
+    $escapedTask=$Task.Replace("'","''")
+    $body="\$ErrorActionPreference='Stop';Start-Sleep -Seconds 10;\$vhd='$escapedVhd';\$outer='$escapedOuter';\$task='$escapedTask';if(Test-Path -LiteralPath \$vhd){Remove-Item -LiteralPath \$vhd -Force -ErrorAction Stop};if(Test-Path -LiteralPath \$outer){Remove-Item -LiteralPath \$outer -Recurse -Force -ErrorAction Stop};if((Test-Path -LiteralPath \$vhd) -or (Test-Path -LiteralPath \$outer)){throw 'KHORA_STARTUP_CLEANUP_RESIDUALS'};Unregister-ScheduledTask -TaskName \$task -Confirm:\$false -ErrorAction Stop"
     $encoded=[Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($body))
     $action=New-ScheduledTaskAction -Execute 'powershell.exe' -Argument ('-NoProfile -NonInteractive -WindowStyle Hidden -EncodedCommand '+$encoded)
     $trigger=New-ScheduledTaskTrigger -AtStartup
