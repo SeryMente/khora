@@ -128,6 +128,21 @@ export function routeFixture(options: { scopes?: string[]; revoked?: boolean; de
       getCurrentVerifierInfo: () => ({ protocol: receipt.NORM_CHECK_PROTOCOL, protocol_version: receipt.NORM_CHECK_PROTOCOL_VERSION, verifier_version: "fixture" }),
     },
   };
+  const julesModuleSource = fs.readFileSync(path.join(root, "lib/server/mcp-jules.ts"), "utf8");
+  const julesModuleCode = ts.transpileModule(julesModuleSource, {
+    compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS },
+  }).outputText;
+  const julesModuleExports: Record<string, unknown> = {};
+  vm.runInNewContext(julesModuleCode, {
+    exports: julesModuleExports,
+    process: { env: {} },
+    require: (name: string) => {
+      if (!Object.hasOwn(modules, name)) throw new Error("Unexpected Jules module dependency: " + name);
+      return modules[name];
+    },
+  }, { timeout: 1000, filename: "mcp-jules-module-fixture.cjs" });
+  modules["@/lib/server/mcp-jules"] = julesModuleExports;
+
   const exported: Record<string, (request: Request) => Promise<Response>> = {};
   vm.runInNewContext(code, { exports: exported, process: { env: {} }, require: (name: string) => {
     if (!Object.hasOwn(modules, name)) throw new Error("Unexpected route dependency: " + name);
