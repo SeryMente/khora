@@ -551,33 +551,32 @@
   "display_name": "Khora MCP",
   "folio_status": "PENDIENTE/NO ASIGNADO; FOL1 PREPARADO NO ACTIVO",
   "transfer_record": {
-    "event_id": "01a19905-d279-7b15-a5fe-77257942c044",
-    "event": "KHORA-MCP-TRANSFER-20261101-7942C044",
-    "from_generation": 5,
-    "to_generation": 6,
+    "event_id": "01a19962-c730-7308-975-5bb49e2d",
+    "event": "KHORA-MCP-TRANSFER-20261101-5BB49E2D",
+    "from_generation": 7,
+    "to_generation": 8,
     "previous_owner_alias": "chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8",
-    "new_owner_alias": "chatgpt-khora-mcp-01a19905-d279-7b15-a5fe-77257942c044",
+    "new_owner_alias": "chatgpt-khora-mcp-01a19962-c730-7308-975-5bb49e2d",
     "native_conversation_id": null,
-    "uuidv7_local": "01a19905-d279-7b15-a5fe-77257942c044",
-    "authorization_ref": "Respuesta expresa del operador en esta conversación: «Si pero se dice OCP MCP, no OCP MSP, cuidado con ese error.», dada como aceptación de la pregunta inmediatamente anterior que autorizaba TRANSFER_RESPONSIBILITY del frente KHORA-MCP y preparar en una rama la retirada de Jules de Cora, manteniendo intactos producción, datos y secretos hasta verificar la migración. La denominación autorizada y corregida es OCP MCP.",
-    "source_control_blob_sha": "92f4f6ab864c19e52a123b6358d94c5a8e7a9474",
-    "base_main_sha": "ec40407107d8e0275811c183f2a79fb29b618e39",
+    "uuidv7_local": "01a19962-c730-7308-975-5bb49e2d",
+    "authorization_ref": "Instrucción expresa del operador en esta conversación, 2026-11-01 (America/Mexico_City): «Si transfer responsiblioty y toma en cuienta promtp de modulo jules». Aclaración expresa de distribución de autoridad: el modelo responsable de Jules decide su arquitectura interna, contratos, interfaces, seguridad, scopes, ACL, comportamiento de herramientas, pruebas y aceptación; el titular global gestiona integración técnica y coordinación transversal, sin sustituir ni modificar unilateralmente decisiones de Jules. Los cambios que afecten varios módulos se coordinan; las decisiones productivas/irreversibles siguen sujetas a autorización del operador.",
+    "source_control_blob_sha": "62b38ee17feae7d3028eff8747dfe746a8f1979a",
     "attachment_commit_sha": null,
-    "result": "VERIFIED: generation 6 and new holder confirmed by exact read-back; previous generation 5 and earlier owner history preserved; no native conversation ID or OCP/session folio issued.",
-    "authorization_scope": "Prepare and implement Jules-removal changes now in an isolated, unmerged branch. Preserve history and data. Do not merge, deploy or change Production until OCP MCP has completed the local migration and its evidence has been verified and accepted by the operator. OCP MCP remains local-only, not publicly exposed; only operator-authorized models may connect. Cora's deployed surface is limited to cognitive-prosthesis capabilities.",
+    "result": "VERIFIED: generation 8, new global titular, previous titular history preserved, and Jules module architectural authority retained; exact GitHub read-back confirmed.",
+    "authorization_scope": "Transfer the single global KHORA-MCP front to the new session. Preserve the Jules module's independent architectural authority as the second active responsible. This does not grant permission to change production, secrets, databases, or irreversible governance beyond separately authorized actions.",
     "verification": {
       "status": "VERIFIED",
-      "verified_at_local": "2026-11-01T15:31:00-06:00",
-      "transfer_commit": "bbd891c989643b852cd34d30cffe08fae1e28dac",
-      "readback_blob_sha": "d73249e95b76f3db56d8e4577536fccc0993fb0d",
+      "verified_at_local": "2026-11-01T17:12:30-06:00",
+      "transfer_commit": "908994264fc5b5964e347f1f9b969473a87b8d2e",
+      "readback_blob_sha": "cc6548761bf85a55de7f1fd4e529a1712fe9f77f",
       "confirmed": [
-        "generation=6",
-        "owner_alias matches this local UUIDv7 operational alias",
+        "generation=8",
+        "new owner_alias and instance",
         "owner_thread=null; native conversation ID not exposed",
-        "previous_owner generation 5 preserved with earlier history",
-        "session_folio=null",
-        "folio_status remains PENDIENTE/NO ASIGNADO; FOL1 PREPARADO NO ACTIVO",
-        "OCP MCP spelling and local-only scope recorded"
+        "previous titular generation 7 preserved with complete prior history",
+        "Jules module co-responsible retained with independent architectural authority",
+        "exactly two active_responsibles",
+        "session_folio=null; FOL1 remains PREPARADO NO ACTIVO"
       ]
     }
   },
@@ -638,11 +637,22 @@
     "authorization_ref": "Instrucción expresa del operador en esta conversación, 2026-11-01 (America/Mexico_City): «Si transfer responsiblioty y toma en cuienta promtp de modulo jules». Aclaración expresa de distribución de autoridad: el modelo responsable de Jules decide su arquitectura interna, contratos, interfaces, seguridad, scopes, ACL, comportamiento de herramientas, pruebas y aceptación; el titular global gestiona integración técnica y coordinación transversal, sin sustituir ni modificar unilateralmente decisiones de Jules. Los cambios que afecten varios módulos se coordinan; las decisiones productivas/irreversibles siguen sujetas a autorización del operador.",
     "source_control_blob_sha": "62b38ee17feae7d3028eff8747dfe746a8f1979a",
     "attachment_commit_sha": null,
-    "result": "WRITE_REQUESTED; awaiting canonical read-back; do not treat as verified until SHA and fields are read back.",
+    "result": "VERIFIED: transfer committed and read back from canonical main.",
     "authorization_scope": "Transfer the single global KHORA-MCP front to the new session. Preserve the Jules module's independent architectural authority as the second active responsible. This does not grant permission to change production, secrets, databases, or irreversible governance beyond separately authorized actions.",
     "verification": {
-      "status": "PENDING_READBACK",
-      "confirmed": []
+      "status": "VERIFIED",
+      "readback_blob_sha": "cc6548761bf85a55de7f1fd4e529a1712fe9f77f",
+      "update_commit_sha": "908994264fc5b5964e347f1f9b969473a87b8d2e",
+      "verified_at_local": "2026-11-01T17:12:30-06:00",
+      "confirmed": [
+        "generation=8",
+        "new owner_alias and instance",
+        "owner_thread=null; native conversation ID not exposed",
+        "previous titular generation 7 preserved with complete prior history",
+        "Jules module co-responsible retained with independent architectural authority",
+        "exactly two active_responsibles",
+        "session_folio=null; FOL1 remains PREPARADO NO ACTIVO"
+      ]
     }
   },
   "previous_responsibility_change": {
@@ -694,6 +704,37 @@
       "integration_rule": "global KHORA-MCP titular proposes cross-cutting changes and coordinates interfaces; it does not unilaterally replace or modify Jules decisions",
       "cross_module_changes": "coordinate with all affected module owners",
       "operator_reserved": "production, irreversible and governance changes require operator authorization"
+    }
+  },
+  "previous_transfer_record": {
+    "event_id": "01a19905-d279-7b15-a5fe-77257942c044",
+    "event": "KHORA-MCP-TRANSFER-20261101-7942C044",
+    "from_generation": 5,
+    "to_generation": 6,
+    "previous_owner_alias": "chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8",
+    "new_owner_alias": "chatgpt-khora-mcp-01a19905-d279-7b15-a5fe-77257942c044",
+    "native_conversation_id": null,
+    "uuidv7_local": "01a19905-d279-7b15-a5fe-77257942c044",
+    "authorization_ref": "Respuesta expresa del operador en esta conversación: «Si pero se dice OCP MCP, no OCP MSP, cuidado con ese error.», dada como aceptación de la pregunta inmediatamente anterior que autorizaba TRANSFER_RESPONSIBILITY del frente KHORA-MCP y preparar en una rama la retirada de Jules de Cora, manteniendo intactos producción, datos y secretos hasta verificar la migración. La denominación autorizada y corregida es OCP MCP.",
+    "source_control_blob_sha": "92f4f6ab864c19e52a123b6358d94c5a8e7a9474",
+    "base_main_sha": "ec40407107d8e0275811c183f2a79fb29b618e39",
+    "attachment_commit_sha": null,
+    "result": "VERIFIED: generation 6 and new holder confirmed by exact read-back; previous generation 5 and earlier owner history preserved; no native conversation ID or OCP/session folio issued.",
+    "authorization_scope": "Prepare and implement Jules-removal changes now in an isolated, unmerged branch. Preserve history and data. Do not merge, deploy or change Production until OCP MCP has completed the local migration and its evidence has been verified and accepted by the operator. OCP MCP remains local-only, not publicly exposed; only operator-authorized models may connect. Cora's deployed surface is limited to cognitive-prosthesis capabilities.",
+    "verification": {
+      "status": "VERIFIED",
+      "verified_at_local": "2026-11-01T15:31:00-06:00",
+      "transfer_commit": "bbd891c989643b852cd34d30cffe08fae1e28dac",
+      "readback_blob_sha": "d73249e95b76f3db56d8e4577536fccc0993fb0d",
+      "confirmed": [
+        "generation=6",
+        "owner_alias matches this local UUIDv7 operational alias",
+        "owner_thread=null; native conversation ID not exposed",
+        "previous_owner generation 5 preserved with earlier history",
+        "session_folio=null",
+        "folio_status remains PENDIENTE/NO ASIGNADO; FOL1 PREPARADO NO ACTIVO",
+        "OCP MCP spelling and local-only scope recorded"
+      ]
     }
   }
 }
