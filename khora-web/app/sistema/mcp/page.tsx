@@ -21,8 +21,8 @@ interface ManualToken {
 }
 
 const MCP_ENDPOINT = "https://khora-web.vercel.app/api/mcp";
-const SUPPORTED_SCOPES = ["runtime:read", "volcados:read", "norm:turn"] as const;
-const DEFAULT_SCOPES = ["runtime:read", "volcados:read", "norm:turn"] as const;
+const SUPPORTED_SCOPES = ["runtime:read", "volcados:read", "norm:turn", "jules:read", "jules:write"] as const;
+const DEFAULT_SCOPES = ["runtime:read", "volcados:read", "norm:turn", "jules:read", "jules:write"] as const;
 
 function formatDate(value: string | null) {
   return value ? new Date(value).toLocaleString("es-MX") : "Nunca";
