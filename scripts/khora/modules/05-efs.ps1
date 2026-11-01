@@ -63,7 +63,11 @@ function Remove-KhoraContainer {
     $rootPrefix=$root+'\'
     if(-not $vhd.StartsWith($rootPrefix,[StringComparison]::OrdinalIgnoreCase)){throw 'VHD_PATH está fuera de ROOT_DIR; se rechaza la eliminación.'}
     if(-not [string]::IsNullOrWhiteSpace([string]$MOUNT_POINT) -and (Test-Path -LiteralPath ($MOUNT_POINT+'\'))){throw 'El volumen sigue montado; no se elimina el VHDX.'}
-    if(Test-Path -LiteralPath $vhd -PathType Leaf){Remove-Item -LiteralPath $vhd -Force -ErrorAction Stop}
+    if(Test-Path -LiteralPath $vhd -PathType Leaf){
+        $diskImage=Get-DiskImage -ImagePath $vhd -ErrorAction Stop
+        if([bool]$diskImage.Attached){throw 'Get-DiskImage confirma que el VHDX sigue adjunto; no se elimina.'}
+        Remove-Item -LiteralPath $vhd -Force -ErrorAction Stop
+    }
     if(Test-Path -LiteralPath $vhd){throw 'El VHDX permanece después del intento de eliminación.'}
     if(Test-Path -LiteralPath $root -PathType Container){Remove-Item -LiteralPath $root -Recurse -Force -ErrorAction Stop}
     if(Test-Path -LiteralPath $root){throw 'La carpeta exterior permanece después del intento de eliminación.'}
