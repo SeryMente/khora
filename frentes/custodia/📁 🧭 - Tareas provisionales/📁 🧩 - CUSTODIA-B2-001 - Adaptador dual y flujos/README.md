@@ -1,0 +1,42 @@
+# CUSTODIA-B2-001 · Adaptador dual y flujos de almacenamiento
+
+**Estado:** `en_curso`  
+**Tipo:** tarea provisional subordinada al OCP Custodia.  
+**Identificador:** local y estable dentro del registro provisional de este frente; no es folio global, sesión ni control.
+
+## Enunciado enraizado en la instrucción
+
+**Fragmento literal de origen:**
+
+> «sigue resolviendo la migración al backplane de extremo a extremo»
+
+**Fuente literal:** [INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md](../../../originales/INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md).
+
+**Desglose operativo (derivado, no cita literal):** completar y comprobar la capa de transporte dual para que Khora pueda escribir en Backblaze B2 cuando el selector de proveedor lo determine, seguir leyendo referencias históricas de Vercel Blob y mantener las verificaciones de cifrado e integridad en los flujos de audio afectados.
+
+## Alcance de trabajo
+
+- Revisar el adaptador `lib/server/object-storage.ts` y el validador de localizadores `lib/storage/object-reference.ts`.
+- Cubrir escritura cifrada KHC1, lectura B2 mediante URL firmada del lado servidor y lectura de Blob legacy con host allowlisted.
+- Integrar captura, importación temporal, reproducción, exportación, transcripción y derivado MP3 sin romper compatibilidad con las referencias Blob.
+- Mantener los localizadores persistidos sin incluir credenciales ni capacidades firmadas de corta duración.
+- Mantener separados staging temporal y objetos originales; la eliminación permitida del adaptador se limita al staging validado para la sesión.
+
+## Estado y evidencia observada
+
+- PR [#348](https://github.com/SeryMente/khora/pull/348), borrador abierto, head `56720137cec75eaf9e61ddc9357e2bef8670b5fe`; rama `feat/custodia-b2-cutover-20261031`.
+- Se inspeccionaron `object-storage.ts`, `object-reference.ts`, `audio-mp3.ts`, rutas de captura/importación/exportación/transcripción y pruebas unitarias.
+- **Defecto confirmado:** `stagingKeyForSession()` usa una expresión regular con dos barras inversas antes del punto de `.khstaging`; la expresión resultante no acepta el nombre normal `1234.khstaging`. La prueba existente `signed staging capability is bounded...` exige ese caso y falla con la expresión actual. La importación temporal B2 queda por ello bloqueada hasta corregir y volver a probar el validador.
+- La prueba de unidad que cubre la ruta B2 existe en la rama; no se dispone todavía de resultado de ejecución local ni de CI verde.
+
+## Criterio de cierre
+
+1. Corregir el validador y conservar la restricción por sesión.
+2. Ejecutar pruebas unitarias del adaptador y validador, typecheck y suite de integración pertinente; publicar evidencia de ejecución.
+3. Comprobar que cada ruta afectada usa el adaptador y conserva el comportamiento Blob legacy.
+4. Demostrar que la capacidad temporal B2 no valida para otra sesión ni para URLs fuera del bucket/región configurados.
+5. No declarar integración aceptada por el mero hecho de que el código exista en la PR.
+
+## Límites
+
+No cambiar el selector de almacenamiento en producción, no desplegar, no cambiar credenciales ni borrar objetos fuente. El trabajo de esta tarea queda en la rama de desarrollo y entornos no productivos. La responsabilidad, autorización y sesión se heredan del [control único de Custodia](../../CONTROL-RESPONSABILIDAD.json), generación 6; no se crea un control por tarea.
