@@ -260,6 +260,43 @@ async function updateReferences(
       || (existing.rows[0].source_encrypted_sha256 && existing.rows[0].source_encrypted_sha256 !== encryptedHash)
     )) throw new Error("migration_ledger_source_conflict");
 
+    // Lock the current reference rows and verify the inventory snapshot before repointing.
+    for (const table of ["dictado_audio_parte", "dictado_mp3", "dictado_mp3_historial"]) {
+      await db.query("SELECT 1 FROM " + table + " WHERE blob_url=$1 FOR UPDATE", [item.url]);
+    }
+    await db.query(
+      `
+        SELECT 1 FROM volcado v
+        WHERE v.audio_url=$1 OR (
+          jsonb_typeof(v.audio_partes)='array' AND EXISTS (
+            SELECT 1 FROM jsonb_array_elements(v.audio_partes) elem WHERE elem->>'url'=$1
+          )
+        )
+        FOR UPDATE
+      `,
+      [item.url],
+    );
+    const countReferencesSql = `
+      SELECT
+        (SELECT count(*)::bigint FROM dictado_audio_parte WHERE blob_url=$1) AS audio_parts,
+        (SELECT count(*)::bigint FROM dictado_mp3 WHERE blob_url=$1) AS mp3,
+        (SELECT count(*)::bigint FROM dictado_mp3_historial WHERE blob_url=$1) AS mp3_history,
+        (SELECT count(*)::bigint FROM volcado WHERE audio_url=$1) AS volcado_audio_url,
+        (SELECT count(*)::bigint
+          FROM volcado v
+          CROSS JOIN LATERAL jsonb_array_elements(
+            CASE WHEN jsonb_typeof(v.audio_partes)='array' THEN v.audio_partes ELSE '[]'::jsonb END
+          ) elem
+          WHERE elem->>'url'=$1
+        ) AS volcado_audio_parts
+    `;
+    const beforeCounts = await db.query(countReferencesSql, [item.url]);
+    const expectedReferences = Object.values(beforeCounts.rows[0] || {})
+      .reduce((sum: number, value: string | number) => sum + Number(value || 0), 0);
+    if (expectedReferences !== item.occurrences) {
+      throw new Error("migration_reference_inventory_changed");
+    }
+
     await db.query(
       `
         INSERT INTO custodia_blob_b2_migration
@@ -281,10 +318,8 @@ async function updateReferences(
       [sourceUrlHash,item.url,destinationUrl,item.sha256,item.bytes,encryptedHash,encryptedBytes,item.occurrences],
     );
 
-    let updated = 0;
     for (const table of ["dictado_audio_parte", "dictado_mp3", "dictado_mp3_historial"]) {
-      const result = await db.query("UPDATE " + table + " SET blob_url=$2 WHERE blob_url=$1", [item.url,destinationUrl]);
-      updated += result.rowCount || 0;
+      await db.query("UPDATE " + table + " SET blob_url=$2 WHERE blob_url=$1", [item.url,destinationUrl]);
     }
     const volcado = await db.query(
       `
@@ -310,7 +345,14 @@ async function updateReferences(
       `,
       [item.url,destinationUrl],
     );
-    updated += volcado.rowCount || 0;
+    const afterCounts = await db.query(countReferencesSql, [item.url]);
+    const remainingReferences = Object.values(afterCounts.rows[0] || {})
+      .reduce((sum: number, value: string | number) => sum + Number(value || 0), 0);
+    if (remainingReferences !== 0) {
+      throw new Error("migration_source_references_remaining");
+    }
+    // Count pointer occurrences (including multiple JSONB entries), not affected parent rows.
+    const updated = expectedReferences;
     await db.query(
       "UPDATE custodia_blob_b2_migration SET state='references_updated',updated_references=$2,updated_at=now() WHERE source_url_sha256=$1",
       [sourceUrlHash,updated],
