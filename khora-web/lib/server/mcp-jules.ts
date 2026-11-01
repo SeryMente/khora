@@ -13,16 +13,11 @@ import {
 import { McpDiagnosticError, diagnosticFailure } from "@/lib/server/mcp-diagnostics";
 import { isJulesDeveloperSubject, listJulesSourceGrants, requireJulesSourceGrant, type JulesAccessMode, type JulesSourceGrant } from "@/lib/server/jules-access";
 import { describeMcpTool, type McpToolName } from "@/lib/server/mcp-tool-contract";
+import type { McpModuleContext } from "./mcp-module-context";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-export type JulesMcpModuleContext = {
-  mcpServer: McpServer;
-  toolsList: ReturnType<typeof describeMcpTool>[];
-  actor: string;
-  correlation_id: string;
-  requireScope: (scope: "jules:read" | "jules:write") => any | null;
-};
+
 
 /**
  * Módulo funcional Jules del servidor MCP de Khora.
@@ -35,7 +30,7 @@ export function registerJulesMcpModule({
   actor,
   correlation_id,
   requireScope,
-}: JulesMcpModuleContext) {
+}: McpModuleContext) {
   // Jules has its own scopes; the single configured developer owner does not need a normative-turn token for routine development actions.
   const julesTool = (name: McpToolName, description: string, inputSchema: z.ZodRawShape, handler: (args: any) => Promise<any>) => {
     toolsList.push(describeMcpTool(name, description, inputSchema));
