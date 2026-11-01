@@ -160,7 +160,14 @@ async function loadReferences(pool: Pool): Promise<Map<string, Candidate>> {
       UNION ALL
       SELECT v.audio_url, p.elem->>'sha256',
              CASE
-               WHEN COALESCE(p.elem->>'bytes','') ~ '^[0-9]+
+               WHEN COALESCE(p.elem->>'bytes','') <> ''
+                 AND translate(p.elem->>'bytes','0123456789','') = ''
+                 AND length(p.elem->>'bytes') <= 19
+                 AND (p.elem->>'bytes')::numeric <= 9223372036854775807
+               THEN (p.elem->>'bytes')::bigint
+               ELSE NULL
+             END,
+             'volcado.audio_url'
       FROM volcado v
       LEFT JOIN LATERAL (
         SELECT elem
