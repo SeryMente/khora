@@ -16,11 +16,11 @@
   },
   "runtime": {
     "entrypoint": "khora-web/lib/server/mcp-jules.ts",
-    "registration_export": "registerJulesMcpModule",
+    "registration_export": "registerMcpModules → registerJulesMcpModule",
     "host": "khora-web/app/api/mcp/route.ts",
     "transport": "shared_streamable_http",
     "endpoint": "/api/mcp",
-    "registry": "khora-web/lib/server/mcp-tool-contract.ts"
+    "registry": "khora-web/lib/server/mcp-module-registry.ts"
   },
   "tools": [
     {
