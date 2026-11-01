@@ -14,9 +14,7 @@ import { McpDiagnosticError, diagnosticFailure } from "@/lib/server/mcp-diagnost
 import { isJulesDeveloperSubject, listJulesSourceGrants, requireJulesSourceGrant, type JulesAccessMode, type JulesSourceGrant } from "@/lib/server/jules-access";
 import { describeMcpTool, type McpToolName } from "@/lib/server/mcp-tool-contract";
 import type { McpModuleContext } from "./mcp-module-context";
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-
 
 
 /**
