@@ -292,7 +292,7 @@ async function updateReferences(
     `;
     const beforeCounts = await db.query(countReferencesSql, [item.url]);
     const expectedReferences = Object.values(beforeCounts.rows[0] || {})
-      .reduce((sum: number, value: string | number) => sum + Number(value || 0), 0);
+      .reduce<number>((sum, value) => sum + Number(value || 0), 0);
     if (expectedReferences !== item.occurrences) {
       throw new Error("migration_reference_inventory_changed");
     }
@@ -321,7 +321,7 @@ async function updateReferences(
     for (const table of ["dictado_audio_parte", "dictado_mp3", "dictado_mp3_historial"]) {
       await db.query("UPDATE " + table + " SET blob_url=$2 WHERE blob_url=$1", [item.url,destinationUrl]);
     }
-    const volcado = await db.query(
+    await db.query(
       `
         UPDATE volcado v SET
           audio_url=CASE WHEN v.audio_url=$1 THEN $2 ELSE v.audio_url END,
@@ -347,7 +347,7 @@ async function updateReferences(
     );
     const afterCounts = await db.query(countReferencesSql, [item.url]);
     const remainingReferences = Object.values(afterCounts.rows[0] || {})
-      .reduce((sum: number, value: string | number) => sum + Number(value || 0), 0);
+      .reduce<number>((sum, value) => sum + Number(value || 0), 0);
     if (remainingReferences !== 0) {
       throw new Error("migration_source_references_remaining");
     }
