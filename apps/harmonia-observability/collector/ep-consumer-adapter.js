@@ -32,6 +32,7 @@ function createEpConsumerAdapter({ root, originalsDir, surfacesDir, activationAt
   const sourceRoot = path.resolve(originalsDir);
   const surfaceRoot = path.resolve(surfacesDir);
   const ledgerPath = path.join(dataRoot, 'ep-consumer-ledger.jsonl');
+  let ledgerIntegrityErrors = 0;
   const activationPath = path.join(dataRoot, 'ep-consumer-activation.json');
   let activatedAt = null;
   try {
@@ -58,7 +59,6 @@ function createEpConsumerAdapter({ root, originalsDir, surfacesDir, activationAt
   const byEventId = new Map();
   const byOperationRef = new Map();
   let ledgerLoaded = false;
-  let ledgerIntegrityErrors = 0;
   let lastReconciledAt = null;
 
   function applyRow(row) {
