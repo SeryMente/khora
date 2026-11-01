@@ -268,13 +268,22 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
   if(message.kind==='harmonia:sync-repository')return syncRepository();
   if(message.kind==='harmonia:get'){
    await checkHealth();
-   if(collector)await flushOutbox();
    const syncData=await chrome.storage.local.get([STORE.repositorySync]);
    let coverage=null;
-   if(collector){try{const response=await fetch(`${COLLECTOR}/coverage`,{headers:headers(),cache:'no-store'});if(response.ok)coverage=await response.json();else throw new Error(`Colector HTTP ${response.status}`);}catch(error){lastError=String(error.message||error);}}
-   const localOutbox=await HarmoniaDurableOutbox.status();
    let epStatus=null;
-   if(collector){try{const epResponse=await fetch(COLLECTOR+'/ep/status',{headers:headers(),cache:'no-store'});if(epResponse.ok)epStatus=await epResponse.json();}catch{}}
+   if(collector){
+    try{
+     const [coverageResponse,epResponse]=await Promise.all([
+      fetch(COLLECTOR+'/coverage',{headers:headers(),cache:'no-store'}),
+      fetch(COLLECTOR+'/ep/status',{headers:headers(),cache:'no-store'})
+     ]);
+     if(coverageResponse.ok)coverage=await coverageResponse.json();
+     else throw new Error('Colector HTTP '+coverageResponse.status);
+     if(epResponse.ok)epStatus=await epResponse.json();
+    }catch(error){lastError=String(error.message||error);}
+   }
+   if(collector)await flushOutbox();
+   const localOutbox=await HarmoniaDurableOutbox.status();
    return {version:'0.3.0',autoEnabled,active:autoEnabled&&Object.keys(sessions).length>0,activeTabs:Object.keys(sessions).length,
     localOutbox,epStatus,sessions:Object.entries(sessions).map(([tabId,session])=>({tabId,startedAt:session.startedAt,lastAt:session.lastAt,events:session.events})),
     collector,lastError,events:eventCount,coverage,repositorySync:syncData[STORE.repositorySync]||null};
