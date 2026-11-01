@@ -103,6 +103,7 @@ function createEpConsumerAdapter({ root, originalsDir, surfacesDir, activationAt
 
   function appendDurable(row) {
     fs.mkdirSync(dataRoot, { recursive: true });
+    const existed = fs.existsSync(ledgerPath);
     let fd;
     try {
       fd = fs.openSync(ledgerPath, 'a');
@@ -119,6 +120,9 @@ function createEpConsumerAdapter({ root, originalsDir, surfacesDir, activationAt
       throw error;
     } finally {
       if (fd !== undefined) fs.closeSync(fd);
+    }
+    if (!existed) {
+      try { const dir = fs.openSync(dataRoot, 'r'); try { fs.fsyncSync(dir); } finally { fs.closeSync(dir); } } catch {}
     }
   }
 
