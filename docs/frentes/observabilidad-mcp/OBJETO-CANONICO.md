@@ -4,10 +4,10 @@
 - Frente único vigente: **Khora MCP**; identidad canónica `KHORA-MCP`.
 - Nombre e identidad histórica: **Observabilidad MCP** / `OBSERVABILIDAD-MCP`. La ruta heredada `docs/frentes/observabilidad-mcp/` se conserva; no se migra ni duplica el OCP o su control.
 - Repositorio: `SeryMente/khora`; OCP único: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`; control único: `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`.
-- OCP: **v0.3.9**. Control de responsabilidad: **generación 5**, titular operativo `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`.
+- OCP: **v0.4.0**. Control de responsabilidad: **generación 7**, titular operativo `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`; corresponsabilidad acotada al módulo Jules `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`. Blob del control leído de vuelta: `62b38ee17feae7d3028eff8747dfe746a8f1979a`.
 - La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local de continuidad: `01a19499-caec-7e19-beb9-bb5b890a36c8`; no es un ID nativo.
 - Folio global y folio de sesión: **PENDIENTE / NO ASIGNADO**; FOL1 está PREPARADO, NO ACTIVO. El control vigente tiene `session_folio: null`; el candidato anterior se conserva solo como antecedente no emitido en el registro de corrección.
-- Las tareas provisionales «Continuidad», «General» y «Jules» pertenecen a este mismo frente y se registran en [Tareas provisionales](./📁%20🧭%20-%20Tareas%20provisionales/README.md); no crean frentes ni controles paralelos.
+- Continuidad y General permanecen como tareas provisionales en [Tareas provisionales](./📁%20🧭%20-%20Tareas%20provisionales/README.md). Jules es ahora un módulo funcional interno del frente; su tarea de implementación se conserva como KHORA-MCP-TASK-003. El módulo hereda el OCP/control padre y no crea FT ni control independientes.
 - `MCP-OBS-DICTADO` permanece como identidad histórica del objeto agregado anterior, no como otro frente activo.
 
 ## 2. LEER PRIMERO
@@ -22,8 +22,8 @@ Leer README, DUG vigente, este OCP y `CONTROL-RESPONSABILIDAD.json`. La titulari
 **Interpretación operativa separada:** el repositorio denomina MCP al servidor/protocolo y herramientas de Khora; «MSP» se conserva en la cita original. El frente cubre el acceso de modelos/agentes autorizados a observabilidad y la integración controlada con Jules.
 
 ## 3. Referencia metodológica
-- DUG consultado desde `SeryMente/metodologia/main`: **Samantha v374 · NX-374m**; HTML canónico Blob SHA `2827d6edc3c07613c59dabf90ddea918e84bb06a`; `main` verificado en `4b9a6d99239e4f1a9bc87de18d1a2c06f05d232f` (`2026-11-01T21:21:59Z`). Metacanon **1.26**; GOW **2.14**. Se revisaron cascada, CNP y principios de responsabilidad, continuidad, persistencia y foliación; el cuerpo enlazado de §ARR no estuvo disponible en la extracción estática y queda pendiente de lectura completa. MCP normativo permanece DESACTIVADO.
-- Metacanon **1.26**; GOW **2.14**.
+- DUG consultado desde `SeryMente/metodologia/main`: **Samantha v375 · NX-375m**; HTML canónico Blob SHA `657225b9c6c4d7bb46aad78fcd6c95de49ea1689`; `main` verificado en `02ddcc4159919f411ff53bf4bd22c96a18bd63d3`. Metacanon **1.26**; GOW **2.16**. Se revisaron CNP, §42, Metacanon §§46–48 y la definición GOW de módulo funcional heredado. La autoridad del módulo Jules permanece subordinada al OCP/control KHORA-MCP. MCP normativo permanece DESACTIVADO.
+- Metacanon **1.26**; GOW **2.16**.
 - CNP vigente (categoría A): P001, P004, P005, P038 y P043; consideración explícita en cada turno. MCP normativo: DESACTIVADO.
 - Fuente normativa: `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`.
 - MCP-NORMATIVO: **DESACTIVADO**. No debe confundirse con el servidor MCP de producto Khora.
@@ -42,8 +42,10 @@ El alcance funcional deseado no acredita que cada clase de recurso, herramienta 
 ### 4.1 Observabilidad — tarea provisional «General»
 Incluye endpoint `/api/mcp`, catálogo/contratos, OAuth/Bearer, scopes y gates; consultas de runtime/eventos con filtros, cursores, paginación, aislamiento por sesión y saneamiento; interoperabilidad de clientes y pruebas. El caso inicial de consumo es el diagnóstico de Dictado, sin asumir autoridad para modificar su UX o sus datos.
 
-### 4.2 Integración Jules — tarea provisional «Jules»
-La implementación de esta intervención expone siete herramientas:
+### 4.2 Integración Jules — módulo funcional
+La integración se organiza como módulo funcional interno, documentado en [Módulo Jules](./modulos/jules/README.md) y registrado por `khora-web/lib/server/mcp-module-registry.ts`. Su implementación reside en `khora-web/lib/server/mcp-jules.ts` y se registra dentro del endpoint único `/api/mcp`; no crea un servidor ni transporte paralelo. La tarea KHORA-MCP-TASK-003 conserva el trabajo de puente local OAuth/RDC.
+
+La implementación expone siete herramientas:
 1. `jules_list_sources`
 2. `jules_list_sessions`
 3. `jules_get_session`
@@ -79,7 +81,8 @@ No incluye la pantalla/micrófono, transcripción o reparación UX de Dictado; c
 ## 5. Roles y colaboración
 - Operador: propietario del propósito y de las autorizaciones de alcance.
 - Titular operativo: el que consta en `CONTROL-RESPONSABILIDAD.json`, sujeto a su generación y vigencia; esta intervención continúa la misma titularidad, no crea otro titular.
-- «General» y «Jules»: tareas provisionales dentro de este mismo frente.
+- «General»: tarea provisional dentro del frente.
+- «Jules»: módulo funcional interno, con corresponsabilidad acotada y tareas/entregables propios; hereda autoridad, OCP y control del frente padre. KHORA-MCP-TASK-003 es su tarea de implementación, no un FT ni control independiente.
 - Dictado, Custodia y Harmonia: consumidores o frentes relacionados, nunca subordinados por esta definición.
 
 ## 6. Autoridad y autorización
@@ -141,10 +144,10 @@ El operador autorizó ampliar el mismo frente para integrar siete herramientas J
 ### C004 — autenticación, clon y validación local — 2026-10-30
 Se autenticó GitHub CLI mediante el flujo interactivo del dispositivo PC-14 como `1interprete1`, sin exponer el token. Se materializó el clon en `C:\Users\PC 13\Desktop\Khora\khora-main`, directamente en la rama de intervención. La revisión local detectó y corrigió una fuga de segmentos propietario/repositorio en las rutas de observabilidad Jules y tres defectos de aserción de pruebas; también se retiró del README una segunda copia idéntica del índice de documentos canónicos. Todos los cambios se publicaron en la rama de la PR, nunca en `main`. La validación local de las pruebas focalizadas terminó 35/35; la suite unitaria completa 568/568; TypeScript, UI Review y navegación pasaron; `npm run build` terminó con código 0 usando un `AUTH_SECRET` aleatorio efímero de proceso, sin archivo `.env` ni `.env.local`. Next.js generó 78/78 páginas; permanecen warnings de APIs Edge y deprecación de middleware. La CI remota no ejecutó pasos; la PR sigue abierta y no se ha desplegado.
 ## 12. Reinstanciación
-Continuar en el OCP y control únicos `docs/frentes/observabilidad-mcp/`. Leer el control generación vigente, comprobar SHA de `main`, rama/PR, estado de Neon/Vercel y evidencia de aceptación. No crear OCP paralelo para Jules ni asumir grant por defecto. No confundir uso de RDC con integración nativa ChatGPT.
+Continuar en el OCP y control únicos `docs/frentes/observabilidad-mcp/`. Leer el control generación vigente, comprobar SHA de `main`, rama/PR, estado de Neon/Vercel y evidencia de aceptación. Jules se reinstancia como módulo funcional heredado en `modulos/jules/`; no crear FT, OCP ni control paralelo. No asumir grants por defecto ni confundir uso de RDC con integración nativa ChatGPT.
 
 ## 13. Persistencia y revisión
-Este documento en `main` es el objeto canónico único del frente. El control independiente reside en `CONTROL-RESPONSABILIDAD.json`. Las tareas provisionales Continuidad/General/Jules se agrupan en el registro enlazado en §1; heredan el mismo control y no tienen autoridad para crear objetos canónicos o controles independientes. La metodología general de `SeryMente/metodologia` prevalece en definiciones transversales.
+Este documento en `main` es el objeto canónico único del frente. El control independiente reside en `CONTROL-RESPONSABILIDAD.json`. Las tareas Continuidad/General y la tarea de implementación KHORA-MCP-TASK-003 se registran en [Tareas provisionales](./📁%20🧭%20-%20Tareas%20provisionales/README.md). El módulo Jules se documenta en [Módulo Jules](./modulos/jules/README.md) y hereda el mismo OCP/control; no crea un control independiente. La metodología general de `SeryMente/metodologia` prevalece en definiciones transversales.
 
 ## 14. Primer corte de reinstanciación RDC PC-14 — histórico · 2026-10-30
 
@@ -394,3 +397,20 @@ El operador presentó un nuevo handshake para `PC-14` (`--no-persist-session`) y
 El control único permanece en generación 5, alias `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`, `owner_thread=null`, `session_folio=null`; FOL1 PREPARADO, NO ACTIVO. El nuevo handshake RDC no cambia la titularidad del frente ni crea un control o folio adicional.
 
 **Estado:** TASK-001 sigue `en_curso`; el clon aislado está materializado y el puente pasa verificaciones estáticas, pero faltan dependencias y pruebas.
+
+
+## 25. Instanciación del módulo funcional Jules — 2026-11-01
+
+El operador corrigió expresamente la dirección de trabajo: revertir la marcha atrás que retiraba Jules de Cora y, en lugar de asumir la titularidad general del frente, crear/asumir el módulo Jules dentro de KHORA-MCP, aprovechando la arquitectura modular existente.
+
+**Clasificación metodológica:** módulo funcional interno / subfrente funcional según GOW v2.16. Desarrolla una faceta delimitada con propósito, estado, tareas y entregables propios; hereda autoridad, OCP y control del FT padre. No es FT independiente. No tiene OCP/control/folio SES propio.
+
+**Responsabilidad:** el titular general del frente permanece `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`. La corresponsabilidad de esta instancia queda limitada a `module:jules`, alias `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`. Control generación 7, blob leído de vuelta `62b38ee17feae7d3028eff8747dfe746a8f1979a`; FOL1 PREPARADO NO ACTIVO y folios PENDIENTE/NO ASIGNADO.
+
+**Implementación modular en revisión:** `khora-web/lib/server/mcp-jules.ts` encapsula los siete handlers; `khora-web/lib/server/mcp-module-registry.ts` registra el módulo; `khora-web/app/api/mcp/route.ts` conserva el único host/endpoint y llama al registro central. `MCP_TOOL_SCOPES` mantiene los siete scopes/herramientas. No se crea una segunda API ni se modifica el modelo de autorización.
+
+**Persistencia modular:** [README del módulo](./modulos/jules/README.md) y [module.json](./modulos/jules/module.json). La tarea KHORA-MCP-TASK-003 se conserva como unidad de trabajo para completar el puente local OAuth/RDC, no como OCP separado.
+
+**Rama de implementación:** [feat/khora-mcp-module-jules-20261101](https://github.com/SeryMente/khora/tree/feat/khora-mcp-module-jules-20261101), basada en `ed442d78fae3b86d6747ee8d4bb347678a766576`. Código y docs aún no fusionados ni desplegados; pruebas de ejecución, typecheck, build y aceptación OAuth/E2E permanecen pendientes de evidencia actual.
+
+**Marcha atrás de retirada:** la rama de retirada `refactor/cora-cognitive-prosthesis-only-20261101` fue restaurada al árbol de línea base `d0b14bb10f48f8a216adab78fbd97ee51ccc4d54` mediante el commit `211d86daeb2e6f8b8a4aa20b6880ad38ff200a84`; el trabajo de retirada no llegó a main. No se modificaron Production, secretos ni datos vivos.
