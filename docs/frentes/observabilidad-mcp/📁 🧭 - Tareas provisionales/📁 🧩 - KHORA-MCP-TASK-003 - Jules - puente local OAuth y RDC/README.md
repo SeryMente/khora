@@ -1,12 +1,16 @@
 # 📝 KHORA-MCP-TASK-003 · Jules — puente local OAuth y RDC
 
-**Naturaleza:** OCP provisional de tarea del frente Khora MCP; no es un frente independiente ni una unidad taxonómica canonizada.  
+**Naturaleza:** tarea de implementación del módulo funcional Jules dentro del frente Khora MCP; no es FT, OCP ni control independiente.  
 **Estado:** `en_curso`  
-**Responsabilidad:** heredada del control `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`, generación 5; sin control, titularidad, sesión ni folio propios.  
+**Responsabilidad:** hereda OCP y control `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`, generación 7. Corresponsable del módulo: `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; sin control, titularidad de FT ni folio propios.  
 **task_id:** `KHORA-MCP-TASK-003`  
-**scope_ref:** `docs/frentes/observabilidad-mcp/`
+**scope_ref:** `docs/frentes/observabilidad-mcp/`  
+**module_ref:** [Módulo funcional Jules](../../modulos/jules/README.md)
 
 ## Enunciado
+
+Esta tarea implementa y valida el módulo funcional Jules definido en el OCP padre. El módulo conserva propósito, estado, catálogo, seguridad, pruebas y entregables propios, pero hereda la autoridad y persistencia del frente KHORA-MCP.
+
 
 Habilitar el uso de las herramientas Jules del servidor MCP de Khora desde ChatGPT mediante un cliente MCP local por `stdio`, operado a través de la sesión RDC autorizada, autenticado contra Khora Production con OAuth 2.1 Authorization Code + PKCE. El flujo no exige crear, copiar o pegar Bearers, no extrae cookies ni credenciales de navegador y no convierte el puente local en una conexión MCP nativa de ChatGPT Free.
 
