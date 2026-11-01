@@ -52,6 +52,18 @@ async function paint(){
   const response=await call('harmonia:get');
   if(!response.ok)throw new Error(response.error||'No se pudo consultar el service worker.');
   const state=response.value||{},coverage=state.coverage||{};
+  const outbox=state.localOutbox||{};
+  const ep=state.epStatus||{};
+  const pending=Number(outbox.pendingCount||0);
+  $('#localPersistence').textContent='Cola durable del navegador: '+pending+' pendientes / '+Number(outbox.capacity||10000)+' · reintentos: '+Number(outbox.retryingCount||0)+(outbox.oldestQueuedAt?' · desde '+new Date(outbox.oldestQueuedAt).toLocaleString():' · sin pendientes');
+  const ledgerHealthy=ep.localLedger==='READY';
+  $('#persistenceDot').className='repoDot '+(pending===0&&ledgerHealthy?'live':ep.localLedger==='DEGRADED'?'off':'');
+  $('#epPersistence').textContent=ep.localLedger==='DEGRADED'
+    ?'Ledger local degradado; el colector debe recuperarlo antes de aceptar nuevos eventos.'
+    :ep.localLedger==='READY'
+      ?'Ledger local: '+Number(ep.localRecords||0)+' registros · nube: '+Number(ep.cloudPendingCount||0)+' pendientes locales. Transporte EP deshabilitado: '+(ep.blockers||['EP_OFFICIAL_CONTRACT_UNAVAILABLE']).join(', ')+'.'
+      :'Estado EP no leído del colector local. No se declara persistencia remota.';
+
   const features=(catalog.features||[]).filter(f=>f.scope!=='out');
   const totalWeight=features.reduce((n,f)=>n+weight(f),0);
   const docWeight=features.filter(isDocumented).reduce((n,f)=>n+weight(f),0);
