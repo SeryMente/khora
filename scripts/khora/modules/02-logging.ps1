@@ -2,9 +2,16 @@
 function Mask-Token {
     param([AllowNull()][string]$Text)
     if ($null -eq $Text) { return '' }
-    $masked = $Text -replace '(ghp_[A-Za-z0-9_]{12})[A-Za-z0-9_]+','$1***'
-    $masked = $masked -replace '(github_pat_[A-Za-z0-9_]{12})[A-Za-z0-9_]+','$1***'
-    $masked = $masked -replace '(Bearer\s+[A-Za-z0-9._~-]{12})[A-Za-z0-9._~-]+','$1***'
+    $masked=[string]$Text
+    foreach($name in @('GH_TOKEN','GITHUB_TOKEN','VERCEL_TOKEN','KHORA_GIT_TOKEN','KHORA_VAULT_PASSWORD','KHORA_TOKEN')){
+        $secret=[Environment]::GetEnvironmentVariable($name,'Process')
+        if(-not [string]::IsNullOrWhiteSpace($secret) -and $secret.Length -ge 8){
+            $masked=$masked.Replace($secret,'[REDACTED]')
+        }
+    }
+    $masked=$masked -replace '(?i)(github_pat_|ghp_|gho_|ghu_|ghs_|ghr_)[A-Za-z0-9_]{12,}','[REDACTED_GITHUB_TOKEN]'
+    $masked=$masked -replace '(?i)(Bearer\s+)[A-Za-z0-9._~-]{12,}','$1[REDACTED]'
+    $masked=$masked -replace '\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b','[REDACTED_JWT]'
     return $masked
 }
 function Invoke-WithKhoraToken {
