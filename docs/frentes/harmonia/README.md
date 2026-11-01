@@ -7,6 +7,15 @@ Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). El OCP conse
 - [Control exclusivo](CONTROL-RESPONSABILIDAD.json): actualmente asignado a la instancia y generación que constan en el JSON; no es un bootstrap sin propietario. Preparar el traspaso no transfiere la titularidad.
 - [Originales](originales/PROCEDENCIA.md), [crónica](cronica/HARMONIA-INSTANCIACION-01.md) y [revisión](evidencias/HARMONIA-INSTANCIACION-01-revision.json).
 
+## Estado vigente · 2026-11-01 · generación 14
+
+- OCP principal: v0.41 / HARMONIA-v0.41, §§46–47.
+- Control: generación 14; alias operativo chatgpt-harmonia-01a19969-8e70-7dcb-b9fd-7db62736f279.
+- RDC activo: PC-8, UUID 7595d30a-bd63-4bc0-a274-f4ae90928247. PC-14 queda como histórico supersedido.
+- Original persistido y leído de vuelta: originales/ChatGPT-HARMONIA-20261101-1709.md; 174033 bytes; SHA-256 A3F10DAF7055B3B16B3F978909C9AFC77ECC6EA8486DF43FE50647297AAA00A6; Git blob 1e1ddd38fd4e3b7c6a1d6cb429467430e4d80ab5.
+- Procedencia y estado: originales/PROCEDENCIA.md; documentos/MANIFIESTO-DOCUMENTAL.json; cronica/HARMONIA-RETOMA-G14-20261101.md.
+- La candidata local-first sigue en rama separada; workflow dedicado 41355059144 PASS. Sin merge, sin EP remoto y aceptación Chrome pendiente.
+
 ## Fuente de código y aceptación
 
 - `main` publica el manifiesto MV3 **v0.3.0** (blob `5c2dd6d616c4ba19541d03df8fbc4abc6f0a11b6`); la candidata `feat/harmonia-e2e-20261021` contiene **v0.4.0** (manifest blob `902968968cc121590a0d6b60fd10c06ea12f5409`). La PR [#333](https://github.com/SeryMente/khora/pull/333) se comprobó en vivo el 2026-10-29: sigue abierta en borrador, sin fusionar; GitHub reporta última actualización 2026-10-23. No se declara aceptada la candidata.
@@ -49,7 +58,7 @@ La consulta viva de RDC de este ciclo confirma que el UUID autorizado de PC-14 `
 - Inventario RDC del 2026-10-29: UUID autorizado `345f64ee-5d6a-429f-a97c-dab44f44cddb` ausente. Dos entradas PC-14 están offline con UUID distintos; PC-4 está online pero pertenece a otra tarea y no se usó. Ninguna operación remota/local se ejecutó para Harmonia.
 - E2E real sigue **ABIERTA**; paquete/raíz cargable y perfil físico NO VERIFICADOS. La acción bloqueante es restaurar el UUID exacto y aportar handshake de conectividad y cuenta → SID → perfil, sin secretos. Si se inicia RDC de nuevo, el único comando normativo de Metacanon §13 es `npx @wonderwhy-er/desktop-commander@latest remote --no-persist-session`.
  
-## Estado vigente · 2026-10-31
+## Estado histórico sustituido · 2026-10-31
 
 La única fuente actual de estado del frente es el OCP [OBJETO-CANONICO.md](OBJETO-CANONICO.md), versión **0.39 / HARMONIA-v0.39**, especialmente §45. El control exclusivo está en generación **12**, registrado en [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json); el folio de sesión sigue sin asignarse porque FOL1 no está activa.
 
