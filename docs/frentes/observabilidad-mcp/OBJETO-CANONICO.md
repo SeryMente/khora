@@ -4,7 +4,7 @@
 - Frente único vigente: **Khora MCP**; identidad canónica `KHORA-MCP`.
 - Nombre e identidad histórica: **Observabilidad MCP** / `OBSERVABILIDAD-MCP`. La ruta heredada `docs/frentes/observabilidad-mcp/` se conserva; no se migra ni duplica el OCP o su control.
 - Repositorio: `SeryMente/khora`; OCP único: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`; control único: `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`.
-- OCP: **v0.3.8**. Control de responsabilidad: **generación 5**, titular operativo `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`.
+- OCP: **v0.3.9**. Control de responsabilidad: **generación 5**, titular operativo `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`.
 - La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local de continuidad: `01a19499-caec-7e19-beb9-bb5b890a36c8`; no es un ID nativo.
 - Folio global y folio de sesión: **PENDIENTE / NO ASIGNADO**; FOL1 está PREPARADO, NO ACTIVO. El control vigente tiene `session_folio: null`; el candidato anterior se conserva solo como antecedente no emitido en el registro de corrección.
 - Las tareas provisionales «Continuidad», «General» y «Jules» pertenecen a este mismo frente y se registran en [Tareas provisionales](./📁%20🧭%20-%20Tareas%20provisionales/README.md); no crean frentes ni controles paralelos.
@@ -22,7 +22,7 @@ Leer README, DUG vigente, este OCP y `CONTROL-RESPONSABILIDAD.json`. La titulari
 **Interpretación operativa separada:** el repositorio denomina MCP al servidor/protocolo y herramientas de Khora; «MSP» se conserva en la cita original. El frente cubre el acceso de modelos/agentes autorizados a observabilidad y la integración controlada con Jules.
 
 ## 3. Referencia metodológica
-- DUG consultado directamente desde `SeryMente/metodologia/main`: **Samantha v373 · NX-373m**; HTML canónico Blob SHA `cac4525de77d4f47a8a59c25201968ecf2056b90`; `main` verificado en `3a443d6d50778f1ed75493e93977bab108a40d39` (2026-11-01T01:36:02Z). Metacanon **1.26**; GOW **2.14**. §ARR y la cascada vigente fueron consultados; MCP normativo permanece desactivado.
+- DUG consultado desde `SeryMente/metodologia/main`: **Samantha v374 · NX-374m**; HTML canónico Blob SHA `2827d6edc3c07613c59dabf90ddea918e84bb06a`; `main` verificado en `4b9a6d99239e4f1a9bc87de18d1a2c06f05d232f` (`2026-11-01T21:21:59Z`). Metacanon **1.26**; GOW **2.14**. Se revisaron cascada, CNP y principios de responsabilidad, continuidad, persistencia y foliación; el cuerpo enlazado de §ARR no estuvo disponible en la extracción estática y queda pendiente de lectura completa. MCP normativo permanece DESACTIVADO.
 - Metacanon **1.26**; GOW **2.14**.
 - CNP vigente (categoría A): P001, P004, P005, P038 y P043; consideración explícita en cada turno. MCP normativo: DESACTIVADO.
 - Fuente normativa: `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`.
