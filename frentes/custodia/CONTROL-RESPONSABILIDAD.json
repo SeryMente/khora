@@ -6,47 +6,52 @@
   "state_object": "frentes/custodia/OBJETO-CANONICO.md",
   "status": "assigned",
   "owner_thread": null,
-  "owner_alias": "chatgpt-custodia-INSTANCE-20261030-01A18F85",
+  "owner_alias": "chatgpt-custodia-retoma-01a19495-f227-7f5d-8985-4648e1a9ffcb",
   "owner_alias_type": "operational_alias_not_native_thread_id",
-  "instance": "chatgpt-custodia-INSTANCE-20261030-01A18F85",
+  "instance": "chatgpt-custodia-INSTANCE-20261031-01A19495F227",
   "session_folio": "PENDIENTE/NO ASIGNADO",
-  "generation": 5,
+  "generation": 6,
   "expiry": null,
-  "authorization_ref": "Respuesta literal del operador en esta conversación: «Si» (2026-10-30, America/Mexico_City), a la pregunta explícita: «¿Me autorizas a transferir la responsabilidad documental de Custodia, generación 4, a esta conversación para mantener y actualizar su OCP durante estos ciclos?». Autoriza únicamente la responsabilidad documental del frente Custodia y la actualización de su OCP durante estos ciclos; no autoriza cambios de código, producto, producción, credenciales, seguridad, proveedores, despliegues ni recuperaciones destructivas.",
-  "authorization_event": "CUSTODIA-TRANSFERENCIA-01a18f85-d775-7709-ac68-c295baedd694",
+  "authorization_ref": "El operador instruyó retomar la responsabilidad del frente Custodia con la autorización previa, sin volver a solicitarla (continuidad de la instrucción anterior de este hilo). La instrucción complementaria vigente se conserva literalmente en frentes/custodia/originales/INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md (blob SHA a77d3d609f76b771ed9b0322db588b162f8bcf9d). Autoriza crear los objetos provisionales solicitados y continuar la migración Vercel Blob → Backblaze B2 en rama y entornos aislados/no productivos; no autoriza por sí sola merge/deploy/selector de producción, SQL/backfill en Neon Production, cambio de credenciales, modificación efectiva de configuración/seguridad del bucket ni eliminación de originales.",
+  "authorization_event": "CUSTODIA-RETOMA-20261031-01a19495-fe84-7587-80c8-c9c690cdb009",
   "previous_owner": {
     "status": "assigned",
     "owner_thread": null,
-    "owner_alias": "chatgpt-custodia-SES-20261029-K7M4Q9R2",
-    "instance": "chatgpt-custodia-SES-20261029-K7M4Q9R2",
-    "session_folio": "SES-20261029-K7M4Q9R2",
-    "generation": 4,
-    "record_kind": "owner_previous_to_generation_5"
+    "owner_alias": "chatgpt-custodia-INSTANCE-20261030-01A18F85",
+    "owner_alias_type": "operational_alias_not_native_thread_id",
+    "instance": "chatgpt-custodia-INSTANCE-20261030-01A18F85",
+    "session_folio": "PENDIENTE/NO ASIGNADO",
+    "generation": 5,
+    "authorization_ref": "Respuesta literal del operador en esta conversación: «Si» (2026-10-30, America/Mexico_City), a la pregunta explícita: «¿Me autorizas a transferir la responsabilidad documental de Custodia, generación 4, a esta conversación para mantener y actualizar su OCP durante estos ciclos?». Autoriza únicamente la responsabilidad documental del frente Custodia y la actualización de su OCP durante estos ciclos; no autoriza cambios de código, producto, producción, credenciales, seguridad, proveedores, despliegues ni recuperaciones destructivas.",
+    "record_kind": "owner_previous_to_generation_6",
+    "blob_sha": "1917f056e8fc084f2f6f023ebf73e167e8a41467"
   },
   "previous_authorization_ref": "Instrucción directa del operador, 2026-10-28, preservada en originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob 357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5). Autoriza inventariar provisionalmente los hallazgos sobre recuperabilidad dentro del OCP; no autoriza cambios de código, alteraciones de producción ni recuperaciones que puedan sobrescribir/eliminar originales. Asignación inicial desde control sin titular previo asignado. ID nativo de conversación no expuesto.",
-  "previous_acquired_at": "2026-10-28",
-  "prior_generation": 4,
-  "previous_blob": "3731c8b5f7cdded5f3406e446369779771f20af5",
-  "base_blob_sha": "3731c8b5f7cdded5f3406e446369779771f20af5",
-  "assignment_method": "Transferencia ejecutada conforme a Samantha v373 · NX-373m, P037 y Metacanon 1.26: lectura inmediata del control de main en generación 4, blob 3731c8b5f7cdded5f3406e446369779771f20af5; autorización afirmativa explícita del operador; ausencia de colisión exacta del alias en búsqueda de archivos/código, commits e incidencias consultadas de SeryMente/khora. Sustitución condicionada al SHA observado, generación 4→5. UUIDv7 local y alias operativo; no son IDs nativos. FOL1 continúa PREPARADA y no ACTIVA, por lo que no se asigna folio global, por OCP ni de sesión.",
+  "previous_acquired_at": "2026-10-30",
+  "prior_generation": 5,
+  "previous_blob": "1917f056e8fc084f2f6f023ebf73e167e8a41467",
+  "base_blob_sha": "1917f056e8fc084f2f6f023ebf73e167e8a41467",
+  "assignment_method": "Transferencia condicionada por blob SHA observado de generación 5 (1917f056e8fc084f2f6f023ebf73e167e8a41467) y escritura GitHub con SHA actual; alias local porque la plataforma no expone ID nativo; read-back posterior obligatorio. Control de responsabilidad documental ampliada con el alcance de migración no productiva autorizado en este hilo.",
   "folio_collision_check": {
-    "searched_scope": "Búsqueda exacta del folio SES-20261029-K7M4Q9R2 en archivos, commits e incidencias de SeryMente/khora; cero resultados previos a la asignación. La consulta no acredita ausencia de colisión en todos los repositorios/controles de la organización.",
+    "searched_scope": "Búsqueda exacta del nuevo alias operativo y UUIDv7 local en el repositorio SeryMente/khora antes de la asignación; 0 coincidencias en cada consulta. No acredita unicidad global fuera del repositorio.",
     "repositories_searched": [
       "SeryMente/khora"
     ],
-    "folio": "SES-20261029-K7M4Q9R2",
+    "alias": "chatgpt-custodia-retoma-01a19495-f227-7f5d-8985-4648e1a9ffcb",
+    "uuidv7": "01a19495-f227-7f5d-8985-4648e1a9ffcb",
     "matches_found": 0,
     "global_uniqueness": "not_verified"
   },
-  "acquired_at": "2026-10-30",
-  "bootstrap_scope": "Responsabilidad documental del frente transversal Custodia para inventariar hallazgos de recuperabilidad en Ingresos > Dictado > Recuperación y mantener el estado del OCP. No autoriza código de producto, credenciales, seguridad, despliegues, cambios de proveedor ni recuperaciones no destructivas sin verificación/consentimiento específico.",
+  "acquired_at": "2026-10-31",
+  "bootstrap_scope": "Responsabilidad documental y operativa del frente transversal Custodia: mantener el OCP y los objetos provisionales; conducir la migración Vercel Blob → Backblaze B2 mediante trabajo en rama, revisión y pruebas/entornos aislados no productivos. No autoriza merge/deploy/cutover de producción, aplicación SQL/backfill en Neon Production, cambio de selector de producción, modificación de credenciales, cambios efectivos de seguridad/configuración del bucket o eliminación de objetos fuente.",
   "enforcement": "cooperative registry; no server fencing of arbitrary writes",
   "readback_required": true,
   "transcript_scope": "Instrucción del operador preservada en el original de este ciclo; la continuidad visible se limita a mensajes adquiridos y no es una exportación nativa exhaustiva.",
   "authorization_original": {
-    "path": "frentes/custodia/originales/INSTRUCCION-TRANSFERENCIA-RESPONSABILIDAD-2026-10-29-C012.md",
-    "blob_sha": "e267321d2cc295d4c80ac5c7c0405bc7bbfaaa15",
-    "commit_sha": "9b6fb4c014a4c5ab83f401eac85cb1f665559149"
+    "path": "frentes/custodia/originales/INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md",
+    "blob_sha": "a77d3d609f76b771ed9b0322db588b162f8bcf9d",
+    "commit_sha": "1db7a62b7c1339d94f2189c37ecec7e41f5c94f4",
+    "scope": "instrucción literal de continuidad del sprint y autorización para crear objetos provisionales y continuar migración en rama/entornos no productivos; exclusiones de producción/credenciales/seguridad/fuentes expresas en el control"
   },
   "prior_visible_output_original": {
     "path": "frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-ANTERIOR-RECUPERABILIDAD-INGRESOS-2026-10-28.md",
@@ -76,12 +81,12 @@
     },
     "previous_authorization_ref": "Instrucción directa del operador, 2026-10-28, preservada en originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob 357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5). Autoriza inventariar provisionalmente los hallazgos sobre recuperabilidad dentro del OCP; no autoriza cambios de código, alteraciones de producción ni recuperaciones que puedan sobrescribir/eliminar originales. Asignación inicial desde control sin titular previo asignado. ID nativo de conversación no expuesto."
   },
-  "transfer_generation": 5,
-  "transfer_authority": "Samantha v373 · NX-373m; Metacanon 1.26; GOW 2.14; DUG blob cac4525de77d4f47a8a59c25201968ecf2056b90.",
+  "transfer_generation": 6,
+  "transfer_authority": "Samantha v373 · NX-373m; Metacanon 1.26; GOW 2.14; DUG blob cac4525de77d4f47a8a59c25201968ecf2056b90; autorización del operador registrada en CUSTODIA-RETOMA-20261031.",
   "previous_owner_observed_on": "2026-10-30",
-  "local_conversation_uuidv7": "01a18f86-42c3-7f11-9855-172eb95c2eea",
+  "local_conversation_uuidv7": "01a19495-f227-7f5d-8985-4648e1a9ffcb",
   "local_conversation_uuidv7_type": "local_registry_identity_not_native_platform_id",
-  "authorization_event_uuidv7": "01a18f85-d775-7709-ac68-c295baedd694",
+  "authorization_event_uuidv7": "01a19495-fe84-7587-80c8-c9c690cdb009",
   "instance_collision_check": {
     "searched_scope": "Búsqueda exacta del alias operativo en archivos/código, commits e incidencias de SeryMente/khora; cero coincidencias en las consultas realizadas. La unicidad global fuera de este repositorio no está verificada.",
     "repositories_searched": [
@@ -95,5 +100,36 @@
   },
   "session_folio_status": "PENDIENTE/NO ASIGNADO",
   "folio_status_note": "FOL1 está PREPARADA_PENDIENTE_ACTIVACION_IPZ en el registro maestro de Metodología (blob b93cbef77f2fa1a6e4290ae8177e957a1616e47b); no se emiten folios CV/CY/A/B ni de sesión en esta transferencia.",
-  "transfer_scope": "Responsabilidad documental del frente transversal Custodia: mantener y actualizar su OCP y registrar la evolución/evidencia de CUSTODIA-01, CUSTODIA-03 y CUSTODIA-04 durante estos ciclos. No autoriza código de producto, credenciales, cambios de seguridad o proveedor, operaciones destructivas, datos de producción, despliegues ni cambios en el frente General."
+  "transfer_scope": "Responsabilidad documental y operativa del frente transversal Custodia: mantener el OCP y los objetos provisionales; conducir la migración Vercel Blob → Backblaze B2 mediante trabajo en rama, revisión y pruebas/entornos aislados no productivos. No autoriza merge/deploy/cutover de producción, aplicación SQL/backfill en Neon Production, cambio de selector de producción, modificación de credenciales, cambios efectivos de seguridad/configuración del bucket o eliminación de objetos fuente.",
+  "previous_owner_generation_4": {
+    "status": "assigned",
+    "owner_thread": null,
+    "owner_alias": "chatgpt-custodia-SES-20261029-K7M4Q9R2",
+    "instance": "chatgpt-custodia-SES-20261029-K7M4Q9R2",
+    "session_folio": "SES-20261029-K7M4Q9R2",
+    "generation": 4,
+    "record_kind": "owner_previous_to_generation_5"
+  },
+  "authorization_addenda": [
+    {
+      "event": "CUSTODIA-RETOMA-20261031-01a19495-fe84-7587-80c8-c9c690cdb009",
+      "local_event_uuidv7": "01a19495-fe84-7587-80c8-c9c690cdb009",
+      "acquired_at": "2026-10-31",
+      "authorization_source": "Instrucción del operador de retomar responsabilidad de Custodia con autorización previa, sin re-preguntar; alcance técnico adicional delimitado por la instrucción literal persistida en originales/INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md.",
+      "original": {
+        "path": "frentes/custodia/originales/INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md",
+        "blob_sha": "a77d3d609f76b771ed9b0322db588b162f8bcf9d"
+      },
+      "scope": "Crear objetos de persistencia provisional enraizados en la instrucción literal y resolver la migración Vercel Blob → Backblaze B2 en rama, revisión de código, correcciones, pruebas y entornos aislados/no productivos.",
+      "exclusions": [
+        "No aplicar migraciones SQL ni backfill en Neon Production",
+        "No cambiar KHORA_OBJECT_STORAGE ni realizar cutover/deploy de producción",
+        "No modificar claves/credenciales",
+        "No modificar configuración de seguridad/CORS del bucket real sin autorización específica",
+        "No borrar objetos originales de Vercel Blob"
+      ],
+      "native_thread_id": "NOT_EXPOSED",
+      "instance_alias": "chatgpt-custodia-INSTANCE-20261031-01A19495F227"
+    }
+  ]
 }
