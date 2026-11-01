@@ -9,7 +9,7 @@
     "front": "KHORA-MCP",
     "ocp": "docs/frentes/observabilidad-mcp/",
     "control": "docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json",
-    "control_generation": 7,
+    "control_generation": 8,
     "independent_control": false,
     "active_responsibility_scope": "module:jules",
     "module_alias": "chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314"
