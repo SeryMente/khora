@@ -13,7 +13,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
-import { describeMcpTool, type McpToolName } from "@/lib/server/mcp-tool-contract";
+import { describeMcpTool, type McpToolName, type McpToolScope } from "@/lib/server/mcp-tool-contract";
 import { registerMcpModules } from "@/lib/server/mcp-module-registry";
 import { normativeReceiptSchema } from "@/lib/server/normative-receipt-schema";
 import {
@@ -185,7 +185,7 @@ async function handleMcpRequest(req: NextRequest) {
     return makeUnauthorizedResponse(config);
   }
 
-  const requireScope = (scope: "volcados:read" | "runtime:read" | "norm:turn" | "jules:read" | "jules:write") =>
+  const requireScope = (scope: McpToolScope) =>
     scopes.includes(scope)
       ? null
       : scopeFailure(config, scope, correlation_id);
