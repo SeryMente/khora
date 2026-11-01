@@ -53,3 +53,20 @@ Verificar la ruta real del perfil Windows conectado y la inexistencia de un chec
 ## Criterio de cierre
 
 El workspace queda materializado en la ruta correcta del perfil Windows actual, su remoto y commit se cotejan con `main`, las dependencias y pruebas relevantes pasan, los archivos de credenciales locales siguen excluidos de Git y las evidencias/rutas se leen de vuelta desde el OCP. La mera persistencia del export o el inicio de `git clone` no cierra la tarea.
+
+
+## Nuevo handshake RDC · 2026-11-01
+
+Los mensajes literales del operador están en [RDC-HANDSHAKE-2026-11-01-150949.md](./originales/RDC-HANDSHAKE-2026-11-01-150949.md). El estado volátil anterior se considera perdido; no se reutilizan procesos, terminales, handles ni variables.
+
+**PC-14:** Online; identidad `PC-14\PC 13`, SID `S-1-5-21-1094932887-1468116028-2730151477-1002`, perfil `C:\Users\PC 13`.
+
+**Checkout previo:** `Desktop\Khora\khora-main` quedó en `feat/custodia-b2-cutover-20261031`, commit `e6c96cbc5c70128380aea0dfddc0835f45b9e0d6`, limpio. Se dejó intacto para evitar colisión con otro frente.
+
+**Checkout dedicado:** `C:\Users\PC 13\Desktop\Khora\khora-mcp-main`; remoto Khora; rama `main`; HEAD inicial y `origin/main` iguales a `5318f6e21bcd7eaf1d6e45754786d5d58f67d94d`; estado limpio. `bridge.mjs` pasa `node --check`; `jules.ps1` y `credential.ps1` pasan el parser PowerShell. `node_modules`, `.env.local` y `.khora-local` están ausentes.
+
+**Bloqueo:** `npm ci` y `npm ci --ignore-scripts` fueron bloqueados antes de ejecutarse. No se eludió el control. Tests, typecheck, UI Review, contrato y build del clon nuevo quedan pendientes. El build de la sesión anterior no tiene resultado final verificable.
+
+**Despliegues:** Production READY en commit `953e69484eabb4e8dc8221d1d8fc188373531bfa`; metadatos OAuth HTTP 200. Preview del puente READY pero sin variables de Preview para esa rama. No copiar secretos productivos.
+
+**Estado:** `en_curso`. Sin consentimiento OAuth, DPAPI ni llamadas Jules autenticadas.
