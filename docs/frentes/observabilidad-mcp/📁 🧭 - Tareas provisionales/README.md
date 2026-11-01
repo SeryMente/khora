@@ -47,3 +47,8 @@ El orden es operativo, no introduce prioridad universal, fecha límite ni respon
 5. No mover la ruta heredada `docs/frentes/observabilidad-mcp/`, ni crear otro OCP/control/frente para General, Jules o la retoma.
 6. El cierre requiere atender el enunciado, recuperar evidencia y leer de vuelta el resultado desde la fuente canónica pertinente.
 7. Una compilación, prueba sintética, Preview sin variables requeridas o metadato OAuth disponible no sustituye una lectura autenticada real ni la aceptación E2E.
+
+
+## Corte RDC · 2026-11-01
+
+Se asumió pérdida total del estado volátil de la sesión local anterior. Dispositivo `PC-14` Online, perfil `C:\Users\PC 13`, SID `S-1-5-21-1094932887-1468116028-2730151477-1002`. El checkout `khora-main` quedó intacto en rama de Custodia. El clon dedicado de Khora MCP está en `C:\Users\PC 13\Desktop\Khora\khora-mcp-main`, rama `main`; HEAD de creación `5318f6e21bcd7eaf1d6e45754786d5d58f67d94d`, limpio. El puente pasa comprobaciones estáticas Node/PowerShell. `npm ci` fue bloqueado por seguridad; las pruebas completas del clon permanecen pendientes. Production y Preview se resumen en el §24 del OCP.
