@@ -7,6 +7,10 @@
 **Evento de creación:** instrucción expresa del operador en esta conversación · 2026-10-31.  
 **Fuente normativa vigente:** [DUG Samantha v377 · NX-377m](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), Metacanon **1.28**, GOW **2.17**; blob HTML leído desde `main`: `54064c8fe00f872023a455f06596061ed69062ae`.
 
+## Checklist maestro de backlog
+
+El seguimiento granular del backlog y la bitácora de ciclos se mantienen en [BACKLOG-CHECKLIST.md](../BACKLOG-CHECKLIST.md); este documento no crea tareas, controles ni folios adicionales.
+
 ## Naturaleza y límites
 
 Este contenedor organiza tres objetos provisionales de tarea del frente Khora MCP. No son frentes independientes ni unidades de una taxonomía global de tareas. Cada tarea conserva un identificador local estable, un directorio y un README propio con enunciado, fuente de origen, estado, límites, siguiente actuación y criterio de cierre.
