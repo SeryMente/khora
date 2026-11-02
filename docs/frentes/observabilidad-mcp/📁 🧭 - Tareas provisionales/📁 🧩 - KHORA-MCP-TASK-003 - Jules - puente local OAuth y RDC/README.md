@@ -2,7 +2,7 @@
 
 **Naturaleza:** tarea de implementación del módulo funcional Jules dentro del frente Khora MCP; no es FT, OCP ni control independiente.  
 **Estado:** `en_curso`  
-**Responsabilidad:** hereda OCP y control `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`, generación 8. Corresponsable del módulo: `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; sin control, titularidad de FT ni folio propios.  
+**Responsabilidad:** hereda OCP y control `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`, generación 9. Corresponsable del módulo: `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; sin control, titularidad de FT ni folio propios.  
 **task_id:** `KHORA-MCP-TASK-003`  
 **scope_ref:** `docs/frentes/observabilidad-mcp/`  
 **module_ref:** [Módulo funcional Jules](../../modulos/jules/README.md)
@@ -51,3 +51,13 @@ Con TASK-001 y la base de TASK-002 verificadas, ejecutar el puente desde el work
 ## Criterio de cierre
 
 Consentimiento OAuth real verificado; refresh token cifrado y releído bajo el SID actual; cliente local operativo por `stdio`; las siete herramientas aparecen con los scopes adecuados; `jules_list_sources` y `jules_list_sessions` devuelven datos autenticados reales; errores de autorización se mantienen fail-closed; límites de T22 y de ChatGPT Free constan sin simular aceptación de escritura. La creación de sesiones o aprobación de planes queda fuera del smoke test y requiere instrucción expresa adicional.
+
+## Registro de ejecución — 2026-11-01 · RDC 015RENTA01
+
+**Entorno:** sesión RDC nueva `aacf2eb5-17f4-428e-9242-c24a1fe4a2ec`; Windows perfil `C:\Users\PC`; el estado volátil de la sesión anterior se considera perdido. Checkout dedicado `Desktop\Khora\khora-jules-main`, rama `feat/khora-mcp-module-jules-20261101`, HEAD previo `c5f56d070e0a5f4cb0956f5f2ee6094e18a05f73`.
+
+**UI Quality E2E:** ejecutados `shell-v2.spec.ts`, `ui-quality.spec.ts` y `dictado-observability-checkpoints.spec.ts` con Playwright/Chromium; resultado **15/20 PASS, 5 FAIL**, exit code 1. Pasaron accesibilidad básica desktop/mobile, navegación, aliases, contrato ING-DIRECT, ARIA, submenús/viewports y prerender de 9 pantallas. Fallaron: (1) checkpoint `REARME_INSTANCIA_ANTERIOR` de dictado; (2) expectativa antigua de error shell en `/grafo` frente a `no_autenticado`; (3–4) fixture de grafo sin entidad sintética en desktop/mobile; (5) splash persistente por encima del umbral del test de tema desktop. No se clasifican como resueltos; requieren alinear harness/contratos y repetir. No son evidencia de fallo ni de éxito de los handlers Jules.
+
+**Integridad:** checkout sin cambios de código de producto; `git diff --check` pasó en el corte previo a reconciliación; artefactos `test-results` ignorados por Git. Servidor local limitado a `127.0.0.1:3000` detenido al terminar. No se usaron datos productivos, credenciales, OAuth ni llamadas autenticadas a Jules.
+
+**Estado:** evidencia de UI general parcial. No equivale a aceptación del puente Jules, no acredita `tools/list`, OAuth, DPAPI, lecturas reales ni CI. TASK-003 permanece `en_curso`.

@@ -1,0 +1,79 @@
+{
+  "schema": "khora-spdf-document-manifest/1",
+  "front": "KHORA-MCP",
+  "ocp": "docs/frentes/observabilidad-mcp/",
+  "created_on": "2026-11-01",
+  "scope_note": "Registro de los dos exports conversacionales citados por el índice del frente. No declara un inventario exhaustivo de todos los documentos y artefactos históricos del OCP.",
+  "documents": [
+    {
+      "record_id": "doc-khora-mcp-export-20261101-1912",
+      "identifier_scope": "local_to_this_manifest_not_a_global_folio",
+      "original_name": "ChatGPT-Khora MCP-20261101-1912.md",
+      "classes": [
+        "PERS-05",
+        "PERS-12"
+      ],
+      "source": {
+        "device": "015RENTA01",
+        "local_path": "C:\\Users\\PC\\Downloads\\ChatGPT-Khora MCP-20261101-1912.md",
+        "export_timestamp_local": "2026-11-01T19:12:18-06:00",
+        "size_bytes": 191165,
+        "line_count": 3995,
+        "encoding": "UTF-8",
+        "sha256": "AF046FD336273BC6235050388764F4012C4EC30B1CD48FC233F1CECE46770519"
+      },
+      "destination": {
+        "repository": "SeryMente/khora",
+        "branch": "main",
+        "path": "docs/frentes/observabilidad-mcp/historial/ChatGPT-Khora MCP-20261101-1912.md",
+        "commit": "60de4a1f68ad9543ef010dc44f51d5fc6434d6f2",
+        "git_blob_sha": "1985f4a421af709b297af6bcac99fd871977cd16",
+        "url": "https://github.com/SeryMente/khora/blob/main/docs/frentes/observabilidad-mcp/historial/ChatGPT-Khora%20MCP-20261101-1912.md"
+      },
+      "verification": {
+        "state": "PERSISTIDO_Y_VERIFICADO",
+        "readback": "GitHub fetch_file sobre main; igualdad exacta del contenido textual re-leído con el texto reconstruido desde los bytes originales obtenidos por RDC; mismo tamaño (191165 bytes) y líneas (3995).",
+        "sha256_source": "PowerShell Get-FileHash -Algorithm SHA256 ejecutado sobre el original RDC.",
+        "readback_git_blob_sha": "1985f4a421af709b297af6bcac99fd871977cd16"
+      },
+      "security_screen": {
+        "state": "LIMITED_PATTERN_SCAN_NO_MATCHES",
+        "patterns_checked": [
+          "AWS access key",
+          "GitHub token",
+          "OpenAI-like key",
+          "Slack token",
+          "Bearer credential",
+          "inline secret assignment",
+          "private key header"
+        ],
+        "matches": 0,
+        "limitation": "Comprobación acotada de patrones comunes; no constituye auditoría exhaustiva ni garantiza ausencia de secretos."
+      }
+    },
+    {
+      "record_id": "doc-khora-mcp-export-20261031-1846",
+      "identifier_scope": "local_to_this_manifest_not_a_global_folio",
+      "original_name": "ChatGPT-Khora MCP-20261031-1846.md",
+      "classes": [
+        "PERS-05",
+        "PERS-12"
+      ],
+      "destination": {
+        "repository": "SeryMente/khora",
+        "branch": "main",
+        "path": "docs/frentes/observabilidad-mcp/historial/ChatGPT-Khora MCP-20261031-1846.md",
+        "git_blob_sha": "d0ae42a0ed816d120239cae6dd29eadb0a2ddc24"
+      },
+      "source": {
+        "size_bytes": 134984,
+        "sha256": "B087AA56DDF20A0E737DCE9614BD6E406F872B540D9C2964440A93F7A5B94464"
+      },
+      "verification": {
+        "state": "PERSISTIDO_Y_VERIFICADO_PREVIAMENTE",
+        "basis": "Metadatos y lectura de vuelta registrados en el índice de tareas del OCP.",
+        "limitation": "No se repitió una comparación del original local anterior en este ciclo."
+      }
+    }
+  ]
+}

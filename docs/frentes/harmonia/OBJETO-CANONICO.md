@@ -4,11 +4,11 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: harmonia. Versión del objeto **0.41**; sello **HARMONIA-v0.41**; corte de estado **2026-11-01**. §§37–45 conservan antecedentes históricos, incluida la transferencia gen12 y el cierre NCL-OCP. §46 conserva la fotografía técnica de la candidata local-first v0.40 en rama separada y la titularidad gen13, ambas supersedidas en responsabilidad por §47. §47 registra la transferencia gen13→gen14 a PC-8 y la captura documental del original ChatGPT-HARMONIA-20261101-1709.md. La capa local-first permanece en rama de revisión; transporte EP y aceptación Chrome siguen pendientes. La regla permanente §36.1-36.2 conserva la aceptación natural exclusivamente en manos del operador.
+- Identificador del frente: harmonia. Versión del objeto **0.43**; sello **HARMONIA-v0.43**; corte de estado **2026-11-01**. §§37–45 conservan antecedentes históricos, incluida la transferencia gen12 y el cierre NCL-OCP. §46 conserva la fotografía técnica de la candidata local-first v0.40 en rama separada y la titularidad gen13, ambas supersedidas en responsabilidad por §47. §47 registra la transferencia gen13→gen14 a PC-8 y la captura documental del original ChatGPT-HARMONIA-20261101-1709.md. §48 registra la renovación del dispositivo RDC tras pérdida total del entorno local y la validación local 10/10 de la candidata local-first en rama de revisión; no supone aceptación Chrome, integración del código en main ni transporte EP. La regla permanente §36.1-36.2 conserva la aceptación natural exclusivamente en manos del operador.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
-- Control exclusivo vigente: CONTROL-RESPONSABILIDAD.json, generación **12**, session_folio=null porque FOL1 permanece preparada y no activa, alias operativo chatgpt-harmonia-01a19387-bd75-7479-acc8-bf1a92d4b04b; owner_thread=null porque la plataforma no expuso ID nativo. Transferencia gen11 → gen12 registrada mediante CAS sobre blob 80a0f7d4b4662c95e79d17c3c49d5f3db189ab1f, commit 266fd842dd4af1e12cc8c4acdf326d808a8e3c07, lectura de vuelta del control blob 5b66f0a465694236a772aaf85c70d197c022d56e. Titular anterior gen11 preservado en previous_owner. Dispositivo autorizado para esta continuidad: PC10RCIF4EI4, UUID d0bbb2a3-d7b4-45e1-8870-652c2c3844fc. No se reasigna folio mientras FOL1 no esté activa; el alias es operativo y no es ID nativo.
+- Control exclusivo vigente: CONTROL-RESPONSABILIDAD.json, generación **14**, titular alias operativo chatgpt-harmonia-01a19969-8e70-7dcb-b9fd-7db62736f279, owner_thread=null, session_folio=null porque FOL1 continúa no activa. Dispositivo RDC autorizado actual: **015RENTA01**, UUID aacf2eb5-17f4-428e-9242-c24a1fe4a2ec, usuario 015RENTA01\015RENTA01, perfil C:\Users\PC, SID S-1-5-21-4061665785-3686036472-903815331-1003; renovación de dispositivo registrada mediante evento UUIDv7 local 01a199c8-8bc1-79fb-a4a8-e3088850c9bc, commit c994caeab849c89b97b094ce3718e485b12c2971, blob/read-back 90e24321237000fea6b594c62fc3564445c82bc6. PC-8 permanece solo en el historial, supersedido tras la pérdida de entorno declarada; el titular y la generación no cambiaron.
 
 - Destino de paquete comprobado y usado mediante ruta física explícita: `C:\Users\fila4\Desktop\Harmonia-Observabilidad-v0.1.0`. Datos locales: `C:\Users\fila4\AppData\Local\Harmonia\data`. No usar rutas derivadas del perfil del proceso RDC para resolver estos destinos.
 
@@ -27,7 +27,7 @@ El estado técnico actual y los límites de verificación están descritos en §
 
 ## 3. Referencia metodológica
 
-- Fuente normativa vigente: [Documento Único de Gobernanza (DUG) en `main`](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), **v373 / NX-373m**, blob `cac4525de77d4f47a8a59c25201968ecf2056b90`. Integra Sam, **Metacanon 1.26** y **GOW 2.14**; la representación de máquina deriva de la sección humana.
+- Fuente normativa vigente: [Documento Único de Gobernanza (DUG) en `main`](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), **v377 / NX-377m**, blob `54064c8fe00f872023a455f06596061ed69062ae`. Integra Sam, **Metacanon 1.28** y **GOW 2.17**; la representación de máquina deriva de la sección humana.
 - [INICIO.md](https://github.com/SeryMente/metodologia/blob/main/INICIO.md), blob `9b169fe76a229279134119d2fa7299e12ddf349c`, confirma el DUG único en `main`. No se usan como vigentes los markdown separados de Sam/Metacanon/GOW.
 - DUG e INICIO releídos directamente desde `main` el 2026-10-30. `INICIO.md` vincula la verificación del DUG v373 con el commit `c79ddf6f862f97cafa61955eb15a17ffaea463d0`; la antigüedad exacta no está expuesta y permanece **NO VERIFICADA**. §ARR fue leído; se revisaron P001, P004, P005, P038 y P043 (CNP), además de P035, P037 y el estado FOL1. `MCP-NORMATIVO: DESACTIVADO`. No se modificó el repositorio normativo de Metodología.
 - Toda salida de ciclo muestra **«Metacanon adquirido: versión, sello, revisión y frescura»**, separado de la versión del objeto. Aplicar refresco §37: versión/huella, delta y fecha de modificación; sin timestamp fiable, antigüedad exacta `NO VERIFICADA`. Un número más nuevo no concede permisos.
@@ -1784,3 +1784,86 @@ La transferencia de responsabilidad y el dispositivo PC-14 descritos en §46.1 s
 - La ingesta documental y la transferencia de responsabilidad no certifican el funcionamiento integral de Harmonia.
 - No se fusionó la rama candidata, no se creó ni cerró una PR, no se desplegó, no se modificó Chrome, no se ejecutó escritura productiva Cora/Neon ni se realizaron cambios de infraestructura EP/B2.
 - Las versiones y dispositivos de secciones previas son fotografías históricas; la autoridad vigente de responsabilidad corresponde al control gen14 releído en main.
+
+
+## 48. Renovación RDC tras pérdida total del entorno local y validación local de la candidata · 2026-11-01
+
+### 48.1. Declaración del operador y nueva autorización
+
+- El operador declaró que el entorno local anterior y la sesión RDC se perdieron por completo y ordenó asumir que no sobrevivió ningún dato local. En esta continuidad no se reutilizan ni presumen clones, rutas, procesos, credenciales, variables, perfiles de Chrome o sesiones anteriores.
+- La conexión nueva es 015RENTA01, UUID RDC aacf2eb5-17f4-428e-9242-c24a1fe4a2ec, Desktop Commander 0.3.1. El inventario RDC mostró el dispositivo online y PC-8 offline.
+- Identidad Windows observada mediante PowerShell y cotejada con RDC: máquina 015RENTA01; usuario 015RENTA01\015RENTA01; SID S-1-5-21-4061665785-3686036472-903815331-1003; perfil C:\Users\PC; LOCALAPPDATA=C:\Users\PC\AppData\Local.
+- Plataforma observada: Windows x64; PowerShell 5.1.26100.7920; Node v24.22.2; Chrome presente en C:\Program Files\Google\Chrome\Application\chrome.exe. Git no se encontró en PATH ni en ubicaciones comunes; VS Code no se encontró en ubicaciones comunes. npm.ps1 está bloqueado por la política de ejecución, mientras que npm.cmd funciona. No se modificó ExecutionPolicy.
+- El control autoritativo se actualizó en main por renovación del dispositivo, sin cambiar titular ni generación: gen14 se conserva, el alias operativo permanece igual y session_folio=null. El nuevo dispositivo exacto queda autorizado para HARMONIA; PC-8 queda preservado como histórico supersedido. Commit c994caeab849c89b97b094ce3718e485b12c2971; blob/read-back 90e24321237000fea6b594c62fc3564445c82bc6; evento UUIDv7 local 01a199c8-8bc1-79fb-a4a8-e3088850c9bc. FOL1 continúa no activa; no se asignó folio global.
+
+### 48.2. Workspace nuevo y alcance de la transferencia
+
+- Workspace recién creado: C:\Users\PC\Desktop\Khora\khora-main. Es un espacio parcial de validación, no un clon completo ni una reconstrucción de la sesión anterior.
+- Se materializaron solo nueve fuentes/fixtures del candidato feat/harmonia-local-first-mainline-20261101: adaptador EP local, servidor/colector, dos suites del colector/ledger, outbox IndexedDB, su suite, catálogo, service worker y popup.
+- Los nueve archivos se compararon contra sus Git blob SHA-1; los nueve coincidieron exactamente. Todos se almacenaron como UTF-8 sin BOM y LF. No se copiaron credenciales ni secretos. No se modificó ningún perfil de Chrome.
+- El shim fake-indexeddb@6.2.7 se instaló con npm.cmd install --no-save --ignore-scripts; exit code 0. No se ejecutaron scripts de instalación ni se requirieron privilegios administrativos.
+
+### 48.3. Validación local ejecutada
+
+- Sintaxis: node --check en ocho archivos JavaScript de runtime/tests, 8/8 PASS.
+- Suite dedicada local-first:
+  node --test apps/harmonia-observability/extension/tests/durable-outbox.test.js apps/harmonia-observability/collector/tests/ep-consumer-adapter.test.js apps/harmonia-observability/collector/tests/server-local-first.integration.test.js
+- Resultado observado: 10 tests, 10 PASS, 0 FAIL, 0 cancelled, 0 skipped, 0 todo; duración 2982.7589 ms; exit code 0.
+- Casos: reconciliación de original preexistente; exclusión de históricos previos a activación; replay idempotente; identidad de operación tras reinicio; conflicto por hash distinto; flush bloqueado sin contrato/allowlist; recuperación local sin afirmar EP; JSONL/ledger durable; reconstrucción de índice sin backfill; outbox IndexedDB con reintentos y ACK explícito.
+- El resultado es una ejecución local real en Windows/Node v24.22.2 y tiene alcance exclusivo sobre las suites listadas. No equivale al workflow GitHub Actions Node 22, CI general, pruebas de UI, ni aceptación natural de la extensión en Chrome.
+
+### 48.4. Reconciliación con la candidata y límites pendientes
+
+- La candidata sigue en PR #351, abierta en borrador y sin merge. El control actualizado fue leído de vuelta también en la rama candidata; por ello su árbol incluye el nuevo dispositivo, aunque la ascendencia conserva un commit de divergencia respecto a main.
+- Los workflows GitHub Actions anteriores y posteriores siguen marcando failure; los jobs consultados no exponen steps y los logs devuelven BlobNotFound. La causa raíz de la ausencia de ejecución del runner/logs permanece NO DETERMINADA. El PASS local no reescribe ni sustituye esos resultados.
+- No hay clone completo ni Git/VS Code instalados en este entorno nuevo; no se afirma restauración del entorno de desarrollo completo.
+- No se cargó ni recargó la extensión en Chrome. La aceptación natural, multi-pestaña/sesión, reinicio MV3, recuperación bajo cuota y métricas CPU/RAM/latencia permanecen PENDIENTES y bajo compuerta del operador.
+- El transporte EP sigue deshabilitado. OEP v0.3.27 / VCU-EP-v28 §91 establece OCP-MCP como destino B2 exclusivo; no se verificaron contrato/SDK, identidad/scopes, allowlist, bucket/key/prefix/permisos, recibo ni read-back remoto. No hay EP_PERSISTED_VERIFIED, backfill, escritura B2 o Neon.
+- No hubo merge, despliegue, cambios de infraestructura ni operación sobre datos de usuario.
+
+### 48.6. Evidencia y fuentes de lectura de vuelta
+
+- Evidencia estructurada de este ciclo: docs/frentes/harmonia/evidencias/EV-HARMONIA-RDC-RESET-TEST-20261101.json; lectura de vuelta exacta y blob registrado en el manifiesto documental.
+- Crónica del ciclo: docs/frentes/harmonia/cronica/HARMONIA-RDC-RESET-G14-20261101.md; lectura de vuelta exacta y blob registrado en el manifiesto documental.
+- Control vigente: docs/frentes/harmonia/CONTROL-RESPONSABILIDAD.json, generación 14, blob actual 90e24321237000fea6b594c62fc3564445c82bc6.
+
+
+### 48.5. Dictamen
+
+- HECHO Y VERIFICADO: renovación RDC gen14 con UUID exacto; entorno parcial nuevo; nueve Git blobs cotejados; sintaxis 8/8 y suite local-first 10/10 PASS.
+- PENDIENTE: runner/logs de GitHub Actions, CI general, aceptación natural Chrome, contrato/autorización/allowlist EP, recibo remoto y read-back en OCP-MCP.
+- NO EJECUTADO: merge de PR #351, deploy, escrituras B2/Neon, backfill, carga de extensión o modificación de perfiles Chrome.
+
+## 49. Candidata local-first final reconstruida sobre main y cierre de ramas divergentes · 2026-11-02
+
+### 49.1. Reconciliación de ramas
+
+- La primera candidata PR #351 y su sucesora PR #352 se cerraron sin merge; quedan preservadas como historia de iteración. Ninguna fue fusionada.
+- La comparación de la rama anterior feat/harmonia-local-first-mainline-20261101 llegó a 13 commits ahead / 11 behind por avance concurrente de documentación de otros frentes en main. No se intentó resolver esa divergencia con force-push ni fusionar una rama obsoleta.
+- Se creó la rama limpia feat/harmonia-local-first-mainline-final-20261101 desde main 874aece7bfa4491e69bfb47281296c8705c4a198, incorporando solo los 12 archivos de código/configuración/tests/workflow de HARMONIA.
+- Commit de implementación: a714d061c8c274a199267075b3b934aaa9725dac. Commit separado de build metadata: e72c38847a8f58446707cd44f4384eefb9f6cc1f. build-info.json v0.3.0 fija sourceRevision al commit de implementación.
+- PR #353, título “feat(harmonia): local-first outbox and EP ledger (final clean mainline)”: https://github.com/SeryMente/khora/pull/353. Estado: abierta en borrador, sin merge.
+- Compare al crear/verificar la PR: 2 commits ahead / 0 behind; merge-base igual al main de base. El diff de la rama limpia se limita a 12 archivos HARMONIA; control, OCP, README, manifiesto, crónica y evidencia se heredan del main actual.
+
+### 49.2. Integridad y pruebas locales
+
+- Los 12 Git blob SHA de la rama final fueron leídos de vuelta y cotejados contra los blobs esperados; coincidencia 12/12.
+- La validación local registrada en §48 continúa aplicando al mismo contenido de código: node --check 8/8 PASS; suite local-first 10/10 PASS, 0 fallos; Windows x64 / Node v24.22.2; fake-indexeddb 6.2.7 instalado sin elevación ni scripts.
+- La validación local no implica aceptación del runtime Chrome, CI general, GitHub Actions, Node 22 ni transporte EP.
+
+### 49.3. CI y bloqueos externos
+
+- En el HEAD final e72c38847a8f58446707cd44f4384eefb9f6cc1f, el push disparó run 41372264801 (HARMONIA local-first) y run 41372264680 (CI general); ambos finalizaron en failure.
+- El job local-first y los tres jobs del CI general consultados exponen steps=[]; las descargas de logs responden BlobNotFound. Causa raíz del runner/logs: NO DETERMINADA. El PASS local no sustituye ni modifica este resultado.
+- No se cargó ni recargó Chrome; aceptación natural multi-pestaña/sesión, reinicio MV3, retención y métricas de rendimiento pendientes.
+- No existe contrato/SDK EP verificado, auth/scopes, allowlist, recibo ni read-back remoto. OEP §91 mantiene OCP-MCP como único destino B2 previsto; bucket/key/prefix/permisos no autenticados ni verificados. No EP_PERSISTED_VERIFIED.
+- Sin B2, Neon, backfill, merge ni deploy. Los previews Vercel siguen sujetos a la restricción de repositorio privado/plan Hobby ya observada.
+
+### 49.4. Evidencia y dictamen
+
+- Control de responsabilidad y nueva autorización RDC: docs/frentes/harmonia/CONTROL-RESPONSABILIDAD.json, gen14, dispositivo 015RENTA01 UUID aacf2eb5-17f4-428e-9242-c24a1fe4a2ec; blob 90e24321237000fea6b594c62fc3564445c82bc6.
+- Evidencia de reinstanciación y validación local: docs/frentes/harmonia/evidencias/EV-HARMONIA-RDC-RESET-TEST-20261101.json; su blob actual y lectura de vuelta constan en MANIFIESTO-DOCUMENTAL.json.
+- Crónica final de rama limpia: docs/frentes/harmonia/cronica/HARMONIA-RDC-RESET-G14-20261101.md; incluye la reconstrucción PR #353.
+- Dictamen: candidata local-first reconstruida sin divergencia respecto al main de base; pruebas locales PASS y hashes exactos; PR #353 continúa draft. CI, Chrome, EP remoto, merge y despliegue no aceptados.
+
+- OCP canónico: v0.43 / HARMONIA-v0.43. El incremento documental registra la sustitución de candidatas; no declara integrada la implementación.
