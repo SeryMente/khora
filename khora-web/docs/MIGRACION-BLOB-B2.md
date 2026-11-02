@@ -281,3 +281,59 @@ El commit documental `8107fe6fdb0961c4b090a57324acbc692521c0cb` activó nuevas e
 Los tres workflows volvieron a terminar con conclusión `failure`. La API de GitHub devolvió jobs completados con `logs_url=null` y `steps=null`; los intentos de descargar los logs anteriores del mismo patrón también respondieron `BlobNotFound` HTTP 404. No hay evidencia accesible para decidir si fallaron al preparar runner, checkout, instalar dependencias o ejecutar una prueba. La suite local focalizada y el build local están verdes, pero no sustituyen el CI remoto. No volver a reintentar a ciegas hasta disponer de diagnóstico de Actions.
 
 El dispositivo PC-8 continuó registrado como Online pero con último contacto de varios minutos y comandos RDC expirados. Por eso la actualización posterior del test privado y este apéndice se hicieron por GitHub Contents API (CLI/headless, sin navegador); el checkout local de PC-8 no se declaró sincronizado con los commits que se hicieron mientras estaba inaccesible.
+
+### Reconstrucción en RDC nuevo y revalidación local — 2026-11-02
+
+#### Entorno y continuidad de Git
+
+El entorno local anterior fue declarado perdido por el usuario. Se trató `015RENTA01` (`aacf2eb5-17f4-428e-9242-c24a1fe4a2ec`) como máquina nueva: no se asumieron clones, sesiones, bóveda, tokens, credenciales ni configuración local supervivientes.
+
+- Windows 11 Pro x64; PowerShell 5.1; Node `v24.22.2`; npm `11.19.1`.
+- MinGit `2.56.0.windows.4` instalado sin elevación en `%LOCALAPPDATA%\KhoraTools\MinGit-2.56.0.4`; SHA-256 del ZIP verificado: `e3bf78351fe777fba47ddee5950082f8a98bb0f02604fdc7ba3ee2cb68ffa877`.
+- Git Credential Manager `2.9.1` consiguió acceso no interactivo al repositorio privado. `git ls-remote` confirmó la rama remota en `c5bdf79250ba2058dff7e4b20f7175a3f845a962`.
+- Checkout aislado reconstruido en `C:\Users\PC\AppData\Local\KhoraWork\khora-main-custodia-b2`, rama `feat/custodia-b2-cutover-20261031`, remoto `https://github.com/SeryMente/khora.git`, HEAD exacto `c5bdf79250ba2058dff7e4b20f7175a3f845a962`, árbol limpio.
+- No se reutilizó ni se sobrescribió `C:\Users\PC\Desktop\Khora\khora-main`: durante la reconstrucción había un proceso independiente preparando allí otro entorno, sin `.git` en la inspección inicial.
+
+#### Instalación y validación
+
+- `npm.cmd ci --no-audit --no-fund` — PASS; 602 paquetes instalados.
+- npm 11 dejó sin aprobar cinco scripts de instalación: `@google/genai`, `esbuild`, `ffmpeg-static`, `protobufjs`, `unrs-resolver`. No se aprobaron scripts por automatismo.
+- `npm.cmd run typecheck` — PASS.
+- `npm.cmd run ui:contract` — PASS.
+- `npm.cmd run ui-review:check` — PASS.
+- `node --import tsx --test tests/unit/object-storage.test.ts` — PASS, 22/22.
+- `node --import tsx --test tests/traceability_session.test.ts` — PASS, 6/6.
+- `npm.cmd run test:unit` — PASS, 594/594; cero fallos, cero omitidos.
+- `npx.cmd next build --webpack` — PASS; compilación optimizada, TypeScript y 78 páginas estáticas generadas. Permanecen advertencias no bloqueantes de Edge Runtime y deprecación de la convención middleware.
+- `node scripts/build-extension.mjs` — PASS; artefacto ignorado `public/downloads/harmonia-v0.3.5.zip`, 221728 bytes, SHA-256 `a8b59689f4bb286f81825c577d90c7c572b9ee63ab3e313d4e971e88748ff011`.
+- `git status --short --branch` — rama sin cambios rastreados; artefactos de build/ZIP excluidos por `.gitignore`.
+
+#### Backblaze B2 y bóveda local
+
+El CLI Backblaze presente en esta máquina es `b2` versión `5.0.2` (`b2sdk 2.13.2`); su SHA-256 coincide con el binario esperado: `543aa2e36d3cbe06cf2c3e59287ce58b0a7d1507af87f147ff2f7d9406879662`. No se consideró la existencia del ejecutable como prueba de autenticación.
+
+El archivo `C:\Users\PC\.b2_account_info` existe (24576 bytes). Se inspeccionó exclusivamente el esquema y conteos SQLite en modo solo lectura: `account=0`, `bucket=0`, `bucket_upload_url=0`; `update_done=6`. No se consultaron columnas ni se leyeron valores de secretos. Por tanto, el CLI B2 no tiene una cuenta autorizada ni buckets registrados en esta configuración.
+
+La bóveda canónica local existe con nueve entradas, pero ninguna variable nombrada `B2`, `BACKBLAZE`, `BLOB`, `KHORA_OBJECT_STORAGE` o `X_KHORA_KEY` está presente. No existe archivo de acceso temporal DPAPI. No se importó ni descifró la bóveda.
+
+El username/correo `the.willfreeman@gmail.com` se registra como dato proporcionado por el usuario para la cuenta Backblaze prevista; no se autenticó esa identidad. La Application Key B2 (Key ID y Application Key) y el bucket de prueba siguen sin estar disponibles.
+
+#### Comprobaciones fail-closed
+
+- `KHORA_B2_PREFLIGHT=1 node --import tsx scripts/preflight-object-storage.ts` — bloqueado intencionalmente con `storage_preflight_credentials_missing`; salida sin cliente/objeto de prueba y sin borrar originales.
+- `npm.cmd run migrate:blob-to-b2 -- --target-branch=custodia-b2-migration-test-20261031` — bloqueado con `DATABASE_URL_UNPOOLED_required` antes de abrir pool o enumerar Blob.
+- `node --import tsx scripts/preflight-experience.ts` — `EXPERIENCE_STORAGE_PREFLIGHT=not_requested`, exit 0.
+
+Estos resultados son pruebas negativas de guardas, no una migración de proveedor. No hubo llamadas de lectura/escritura a B2 o Blob, ni SQL/backfill en Neon.
+
+#### Estado de recursos conectados
+
+En Vercel `khora-web`, una lectura de metadatos sin descifrar valores confirma que `KHORA_OBJECT_STORAGE`, `KHORA_B2_BUCKET_NAME`, `KHORA_B2_BUCKET_ID`, `KHORA_B2_APPLICATION_KEY` y `KHORA_B2_KEY_ID` tienen target exclusivamente `production`. `BLOB_READ_WRITE_TOKEN` sigue compartido entre `production`, `preview` y `development`; no está demostrado que sea un origen aislado y no se usó para pruebas. No se descifraron, descargaron ni copiaron valores de Vercel.
+
+El origen Blob sintético no se ha podido provisionar debido al error de cuota previamente registrado `usage_threshold_limits_reached`. La base Neon no productiva `custodia_b2_e2e` permanece como entorno preparado pero vacío; no se consultó ni modificó producción.
+
+#### CI y publicación
+
+En el commit comprobado `c5bdf79250ba2058dff7e4b20f7175a3f845a962`, los workflows GitHub `CI`, `UI Quality` y `khora-ok / gate` terminan en `failure`; las ejecuciones previas tampoco expusieron logs utilizables (`logs_url=null`, `steps=null`/`BlobNotFound`). El resultado local de 594 pruebas y build Next PASS no se presenta como CI remoto aprobado. Los checks de Vercel siguen fallando por la política del plan Hobby frente al repositorio privado; Netlify preview también figura fallido.
+
+La PR #348 continúa abierta, en borrador y sin merge. No se hizo deploy, no se modificó el selector de producción, no se modificaron variables Vercel, no se aplicó SQL/backfill, no se cambió CORS ni se copiaron, reapuntaron o eliminaron objetos reales.
