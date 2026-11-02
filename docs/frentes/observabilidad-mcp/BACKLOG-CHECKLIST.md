@@ -77,6 +77,27 @@ Los estados se aplican a cada punto, no al conjunto de una tarea. No se cierran 
 - [ ] Resolver Preview mediante configuración segura no productiva; no copiar secretos de Production.
 - [ ] Mantener Dictado como consumidor de diagnóstico: sin cambios de UX, audio, transcripciones ni datos.
 
+### Evidencia estática y comprobación pública — Ciclo 2
+
+- [x] Revisar la matriz de scopes declarada por `MCP_TOOL_SCOPES`: herramientas de audio/volcados, runtime, normativas y Jules usan scopes diferenciados.
+- [x] Inspeccionar el handler `/api/mcp`: config obligatoria, guard de `KHORA_READONLY_DATABASE_URL` en Production, validación Bearer/JWT o token manual, issuer/audience, generación de revocación y rechazo por scope insuficiente.
+- [x] Confirmar que `tools/list` filtra capacidades por scopes del token; los handlers Jules usan `jules:read` / `jules:write` sin `norm:turn`, mientras el host aplica su gate normativo al resto de herramientas sustantivas.
+- [x] Revisar estáticamente las consultas de observabilidad: parámetros SQL, filtros opcionales por sesión/componente/severidad/resultado/fase/scope/categoría, límite de 1–200, ventana de 1–86400 segundos y cursor incremental con `id > cursor`.
+- [x] Consultar Production sin credenciales: OAuth Authorization Server metadata HTTP 200; Protected Resource metadata HTTP 200; `GET /api/mcp` sin Bearer HTTP 401 y `WWW-Authenticate` apuntando al recurso protegido canónico.
+- [x] Revisar el contrato de privacidad del `ObservationEnvelope`: rechaza patrones de audio/transcripción y claves prohibidas en métricas, y limita cadenas de métricas a 200 caracteres.
+- [x] Verificar que la ingesta estructurada limpia patrones conocidos de credenciales en mensaje/detalle y que una prueba unitaria comprueba la exclusión de campos de transcripción en telemetría de Dictado. La suite no se ejecutó en este ciclo.
+- [x] Comprobar que la auditoría MCP registra metadatos y no args, tokens, texto, SQL, stack ni excepciones crudas; esto no constituye un sanitizador del payload exitoso devuelto al cliente.
+
+### Hallazgo de privacidad pendiente — no aceptado como seguro todavía
+
+- [!] Reconciliar la exposición de `detalle` y `metrics` por `mcp-observability.ts`: las consultas devuelven esos campos directamente y no filtran por `privacy_class`.
+- [!] Revisar la ruta heredada `RegistrarEventoParams`: el campo `metrics` se serializa a la columna sin pasar por `cleanSecretos` ni por `validateObservationPrivacy`; la redacción por patrones cubre mensaje/detalle, no equivale a validar todo contenido posible.
+- [!] Verificar si `runtime:read` autoriza deliberadamente una vista global. El filtro `session_id` es opcional y, por sí solo, no prueba aislamiento por sujeto/sesión.
+- [ ] Definir el filtro de privacidad/minimización esperado y agregar pruebas que cubran ambas rutas de ingesta, todos los campos retornados por MCP y el aislamiento entre sesiones/sujetos.
+- [ ] Ejecutar las pruebas y confirmar el comportamiento con una identidad real de solo lectura, sin consultar ni exportar contenido sensible.
+
+**Límite de evidencia:** los GET públicos solo verifican metadatos y el rechazo sin credencial. No se ejecutó OAuth real, `tools/list` autenticado, invocación de herramientas, query a Neon ni verificación del rol efectivo de la base de datos.
+
 **Cierre:** catálogo/contratos leídos de vuelta, permisos positivos y negativos probados con identidad real y al menos una consulta de observabilidad autenticada satisfactoria.
 
 ## 3. Custodia — contrato de lectura MCP
@@ -150,6 +171,16 @@ Los estados se aplican a cada punto, no al conjunto de una tarea. No se cierran 
 **No ejecutado:** instalación de dependencias, suite completa, typecheck, UI Review, contrato y build del checkout nuevo. La política de seguridad que bloqueó npm ci en el corte anterior sigue siendo una compuerta; no fue eludida.
 
 **Resultado del ciclo:** continuidad documental y checkout principal restablecidos; TASK-001 permanece `en_curso` hasta pruebas completas. El siguiente paso es resolver la instalación de dependencias por una vía permitida o documentar su bloqueo definitivo, y en paralelo auditar los contratos/estado efectivo de General sin usar credenciales ni efectuar escrituras.
+
+### Ciclo de trabajo 2 — auditoría estática y metadata pública · 2026-11-01
+
+**Ejecutado y verificado:** lectura estática de los contratos de scopes, autenticación, revocación, `tools/list`, consultas de runtime y flujo de privacidad de eventos; tres GET públicos de Production con resultados 200/200/401; evidencia de redacción de patrones conocidos y prueba existente para telemetría de Dictado.
+
+**Hallazgo:** la consulta MCP devuelve `detalle` y `metrics` sin filtro visible por `privacy_class`; el camino heredado de ingesta puede guardar `metrics` sin la validación de privacidad del envelope estructurado. El filtro por `session_id` es opcional. Se registra como riesgo por revisar, no como vulnerabilidad explotable demostrada. No se cambió código ni se consultó la base de datos.
+
+**No ejecutado:** OAuth autenticado, descubrimiento real de herramientas, consultas a Neon, pruebas automatizadas, rol efectivo DB, aislamiento real por sujeto y lectura real de observabilidad.
+
+**Resultado del ciclo:** baseline General parcialmente inspeccionado; su aceptación sigue pendiente y se añade una compuerta explícita de privacidad/sesión antes de declarar seguro el acceso a runtime. No se modificó Production, secretos, base de datos ni ramas.
 
 ## Límites permanentes
 
