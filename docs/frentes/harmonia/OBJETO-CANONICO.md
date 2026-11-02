@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: harmonia. Versión del objeto **0.41**; sello **HARMONIA-v0.41**; corte de estado **2026-11-01**. §§37–45 conservan antecedentes históricos, incluida la transferencia gen12 y el cierre NCL-OCP. §46 conserva la fotografía técnica de la candidata local-first v0.40 en rama separada y la titularidad gen13, ambas supersedidas en responsabilidad por §47. §47 registra la transferencia gen13→gen14 a PC-8 y la captura documental del original ChatGPT-HARMONIA-20261101-1709.md. La capa local-first permanece en rama de revisión; transporte EP y aceptación Chrome siguen pendientes. La regla permanente §36.1-36.2 conserva la aceptación natural exclusivamente en manos del operador.
+- Identificador del frente: harmonia. Versión del objeto **0.42**; sello **HARMONIA-v0.42**; corte de estado **2026-11-01**. §§37–45 conservan antecedentes históricos, incluida la transferencia gen12 y el cierre NCL-OCP. §46 conserva la fotografía técnica de la candidata local-first v0.40 en rama separada y la titularidad gen13, ambas supersedidas en responsabilidad por §47. §47 registra la transferencia gen13→gen14 a PC-8 y la captura documental del original ChatGPT-HARMONIA-20261101-1709.md. La capa local-first permanece en rama de revisión; transporte EP y aceptación Chrome siguen pendientes. La regla permanente §36.1-36.2 conserva la aceptación natural exclusivamente en manos del operador.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -1784,3 +1784,56 @@ La transferencia de responsabilidad y el dispositivo PC-14 descritos en §46.1 s
 - La ingesta documental y la transferencia de responsabilidad no certifican el funcionamiento integral de Harmonia.
 - No se fusionó la rama candidata, no se creó ni cerró una PR, no se desplegó, no se modificó Chrome, no se ejecutó escritura productiva Cora/Neon ni se realizaron cambios de infraestructura EP/B2.
 - Las versiones y dispositivos de secciones previas son fotografías históricas; la autoridad vigente de responsabilidad corresponde al control gen14 releído en main.
+
+
+## 48. Candidata local-first integrada sobre main, frontera EP rectificada y validación bloqueada · 2026-11-01
+
+### 48.1. Rama limpia, revisión y procedencia
+
+- Se preservó main en el commit base 8850b47fdfc2b24a670f653b1e3cf883f2bde055. No se integraron los 29 commits históricos de la rama divergida feat/harmonia-ep-local-first-adapter-20261101 (29 ahead / 15 behind respecto de aquel main).
+- Se creó la rama aislada feat/harmonia-local-first-mainline-20261101 desde ese main, sin tocar el clon local de PC-8, que estaba configurado en la rama independiente de Custodia.
+- Commit de código: db2b1e05a131ec37688124276f7c7dd6b381564d. Commit de metadatos: e263163f78b6509267ed21408f4d891355a30784. Head actual de la candidata: e263163f78b6509267ed21408f4d891355a30784.
+- Comparación al abrir revisión: main...feat/harmonia-local-first-mainline-20261101 = 2 commits ahead / 0 behind, sin divergencia.
+- PR #351, título “feat(harmonia): durable local-first outbox and EP ledger”, permanece abierta en borrador. No equivale a aprobación ni aceptación.
+- La nueva candidata se construyó a partir de los fuentes de local-first seleccionados; no importa la antigua documentación OCP v0.40 ni sustituye el OCP canónico. Los cambios incluyen outbox IndexedDB, ledger local EP, colector durable, señalización del popup, metadatos de build y workflow de pruebas.
+
+### 48.2. Capa local-first incorporada a la candidata
+
+- extension/durable-outbox.js: cola durable IndexedDB, identidad idempotente por eventId, reintentos y retirada únicamente tras ACK correlacionado del colector local.
+- collector/server.js: append durable del JSONL con fsync, persistencia atómica del índice y reconciliación frente a los originales. El directorio de datos por defecto se resuelve mediante LOCALAPPDATA o el perfil del usuario; se eliminó la ruta personal fija de fila4.
+- collector/ep-consumer-adapter.js: ledger append-only de referencias y hashes, identidad estable de operación, recuperación local y estados separados. El manifiesto de activación evita incorporar automáticamente originales anteriores al inicio de la réplica; no existe backfill histórico.
+- extension/service-worker.js: cola primero en IndexedDB, envío posterior al colector local y retry alarm. El ACK del colector no se interpreta como ACK remoto.
+- extension/popup.js / popup.html: muestran cola, ledger y bloqueos EP; el botón “Sincronizar ahora” llama a la consulta de metadatos/catálogo, no a una descarga o ejecución de código remoto.
+- extension/build-info.json: esquema harmonia.repository-build.v1, versión MV3 0.3.0, catálogo 0.1.2 y sourceRevision=db2b1e05a131ec37688124276f7c7dd6b381564d. La captura de mensajes permanece desactivada; se conserva el contrato de estructura/controles de main.
+- El workflow de validación se generalizó a ramas que cambien HARMONIA; no depende del nombre de la rama de implementación.
+
+### 48.3. Rectificación de destino EP: prevalece OEP §91
+
+- El OEP de SeryMente/metodologia/main, §91, rectifica que OCP-MCP es el único bucket B2 previsto para EP; OCP-MSP y metodologia-ep-persistencia son destinos incorrectos. §95 reitera el destino y mantiene cuenta, key, prefix y permisos como no verificados.
+- Las menciones OCP-MSP de §§46.5 y 47.4 se conservan literalmente como historial de la revisión anterior, pero quedan supersedidas por §91 del OEP. No crear, configurar ni usar OCP-MSP.
+- Esta candidata no conecta a B2 ni a un endpoint EP. No hay contrato de consumidor EP verificado, API/SDK, autenticación/scopes, allowlist aprobada, recibo remoto ni operación de read-back. El nombre OCP-MCP es la designación normativa del destino previsto, no evidencia de que el bucket, la clave o el scope estén disponibles.
+- flush() continúa bloqueado y attempted=0; cloudState=CLOUD_PENDING, eligibility=PENDING_ALLOWLIST_APPROVAL. No declarar EP_PERSISTED_VERIFIED. No introducir App Keys B2 en la extensión ni acceso directo a B2.
+
+### 48.4. Validación observada y límites
+
+- El workflow anterior 41355059144 tuvo conclusión success para el corte anterior 3fc095557ca090e4d446a9caf375f6e0043ddf57 en la antigua rama local-first. No es prueba del HEAD actual ni de la candidata PR #351.
+- En el HEAD e263163f78b6509267ed21408f4d891355a30784, el workflow local-first 41364608505 y el CI general 41364608607 terminaron en failure. Los cuatro jobs consultados no exponen pasos (steps=[]), y la descarga de logs responde BlobNotFound. Causa raíz de la ausencia de ejecución/logs: NO DETERMINADA. Por ello, las pruebas de este HEAD quedan NO EJECUTADAS / NO DIAGNOSTICABLES, no PASS y tampoco fallo atribuible a una aserción.
+- La consulta de PC-8 confirmó el equipo autorizado online, pero no se consiguió una ejecución local alternativa: el control de seguridad del conector bloqueó la materialización remota de los archivos de prueba. No se declara validación local.
+- Los checks Vercel muestran la restricción del plan Hobby ante el repositorio privado de organización. Son bloqueos externos del preview, no una prueba de código.
+- No se cargó ni recargó la extensión; no se probó IndexedDB real, suspensión MV3, reconexión, persistencia bajo cuota ni uso natural. No hay mediciones nuevas de CPU/RAM/latencia.
+
+### 48.5. Compuertas aún abiertas
+
+1. Obtener una ejecución efectiva de la suite local-first y del CI general con pasos y logs disponibles; analizar/corregir cualquier fallo real antes de salir de borrador.
+2. Revisar el diff de PR #351; la revisión y eventual merge requieren CI utilizable y aceptación técnica.
+3. Realizar la aceptación natural en Chrome por el operador: múltiples pestañas, sesiones, reinicios, retención/recuperación y ausencia de pérdidas/duplicados. La aceptación no se sustituye por fixtures ni pruebas HTTP sintéticas.
+4. Obtener el contrato oficial/versionado de consumidor EP, identidad/scopes, allowlist, semántica de recibo, lectura de vuelta y autorización correspondiente para el destino OCP-MCP; verificar bucket/key/prefix mediante el procedimiento EP antes de cualquier transporte.
+5. Mantener la captura de texto visible de la candidata v0.4.1 como línea separada hasta revisar contrato de datos, sanitización, idempotencia de chunks y aceptación. No copiarla a esta candidata local-first sin resolver esas diferencias.
+6. Resolver el bloqueo de preview Vercel por separado si el proceso de release lo requiere.
+
+### 48.6. Dictamen del corte
+
+- Hecho: candidata local-first publicada en PR #351 draft; outbox/ledger/colector/popup/build metadata/workflow están en la rama.
+- No aceptado: tests del HEAD actual, runtime Chrome, E2E natural, transporte remoto EP, persistencia B2, backfill, merge y despliegue.
+- No ejecutado: escritura productiva Cora/Neon, cambios de infraestructura EP/B2, acceso a Chrome/perfiles, merge a main y deploy.
+- El OCP v0.42 documenta el estado de la candidata y las compuertas; no declara que la nueva versión de código esté integrada en main. La capa remota permanece fail-closed hasta que se verifique contrato, identidad, allowlist, recibo y read-back.

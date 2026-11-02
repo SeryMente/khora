@@ -9,19 +9,21 @@ Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). El OCP conse
 
 ## Estado vigente · 2026-11-01 · generación 14
 
-- OCP principal: v0.41 / HARMONIA-v0.41, §§46–47.
+- OCP principal: v0.42 / HARMONIA-v0.42, §§46–48.
 - Control: generación 14; alias operativo chatgpt-harmonia-01a19969-8e70-7dcb-b9fd-7db62736f279.
 - RDC activo: PC-8, UUID 7595d30a-bd63-4bc0-a274-f4ae90928247. PC-14 queda como histórico supersedido.
 - Original persistido y leído de vuelta: originales/ChatGPT-HARMONIA-20261101-1709.md; 174033 bytes; SHA-256 A3F10DAF7055B3B16B3F978909C9AFC77ECC6EA8486DF43FE50647297AAA00A6; Git blob 1e1ddd38fd4e3b7c6a1d6cb429467430e4d80ab5.
 - Procedencia y estado: originales/PROCEDENCIA.md; documentos/MANIFIESTO-DOCUMENTAL.json; cronica/HARMONIA-RETOMA-G14-20261101.md. Evidencia: evidencias/EV-HARMONIA-G14-20261101.json.
-- La candidata local-first sigue en rama separada; workflow dedicado 41355059144 PASS. Sin merge, sin EP remoto y aceptación Chrome pendiente.
+- Candidata local-first de revisión: PR #351, rama feat/harmonia-local-first-mainline-20261101, HEAD e263163f78b6509267ed21408f4d891355a30784; 2 commits sobre main al abrir PR, sin merge.
+- Los runs nuevos 41364608505 y 41364608607 no exponen pasos ni logs (BlobNotFound); la suite de este HEAD no se considera ejecutada. No confundir el PASS histórico 41355059144 con el nuevo candidato.
+- EP remoto permanece bloqueado; OEP §91 fija OCP-MCP como único destino B2 previsto. No hay cuenta/key/scope autenticados, contrato, allowlist, recibo ni read-back verificados. Aceptación Chrome pendiente.
 
-## Fuente de código y aceptación
+## Antecedentes históricos de código y aceptación (no vigentes)
 
-- `main` publica el manifiesto MV3 **v0.3.0** (blob `5c2dd6d616c4ba19541d03df8fbc4abc6f0a11b6`); la candidata `feat/harmonia-e2e-20261021` contiene **v0.4.0** (manifest blob `902968968cc121590a0d6b60fd10c06ea12f5409`). La PR [#333](https://github.com/SeryMente/khora/pull/333) se comprobó en vivo el 2026-10-29: sigue abierta en borrador, sin fusionar; GitHub reporta última actualización 2026-10-23. No se declara aceptada la candidata.
+- `main` publica el manifiesto MV3 **v0.3.0** (blob `5c2dd6d616c4ba19541d03df8fbc4abc6f0a11b6`); la candidata `feat/harmonia-e2e-20261021` contiene **v0.4.0** (manifest blob `902968968cc121590a0d6b60fd10c06ea12f5409`). La PR [#333](https://github.com/SeryMente/khora/pull/333) se comprobó en vivo el 2026-10-29: está cerrada sin merge. No se declara aceptada la candidata.
 - Se leyó la candidata y sus contratos/tests desde GitHub, pero no hubo ejecución local actual de Node/Chrome en este ciclo. El test `collector.integration.test.js` usa eventos sintéticos para validar el colector; no prueba captura natural del content script. Los 5/5 tests referidos en historial son resultados históricos, no evidencia reejecutada hoy.
 - Se reintentó CI: el job de Harmonia terminó en `failure` sin runner/pasos/logs/artefactos. La causa raíz queda **NO DETERMINADA**; no se atribuye a código ni se declara CI aprobada. No repetir tests generales para diagnosticar sin logs.
-- El OCP actual es **v0.28 / HARMONIA-v0.28**, §§1–35; §35 documenta la revisión del 2026-10-29. El pool v1 requiere captura real en dos sesiones/pestañas, al menos cinco huellas, mensajes visibles por sesión, no cruces, replay idempotente, recuperación tras reinicio, corpus saneado, hash y read-back exacto. La traza real disponible sigue siendo solo diagnóstica (627 eventos sin superficie ni mensaje visible); la fixture de 11 eventos es sintética.
+- El corte v0.28 / HARMONIA-v0.28 citado en este apartado es histórico y fue sustituido por el OCP vigente v0.42 / HARMONIA-v0.42, §§46–48. El pool v1 requiere captura real en dos sesiones/pestañas, al menos cinco huellas, mensajes visibles por sesión, no cruces, replay idempotente, recuperación tras reinicio, corpus saneado, hash y read-back exacto. La traza real disponible sigue siendo solo diagnóstica (627 eventos sin superficie ni mensaje visible); la fixture de 11 eventos es sintética.
 - Los registros históricos mencionan `C:\Users\PC 13\Desktop\Harmonia`; ese destino no está verificado actualmente y no debe seleccionarse por inercia. No afirmar que el paquete local coincide con `main`.
 
 La consulta RDC viva del 2026-10-29 no encuentra el UUID autorizado de Harmonia `345f64ee-5d6a-429f-a97c-dab44f44cddb`. Dos registros llamados `PC-14` tienen otros UUID (`6f97ebe0-ac17-4628-9fab-d22b95a9fcb6` y `18801fe3-a3e2-4d64-9cec-37d02692fdfb`) y están offline. PC-4 (`89864f62-e921-4353-96dc-3a471e50920d`) está online, pero tiene trabajo de Khora ajeno y no se selecciona. No ejecutar operaciones locales hasta restaurar el UUID autorizado, comprobar conectividad y validar cuenta Windows → SID → `Win32_UserProfile.LocalPath`. La discrepancia entre rutas históricas (`PC 13`) y el perfil declarado (`CENTRAL\fila4` / `C:\Users\fila4`) continúa sin resolver; no adivinar. Nunca usar ni leer `C:\Users\MantenimientoRCI\` como raíz operativa.

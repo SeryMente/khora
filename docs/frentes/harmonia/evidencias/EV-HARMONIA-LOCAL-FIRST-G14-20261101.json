@@ -1,0 +1,161 @@
+{
+  "schema": "harmonia.evidence.local-first-mainline.v1",
+  "front": "harmonia",
+  "recordedAt": "2026-11-01",
+  "responsibility": {
+    "generation": 14,
+    "ownerAlias": "chatgpt-harmonia-01a19969-8e70-7dcb-b9fd-7db62736f279",
+    "authorizedDeviceId": "7595d30a-bd63-4bc0-a274-f4ae90928247",
+    "controlBlobSha1": "41c4ace91267104eb472ffdec0fb27ed04651927",
+    "sessionFolio": null,
+    "fol1": "NOT_ACTIVE"
+  },
+  "governance": {
+    "dug": {
+      "version": "v377",
+      "signature": "NX-377m",
+      "metacanon": "1.28",
+      "gow": "2.17",
+      "blobSha1": "54064c8fe00f872023a455f06596061ed69062ae",
+      "commit": "8ee2482866b3dd085e58e05006727256d0274376"
+    },
+    "oep": {
+      "version": "v0.3.26",
+      "signature": "VCU-EP-v28",
+      "blobSha1": "986005a15858f8109921bf14e37741b360d31b54",
+      "commit": "75fc9be48354f347796567e1b41617b5e102f676",
+      "section91Destination": "OCP-MCP",
+      "section91Supersedes": "OCP-MSP"
+    }
+  },
+  "repository": {
+    "fullName": "SeryMente/khora",
+    "mainBase": "8850b47fdfc2b24a670f653b1e3cf883f2bde055",
+    "candidateBranch": "feat/harmonia-local-first-mainline-20261101",
+    "codeCommit": "db2b1e05a131ec37688124276f7c7dd6b381564d",
+    "head": "e263163f78b6509267ed21408f4d891355a30784",
+    "compareAtPrCreation": {
+      "status": "ahead",
+      "aheadBy": 2,
+      "behindBy": 0
+    },
+    "pullRequest": {
+      "number": 351,
+      "url": "https://github.com/SeryMente/khora/pull/351",
+      "state": "open",
+      "draft": true,
+      "merged": false
+    },
+    "buildInfoBlobSha1": "1df069d7b53d2264240d2d3bdeacebfe4cca2c69",
+    "manifestVersion": "0.3.0",
+    "visibleMessageTextCapture": false
+  },
+  "implementation": {
+    "indexedDbOutbox": true,
+    "stableEventIdentity": true,
+    "localCollectorJsonlFsync": true,
+    "recoverableIndex": true,
+    "appendOnlyLocalReferenceLedger": true,
+    "localSourceAndSurfaceHashReadback": true,
+    "activationExcludesPreexistingHistory": true,
+    "defaultDataRootUsesLocalAppData": true,
+    "popupOutboxLedgerStatus": true,
+    "popupRepositoryMetadataSync": true,
+    "remoteEpTransport": false,
+    "remoteReceipt": false,
+    "remoteReadback": false,
+    "epPersistedVerified": false,
+    "historicalBackfill": false
+  },
+  "files": [
+    {
+      "path": "apps/harmonia-observability/collector/ep-consumer-adapter.js",
+      "gitBlobSha1": "430ab91ff4ba103df9266aa525461a12d1a98223"
+    },
+    {
+      "path": "apps/harmonia-observability/collector/server.js",
+      "gitBlobSha1": "48888b7b6315b7b73edae6d7e9663c533505c3fd"
+    },
+    {
+      "path": "apps/harmonia-observability/extension/service-worker.js",
+      "gitBlobSha1": "b0efa195f3a25a17e1de836cb6ddd2352a7c8bd8"
+    },
+    {
+      "path": "apps/harmonia-observability/extension/popup.js",
+      "gitBlobSha1": "1c349e5f07434e7a472e335f7b78b43afb54984f"
+    },
+    {
+      "path": "apps/harmonia-observability/extension/popup.html",
+      "gitBlobSha1": "81d48bf4938c33a92fa0f3c70e15df607534690d"
+    },
+    {
+      "path": "apps/harmonia-observability/extension/durable-outbox.js",
+      "gitBlobSha1": "51b53b0daac91562e0f37204fbf40362390b45ee"
+    },
+    {
+      "path": "apps/harmonia-observability/extension/build-info.json",
+      "gitBlobSha1": "1df069d7b53d2264240d2d3bdeacebfe4cca2c69"
+    },
+    {
+      "path": "apps/harmonia-observability/EP-LOCAL-FIRST.md",
+      "gitBlobSha1": "7fe95ca2380aa3371c1f4da8afe877c4dc64283a"
+    },
+    {
+      "path": ".github/workflows/harmonia-local-first.yml",
+      "gitBlobSha1": "e7cb8cd9726f639fe139cb281eba3612f06a7dc2"
+    }
+  ],
+  "validation": {
+    "previousWorkflow": {
+      "runId": 41355059144,
+      "headCommit": "3fc095557ca090e4d446a9caf375f6e0043ddf57",
+      "conclusion": "success",
+      "scope": "previous candidate only"
+    },
+    "currentHarmoniaWorkflow": {
+      "runId": 41364608505,
+      "conclusion": "failure",
+      "jobsWithoutSteps": 1,
+      "logs": "BlobNotFound",
+      "rootCause": "NOT_DETERMINED",
+      "testExecution": "NOT_VERIFIED"
+    },
+    "currentGeneralCi": {
+      "runId": 41364608607,
+      "conclusion": "failure",
+      "jobsWithoutSteps": 3,
+      "logs": "BlobNotFound",
+      "rootCause": "NOT_DETERMINED",
+      "testExecution": "NOT_VERIFIED"
+    },
+    "vercelChecks": {
+      "state": "failure",
+      "reportedReason": "private GitHub organization repository on Hobby plan"
+    },
+    "alternativePc8LocalValidation": {
+      "state": "BLOCKED_BY_CONNECTOR_SECURITY_CONTROL",
+      "result": "NOT_EXECUTED"
+    }
+  },
+  "acceptance": {
+    "chromeLoaded": false,
+    "chromeNaturalCaptureAccepted": false,
+    "mv3IndexedDbRestartTested": false,
+    "reconnectRecoveryTested": false,
+    "cpuRamLatencyMeasured": false,
+    "merge": false,
+    "deployment": false,
+    "b2Operations": false,
+    "neonWrites": false
+  },
+  "blockers": [
+    "Effective CI/test execution with steps and usable logs",
+    "Operator natural Chrome acceptance",
+    "Official versioned EP consumer API/SDK contract",
+    "Consumer authentication and scopes",
+    "Approved field allowlist",
+    "Remote receipt and read-back under OCP-MCP; bucket/key/prefix permissions currently unverified",
+    "Separate review of v0.4.1 visible-message capture candidate",
+    "Vercel private-organization Hobby preview restriction"
+  ]
+}
