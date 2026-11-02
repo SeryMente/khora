@@ -2,7 +2,7 @@
 
 **Naturaleza:** OCP provisional de tarea; no es un frente independiente ni una unidad taxonómica canonizada.  
 **Estado:** `en_curso`  
-**Responsabilidad:** heredada del control `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`, generación 5; sin control, titularidad, sesión ni folio propios.  
+**Responsabilidad:** heredada del control `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`, generación 8; titular global `chatgpt-khora-mcp-01a19962-c730-7308-975-5bb49e2d` y autoridad arquitectónica modular Jules `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; esta tarea no tiene control, titularidad, sesión ni folio propios.  
 **task_id:** `KHORA-MCP-TASK-001`  
 **scope_ref:** `docs/frentes/observabilidad-mcp/`
 
@@ -20,7 +20,7 @@ Recuperar, conservar y verificar la continuidad documental de la sesión local p
 
 - [Instrucción literal de retoma](./originales/INSTRUCCION-RETOMA-KHORA-MCP-2026-10-31.md).
 - [Exportación de la sesión Khora MCP del 2026-10-31](../../historial/ChatGPT-Khora%20MCP-20261031-1846.md), preservada byte a byte; 134,984 bytes; SHA-256 `B087AA56DDF20A0E737DCE9614BD6E406F872B540D9C2964440A93F7A5B94464`.
-- OCP padre, §§1, 12, 21–23; control de responsabilidad vigente, generación 5.
+- OCP padre, §§1, 12, 21–23 y 26; control único vigente, generación 8 (blob `68ca6e46db82453839a0cac7ca03fbcd7a26d912`). La autoridad arquitectónica modular de Jules se mantiene separada de la titularidad global.
 - PR #347 y commit de merge `4530e03a33c5e1743ab9646eb6c862b3c458c605`, como estado técnico heredado, no como autorización nueva.
 
 ## Alcance
@@ -70,3 +70,16 @@ Los mensajes literales del operador están en [RDC-HANDSHAKE-2026-11-01-150949.m
 **Despliegues:** Production READY en commit `953e69484eabb4e8dc8221d1d8fc188373531bfa`; metadatos OAuth HTTP 200. Preview del puente READY pero sin variables de Preview para esa rama. No copiar secretos productivos.
 
 **Estado:** `en_curso`. Sin consentimiento OAuth, DPAPI ni llamadas Jules autenticadas.
+
+
+## Persistencia documental adicional · 2026-11-01
+
+Se preservó el original `ChatGPT-Khora MCP-20261101-1912.md` desde el equipo RDC `015RENTA01`, ruta `C:\\Users\\PC\\Downloads\\ChatGPT-Khora MCP-20261101-1912.md`, en [historial del OCP](../../historial/ChatGPT-Khora%20MCP-20261101-1912.md).
+
+- Tamaño original: **191,165 bytes**; **3,995 líneas**.
+- SHA-256: `AF046FD336273BC6235050388764F4012C4EC30B1CD48FC233F1CECE46770519`.
+- Commit de persistencia: `60de4a1f68ad9543ef010dc44f51d5fc6434d6f2`; Git blob read-back: `1985f4a421af709b297af6bcac99fd871977cd16`.
+- Se releyó desde `main` y se cotejó igualdad textual exacta, tamaño y líneas. Estado: **PERSISTIDO_Y_VERIFICADO**.
+- Manifiesto: [MANIFIESTO-DOCUMENTAL.json](../../documentos/MANIFIESTO-DOCUMENTAL.json).
+
+El control conserva la generación 8 y sus dos responsables activos ya registrados (titular global y corresponsable arquitectónico Jules). No se alteró el control ni se presume que esta conversación haya adquirido titularidad/corresponsabilidad. La TASK-001 sigue `en_curso`; checkout, pruebas del puente, consentimiento OAuth y aceptación E2E no quedan resueltos por esta persistencia.
