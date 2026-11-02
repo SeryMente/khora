@@ -671,7 +671,7 @@
   "previous_blob": "68ca6e46db82453839a0cac7ca03fbcd7a26d912",
   "base_blob_sha": "68ca6e46db82453839a0cac7ca03fbcd7a26d912",
   "base_main_sha": "874aece7bfa4491e69bfb47281296c8705c4a198",
-  "transfer_method": "Generation 9 TRANSFER_RESPONSIBILITY via GitHub Contents API conditioned on the exact generation-8 control blob SHA read immediately before write. The outgoing titular and all prior owner/control history are preserved under previous_owner/prior_control_history. Jules module co-responsibility is retained. Canonical acceptance requires exact read-back.",
+  "transfer_method": "Generation 9 TRANSFER_RESPONSIBILITY executed with compare-and-swap against the exact generation-8 control blob SHA. The generation-8 titular, the immediately preceding generation-7→8 transfer/change records, and the earlier responsibility history are preserved under previous_owner and the history fields. Jules module co-responsibility remains active. Exact read-back completed.",
   "previous_control_generation": {
     "schema": "responsabilidad-frente/1",
     "front": "observabilidad-mcp",
@@ -854,13 +854,24 @@
     "source_control_blob_sha": "68ca6e46db82453839a0cac7ca03fbcd7a26d912",
     "base_main_sha": "874aece7bfa4491e69bfb47281296c8705c4a198",
     "attachment_commit_sha": null,
-    "result": "EXECUTED; read-back verification is in progress.",
+    "result": "VERIFIED: generation 9 and new global titular confirmed by exact GitHub read-back; outgoing generation 8 titular and prior history preserved; Jules module architectural co-responsibility retained; no native conversation ID or session folio assigned.",
     "authorization_scope": "Titularidad global del único frente KHORA-MCP: arquitectura/integración del host, registro, contratos transversales, coordinación modular, documentación y validación integrada. Se conserva Jules como corresponsable arquitectónico con autoridad final dentro del módulo Jules. Las decisiones multi-módulo se coordinan. Producción, secretos, bases de datos, despliegues y operaciones irreversibles mantienen sus autorizaciones específicas.",
     "verification": {
-      "status": "PENDING_READBACK",
-      "verified_at_local": null,
-      "readback_blob_sha": null,
-      "confirmed": []
+      "status": "VERIFIED",
+      "verified_at_local": "2026-11-01T19:27:01.1876442-06:00",
+      "update_commit_sha": "eb3f09383ea70f15e42ee7a4f2efb03984325512",
+      "readback_blob_sha": "ee1f8457fdf4ac5e1bd6eae30e71ae18dec223a1",
+      "confirmed": [
+        "generation=9",
+        "new owner_alias and instance match the UUIDv7 local alias",
+        "owner_thread=null; native conversation ID not exposed",
+        "generation-8 titular archived under previous_owner",
+        "generation-7→8 transfer record and responsibility change preserved",
+        "prior generation-6→7 Jules ADD_CO_RESPONSIBLE history preserved",
+        "exactly two active_responsibles",
+        "Jules remains assigned_module_scope with module_id=jules",
+        "session_folio=null; FOL1 PREPARADO NO ACTIVO"
+      ]
     }
   },
   "strategic_redirection": {
@@ -931,33 +942,33 @@
     }
   },
   "previous_responsibility_change": {
-    "operation": "ADD_CO_RESPONSIBLE",
-    "event_id": "01a19912-7918-7602-af7a-e2828585e314",
-    "event": "KHORA-MCP-ADD-CO-RESPONSIBLE-JULES-20261101-8585E314",
-    "from_generation": 6,
-    "to_generation": 7,
-    "previous_primary_owner_alias": "chatgpt-khora-mcp-01a19905-d279-7b15-a5fe-77257942c044",
-    "retained_primary_owner_alias": "chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8",
-    "added_co_responsible_alias": "chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314",
-    "added_scope": "module:jules",
+    "operation": "TRANSFER_RESPONSIBILITY",
+    "event_id": "01a19962-c730-7308-975-5bb49e2d",
+    "event": "KHORA-MCP-TRANSFER-20261101-5BB49E2D",
+    "from_generation": 7,
+    "to_generation": 8,
+    "previous_owner_alias": "chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8",
+    "new_owner_alias": "chatgpt-khora-mcp-01a19962-c730-7308-975-5bb49e2d",
     "native_conversation_id": null,
-    "uuidv7_local": "01a19912-7918-7602-af7a-e2828585e314",
-    "authorization_ref": "Instrucción literal del operador en esta conversación: «Espera da mnarcha atras, y haz que en  vez de asumir frente de Khora MCP, asumas y crees modulo Jules, en Khora MCP, ya hay infraestrucutra para modulos.» Se interpreta como rechazo de TRANSFER_RESPONSIBILITY del frente padre y autorización de ADD_CO_RESPONSIBLE con alcance acotado al módulo funcional Jules, preservando al titular anterior.",
-    "source_control_blob_sha": "f134b2b42e1926bcc5398a6abf30c758c9ff03e8",
-    "result": "VERIFIED: ADD_CO_RESPONSIBLE retained prior KHORA-MCP primary owner and added exactly one module:jules co-responsible; generation 7, SHA and read-back matched. No native conversation ID or session folio assigned.",
+    "uuidv7_local": "01a19962-c730-7308-975-5bb49e2d",
+    "authorization_ref": "Instrucción expresa del operador en esta conversación, 2026-11-01 (America/Mexico_City): «Si transfer responsiblioty y toma en cuienta promtp de modulo jules». Aclaración expresa de distribución de autoridad: el modelo responsable de Jules decide su arquitectura interna, contratos, interfaces, seguridad, scopes, ACL, comportamiento de herramientas, pruebas y aceptación; el titular global gestiona integración técnica y coordinación transversal, sin sustituir ni modificar unilateralmente decisiones de Jules. Los cambios que afecten varios módulos se coordinan; las decisiones productivas/irreversibles siguen sujetas a autorización del operador.",
+    "source_control_blob_sha": "62b38ee17feae7d3028eff8747dfe746a8f1979a",
+    "attachment_commit_sha": null,
+    "result": "VERIFIED: transfer committed and read back from canonical main.",
+    "authorization_scope": "Transfer the single global KHORA-MCP front to the new session. Preserve the Jules module's independent architectural authority as the second active responsible. This does not grant permission to change production, secrets, databases, or irreversible governance beyond separately authorized actions.",
     "verification": {
       "status": "VERIFIED",
-      "readback_blob_sha": "2de670b6143cb64e0e8950af41197455296652eb",
-      "update_commit_sha": "9960d94192f3d3bb8127890049448e57b068f1d2",
-      "verified_at_local": "2026-11-01T15:42:00-06:00",
+      "readback_blob_sha": "cc6548761bf85a55de7f1fd4e529a1712fe9f77f",
+      "update_commit_sha": "908994264fc5b5964e347f1f9b969473a87b8d2e",
+      "verified_at_local": "2026-11-01T17:12:30-06:00",
       "confirmed": [
-        "generation=7",
-        "primary owner preserved",
+        "generation=8",
+        "new owner_alias and instance",
+        "owner_thread=null; native conversation ID not exposed",
+        "previous titular generation 7 preserved with complete prior history",
+        "Jules module co-responsible retained with independent architectural authority",
         "exactly two active_responsibles",
-        "co-responsible scope=module:jules",
-        "no native conversation ID claimed",
-        "session_folio=null",
-        "FOL1 PREPARADO NO ACTIVO"
+        "session_folio=null; FOL1 remains PREPARADO NO ACTIVO"
       ]
     }
   },
@@ -981,7 +992,36 @@
       "operator_reserved": "production, irreversible and governance changes require operator authorization"
     }
   },
-  "previous_transfer_record": null,
+  "previous_transfer_record": {
+    "event_id": "01a19962-c730-7308-975-5bb49e2d",
+    "event": "KHORA-MCP-TRANSFER-20261101-5BB49E2D",
+    "from_generation": 7,
+    "to_generation": 8,
+    "previous_owner_alias": "chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8",
+    "new_owner_alias": "chatgpt-khora-mcp-01a19962-c730-7308-975-5bb49e2d",
+    "native_conversation_id": null,
+    "uuidv7_local": "01a19962-c730-7308-975-5bb49e2d",
+    "authorization_ref": "Instrucción expresa del operador en esta conversación, 2026-11-01 (America/Mexico_City): «Si transfer responsiblioty y toma en cuienta promtp de modulo jules». Aclaración expresa de distribución de autoridad: el modelo responsable de Jules decide su arquitectura interna, contratos, interfaces, seguridad, scopes, ACL, comportamiento de herramientas, pruebas y aceptación; el titular global gestiona integración técnica y coordinación transversal, sin sustituir ni modificar unilateralmente decisiones de Jules. Los cambios que afecten varios módulos se coordinan; las decisiones productivas/irreversibles siguen sujetas a autorización del operador.",
+    "source_control_blob_sha": "62b38ee17feae7d3028eff8747dfe746a8f1979a",
+    "attachment_commit_sha": null,
+    "result": "VERIFIED: generation 8, new global titular, previous titular history preserved, and Jules module architectural authority retained; exact GitHub read-back confirmed.",
+    "authorization_scope": "Transfer the single global KHORA-MCP front to the new session. Preserve the Jules module's independent architectural authority as the second active responsible. This does not grant permission to change production, secrets, databases, or irreversible governance beyond separately authorized actions.",
+    "verification": {
+      "status": "VERIFIED",
+      "verified_at_local": "2026-11-01T17:12:30-06:00",
+      "transfer_commit": "908994264fc5b5964e347f1f9b969473a87b8d2e",
+      "readback_blob_sha": "cc6548761bf85a55de7f1fd4e529a1712fe9f77f",
+      "confirmed": [
+        "generation=8",
+        "new owner_alias and instance",
+        "owner_thread=null; native conversation ID not exposed",
+        "previous titular generation 7 preserved with complete prior history",
+        "Jules module co-responsible retained with independent architectural authority",
+        "exactly two active_responsibles",
+        "session_folio=null; FOL1 remains PREPARADO NO ACTIVO"
+      ]
+    }
+  },
   "responsibility_change_history": [
     {
       "operation": "ADD_CO_RESPONSIBLE",
@@ -1011,6 +1051,70 @@
           "no native conversation ID claimed",
           "session_folio=null",
           "FOL1 PREPARADO NO ACTIVO"
+        ]
+      }
+    },
+    {
+      "operation": "ADD_CO_RESPONSIBLE",
+      "event_id": "01a19912-7918-7602-af7a-e2828585e314",
+      "event": "KHORA-MCP-ADD-CO-RESPONSIBLE-JULES-20261101-8585E314",
+      "from_generation": 6,
+      "to_generation": 7,
+      "previous_primary_owner_alias": "chatgpt-khora-mcp-01a19905-d279-7b15-a5fe-77257942c044",
+      "retained_primary_owner_alias": "chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8",
+      "added_co_responsible_alias": "chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314",
+      "added_scope": "module:jules",
+      "native_conversation_id": null,
+      "uuidv7_local": "01a19912-7918-7602-af7a-e2828585e314",
+      "authorization_ref": "Instrucción literal del operador en esta conversación: «Espera da mnarcha atras, y haz que en  vez de asumir frente de Khora MCP, asumas y crees modulo Jules, en Khora MCP, ya hay infraestrucutra para modulos.» Se interpreta como rechazo de TRANSFER_RESPONSIBILITY del frente padre y autorización de ADD_CO_RESPONSIBLE con alcance acotado al módulo funcional Jules, preservando al titular anterior.",
+      "source_control_blob_sha": "f134b2b42e1926bcc5398a6abf30c758c9ff03e8",
+      "result": "VERIFIED: ADD_CO_RESPONSIBLE retained prior KHORA-MCP primary owner and added exactly one module:jules co-responsible; generation 7, SHA and read-back matched. No native conversation ID or session folio assigned.",
+      "verification": {
+        "status": "VERIFIED",
+        "readback_blob_sha": "2de670b6143cb64e0e8950af41197455296652eb",
+        "update_commit_sha": "9960d94192f3d3bb8127890049448e57b068f1d2",
+        "verified_at_local": "2026-11-01T15:42:00-06:00",
+        "confirmed": [
+          "generation=7",
+          "primary owner preserved",
+          "exactly two active_responsibles",
+          "co-responsible scope=module:jules",
+          "no native conversation ID claimed",
+          "session_folio=null",
+          "FOL1 PREPARADO NO ACTIVO"
+        ]
+      }
+    }
+  ],
+  "transfer_record_history": [
+    {
+      "event_id": "01a19905-d279-7b15-a5fe-77257942c044",
+      "event": "KHORA-MCP-TRANSFER-20261101-7942C044",
+      "from_generation": 5,
+      "to_generation": 6,
+      "previous_owner_alias": "chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8",
+      "new_owner_alias": "chatgpt-khora-mcp-01a19905-d279-7b15-a5fe-77257942c044",
+      "native_conversation_id": null,
+      "uuidv7_local": "01a19905-d279-7b15-a5fe-77257942c044",
+      "authorization_ref": "Respuesta expresa del operador en esta conversación: «Si pero se dice OCP MCP, no OCP MSP, cuidado con ese error.», dada como aceptación de la pregunta inmediatamente anterior que autorizaba TRANSFER_RESPONSIBILITY del frente KHORA-MCP y preparar en una rama la retirada de Jules de Cora, manteniendo intactos producción, datos y secretos hasta verificar la migración. La denominación autorizada y corregida es OCP MCP.",
+      "source_control_blob_sha": "92f4f6ab864c19e52a123b6358d94c5a8e7a9474",
+      "base_main_sha": "ec40407107d8e0275811c183f2a79fb29b618e39",
+      "attachment_commit_sha": null,
+      "result": "VERIFIED: generation 6 and new holder confirmed by exact read-back; previous generation 5 and earlier owner history preserved; no native conversation ID or OCP/session folio issued.",
+      "authorization_scope": "Prepare and implement Jules-removal changes now in an isolated, unmerged branch. Preserve history and data. Do not merge, deploy or change Production until OCP MCP has completed the local migration and its evidence has been verified and accepted by the operator. OCP MCP remains local-only, not publicly exposed; only operator-authorized models may connect. Cora's deployed surface is limited to cognitive-prosthesis capabilities.",
+      "verification": {
+        "status": "VERIFIED",
+        "verified_at_local": "2026-11-01T15:31:00-06:00",
+        "transfer_commit": "bbd891c989643b852cd34d30cffe08fae1e28dac",
+        "readback_blob_sha": "d73249e95b76f3db56d8e4577536fccc0993fb0d",
+        "confirmed": [
+          "generation=6",
+          "owner_alias matches this local UUIDv7 operational alias",
+          "owner_thread=null; native conversation ID not exposed",
+          "previous_owner generation 5 preserved with earlier history",
+          "session_folio=null",
+          "folio_status remains PENDIENTE/NO ASIGNADO; FOL1 PREPARADO NO ACTIVO",
+          "OCP MCP spelling and local-only scope recorded"
         ]
       }
     }
