@@ -1,0 +1,168 @@
+{
+  "schema": "harmonia.local-environment-reset-and-validation.v1",
+  "front": "harmonia",
+  "recordedAtLocal": "2026-11-01T19:13:31.537-06:00",
+  "control": {
+    "branch": "main",
+    "generation": 14,
+    "ownerAlias": "chatgpt-harmonia-01a19969-8e70-7dcb-b9fd-7db62736f279",
+    "sessionFolio": null,
+    "fol1": "NOT_ACTIVE",
+    "deviceAuthorizationEvent": "01a199c8-8bc1-79fb-a4a8-e3088850c9bc",
+    "deviceControlBlobSha1": "90e24321237000fea6b594c62fc3564445c82bc6",
+    "deviceControlCommit": "c994caeab849c89b97b094ce3718e485b12c2971"
+  },
+  "operatorDeclaration": {
+    "statement": "The previous local environment and RDC session were completely lost; assume no local environment data survived.",
+    "action": "Treat all previous local paths, clones, processes, credentials, Chrome profiles and RDC sessions as lost; bootstrap from verified sources."
+  },
+  "rdc": {
+    "name": "015RENTA01",
+    "deviceId": "aacf2eb5-17f4-428e-9242-c24a1fe4a2ec",
+    "appVersion": "0.3.1",
+    "node": "v24.22.2",
+    "platform": "Windows x64",
+    "powershell": "5.1.26100.7920",
+    "machineName": "015RENTA01",
+    "user": "015RENTA01\\015RENTA01",
+    "profile": "C:\\Users\\PC",
+    "sid": "S-1-5-21-4061665785-3686036472-903815331-1003",
+    "verifiedAtLocal": "2026-11-01T19:03:39.457-06:00",
+    "chromePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "gitAvailable": false,
+    "vscodeAvailable": false,
+    "npmPs1BlockedByExecutionPolicy": true,
+    "npmCmdAvailable": true
+  },
+  "workspace": {
+    "path": "C:\\Users\\PC\\Desktop\\Khora\\khora-main",
+    "kind": "FRESH_PARTIAL_VALIDATION_WORKSPACE_NOT_A_FULL_GIT_CLONE",
+    "purpose": "materialize exactly the HARMONIA local-first source/test files needed for local syntax and unit/integration tests",
+    "installedTestDependency": "fake-indexeddb@6.2.7",
+    "installCommand": "npm.cmd install --no-save --ignore-scripts fake-indexeddb@6.2.7",
+    "installationExitCode": 0,
+    "secretsCopied": false,
+    "chromeProfileTouched": false
+  },
+  "candidate": {
+    "repository": "SeryMente/khora",
+    "branch": "feat/harmonia-local-first-mainline-20261101",
+    "pr": 351,
+    "codeCommit": "db2b1e05a131ec37688124276f7c7dd6b381564d",
+    "workerBlob": "f8b9d4566f0cfe1ed06866ebf3a3f0eed9671254",
+    "popupBlob": "1c349e5f07434e7a472e335f7b78b43afb54984f",
+    "testSourceHead": "a530c3d489316f7cb7e742b2ba21bbca174f068a",
+    "branchControlBlob": "90e24321237000fea6b594c62fc3564445c82bc6"
+  },
+  "transferredFiles": [
+    {
+      "path": "apps/harmonia-observability/collector/ep-consumer-adapter.js",
+      "gitBlobSha1": "430ab91ff4ba103df9266aa525461a12d1a98223",
+      "localGitBlobSha1": "430ab91ff4ba103df9266aa525461a12d1a98223",
+      "exact": true
+    },
+    {
+      "path": "apps/harmonia-observability/collector/server.js",
+      "gitBlobSha1": "48888b7b6315b7b73edae6d7e9663c533505c3fd",
+      "localGitBlobSha1": "48888b7b6315b7b73edae6d7e9663c533505c3fd",
+      "exact": true
+    },
+    {
+      "path": "apps/harmonia-observability/collector/tests/ep-consumer-adapter.test.js",
+      "gitBlobSha1": "e34f33c49269bcb0c719d8a8c827202346af4186",
+      "localGitBlobSha1": "e34f33c49269bcb0c719d8a8c827202346af4186",
+      "exact": true
+    },
+    {
+      "path": "apps/harmonia-observability/collector/tests/server-local-first.integration.test.js",
+      "gitBlobSha1": "805b72660f50c91416c061f72a518cfd3c280354",
+      "localGitBlobSha1": "805b72660f50c91416c061f72a518cfd3c280354",
+      "exact": true
+    },
+    {
+      "path": "apps/harmonia-observability/extension/durable-outbox.js",
+      "gitBlobSha1": "51b53b0daac91562e0f37204fbf40362390b45ee",
+      "localGitBlobSha1": "51b53b0daac91562e0f37204fbf40362390b45ee",
+      "exact": true
+    },
+    {
+      "path": "apps/harmonia-observability/extension/tests/durable-outbox.test.js",
+      "gitBlobSha1": "c3581a411c8423f47e288a11db23c1ab58bb5c9d",
+      "localGitBlobSha1": "c3581a411c8423f47e288a11db23c1ab58bb5c9d",
+      "exact": true
+    },
+    {
+      "path": "apps/harmonia-observability/coverage-catalog.json",
+      "gitBlobSha1": "d18285374d5b54561738882222b2981dff3168be",
+      "localGitBlobSha1": "d18285374d5b54561738882222b2981dff3168be",
+      "exact": true
+    },
+    {
+      "path": "apps/harmonia-observability/extension/service-worker.js",
+      "gitBlobSha1": "f8b9d4566f0cfe1ed06866ebf3a3f0eed9671254",
+      "localGitBlobSha1": "f8b9d4566f0cfe1ed06866ebf3a3f0eed9671254",
+      "exact": true
+    },
+    {
+      "path": "apps/harmonia-observability/extension/popup.js",
+      "gitBlobSha1": "1c349e5f07434e7a472e335f7b78b43afb54984f",
+      "localGitBlobSha1": "1c349e5f07434e7a472e335f7b78b43afb54984f",
+      "exact": true
+    }
+  ],
+  "validation": {
+    "syntax": {
+      "command": "node --check",
+      "pass": 8,
+      "fail": 0,
+      "files": 8,
+      "nodeVersion": "v24.22.2"
+    },
+    "automatedTests": {
+      "command": "node --test apps/harmonia-observability/extension/tests/durable-outbox.test.js apps/harmonia-observability/collector/tests/ep-consumer-adapter.test.js apps/harmonia-observability/collector/tests/server-local-first.integration.test.js",
+      "tests": 10,
+      "pass": 10,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 2982.7589,
+      "exitCode": 0
+    },
+    "testCases": [
+      "reconciles an original written before the ledger and creates a blocked durable reference",
+      "does not auto-enqueue pre-activation historical originals",
+      "duplicate enqueue keeps the same operation identity",
+      "operation identity survives a collector restart",
+      "same event identity with a different source hash is a conflict",
+      "flush never attempts network without the official EP contract and allowlist",
+      "recover verifies the local source but does not claim EP verification",
+      "HTTP collector stores JSONL and ledger durably and rejects conflicting replays",
+      "startup reconciles post-activation JSONL and rebuilds a lagging index without enqueueing history",
+      "durable outbox is idempotent, retries, survives module restart and acknowledges only explicitly"
+    ],
+    "scope": "HARMONIA local-first tests and syntax only; Node 24.22.2 on Windows. This is a fresh local execution, not the GitHub Actions runner and not Chrome acceptance."
+  },
+  "unchanged": {
+    "chromeExtensionLoaded": false,
+    "chromeProfileModified": false,
+    "naturalChromeAcceptance": false,
+    "cpuRamLatencyMeasured": false,
+    "fullRepositoryClone": false,
+    "localGitInstalled": false,
+    "fullGeneralKhoraCi": false,
+    "remoteEpTransport": false,
+    "b2Operations": false,
+    "neonWrites": false,
+    "historicalBackfill": false,
+    "merge": false,
+    "deployment": false
+  },
+  "blockers": [
+    "GitHub Actions jobs still report failure with zero recorded steps and BlobNotFound logs; root cause remains undetermined.",
+    "Chrome natural acceptance remains operator-owned and unperformed.",
+    "Official versioned EP consumer contract, auth/scopes, approved allowlist, receipt and remote read-back remain unverified.",
+    "OCP-MCP bucket/key/prefix permissions are not authenticated or verified.",
+    "Vercel preview remains blocked by private-organization repository restriction on Hobby plan."
+  ]
+}
