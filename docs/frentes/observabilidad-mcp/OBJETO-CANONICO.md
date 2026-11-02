@@ -4,8 +4,9 @@
 - Frente único vigente: **Khora MCP**; identidad canónica `KHORA-MCP`.
 - Nombre e identidad histórica: **Observabilidad MCP** / `OBSERVABILIDAD-MCP`. La ruta heredada `docs/frentes/observabilidad-mcp/` se conserva; no se migra ni duplica el OCP o su control.
 - Repositorio: `SeryMente/khora`; OCP único: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`; control único: `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`.
-- OCP: **v0.3.9**. Control de responsabilidad: **generación 5**, titular operativo `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`.
-- La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local de continuidad: `01a19499-caec-7e19-beb9-bb5b890a36c8`; no es un ID nativo.
+- OCP: **v0.3.10**. Control de responsabilidad: **generación 8**, titular global operativo `chatgpt-khora-mcp-01a19962-c730-7308-975-5bb49e2d`.
+- La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local del titular global registrado: `01a19962-c730-7308-975-5bb49e2d`; no es un ID nativo.
+- Corresponsable arquitectónico del módulo Jules: `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; su autoridad es modular y no equivale a titularidad global.
 - Folio global y folio de sesión: **PENDIENTE / NO ASIGNADO**; FOL1 está PREPARADO, NO ACTIVO. El control vigente tiene `session_folio: null`; el candidato anterior se conserva solo como antecedente no emitido en el registro de corrección.
 - Las tareas provisionales «Continuidad», «General» y «Jules» pertenecen a este mismo frente y se registran en [Tareas provisionales](./📁%20🧭%20-%20Tareas%20provisionales/README.md); no crean frentes ni controles paralelos.
 - `MCP-OBS-DICTADO` permanece como identidad histórica del objeto agregado anterior, no como otro frente activo.
@@ -22,8 +23,8 @@ Leer README, DUG vigente, este OCP y `CONTROL-RESPONSABILIDAD.json`. La titulari
 **Interpretación operativa separada:** el repositorio denomina MCP al servidor/protocolo y herramientas de Khora; «MSP» se conserva en la cita original. El frente cubre el acceso de modelos/agentes autorizados a observabilidad y la integración controlada con Jules.
 
 ## 3. Referencia metodológica
-- DUG consultado desde `SeryMente/metodologia/main`: **Samantha v374 · NX-374m**; HTML canónico Blob SHA `2827d6edc3c07613c59dabf90ddea918e84bb06a`; `main` verificado en `4b9a6d99239e4f1a9bc87de18d1a2c06f05d232f` (`2026-11-01T21:21:59Z`). Metacanon **1.26**; GOW **2.14**. Se revisaron cascada, CNP y principios de responsabilidad, continuidad, persistencia y foliación; el cuerpo enlazado de §ARR no estuvo disponible en la extracción estática y queda pendiente de lectura completa. MCP normativo permanece DESACTIVADO.
-- Metacanon **1.26**; GOW **2.14**.
+- DUG consultado desde `SeryMente/metodologia/main`: **Samantha v377 · NX-377m**; HTML canónico Blob SHA `54064c8fe00f872023a455f06596061ed69062ae`; fuente obtenida directamente desde `main`. Metacanon **1.28**; GOW **2.17**. Se consultó §ARR mediante el índice de entrada `gow-sec-14` / `#gow-arranque-chatgpt` y sus 28 términos asociados; CNP: P001, P004, P005, P038 y P043. También se revisaron P035, P037, P041, P042 y los anexos ART-012, ART-014 y ART-029 para continuidad, colisión de responsabilidad, persistencia y módulos. La revisión vigente del HTML en `main` está verificada por lectura de vuelta; el SHA del commit de punta y su antigüedad no se declaran en este corte. MCP normativo permanece DESACTIVADO.
+- Metacanon **1.28**; GOW **2.17**.
 - CNP vigente (categoría A): P001, P004, P005, P038 y P043; consideración explícita en cada turno. MCP normativo: DESACTIVADO.
 - Fuente normativa: `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`.
 - MCP-NORMATIVO: **DESACTIVADO**. No debe confundirse con el servidor MCP de producto Khora.
@@ -434,3 +435,25 @@ Las decisiones que afecten simultáneamente a varios módulos requieren coordina
 Esta sesión se inició sin el workspace, procesos ni estado local anterior. La máquina RDC PC-14 previamente documentada está Offline. El dispositivo PC-8 está Online, pero el perfil comprobado no contiene los clones KHORA conocidos; Git no está disponible en PATH y GitHub CLI no tiene sesión autenticada. El conector GitHub permite lectura y escritura del repositorio y se utilizó para el cambio de control; no equivale a tener un checkout local ni a disponer de credenciales locales.
 
 Por tanto, el estado de implementación Custodia MCP no se declara recuperado ni validado en PC-8. La rama autorizada `work/mcp-custodia-read-contract-20261031` fue fast-forwarded de forma no forzada desde `ed442d78fae3b86d6747ee8d4bb347678a766576` hasta el baseline de gobierno `bca482b617567c7b3bd69e318c42439c7730cb08`; no tenía commits funcionales propios que preservar. La implementación funcional, pruebas y publicación de esa rama siguen pendientes. No se modificó la rama de Custodia B2, el PR #349 de Jules ni Production.
+
+
+## 26. Persistencia del export conversacional y continuidad documental — 2026-11-01
+
+### 26.1 Original conservado
+
+- Nombre original: `ChatGPT-Khora MCP-20261101-1912.md`.
+- Origen RDC: equipo `015RENTA01`, perfil `C:\\Users\\PC`, ruta `C:\\Users\\PC\\Downloads\\ChatGPT-Khora MCP-20261101-1912.md`.
+- Tamaño: **191,165 bytes**; **3,995 líneas**; codificación UTF-8.
+- SHA-256 del original: `AF046FD336273BC6235050388764F4012C4EC30B1CD48FC233F1CECE46770519`.
+- Destino canónico del OCP heredado: [historial/ChatGPT-Khora MCP-20261101-1912.md](./historial/ChatGPT-Khora%20MCP-20261101-1912.md).
+- Commit de persistencia: `60de4a1f68ad9543ef010dc44f51d5fc6434d6f2`; Git blob leído de vuelta: `1985f4a421af709b297af6bcac99fd871977cd16`.
+- Verificación: se releyó desde `main`; el contenido textual coincide exactamente con la reconstrucción realizada desde los bytes originales obtenidos por RDC; tamaño y número de líneas coinciden. Estado del documento: **PERSISTIDO_Y_VERIFICADO**.
+- Manifiesto documental: [documentos/MANIFIESTO-DOCUMENTAL.json](./documentos/MANIFIESTO-DOCUMENTAL.json), con alcance explícitamente limitado a los exports conversacionales registrados.
+
+La revisión acotada de patrones comunes de credenciales no encontró coincidencias; no es una auditoría exhaustiva de secretos. El original no fue transformado ni sustituido por un resumen.
+
+### 26.2 Titularidad y límite de esta retoma
+
+El control único leído desde `main` permanece en **generación 8**, blob `68ca6e46db82453839a0cac7ca03fbcd7a26d912`, con el titular global `chatgpt-khora-mcp-01a19962-c730-7308-975-5bb49e2d` y la corresponsabilidad arquitectónica del módulo Jules `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`. El presente encargo de persistencia no modificó `CONTROL-RESPONSABILIDAD.json`, no sustituyó al titular ni añadió una tercera sesión responsable. Para la retoma global de esta conversación sigue pendiente que el operador elija expresamente el modo previsto por P037: `TRANSFER_RESPONSIBILITY` o `ADD_CO_RESPONSIBLE`. No se emitió folio: FOL1 continúa **PREPARADO, NO ACTIVO**.
+
+La tarea TASK-001 permanece `en_curso`: archivar el export no demuestra por sí solo la reconstrucción del checkout local, las pruebas del puente, el consentimiento OAuth ni la aceptación E2E de Jules.
