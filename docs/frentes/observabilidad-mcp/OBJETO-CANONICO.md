@@ -4,8 +4,8 @@
 - Frente único vigente: **Khora MCP**; identidad canónica `KHORA-MCP`.
 - Nombre e identidad histórica: **Observabilidad MCP** / `OBSERVABILIDAD-MCP`. La ruta heredada `docs/frentes/observabilidad-mcp/` se conserva; no se migra ni duplica el OCP o su control.
 - Repositorio: `SeryMente/khora`; OCP único: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`; control único: `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`.
-- OCP: **v0.3.10**. Control de responsabilidad: **generación 8**, titular global operativo `chatgpt-khora-mcp-01a19962-c730-7308-975-5bb49e2d`.
-- La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local del titular global registrado: `01a19962-c730-7308-975-5bb49e2d`; no es un ID nativo.
+- OCP: **v0.3.11**. Control de responsabilidad: **generación 9**, titular global operativo `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229`.
+- La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local del titular global registrado: `01a199dd-30ba-7843-92ae-278ff01d4229`; no es un ID nativo.
 - Corresponsable arquitectónico del módulo Jules: `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; su autoridad es modular y no equivale a titularidad global.
 - Folio global y folio de sesión: **PENDIENTE / NO ASIGNADO**; FOL1 está PREPARADO, NO ACTIVO. El control vigente tiene `session_folio: null`; el candidato anterior se conserva solo como antecedente no emitido en el registro de corrección.
 - Las tareas provisionales «Continuidad», «General» y «Jules» pertenecen a este mismo frente y se registran en [Tareas provisionales](./📁%20🧭%20-%20Tareas%20provisionales/README.md); no crean frentes ni controles paralelos.
@@ -454,6 +454,33 @@ La revisión acotada de patrones comunes de credenciales no encontró coincidenc
 
 ### 26.2 Titularidad y límite de esta retoma
 
-El control único leído desde `main` permanece en **generación 8**, blob `68ca6e46db82453839a0cac7ca03fbcd7a26d912`, con el titular global `chatgpt-khora-mcp-01a19962-c730-7308-975-5bb49e2d` y la corresponsabilidad arquitectónica del módulo Jules `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`. El presente encargo de persistencia no modificó `CONTROL-RESPONSABILIDAD.json`, no sustituyó al titular ni añadió una tercera sesión responsable. Para la retoma global de esta conversación sigue pendiente que el operador elija expresamente el modo previsto por P037: `TRANSFER_RESPONSIBILITY` o `ADD_CO_RESPONSIBLE`. No se emitió folio: FOL1 continúa **PREPARADO, NO ACTIVO**.
+El control único leído desde `main` permanece en **generación 8**, blob `68ca6e46db82453839a0cac7ca03fbcd7a26d912`, con el titular global `chatgpt-khora-mcp-01a19962-c730-7308-975-5bb49e2d` y la corresponsabilidad arquitectónica del módulo Jules `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`. El presente encargo de persistencia no modificó `CONTROL-RESPONSABILIDAD.json`, no sustituyó al titular ni añadió una tercera sesión responsable. La retoma global de esta conversación quedó formalizada mediante `TRANSFER_RESPONSIBILITY` en generación 9, con read-back verificado; el titular registrado es `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229`. Jules conserva su autoridad arquitectónica modular. No se emitió folio: FOL1 continúa **PREPARADO, NO ACTIVO**.
 
 La tarea TASK-001 permanece `en_curso`: archivar el export no demuestra por sí solo la reconstrucción del checkout local, las pruebas del puente, el consentimiento OAuth ni la aceptación E2E de Jules.
+
+
+## 27. Transferencia de titularidad global a la sesión actual — 2026-11-01
+
+### 27.1 Autorización y operación
+
+El operador respondió afirmativamente a la pregunta explícita de sustitución del titular: «Si transfer respoinsibility». Se ejecutó `TRANSFER_RESPONSIBILITY` sobre el único control del frente, comparando el blob de generación 8 `68ca6e46db82453839a0cac7ca03fbcd7a26d912` antes de escribir.
+
+- Generación anterior: **8**; titular saliente: `chatgpt-khora-mcp-01a19962-c730-7308-975-5bb49e2d`.
+- Generación vigente: **9**; nuevo titular global: `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229`.
+- UUIDv7 local: `01a199dd-30ba-7843-92ae-278ff01d4229`; alias operativo, no ID nativo de conversación.
+- `owner_thread=null`: la plataforma no expuso ID nativo.
+- Evento: `KHORA-MCP-TRANSFER-20261101-278FF01D`.
+- Commit de escritura inicial: `eb3f09383ea70f15e42ee7a4f2efb03984325512`.
+- Commit de read-back y verificación final: `87fbfdd4ab5f76978f7f016cde9381c274668ece`.
+- Blob final de `CONTROL-RESPONSABILIDAD.json`: `81b7da1282197a967dddf6c241e6ef7e444af2d6`.
+- La lectura final recuperó exactamente el contenido escrito y confirmó generación 9, alias/titular, titular anterior, corresponsable Jules y conteo de dos responsables activos.
+
+El titular saliente y la cadena previa de responsabilidad se conservaron en `previous_owner`, `previous_transfer_record`, `previous_responsibility_change` y sus historiales. El control sigue siendo único. `session_folio=null`; FOL1 continúa **PREPARADO, NO ACTIVO**.
+
+### 27.2 Distribución de autoridad vigente
+
+- Titular global KHORA-MCP: `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229`; arquitectura e integración del host/servidor completo, registro, contratos transversales, coordinación modular, estado/documentación global y validación integrada.
+- Corresponsable arquitectónico Jules: `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; conserva decisión final sobre arquitectura interna, contratos, interfaces, seguridad específica, scopes, ACL, comportamiento de las siete herramientas, pruebas y aceptación del módulo Jules.
+- El titular global no sustituye ni modifica unilateralmente las decisiones internas de Jules. Los cambios transversales se coordinan; las operaciones productivas, irreversibles y de gobierno siguen sujetas a las autorizaciones específicas del operador.
+
+La transferencia no autoriza por sí misma cambios en Production, secretos, bases de datos, migraciones aplicadas, despliegues ni llamadas Jules de escritura.
