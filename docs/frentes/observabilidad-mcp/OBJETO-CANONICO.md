@@ -472,7 +472,7 @@ El operador respondió afirmativamente a la pregunta explícita de sustitución 
 - Evento: `KHORA-MCP-TRANSFER-20261101-278FF01D`.
 - Commit de escritura inicial: `eb3f09383ea70f15e42ee7a4f2efb03984325512`.
 - Commit de read-back y verificación final: `87fbfdd4ab5f76978f7f016cde9381c274668ece`.
-- Blob final de `CONTROL-RESPONSABILIDAD.json`: `81b7da1282197a967dddf6c241e6ef7e444af2d6`.
+- Blob final de `CONTROL-RESPONSABILIDAD.json`: `4fba2187947730abca0cc338429dfacf4810594c`.
 - La lectura final recuperó exactamente el contenido escrito y confirmó generación 9, alias/titular, titular anterior, corresponsable Jules y conteo de dos responsables activos.
 
 El titular saliente y la cadena previa de responsabilidad se conservaron en `previous_owner`, `previous_transfer_record`, `previous_responsibility_change` y sus historiales. El control sigue siendo único. `session_folio=null`; FOL1 continúa **PREPARADO, NO ACTIVO**.
