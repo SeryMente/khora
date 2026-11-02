@@ -2,7 +2,7 @@
 
 **Tipo:** documento vivo de seguimiento del backlog; no crea tareas, frentes, módulos, controles, responsables ni folios nuevos.  
 **Corte:** 2026-11-01 · America/Mexico_City.  
-**OCP padre:** [OBJETO-CANONICO.md](./OBJETO-CANONICO.md), versión v0.3.11.  
+**OCP padre:** [OBJETO-CANONICO.md](./OBJETO-CANONICO.md), versión v0.3.12.  
 **Control vigente:** [CONTROL-RESPONSABILIDAD.json](./CONTROL-RESPONSABILIDAD.json), generación 9.  
 **Índice de tareas formales:** [Tareas provisionales](./📁%20🧭%20-%20Tareas%20provisionales/README.md).  
 **Titular global:** `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229`.  
@@ -21,7 +21,7 @@ Los estados se aplican a cada punto, no al conjunto de una tarea. No se cierran 
 
 ## 1. TASK-001 — Continuidad documental y reconstrucción del workspace
 
-**Estado:** `en_curso`  
+**Estado:** `completada`  
 **Núcleo:** [KHORA-MCP-TASK-001](./📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20KHORA-MCP-TASK-001%20-%20Continuidad%20y%20reconstrucci%C3%B3n%20del%20workspace/README.md)
 
 ### Continuidad documental
@@ -45,19 +45,19 @@ Los estados se aplican a cada punto, no al conjunto de una tarea. No se cierran 
 - [x] Verificar que Git ignora `.khora-local/` y que la carpeta no existe en el checkout restaurado.
 - [x] Confirmar que `khora-web/node_modules` no está materializado en el nuevo checkout.
 - [x] Verificar que `.env.local`, `.vercel`, `khora-web/node_modules` y `.khora-local` están ausentes del checkout restaurado, sin leer contenidos; confirmar las reglas de exclusión aplicables, incluida `.khora-local/` para la ruta DPAPI.
-- [ ] Instalar dependencias de forma permitida y reproducible.
-- [ ] Ejecutar en el checkout actual suite unitaria, typecheck, UI Review, contrato de navegación y build.
-- [ ] Cotejar las pruebas del checkout nuevo con el SHA exacto de `main` y registrar logs/resultados.
+- [x] Materializar las dependencias desde `package-lock.json`; `npm ls --depth=0 --omit=optional` terminó con exit 0 y árbol completo. La invocación npm ci tuvo código 1 en el wrapper PowerShell por una advertencia emitida en stderr; esa llamada no se declara exit 0.
+- [x] Ejecutar en el checkout actual suite unitaria (572/572), typecheck, UI Review, contrato de navegación y build (Next.js 16.4.0, 78/78 páginas); todos finalizaron con exit 0.
+- [x] Cotejar las pruebas del checkout nuevo con el SHA exacto `a9bed89b3bb0c48291b836348e2d264f11ece5f8` de `main` y registrar los resultados de ejecución.
 
-**Compuerta:** la instalación `npm ci` y `npm ci --ignore-scripts` fue bloqueada por controles de seguridad en el corte anterior. No se ha eludido ni reintentado sin cambio causal. La ausencia de `node_modules` impide declarar ejecutadas las pruebas dependientes de paquetes.  
-**Estado de cierre:** pendiente; el checkout y las verificaciones estáticas quedaron recuperados, pero faltan dependencias y pruebas completas.
+**Salvedad de instalación:** `npm ci --no-audit --no-fund` materializó los paquetes, pero el wrapper PowerShell reportó código 1 al elevar una advertencia deprecada de npm desde stderr. La verificación independiente `npm ls --depth=0 --omit=optional` terminó con código 0 y mostró el árbol completo. Se conserva esta diferencia en vez de afirmar que npm ci salió con 0.  
+**Estado de cierre:** completada; pruebas y build del checkout nuevo aprobados.
 
 ### Integridad del workspace
 
 - [x] Mantener separado el checkout incompleto preexistente `khora-main`; no contiene `.git` y no se modificó.
 - [x] Mantener separado el checkout `khora-jules-main` y su rama divergente; no se reescribió su historial.
-- [ ] Decidir el destino de las carpetas históricas `khora-main` y `khora-jules-main` después de completar la validación; no borrarlas ni renombrarlas antes.
-- [ ] Registrar el estado local final y leer de vuelta cualquier evidencia actualizada en el OCP.
+- [x] Preservar sin cambios las carpetas históricas `khora-main` y `khora-jules-main`; no se borraron, renombraron, fusionaron ni reescribieron.
+- [x] Registrar el estado local final y leer de vuelta la evidencia en TASK-001, el índice, OCP v0.3.12 y este checklist.
 
 ## 2. TASK-002 — General: acceso MCP, catálogo y observabilidad
 
@@ -189,6 +189,20 @@ Los estados se aplican a cada punto, no al conjunto de una tarea. No se cierran 
 **No ejecutado:** instalación de dependencias, suite, typecheck, UI Review, contrato o build. La compuerta previa de npm permanece sin cambio causal.
 
 **Resultado del ciclo:** la continuidad del checkout queda sincronizada y su higiene local verificada. TASK-001 sigue `en_curso` por la instalación/pruebas pendientes.
+
+### Ciclo de trabajo 4 — dependencias, validación completa y cierre TASK-001 · 2026-11-01
+
+**Entorno:** RDC `015RENTA01`, perfil `C:\Users\PC`, checkout `C:\Users\PC\Desktop\Khora\khora-mcp-main`, rama `main`. El conjunto de pruebas/build se ejecutó sobre el commit `a9bed89b3bb0c48291b836348e2d264f11ece5f8`, igual a `origin/main` en ese corte.
+
+**Dependencias y herramientas:** Node `v24.22.2`, npm `11.19.1`, MinGit `2.56.0.windows.4`; lockfile v3 con 690 entradas y siete paquetes con install scripts. El paquete completo quedó materializado y `npm ls --depth=0 --omit=optional` terminó con exit 0. `npm ci --no-audit --no-fund` se reportó como exit 1 por el wrapper PowerShell al convertir una advertencia npm deprecada de stderr en error; no se oculta ni se etiqueta esa invocación como exit 0.
+
+**Pruebas:** `typecheck`, `ui-review:check`, `ui:contract`: PASS, exit 0. `test:unit`: **572/572 PASS**, cero fallos/omitidos, exit 0. El test de sincronización del contrato Metodología pasó con GitHub CLI portable `2.103.3`, instalada bajo LOCALAPPDATA, usada sin autenticación ni cambio permanente de PATH.
+
+**Build:** `npm run build`: PASS, exit 0; Next.js `16.4.0`; TypeScript OK; **78/78** páginas generadas; trazas y optimización completadas. Warnings no bloqueantes: convención `middleware` deprecada (migración recomendada a `proxy`) y referencias a APIs incompatibles con Edge Runtime en dependencias.
+
+**Higiene/seguridad:** `.env*`, `.vercel` y `.khora-local` ausentes; dependencias y build ignorados por Git. El preflight de almacenamiento fue `not_requested`; no hubo consulta ni escritura a DB. `AUTH_SECRET` fue aleatorio, efímero y retirado del entorno al finalizar. Se produjo localmente el ZIP de Harmonia `0.3.5` (221,728 bytes; SHA-256 `5B0060C3B1C56CE5713A05FE732CD01417463D8E7E0BDEF70ED5C5D416A418B4`) y fue retirado después de verificar que no estaba versionado.
+
+**Resultado:** el criterio de TASK-001 se satisface y la tarea se marca `completada` en su núcleo y en el índice. El OCP se elevó a v0.3.12 (§28). No se realizó consentimiento OAuth, DPAPI real, llamada Jules autenticada, escritura Jules, migración, grant, merge funcional ni despliegue. TASK-002 y TASK-003 permanecen abiertas.
 
 ## Límites permanentes
 
