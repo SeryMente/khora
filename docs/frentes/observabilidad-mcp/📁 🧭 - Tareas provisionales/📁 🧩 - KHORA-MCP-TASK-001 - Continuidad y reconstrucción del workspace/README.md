@@ -2,7 +2,7 @@
 
 **Naturaleza:** OCP provisional de tarea; no es un frente independiente ni una unidad taxonómica canonizada.  
 **Estado:** `en_curso`  
-**Responsabilidad:** heredada del control `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`, generación 8; titular global `chatgpt-khora-mcp-01a19962-c730-7308-975-5bb49e2d` y autoridad arquitectónica modular Jules `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; esta tarea no tiene control, titularidad, sesión ni folio propios.  
+**Responsabilidad:** heredada del control `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`, generación 9; titular global `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229` y autoridad arquitectónica modular Jules `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; esta tarea no tiene control, titularidad, sesión ni folio propios.  
 **task_id:** `KHORA-MCP-TASK-001`  
 **scope_ref:** `docs/frentes/observabilidad-mcp/`
 
@@ -20,7 +20,7 @@ Recuperar, conservar y verificar la continuidad documental de la sesión local p
 
 - [Instrucción literal de retoma](./originales/INSTRUCCION-RETOMA-KHORA-MCP-2026-10-31.md).
 - [Exportación de la sesión Khora MCP del 2026-10-31](../../historial/ChatGPT-Khora%20MCP-20261031-1846.md), preservada byte a byte; 134,984 bytes; SHA-256 `B087AA56DDF20A0E737DCE9614BD6E406F872B540D9C2964440A93F7A5B94464`.
-- OCP padre, §§1, 12, 21–23 y 26; control único vigente, generación 8 (blob `68ca6e46db82453839a0cac7ca03fbcd7a26d912`). La autoridad arquitectónica modular de Jules se mantiene separada de la titularidad global.
+- OCP padre, §§1, 12, 21–23, 26–27; control único vigente, generación 9 (blob `81b7da1282197a967dddf6c241e6ef7e444af2d6`, commit `87fbfdd4ab5f76978f7f016cde9381c274668ece`). La autoridad arquitectónica modular de Jules se mantiene separada de la titularidad global.
 - PR #347 y commit de merge `4530e03a33c5e1743ab9646eb6c862b3c458c605`, como estado técnico heredado, no como autorización nueva.
 
 ## Alcance
@@ -82,4 +82,15 @@ Se preservó el original `ChatGPT-Khora MCP-20261101-1912.md` desde el equipo RD
 - Se releyó desde `main` y se cotejó igualdad textual exacta, tamaño y líneas. Estado: **PERSISTIDO_Y_VERIFICADO**.
 - Manifiesto: [MANIFIESTO-DOCUMENTAL.json](../../documentos/MANIFIESTO-DOCUMENTAL.json).
 
-El control conserva la generación 8 y sus dos responsables activos ya registrados (titular global y corresponsable arquitectónico Jules). No se alteró el control ni se presume que esta conversación haya adquirido titularidad/corresponsabilidad. La TASK-001 sigue `en_curso`; checkout, pruebas del puente, consentimiento OAuth y aceptación E2E no quedan resueltos por esta persistencia.
+El control fue transferido y verificado en generación 9 a `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229`; Jules conserva la corresponsabilidad arquitectónica modular. Se preservó el titular saliente y su historial. La TASK-001 sigue `en_curso`; checkout, pruebas del puente, consentimiento OAuth y aceptación E2E no quedan resueltos por esta transferencia.
+
+
+## Transferencia de titularidad global verificada · 2026-11-01
+
+- Evento: `KHORA-MCP-TRANSFER-20261101-278FF01D`; `TRANSFER_RESPONSIBILITY` de generación 8 a 9.
+- Titular global vigente: `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229` (UUIDv7 local; `owner_thread=null`).
+- Jules permanece como autoridad arquitectónica modular: `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`.
+- Control leído de vuelta: blob `81b7da1282197a967dddf6c241e6ef7e444af2d6`; commit `87fbfdd4ab5f76978f7f016cde9381c274668ece`.
+- Exactamente dos responsables activos; `session_folio=null`; FOL1 PREPARADO, NO ACTIVO.
+
+La tarea no cambia de alcance ni se cierra por esta transferencia. Continúan pendientes la reconstrucción/validación del checkout, instalación de dependencias permitidas, pruebas pertinentes del puente, consentimiento OAuth en el perfil actual y aceptación E2E autorizada de Jules.
