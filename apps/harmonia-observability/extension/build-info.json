@@ -1,7 +1,7 @@
 {
   "schema": "harmonia.repository-build.v1",
   "version": "0.3.0",
-  "sourceRevision": "db2b1e05a131ec37688124276f7c7dd6b381564d",
+  "sourceRevision": "a714d061c8c274a199267075b3b934aaa9725dac",
   "catalogVersion": "0.1.2",
   "releaseChannel": "candidate",
   "captureContract": {
@@ -42,5 +42,6 @@
     "bucketAuthenticatedOrVerified": false,
     "consumerContractVerified": false,
     "allowlistApproved": false
-  }
+  },
+  "sourceRevisionScope": "local-first code commit before build metadata self-reference update"
 }
