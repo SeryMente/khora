@@ -4,7 +4,7 @@
 - Frente único vigente: **Khora MCP**; identidad canónica `KHORA-MCP`.
 - Nombre e identidad histórica: **Observabilidad MCP** / `OBSERVABILIDAD-MCP`. La ruta heredada `docs/frentes/observabilidad-mcp/` se conserva; no se migra ni duplica el OCP o su control.
 - Repositorio: `SeryMente/khora`; OCP único: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`; control único: `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`.
-- OCP: **v0.3.11**. Control de responsabilidad: **generación 9**, titular global operativo `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229`.
+- OCP: **v0.3.12**. Control de responsabilidad: **generación 9**, titular global operativo `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229`.
 - La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local del titular global registrado: `01a199dd-30ba-7843-92ae-278ff01d4229`; no es un ID nativo.
 - Corresponsable arquitectónico del módulo Jules: `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; su autoridad es modular y no equivale a titularidad global.
 - Folio global y folio de sesión: **PENDIENTE / NO ASIGNADO**; FOL1 está PREPARADO, NO ACTIVO. El control vigente tiene `session_folio: null`; el candidato anterior se conserva solo como antecedente no emitido en el registro de corrección.
@@ -485,3 +485,42 @@ El titular saliente y la cadena previa de responsabilidad se conservaron en `pre
 - El titular global no sustituye ni modifica unilateralmente las decisiones internas de Jules. Los cambios transversales se coordinan; las operaciones productivas, irreversibles y de gobierno siguen sujetas a las autorizaciones específicas del operador.
 
 La transferencia no autoriza por sí misma cambios en Production, secretos, bases de datos, migraciones aplicadas, despliegues ni llamadas Jules de escritura.
+
+
+## 28. Cierre de continuidad y validación del workspace principal — 2026-11-01
+
+### 28.1 Checkout restaurado
+
+Se completó la tarea provisional `KHORA-MCP-TASK-001` en el perfil RDC vigente:
+
+- Dispositivo: `015RENTA01`, ID `aacf2eb5-17f4-428e-9242-c24a1fe4a2ec`; perfil `C:\Users\PC`.
+- Workspace dedicado: `C:\Users\PC\Desktop\Khora\khora-mcp-main`.
+- Repositorio/remoto: `SeryMente/khora` / `https://github.com/SeryMente/khora.git`.
+- Rama `main`; HEAD y `origin/main` cotejados en `a9bed89b3bb0c48291b836348e2d264f11ece5f8` durante el cierre local.
+- `git status --short --branch`: checkout limpio tras retirar el ZIP generado localmente y fast-forward no forzado de la documentación vigente.
+- Los clones históricos `khora-main` (sin `.git`) y `khora-jules-main` (rama Jules divergente) se conservaron sin sobrescritura. La rama Jules no se fusionó ni rebaseó.
+
+### 28.2 Dependencias y validación
+
+- Node `v24.22.2`; npm `11.19.1`; MinGit preexistente `2.56.0.windows.4`.
+- Dependencias materializadas desde el lockfile; `npm ls --depth=0 --omit=optional` terminó con código 0 y reportó el árbol completo. La invocación de `npm ci --no-audit --no-fund` quedó con código 1 en el wrapper PowerShell porque este elevó una advertencia npm deprecada emitida por stderr; no se registra falsamente esa invocación como exit 0. La posterior inspección de dependencias, pruebas y build demuestra el estado utilizable del árbol instalado.
+- `npm run typecheck`: PASS.
+- `npm run ui-review:check`: PASS.
+- `npm run ui:contract`: PASS.
+- `npm run test:unit`: **572/572 PASS**, cero fallos y cero omitidos. El test de sincronización del contrato de Metodología pasó con la GitHub CLI portable `2.103.3`; esta CLI se ejecutó sin añadir credenciales ni modificar permanentemente PATH.
+- `npm run build`: **PASS**, Next.js `16.4.0`, código de salida 0; TypeScript completado y **78/78** páginas estáticas generadas.
+- Warnings de build: convención `middleware` deprecada (Next.js recomienda migrar a `proxy`) y avisos Edge Runtime por APIs de dependencias. No impidieron compilación, generación ni trazas.
+
+### 28.3 Higiene, privacidad y límites
+
+- `.env*` (incluidas variantes locales, desarrollo, producción y test), `.vercel` y `.khora-local` ausentes en el checkout restaurado; las rutas locales sensibles permanecen excluidas por Git. No se copiaron credenciales DPAPI ni secretos de Production.
+- El `AUTH_SECRET` del build fue aleatorio, efímero, limitado al proceso y eliminado tras finalizar.
+- `EXPERIENCE_STORAGE_PREFLIGHT=not_requested`: el preflight que podría escribir datos sintéticos en DB no se solicitó; no se consultó ni modificó la base de datos.
+- El prebuild generó localmente `harmonia-v0.3.5.zip` (221,728 bytes, SHA-256 `5B0060C3B1C56CE5713A05FE732CD01417463D8E7E0BDEF70ED5C5D416A418B4`). Se confirmó que no estaba versionado y se retiró al finalizar; el checkout quedó limpio.
+- No se hizo consentimiento OAuth, aprovisionamiento DPAPI del propietario, llamadas autenticadas a Jules, creación de sesiones, envío de mensajes, aprobación de planes, migraciones, grants, merge funcional ni despliegue.
+
+### 28.4 Estado de tarea y continuidad
+
+`KHORA-MCP-TASK-001` queda **completada** conforme a su criterio de cierre: workspace restaurado, remoto/HEAD cotejados, dependencias utilizables, pruebas y build satisfactorios, higiene local comprobada y evidencias persistidas en [BACKLOG-CHECKLIST.md](./BACKLOG-CHECKLIST.md) y el núcleo de TASK-001.
+
+TASK-002 General continúa `en_curso`, con la compuerta de privacidad de observabilidad descrita en el checklist. TASK-003 Jules continúa `en_curso` y conserva su autoridad arquitectónica modular. El cierre de TASK-001 no altera el control generación 9 ni amplía permisos productivos.

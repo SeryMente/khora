@@ -2,7 +2,7 @@
 
 **Tipo:** documento vivo de seguimiento del backlog; no crea tareas, frentes, módulos, controles, responsables ni folios nuevos.  
 **Corte:** 2026-11-01 · America/Mexico_City.  
-**OCP padre:** [OBJETO-CANONICO.md](./OBJETO-CANONICO.md), versión v0.3.11.  
+**OCP padre:** [OBJETO-CANONICO.md](./OBJETO-CANONICO.md), versión v0.3.12.  
 **Control vigente:** [CONTROL-RESPONSABILIDAD.json](./CONTROL-RESPONSABILIDAD.json), generación 9.  
 **Índice de tareas formales:** [Tareas provisionales](./📁%20🧭%20-%20Tareas%20provisionales/README.md).  
 **Titular global:** `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229`.  
@@ -21,7 +21,7 @@ Los estados se aplican a cada punto, no al conjunto de una tarea. No se cierran 
 
 ## 1. TASK-001 — Continuidad documental y reconstrucción del workspace
 
-**Estado:** `en_curso`  
+**Estado:** `completada`  
 **Núcleo:** [KHORA-MCP-TASK-001](./📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20KHORA-MCP-TASK-001%20-%20Continuidad%20y%20reconstrucci%C3%B3n%20del%20workspace/README.md)
 
 ### Continuidad documental
@@ -44,20 +44,20 @@ Los estados se aplican a cada punto, no al conjunto de una tarea. No se cierran 
 - [x] Parsear `jules.ps1` y `credential.ps1` con el parser de PowerShell: PASS.
 - [x] Verificar que Git ignora `.khora-local/` y que la carpeta no existe en el checkout restaurado.
 - [x] Confirmar que `khora-web/node_modules` no está materializado en el nuevo checkout.
-- [ ] Inspeccionar y registrar el estado final de `.env.local`, `.vercel` y otros artefactos locales excluidos, sin leer ni copiar secretos.
-- [ ] Instalar dependencias de forma permitida y reproducible.
-- [ ] Ejecutar en el checkout actual suite unitaria, typecheck, UI Review, contrato de navegación y build.
-- [ ] Cotejar las pruebas del checkout nuevo con el SHA exacto de `main` y registrar logs/resultados.
+- [x] Verificar que `.env.local`, `.vercel`, `khora-web/node_modules` y `.khora-local` están ausentes del checkout restaurado, sin leer contenidos; confirmar las reglas de exclusión aplicables, incluida `.khora-local/` para la ruta DPAPI.
+- [x] Materializar las dependencias desde `package-lock.json`; `npm ls --depth=0 --omit=optional` terminó con exit 0 y árbol completo. La invocación npm ci tuvo código 1 en el wrapper PowerShell por una advertencia emitida en stderr; esa llamada no se declara exit 0.
+- [x] Ejecutar en el checkout actual suite unitaria (572/572), typecheck, UI Review, contrato de navegación y build (Next.js 16.4.0, 78/78 páginas); todos finalizaron con exit 0.
+- [x] Cotejar las pruebas del checkout nuevo con el SHA exacto `a9bed89b3bb0c48291b836348e2d264f11ece5f8` de `main` y registrar los resultados de ejecución.
 
-**Compuerta:** la instalación `npm ci` y `npm ci --ignore-scripts` fue bloqueada por controles de seguridad en el corte anterior. No se ha eludido ni reintentado sin cambio causal. La ausencia de `node_modules` impide declarar ejecutadas las pruebas dependientes de paquetes.  
-**Estado de cierre:** pendiente; el checkout y las verificaciones estáticas quedaron recuperados, pero faltan dependencias y pruebas completas.
+**Salvedad de instalación:** `npm ci --no-audit --no-fund` materializó los paquetes, pero el wrapper PowerShell reportó código 1 al elevar una advertencia deprecada de npm desde stderr. La verificación independiente `npm ls --depth=0 --omit=optional` terminó con código 0 y mostró el árbol completo. Se conserva esta diferencia en vez de afirmar que npm ci salió con 0.  
+**Estado de cierre:** completada; pruebas y build del checkout nuevo aprobados.
 
 ### Integridad del workspace
 
 - [x] Mantener separado el checkout incompleto preexistente `khora-main`; no contiene `.git` y no se modificó.
 - [x] Mantener separado el checkout `khora-jules-main` y su rama divergente; no se reescribió su historial.
-- [ ] Decidir el destino de las carpetas históricas `khora-main` y `khora-jules-main` después de completar la validación; no borrarlas ni renombrarlas antes.
-- [ ] Registrar el estado local final y leer de vuelta cualquier evidencia actualizada en el OCP.
+- [x] Preservar sin cambios las carpetas históricas `khora-main` y `khora-jules-main`; no se borraron, renombraron, fusionaron ni reescribieron.
+- [x] Registrar el estado local final y leer de vuelta la evidencia en TASK-001, el índice, OCP v0.3.12 y este checklist.
 
 ## 2. TASK-002 — General: acceso MCP, catálogo y observabilidad
 
@@ -76,6 +76,27 @@ Los estados se aplican a cada punto, no al conjunto de una tarea. No se cierran 
 - [ ] Verificar interoperabilidad con los clientes MCP comprendidos en el alcance.
 - [ ] Resolver Preview mediante configuración segura no productiva; no copiar secretos de Production.
 - [ ] Mantener Dictado como consumidor de diagnóstico: sin cambios de UX, audio, transcripciones ni datos.
+
+### Evidencia estática y comprobación pública — Ciclo 2
+
+- [x] Revisar la matriz de scopes declarada por `MCP_TOOL_SCOPES`: herramientas de audio/volcados, runtime, normativas y Jules usan scopes diferenciados.
+- [x] Inspeccionar el handler `/api/mcp`: config obligatoria, guard de `KHORA_READONLY_DATABASE_URL` en Production, validación Bearer/JWT o token manual, issuer/audience, generación de revocación y rechazo por scope insuficiente.
+- [x] Confirmar que `tools/list` filtra capacidades por scopes del token; los handlers Jules usan `jules:read` / `jules:write` sin `norm:turn`, mientras el host aplica su gate normativo al resto de herramientas sustantivas.
+- [x] Revisar estáticamente las consultas de observabilidad: parámetros SQL, filtros opcionales por sesión/componente/severidad/resultado/fase/scope/categoría, límite de 1–200, ventana de 1–86400 segundos y cursor incremental con `id > cursor`.
+- [x] Consultar Production sin credenciales: OAuth Authorization Server metadata HTTP 200; Protected Resource metadata HTTP 200; `GET /api/mcp` sin Bearer HTTP 401 y `WWW-Authenticate` apuntando al recurso protegido canónico.
+- [x] Revisar el contrato de privacidad del `ObservationEnvelope`: rechaza patrones de audio/transcripción y claves prohibidas en métricas, y limita cadenas de métricas a 200 caracteres.
+- [x] Verificar que la ingesta estructurada limpia patrones conocidos de credenciales en mensaje/detalle y que una prueba unitaria comprueba la exclusión de campos de transcripción en telemetría de Dictado. La suite no se ejecutó en este ciclo.
+- [x] Comprobar que la auditoría MCP registra metadatos y no args, tokens, texto, SQL, stack ni excepciones crudas; esto no constituye un sanitizador del payload exitoso devuelto al cliente.
+
+### Hallazgo de privacidad pendiente — no aceptado como seguro todavía
+
+- [!] Reconciliar la exposición de `detalle` y `metrics` por `mcp-observability.ts`: las consultas devuelven esos campos directamente y no filtran por `privacy_class`.
+- [!] Revisar la ruta heredada `RegistrarEventoParams`: el campo `metrics` se serializa a la columna sin pasar por `cleanSecretos` ni por `validateObservationPrivacy`; la redacción por patrones cubre mensaje/detalle, no equivale a validar todo contenido posible.
+- [!] Verificar si `runtime:read` autoriza deliberadamente una vista global. El filtro `session_id` es opcional y, por sí solo, no prueba aislamiento por sujeto/sesión.
+- [ ] Definir el filtro de privacidad/minimización esperado y agregar pruebas que cubran ambas rutas de ingesta, todos los campos retornados por MCP y el aislamiento entre sesiones/sujetos.
+- [ ] Ejecutar las pruebas y confirmar el comportamiento con una identidad real de solo lectura, sin consultar ni exportar contenido sensible.
+
+**Límite de evidencia:** los GET públicos solo verifican metadatos y el rechazo sin credencial. No se ejecutó OAuth real, `tools/list` autenticado, invocación de herramientas, query a Neon ni verificación del rol efectivo de la base de datos.
 
 **Cierre:** catálogo/contratos leídos de vuelta, permisos positivos y negativos probados con identidad real y al menos una consulta de observabilidad autenticada satisfactoria.
 
@@ -150,6 +171,38 @@ Los estados se aplican a cada punto, no al conjunto de una tarea. No se cierran 
 **No ejecutado:** instalación de dependencias, suite completa, typecheck, UI Review, contrato y build del checkout nuevo. La política de seguridad que bloqueó npm ci en el corte anterior sigue siendo una compuerta; no fue eludida.
 
 **Resultado del ciclo:** continuidad documental y checkout principal restablecidos; TASK-001 permanece `en_curso` hasta pruebas completas. El siguiente paso es resolver la instalación de dependencias por una vía permitida o documentar su bloqueo definitivo, y en paralelo auditar los contratos/estado efectivo de General sin usar credenciales ni efectuar escrituras.
+
+### Ciclo de trabajo 2 — auditoría estática y metadata pública · 2026-11-01
+
+**Ejecutado y verificado:** lectura estática de los contratos de scopes, autenticación, revocación, `tools/list`, consultas de runtime y flujo de privacidad de eventos; tres GET públicos de Production con resultados 200/200/401; evidencia de redacción de patrones conocidos y prueba existente para telemetría de Dictado.
+
+**Hallazgo:** la consulta MCP devuelve `detalle` y `metrics` sin filtro visible por `privacy_class`; el camino heredado de ingesta puede guardar `metrics` sin la validación de privacidad del envelope estructurado. El filtro por `session_id` es opcional. Se registra como riesgo por revisar, no como vulnerabilidad explotable demostrada. No se cambió código ni se consultó la base de datos.
+
+**No ejecutado:** OAuth autenticado, descubrimiento real de herramientas, consultas a Neon, pruebas automatizadas, rol efectivo DB, aislamiento real por sujeto y lectura real de observabilidad.
+
+**Resultado del ciclo:** baseline General parcialmente inspeccionado; su aceptación sigue pendiente y se añade una compuerta explícita de privacidad/sesión antes de declarar seguro el acceso a runtime. No se modificó Production, secretos, base de datos ni ramas.
+
+### Ciclo de trabajo 3 — sincronización del checkout y artefactos locales · 2026-11-01
+
+**Ejecutado y verificado:** checkout principal limpio antes de sincronizar; `git fetch origin main` y fast-forward no forzado `16b84131e4a61dfaca618570e4c241597fa38cf8 → 22c6a7c8ec83d6e705d8dce747f9c4ba43972b63`; read-back confirmó `HEAD = origin/main`, rama `main` y árbol limpio. Se comprobó que `.env.local`, `.vercel`, `khora-web/node_modules` y `.khora-local` no existen en el checkout; `.env.local`, `.vercel` y `node_modules` están ignorados y la ruta DPAPI dentro de `.khora-local/` está cubierta por la regla raíz. No se leyó contenido secreto ni se copió ningún artefacto.
+
+**No ejecutado:** instalación de dependencias, suite, typecheck, UI Review, contrato o build. La compuerta previa de npm permanece sin cambio causal.
+
+**Resultado del ciclo:** la continuidad del checkout queda sincronizada y su higiene local verificada. TASK-001 sigue `en_curso` por la instalación/pruebas pendientes.
+
+### Ciclo de trabajo 4 — dependencias, validación completa y cierre TASK-001 · 2026-11-01
+
+**Entorno:** RDC `015RENTA01`, perfil `C:\Users\PC`, checkout `C:\Users\PC\Desktop\Khora\khora-mcp-main`, rama `main`. El conjunto de pruebas/build se ejecutó sobre el commit `a9bed89b3bb0c48291b836348e2d264f11ece5f8`, igual a `origin/main` en ese corte.
+
+**Dependencias y herramientas:** Node `v24.22.2`, npm `11.19.1`, MinGit `2.56.0.windows.4`; lockfile v3 con 690 entradas y siete paquetes con install scripts. El paquete completo quedó materializado y `npm ls --depth=0 --omit=optional` terminó con exit 0. `npm ci --no-audit --no-fund` se reportó como exit 1 por el wrapper PowerShell al convertir una advertencia npm deprecada de stderr en error; no se oculta ni se etiqueta esa invocación como exit 0.
+
+**Pruebas:** `typecheck`, `ui-review:check`, `ui:contract`: PASS, exit 0. `test:unit`: **572/572 PASS**, cero fallos/omitidos, exit 0. El test de sincronización del contrato Metodología pasó con GitHub CLI portable `2.103.3`, instalada bajo LOCALAPPDATA, usada sin autenticación ni cambio permanente de PATH.
+
+**Build:** `npm run build`: PASS, exit 0; Next.js `16.4.0`; TypeScript OK; **78/78** páginas generadas; trazas y optimización completadas. Warnings no bloqueantes: convención `middleware` deprecada (migración recomendada a `proxy`) y referencias a APIs incompatibles con Edge Runtime en dependencias.
+
+**Higiene/seguridad:** `.env*`, `.vercel` y `.khora-local` ausentes; dependencias y build ignorados por Git. El preflight de almacenamiento fue `not_requested`; no hubo consulta ni escritura a DB. `AUTH_SECRET` fue aleatorio, efímero y retirado del entorno al finalizar. Se produjo localmente el ZIP de Harmonia `0.3.5` (221,728 bytes; SHA-256 `5B0060C3B1C56CE5713A05FE732CD01417463D8E7E0BDEF70ED5C5D416A418B4`) y fue retirado después de verificar que no estaba versionado.
+
+**Resultado:** el criterio de TASK-001 se satisface y la tarea se marca `completada` en su núcleo y en el índice. El OCP se elevó a v0.3.12 (§28). No se realizó consentimiento OAuth, DPAPI real, llamada Jules autenticada, escritura Jules, migración, grant, merge funcional ni despliegue. TASK-002 y TASK-003 permanecen abiertas.
 
 ## Límites permanentes
 
