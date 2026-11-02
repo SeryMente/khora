@@ -63,3 +63,15 @@ Chrome no se cargó ni recargó; no hubo aceptación natural, mediciones CPU/RAM
 - Rama: https://github.com/SeryMente/khora/tree/feat/harmonia-local-first-mainline-20261101
 - DUG: https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html
 - OEP: https://github.com/SeryMente/metodologia/blob/main/frentes/ep/OEP.md
+
+## Reconstrucción final de la candidata desde el main vigente · 2026-11-02
+
+- La rama anterior feat/harmonia-local-first-mainline-20261101 acumuló 13 commits ahead / 11 behind después de nuevas actualizaciones documentales y de otros frentes en main. No se fusionó.
+- Se cerraron PR #351 y PR #352 sin merge, ambas sustituidas por PR #353. Sus ramas y commits quedan preservados como historial; no se reescribieron.
+- Rama final: feat/harmonia-local-first-mainline-final-20261101, creada desde main 874aece7bfa4491e69bfb47281296c8705c4a198.
+- Commit de implementación: a714d061c8c274a199267075b3b934aaa9725dac; commit de metadatos: e72c38847a8f58446707cd44f4384eefb9f6cc1f. build-info.json v0.3.0 ahora referencia el commit de implementación con sourceRevision a714d061c8c274a199267075b3b934aaa9725dac.
+- Comparación al crear PR #353: 2 commits ahead / 0 behind; merge-base coincide con main. El diff contiene exclusivamente 12 archivos de HARMONIA (outbox, ledger, colector, worker, popup, build metadata, tests, documento de integración EP y workflow).
+- Los 12 Git blob SHA fueron leídos de vuelta desde la rama final y coinciden exactamente con las fuentes ya validadas localmente.
+- PR #353: https://github.com/SeryMente/khora/pull/353, abierta en borrador, sin merge.
+- Workflows de push observados para el HEAD final: run 41372264801 (HARMONIA local-first) y run 41372264680 (CI general), ambos failure. Los jobs consultados devuelven steps=[] y los logs devuelven BlobNotFound. Causa raíz del runner/logs no determinada. El resultado local 10/10 no se presenta como CI de GitHub.
+- La aceptación Chrome, contrato/auth/allowlist/recibo/read-back EP y despliegue siguen pendientes. El OCP canónico main v0.42 y la evidencia de reinstanciación se conservan en main; no se duplicaron en la candidata.
