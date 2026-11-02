@@ -3,9 +3,9 @@
 **Estado:** materialización operativa provisional; no modifica ni sustituye el OCP único ni crea un sistema general de gestión de tareas.  
 **Contenedor:** `docs/frentes/observabilidad-mcp/📁 🧭 - Tareas provisionales/`  
 **OCP padre y fuente de estado:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md)  
-**Control heredado:** [CONTROL-RESPONSABILIDAD.json](../CONTROL-RESPONSABILIDAD.json), generación **5**, titular operativo `chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8`; blob leído de vuelta `92f4f6ab864c19e52a123b6358d94c5a8e7a9474`.  
+**Control heredado:** [CONTROL-RESPONSABILIDAD.json](../CONTROL-RESPONSABILIDAD.json), generación **8**, titular global `chatgpt-khora-mcp-01a19962-c730-7308-975-5bb49e2d`; corresponsable arquitectónico del módulo Jules `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; blob leído de vuelta `68ca6e46db82453839a0cac7ca03fbcd7a26d912`.  
 **Evento de creación:** instrucción expresa del operador en esta conversación · 2026-10-31.  
-**Fuente normativa vigente:** [DUG Samantha v374 · NX-374m](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), Metacanon **1.26**, GOW **2.14**.
+**Fuente normativa vigente:** [DUG Samantha v377 · NX-377m](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), Metacanon **1.28**, GOW **2.17**; blob HTML leído desde `main`: `54064c8fe00f872023a455f06596061ed69062ae`.
 
 ## Naturaleza y límites
 
@@ -52,3 +52,12 @@ El orden es operativo, no introduce prioridad universal, fecha límite ni respon
 ## Corte RDC · 2026-11-01
 
 Se asumió pérdida total del estado volátil de la sesión local anterior. Dispositivo `PC-14` Online, perfil `C:\Users\PC 13`, SID `S-1-5-21-1094932887-1468116028-2730151477-1002`. El checkout `khora-main` quedó intacto en rama de Custodia. El clon dedicado de Khora MCP está en `C:\Users\PC 13\Desktop\Khora\khora-mcp-main`, rama `main`; HEAD de creación `5318f6e21bcd7eaf1d6e45754786d5d58f67d94d`, limpio. El puente pasa comprobaciones estáticas Node/PowerShell. `npm ci` fue bloqueado por seguridad; las pruebas completas del clon permanecen pendientes. Production y Preview se resumen en el §24 del OCP.
+
+
+## Persistencia documental adicional · 2026-11-01
+
+- [Exportación ChatGPT-Khora MCP-20261101-1912.md](../historial/ChatGPT-Khora%20MCP-20261101-1912.md): original recibido por RDC desde `015RENTA01`, `C:\\Users\\PC\\Downloads\\ChatGPT-Khora MCP-20261101-1912.md`; **191,165 bytes**, **3,995 líneas**, SHA-256 `AF046FD336273BC6235050388764F4012C4EC30B1CD48FC233F1CECE46770519`.
+- GitHub `main`: commit `60de4a1f68ad9543ef010dc44f51d5fc6434d6f2`; blob de lectura de vuelta `1985f4a421af709b297af6bcac99fd871977cd16`; comparación textual exacta y tamaño/líneas coincidentes.
+- Manifiesto: [MANIFIESTO-DOCUMENTAL.json](../documentos/MANIFIESTO-DOCUMENTAL.json). El inventario declara solo los exports conversacionales incluidos, no todo el contenido histórico del OCP.
+- El archivo anterior `ChatGPT-Khora MCP-20261031-1846.md` conserva su verificación histórica registrada arriba; no se ha reescrito.
+- El control global permanece en generación **8**. Esta actualización documental no ejecuta transferencia ni incorpora una tercera persona responsable; la modalidad de retoma global queda sujeta a la elección expresa del operador conforme a P037.
