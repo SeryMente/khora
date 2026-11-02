@@ -1786,14 +1786,15 @@ La transferencia de responsabilidad y el dispositivo PC-14 descritos en §46.1 s
 - Las versiones y dispositivos de secciones previas son fotografías históricas; la autoridad vigente de responsabilidad corresponde al control gen14 releído en main.
 
 
-## 48. Candidata local-first integrada sobre main, frontera EP rectificada y validación bloqueada · 2026-11-01
+## 48. Candidata local-first portada a rama limpia desde main, frontera EP rectificada y validación bloqueada · 2026-11-01
 
 ### 48.1. Rama limpia, revisión y procedencia
 
 - Se preservó main en el commit base 8850b47fdfc2b24a670f653b1e3cf883f2bde055. No se integraron los 29 commits históricos de la rama divergida feat/harmonia-ep-local-first-adapter-20261101 (29 ahead / 15 behind respecto de aquel main).
 - Se creó la rama aislada feat/harmonia-local-first-mainline-20261101 desde ese main, sin tocar el clon local de PC-8, que estaba configurado en la rama independiente de Custodia.
-- Commit de código: db2b1e05a131ec37688124276f7c7dd6b381564d. Commit de metadatos: e263163f78b6509267ed21408f4d891355a30784. Head actual de la candidata: e263163f78b6509267ed21408f4d891355a30784.
-- Comparación al abrir revisión: main...feat/harmonia-local-first-mainline-20261101 = 2 commits ahead / 0 behind, sin divergencia.
+- Commit de código: db2b1e05a131ec37688124276f7c7dd6b381564d. Commit de metadatos/build: e263163f78b6509267ed21408f4d891355a30784. Commit de OCP/README/crónica/evidencia: adb3944b2235c04855784945bcfea23967285680. El manifiesto se reconcilió sobre ese corte en el commit 09d8d5976245bc226e264d7969e5a1f920a4081c.
+- Comparación al abrir PR: 2 commits ahead / 0 behind. Tras incorporar el primer lote documental, la comparación consultada fue 4 commits ahead / 0 behind. El commit de reconciliación documental de este apartado añade el manifiesto y los ajustes finales; no se presenta como merge.
+- En el último snapshot previo a esta reconciliación documental, GitHub mostraba PR head 09d8d5976245bc226e264d7969e5a1f920a4081c y mergeable=true. El HEAD de código/build es e263163f78b6509267ed21408f4d891355a30784; no confundir ambos.
 - PR #351, título “feat(harmonia): durable local-first outbox and EP ledger”, permanece abierta en borrador. No equivale a aprobación ni aceptación.
 - La nueva candidata se construyó a partir de los fuentes de local-first seleccionados; no importa la antigua documentación OCP v0.40 ni sustituye el OCP canónico. Los cambios incluyen outbox IndexedDB, ledger local EP, colector durable, señalización del popup, metadatos de build y workflow de pruebas.
 
@@ -1817,7 +1818,7 @@ La transferencia de responsabilidad y el dispositivo PC-14 descritos en §46.1 s
 ### 48.4. Validación observada y límites
 
 - El workflow anterior 41355059144 tuvo conclusión success para el corte anterior 3fc095557ca090e4d446a9caf375f6e0043ddf57 en la antigua rama local-first. No es prueba del HEAD actual ni de la candidata PR #351.
-- En el HEAD e263163f78b6509267ed21408f4d891355a30784, el workflow local-first 41364608505 y el CI general 41364608607 terminaron en failure. Los cuatro jobs consultados no exponen pasos (steps=[]), y la descarga de logs responde BlobNotFound. Causa raíz de la ausencia de ejecución/logs: NO DETERMINADA. Por ello, las pruebas de este HEAD quedan NO EJECUTADAS / NO DIAGNOSTICABLES, no PASS y tampoco fallo atribuible a una aserción.
+- En el corte inicial e263163f78b6509267ed21408f4d891355a30784, el workflow local-first 41364608505 y el CI general 41364608607 terminaron en failure. Los eventos posteriores de PR sobre los commits documentales también terminaron en failure: 41365195109 (HARMONIA), 41365195098 (CI), 41365195100 (UI Quality) y 41365195137 (khora-ok/gate). En todos los jobs consultados, steps=[]; las descargas de logs consultadas devuelven BlobNotFound. Causa raíz de la ausencia de ejecución/logs: NO DETERMINADA. Por ello, las pruebas de la candidata actual quedan NO EJECUTADAS / NO DIAGNOSTICABLES, no PASS y tampoco fallo atribuible a una aserción.
 - La consulta de PC-8 confirmó el equipo autorizado online, pero no se consiguió una ejecución local alternativa: el control de seguridad del conector bloqueó la materialización remota de los archivos de prueba. No se declara validación local.
 - Los checks Vercel muestran la restricción del plan Hobby ante el repositorio privado de organización. Son bloqueos externos del preview, no una prueba de código.
 - No se cargó ni recargó la extensión; no se probó IndexedDB real, suspensión MV3, reconexión, persistencia bajo cuota ni uso natural. No hay mediciones nuevas de CPU/RAM/latencia.
@@ -1836,4 +1837,4 @@ La transferencia de responsabilidad y el dispositivo PC-14 descritos en §46.1 s
 - Hecho: candidata local-first publicada en PR #351 draft; outbox/ledger/colector/popup/build metadata/workflow están en la rama.
 - No aceptado: tests del HEAD actual, runtime Chrome, E2E natural, transporte remoto EP, persistencia B2, backfill, merge y despliegue.
 - No ejecutado: escritura productiva Cora/Neon, cambios de infraestructura EP/B2, acceso a Chrome/perfiles, merge a main y deploy.
-- El OCP v0.42 documenta el estado de la candidata y las compuertas; no declara que la nueva versión de código esté integrada en main. La capa remota permanece fail-closed hasta que se verifique contrato, identidad, allowlist, recibo y read-back.
+- Este archivo v0.42 y el README asociado son una propuesta documental en la rama PR #351. El OCP canónico de main permanece v0.41 hasta que la PR se revise y se fusione. La candidata de código continúa sin aceptación; la capa remota permanece fail-closed hasta verificar contrato, identidad, allowlist, recibo y read-back.

@@ -48,7 +48,15 @@
     },
     "buildInfoBlobSha1": "1df069d7b53d2264240d2d3bdeacebfe4cca2c69",
     "manifestVersion": "0.3.0",
-    "visibleMessageTextCapture": false
+    "visibleMessageTextCapture": false,
+    "lastBranchSnapshot": {
+      "head": "09d8d5976245bc226e264d7969e5a1f920a4081c",
+      "compare": {
+        "aheadBy": 4,
+        "behindBy": 0
+      },
+      "scope": "snapshot before final documentation reconciliation"
+    }
   },
   "implementation": {
     "indexedDbOutbox": true,
@@ -135,6 +143,35 @@
     "alternativePc8LocalValidation": {
       "state": "BLOCKED_BY_CONNECTOR_SECURITY_CONTROL",
       "result": "NOT_EXECUTED"
+    },
+    "latestPullRequestRuns": {
+      "harmonia": {
+        "runId": 41365195109,
+        "conclusion": "failure",
+        "jobsWithoutSteps": 1,
+        "logs": "BlobNotFound",
+        "rootCause": "NOT_DETERMINED"
+      },
+      "ci": {
+        "runId": 41365195098,
+        "conclusion": "failure",
+        "jobsWithoutSteps": 3,
+        "logs": "BlobNotFound",
+        "rootCause": "NOT_DETERMINED"
+      },
+      "uiQuality": {
+        "runId": 41365195100,
+        "conclusion": "failure",
+        "jobsWithoutSteps": 2,
+        "logs": "BlobNotFound",
+        "rootCause": "NOT_DETERMINED"
+      },
+      "khoraOk": {
+        "runId": 41365195137,
+        "conclusion": "failure",
+        "jobsWithoutSteps": 1,
+        "rootCause": "NOT_DETERMINED"
+      }
     }
   },
   "acceptance": {

@@ -6,7 +6,7 @@
   "ocp_path": "docs/frentes/harmonia/",
   "manifest_path": "docs/frentes/harmonia/documentos/MANIFIESTO-DOCUMENTAL.json",
   "ocp_version": "0.42",
-  "ocp_blob_sha1": "c1d0d5eb9115f73bceac630931e859e1279c4448",
+  "ocp_blob_sha1": "321ca065a2c9d1919382edd71869bd927b777641",
   "responsibility": {
     "generation": 14,
     "owner_alias": "chatgpt-harmonia-01a19969-8e70-7dcb-b9fd-7db62736f279",
@@ -22,17 +22,17 @@
   },
   "README": {
     "path": "docs/frentes/harmonia/README.md",
-    "git_blob_sha1": "96e10e68013cf4232e4c953c759e6c99584fdc72",
+    "git_blob_sha1": "02cff2f655bc4d8faa30c4b0d46d1dcbbc2af016",
     "state": "PERSISTIDO_Y_VERIFICADO_EN_BRANCH_PR",
     "readback_exact": true
   },
   "candidate_technical_branch": {
     "branch": "feat/harmonia-local-first-mainline-20261101",
-    "head": "adb3944b2235c04855784945bcfea23967285680",
     "code_commit": "db2b1e05a131ec37688124276f7c7dd6b381564d",
     "build_metadata_commit": "e263163f78b6509267ed21408f4d891355a30784",
-    "documentation_commit": "adb3944b2235c04855784945bcfea23967285680",
-    "candidate_ocp_blob_sha1": "c1d0d5eb9115f73bceac630931e859e1279c4448",
+    "first_documentation_commit": "adb3944b2235c04855784945bcfea23967285680",
+    "last_branch_snapshot_before_final_docs": "09d8d5976245bc226e264d7969e5a1f920a4081c",
+    "candidate_ocp_blob_sha1": "321ca065a2c9d1919382edd71869bd927b777641",
     "pull_request": 351,
     "pull_request_url": "https://github.com/SeryMente/khora/pull/351",
     "pull_request_state": "open",
@@ -40,16 +40,19 @@
     "base_branch": "main",
     "base_commit_at_creation": "8850b47fdfc2b24a670f653b1e3cf883f2bde055",
     "compare_at_pr_creation": {
-      "status": "ahead",
       "ahead_by": 2,
       "behind_by": 0
     },
+    "compare_after_initial_documentation": {
+      "ahead_by": 4,
+      "behind_by": 0
+    },
     "merged": false,
-    "remote_ep_enabled": false,
     "chrome_accepted": false,
+    "remote_ep_enabled": false,
     "ci_state": "NOT_DIAGNOSTICABLE_NO_STEPS_LOGS_BLOB_NOT_FOUND"
   },
-  "inventory_note": "Existing original/session records retain their historical-reference status unless explicitly revalidated. This candidate cycle adds one chronicle and one evidence record with exact branch read-back; other prior entries were not rehashed. Manifest/OCP version 0.42 describes the proposed state on the PR branch and is not yet canonical main.",
+  "inventory_note": "Existing original/session records retain their historical-reference status unless explicitly revalidated. This cycle adds a chronicle and evidence record in the PR branch with read-back verification. Other prior entries were not rehashed. OCP v0.42 is proposed on the draft PR branch; canonical main remains v0.41 until merge.",
   "entries": [
     {
       "document_id": "HAR-EXISTING-70663c69e843",
@@ -354,7 +357,7 @@
       "document_id": "HAR-CHRONICLE-G14-LOCAL-FIRST-20261101",
       "original_name": "HARMONIA-LOCAL-FIRST-MAINLINE-G14-20261101.md",
       "canonical_path": "docs/frentes/harmonia/cronica/HARMONIA-LOCAL-FIRST-MAINLINE-G14-20261101.md",
-      "git_blob_sha1": "598250a802e2dd1d797b0c0a216f5e56fd996707",
+      "git_blob_sha1": "f7935baf25763e5df4c80c57edf18e99ecf47294",
       "sha256": null,
       "classification": "cycle_chronicle",
       "persistence_state": "PERSISTIDO_Y_VERIFICADO_EN_BRANCH_PR",
@@ -365,7 +368,7 @@
       "document_id": "HAR-EVIDENCE-G14-LOCAL-FIRST-20261101",
       "original_name": "EV-HARMONIA-LOCAL-FIRST-G14-20261101.json",
       "canonical_path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-LOCAL-FIRST-G14-20261101.json",
-      "git_blob_sha1": "589ef10fe505dc88ddd58a0f7fe45a6ff7eb4615",
+      "git_blob_sha1": "c3ed7b183f0a91a016277913da7b76735df10574",
       "sha256": null,
       "classification": "cycle_evidence",
       "persistence_state": "PERSISTIDO_Y_VERIFICADO_EN_BRANCH_PR",
@@ -396,11 +399,15 @@
     "generation": 14,
     "date": "2026-11-01",
     "status": "OPEN_DRAFT_REVIEW",
-    "main_base": "8850b47fdfc2b24a670f653b1e3cf883f2bde055",
+    "main_canonical_ocp_version": "0.41",
+    "candidate_ocp_version": "0.42",
     "branch": "feat/harmonia-local-first-mainline-20261101",
-    "head": "adb3944b2235c04855784945bcfea23967285680",
+    "last_snapshot_before_final_docs": "09d8d5976245bc226e264d7969e5a1f920a4081c",
+    "compare_after_initial_documentation": {
+      "ahead_by": 4,
+      "behind_by": 0
+    },
     "pr": 351,
-    "ocp_version": "0.42",
     "ep_destination_from_oep_section91": "OCP-MCP",
     "ep_contract_verified": false,
     "ep_transport_enabled": false,
@@ -410,14 +417,16 @@
   },
   "latest_cycle_chronicle": {
     "path": "docs/frentes/harmonia/cronica/HARMONIA-LOCAL-FIRST-MAINLINE-G14-20261101.md",
-    "git_blob_sha1": "598250a802e2dd1d797b0c0a216f5e56fd996707",
+    "git_blob_sha1": "f7935baf25763e5df4c80c57edf18e99ecf47294",
     "state": "PERSISTIDO_Y_VERIFICADO_EN_BRANCH_PR",
     "readback_exact": true
   },
   "latest_cycle_evidence": {
     "path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-LOCAL-FIRST-G14-20261101.json",
-    "git_blob_sha1": "589ef10fe505dc88ddd58a0f7fe45a6ff7eb4615",
+    "git_blob_sha1": "c3ed7b183f0a91a016277913da7b76735df10574",
     "state": "PERSISTIDO_Y_VERIFICADO_EN_BRANCH_PR",
     "readback_exact": true
-  }
+  },
+  "ocp_publication_state": "DRAFT_PR_BRANCH_NOT_MERGED",
+  "main_canonical_ocp_version_at_base": "0.41"
 }

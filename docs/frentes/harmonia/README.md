@@ -9,13 +9,13 @@ Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). El OCP conse
 
 ## Estado vigente · 2026-11-01 · generación 14
 
-- OCP principal: v0.42 / HARMONIA-v0.42, §§46–48.
+- OCP canónico de main al abrir esta PR: v0.41 / HARMONIA-v0.41. Esta rama propone actualizar el objeto a v0.42 / HARMONIA-v0.42, §§46–48; la propuesta no es canónica hasta el merge.
 - Control: generación 14; alias operativo chatgpt-harmonia-01a19969-8e70-7dcb-b9fd-7db62736f279.
 - RDC activo: PC-8, UUID 7595d30a-bd63-4bc0-a274-f4ae90928247. PC-14 queda como histórico supersedido.
 - Original persistido y leído de vuelta: originales/ChatGPT-HARMONIA-20261101-1709.md; 174033 bytes; SHA-256 A3F10DAF7055B3B16B3F978909C9AFC77ECC6EA8486DF43FE50647297AAA00A6; Git blob 1e1ddd38fd4e3b7c6a1d6cb429467430e4d80ab5.
 - Procedencia y estado: originales/PROCEDENCIA.md; documentos/MANIFIESTO-DOCUMENTAL.json; cronica/HARMONIA-RETOMA-G14-20261101.md. Evidencia: evidencias/EV-HARMONIA-G14-20261101.json.
-- Candidata local-first de revisión: PR #351, rama feat/harmonia-local-first-mainline-20261101, HEAD e263163f78b6509267ed21408f4d891355a30784; 2 commits sobre main al abrir PR, sin merge.
-- Los runs nuevos 41364608505 y 41364608607 no exponen pasos ni logs (BlobNotFound); la suite de este HEAD no se considera ejecutada. No confundir el PASS histórico 41355059144 con el nuevo candidato.
+- Candidata local-first de revisión: PR #351, rama feat/harmonia-local-first-mainline-20261101, abierta en borrador; no fusionada. El commit de código/build es e263163f78b6509267ed21408f4d891355a30784; los commits documentales se conservan por separado. La comparación fue 2 commits ahead / 0 behind al abrir la PR y 4 ahead / 0 behind tras el primer lote documental.
+- Los runs de push/PR 41364608505, 41364608607, 41365195109, 41365195098, 41365195100 y 41365195137 no exponen pasos (steps=[]) y los logs consultados devuelven BlobNotFound. La suite de la candidata no se considera ejecutada. No confundir el PASS histórico 41355059144 con este candidato.
 - EP remoto permanece bloqueado; OEP §91 fija OCP-MCP como único destino B2 previsto. No hay cuenta/key/scope autenticados, contrato, allowlist, recibo ni read-back verificados. Aceptación Chrome pendiente.
 
 ## Antecedentes históricos de código y aceptación (no vigentes)
@@ -52,7 +52,7 @@ La consulta viva de RDC de este ciclo confirma que el UUID autorizado de PC-14 `
 
 ## Estado activo · revisión HARMONIA-CICLO-SES-20261028-P9K4R7M2-20261029
 
-- OCP canónico: [OBJETO-CANONICO.md](OBJETO-CANONICO.md), v0.28 / HARMONIA-v0.28, §35; blob leído de vuelta `88c2cbaec4b0f21bc00506e78ebd2913e5679b44`.
+- El OCP v0.28 citado en este bloque es histórico. El OCP canónico de main al corte de esta PR es v0.41; la propuesta v0.42 / HARMONIA-v0.42 está en PR #351, abierta en borrador y sin merge.
 - Responsabilidad sin cambios: `CONTROL-RESPONSABILIDAD.json`, generación 8, folio activo `SES-20261028-P9K4R7M2`, alias `chatgpt-harmonia-SES-20261028-P9K4R7M2`, blob actual `2b8e5091e621b1017ed1e55f2796cc48f9ba444b`. U20 conserva la autorización literal `Si` (blob `bfe29b24091e039f901592b66887336a9b8b0235`). No se transfirió ni mutó el control en este ciclo.
 - Gobierno rereleído en `SeryMente/metodologia/main`: DUG v360 / NX-360m, blob `3cda9d38db1bee76ff0ca752f3ecde8719c70d41`; INICIO blob `345d2b383f07c762afbdcc2dc567ce27451aa6e5`; Metacanon 1.24 y GOW 2.9 integrados. Commit/edad exactos no expuestos. `MCP-NORMATIVO: DESACTIVADO`; metodología no se modificó.
 - Original de solicitud U21: [`HARMONIA-REVISION-E2E-SES-20261028-P9K4R7M2-20261029.jsonl`](originales/HARMONIA-REVISION-E2E-SES-20261028-P9K4R7M2-20261029.jsonl), blob `fa55c374b504b29c2565b310b343cf081c4e7c71`. Salida y crónica: [salida del ciclo](originales/HARMONIA-CICLO-SES-20261028-P9K4R7M2-20261029-salida.md) y [crónica](cronica/HARMONIA-CICLO-SES-20261028-P9K4R7M2-20261029.md).
