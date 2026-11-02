@@ -1053,37 +1053,6 @@
           "FOL1 PREPARADO NO ACTIVO"
         ]
       }
-    },
-    {
-      "operation": "ADD_CO_RESPONSIBLE",
-      "event_id": "01a19912-7918-7602-af7a-e2828585e314",
-      "event": "KHORA-MCP-ADD-CO-RESPONSIBLE-JULES-20261101-8585E314",
-      "from_generation": 6,
-      "to_generation": 7,
-      "previous_primary_owner_alias": "chatgpt-khora-mcp-01a19905-d279-7b15-a5fe-77257942c044",
-      "retained_primary_owner_alias": "chatgpt-khora-mcp-01a19499-caec-7e19-beb9-bb5b890a36c8",
-      "added_co_responsible_alias": "chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314",
-      "added_scope": "module:jules",
-      "native_conversation_id": null,
-      "uuidv7_local": "01a19912-7918-7602-af7a-e2828585e314",
-      "authorization_ref": "Instrucción literal del operador en esta conversación: «Espera da mnarcha atras, y haz que en  vez de asumir frente de Khora MCP, asumas y crees modulo Jules, en Khora MCP, ya hay infraestrucutra para modulos.» Se interpreta como rechazo de TRANSFER_RESPONSIBILITY del frente padre y autorización de ADD_CO_RESPONSIBLE con alcance acotado al módulo funcional Jules, preservando al titular anterior.",
-      "source_control_blob_sha": "f134b2b42e1926bcc5398a6abf30c758c9ff03e8",
-      "result": "VERIFIED: ADD_CO_RESPONSIBLE retained prior KHORA-MCP primary owner and added exactly one module:jules co-responsible; generation 7, SHA and read-back matched. No native conversation ID or session folio assigned.",
-      "verification": {
-        "status": "VERIFIED",
-        "readback_blob_sha": "2de670b6143cb64e0e8950af41197455296652eb",
-        "update_commit_sha": "9960d94192f3d3bb8127890049448e57b068f1d2",
-        "verified_at_local": "2026-11-01T15:42:00-06:00",
-        "confirmed": [
-          "generation=7",
-          "primary owner preserved",
-          "exactly two active_responsibles",
-          "co-responsible scope=module:jules",
-          "no native conversation ID claimed",
-          "session_folio=null",
-          "FOL1 PREPARADO NO ACTIVO"
-        ]
-      }
     }
   ],
   "transfer_record_history": [
