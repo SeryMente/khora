@@ -68,6 +68,6 @@ Se asumió pérdida total del estado volátil de la sesión local anterior. Disp
 - Operación: `TRANSFER_RESPONSIBILITY`, generación 8 → 9; evento `KHORA-MCP-TRANSFER-20261101-278FF01D`.
 - Titular vigente: `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229`; alias operativo derivado de UUIDv7 local, sin ID nativo de conversación.
 - Titular anterior gen8 archivado; Jules permanece como corresponsable arquitectónico modular.
-- Control blob de lectura de vuelta: `4fba2187947730abca0cc338429dfacf4810594c`; commit: `87fbfdd4ab5f76978f7f016cde9381c274668ece`.
+- Control blob de lectura de vuelta: `4fba2187947730abca0cc338429dfacf4810594c`; commit de verificación de transferencia: `87fbfdd4ab5f76978f7f016cde9381c274668ece`; commit de consolidación final del control: `87a8ed32dbf1a3d8818e06e73e76c6d8766c022b`.
 - El control conserva dos responsables activos; `session_folio=null`; FOL1 PREPARADO, NO ACTIVO.
 - La persistencia de export, manifiesto, OCP y tareas permanece en sus rutas; el checkout y las pruebas E2E de Jules continúan pendientes.
