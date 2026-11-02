@@ -256,3 +256,15 @@ La suite completa `node --import tsx --test tests/traceability_session.test.ts` 
 #### Estado de proveedor
 
 La identidad `the.willfreeman@gmail.com` ya está documentada, pero no se ha autenticado CLI contra Backblaze, no se ha obtenido una Application Key, no se ha enumerado el bucket productivo y no se ha provisionado un bucket de pruebas. Las variables productivas de Vercel no se descifraron ni se consultaron. Permanecen pendientes la verificación de acceso a la cuenta, el identificador/nombre del bucket de destino y una Application Key de pruebas de mínimo privilegio. No se ejecutaron escrituras, borrados, CORS, backfill, migración real, deploy ni merge.
+
+### CI remoto y pin del contrato privado — actualización 2026-11-02
+
+El repositorio canónico `SeryMente/metodologia` es privado. La copia local KHORA `khora-web/contracts/FORMATO-REGISTRO-VERIFICACION-CICLO.schema.json` fue cotejada mediante lectura autenticada de ambos repositorios: el SHA del Git blob local y el del archivo canónico coinciden exactamente en `232590a1f6339e2517e67038e1b5f7e8bd1638e3` (versión `v1.7.7`).
+
+La prueba `tests/unit/methodology_contract_sync.test.ts` se modificó para calcular el Git blob SHA sobre bytes UTF-8 con finales de línea normalizados LF y compararlo con ese pin revisado. Así mantiene una comparación exacta sin depender de red, del ejecutable `gh` ni de un token cross-repository durante CI. Una actualización futura del contrato debe cotejar la fuente privada mediante acceso autorizado y cambiar el pin en una revisión explícita.
+
+Después del commit `60f4f9d69a99adfc46c852e2c59d189ef4498cd3`, GitHub volvió a lanzar los workflows `CI` (run `41364914819`), `UI Quality` (run `41364914806`) y `khora-ok / gate` (run `41364914883`). Los tres terminaron en `failure` aproximadamente tres segundos después de iniciar. La API de jobs no devolvió pasos y la descarga de cada log respondió `BlobNotFound` (HTTP 404); por ello no se pudo identificar la causa interna ni confirmar que los runners ejecutaran los comandos. No se atribuye este resultado al código ni se marca CI como aprobado.
+
+Los checks de despliegue Vercel continúan fallando con el destino de actualización del plan Hobby ante repositorio privado; Netlify también reporta un deploy-preview fallido. Estas señales no equivalen a una prueba de código ni justifican cambiar el proyecto productivo `khora-web` o desplegar desde otra cuenta.
+
+El último estado comprobado de PR #348 es abierto, en borrador y sin merge. No se ejecutó deploy, migración real, escritura en Backblaze, cambio de CORS ni backfill.
