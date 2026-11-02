@@ -46,12 +46,38 @@ function formatDate(value){
  if(!value)return 'Esperando el primer barrido natural.';
  const d=new Date(value);return Number.isNaN(d.getTime())?'Último barrido sin fecha válida.':'Último barrido: '+d.toLocaleString();
 }
+function paintRepository(sync){
+ const status=sync?.status||'pending';
+ const labels={pending:'Sincronización aún no consultada',current:'Metadatos y catálogo de main verificados','catalog-updated':'Catálogo actualizado desde main','update-available':'Hay una versión de código más reciente en main',error:'No se pudo verificar main'};
+ const checked=sync?.checkedAt?new Date(sync.checkedAt):null;
+ const checkedText=checked&&!Number.isNaN(checked.getTime())?' · '+checked.toLocaleString():'';
+ $('#repoStatus').textContent=(labels[status]||'Estado de sincronización desconocido')+checkedText;
+ $('#repoDot').className='repoDot '+(status==='current'||status==='catalog-updated'?'live':status==='error'?'off':'');
+ if(status==='error')$('#repoDetail').textContent='El repositorio solo se consulta para metadatos y catálogo; no se descarga ni ejecuta código remoto. '+String(sync?.error||'Error sin detalle');
+ else if(status==='update-available')$('#repoDetail').textContent='Versión local '+String(sync?.localVersion||'—')+' · main '+String(sync?.remoteVersion||'—')+'. La actualización de código no se aplica automáticamente.';
+ else if(status==='catalog-updated')$('#repoDetail').textContent='Catálogo '+String(sync?.catalogVersion||'—')+' leído y validado. El código remoto nunca se ejecuta dentro de la extensión.';
+ else if(status==='current')$('#repoDetail').textContent='Versión '+String(sync?.localVersion||'—')+' · revisión '+String(sync?.localRevision||'—').slice(0,12)+'. Solo se sincronizan metadatos y catálogo.';
+ else $('#repoDetail').textContent='Sincronización de solo lectura cada seis horas. El código remoto nunca se ejecuta dentro de la extensión.';
+}
 async function paint(){
  try{
   if(!catalog)await loadCatalog();
   const response=await call('harmonia:get');
   if(!response.ok)throw new Error(response.error||'No se pudo consultar el service worker.');
   const state=response.value||{},coverage=state.coverage||{};
+  const outbox=state.localOutbox||{};
+  const ep=state.epStatus||{};
+  paintRepository(state.repositorySync||null);
+  const pending=Number(outbox.pendingCount||0);
+  $('#localPersistence').textContent='Cola durable del navegador: '+pending+' pendientes / '+Number(outbox.capacity||10000)+' · reintentos: '+Number(outbox.retryingCount||0)+(outbox.oldestQueuedAt?' · desde '+new Date(outbox.oldestQueuedAt).toLocaleString():' · sin pendientes');
+  const ledgerHealthy=ep.localLedger==='READY';
+  $('#persistenceDot').className='repoDot '+(pending===0&&ledgerHealthy?'live':ep.localLedger==='DEGRADED'?'off':'');
+  $('#epPersistence').textContent=ep.localLedger==='DEGRADED'
+    ?'Ledger local degradado; el colector debe recuperarlo antes de aceptar nuevos eventos.'
+    :ep.localLedger==='READY'
+      ?'Ledger local: '+Number(ep.localRecords||0)+' registros · nube: '+Number(ep.cloudPendingCount||0)+' pendientes locales. Transporte EP deshabilitado: '+(ep.blockers||['EP_OFFICIAL_CONTRACT_UNAVAILABLE']).join(', ')+'.'
+      :'Estado EP no leído del colector local. No se declara persistencia remota.';
+
   const features=(catalog.features||[]).filter(f=>f.scope!=='out');
   const totalWeight=features.reduce((n,f)=>n+weight(f),0);
   const docWeight=features.filter(isDocumented).reduce((n,f)=>n+weight(f),0);
@@ -93,4 +119,10 @@ toggle.addEventListener('click',async()=>{
  await paint();
 });
 $('#refresh').addEventListener('click',()=>void paint());
+$('#syncNow').addEventListener('click',async()=>{
+ const button=$('#syncNow');button.disabled=true;button.textContent='Consultando…';
+ const result=await call('harmonia:sync-repository');
+ if(!result.ok)alert(result.error||'No se pudo consultar el repositorio.');
+ button.textContent='Sincronizar ahora';await paint();button.disabled=false;
+});
 void paint();
