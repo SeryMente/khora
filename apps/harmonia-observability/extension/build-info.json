@@ -1,0 +1,46 @@
+{
+  "schema": "harmonia.repository-build.v1",
+  "version": "0.3.0",
+  "sourceRevision": "db2b1e05a131ec37688124276f7c7dd6b381564d",
+  "catalogVersion": "0.1.2",
+  "releaseChannel": "candidate",
+  "captureContract": {
+    "automaticOnChatGptTabOpen": true,
+    "multipleTabs": true,
+    "surfaceStructure": true,
+    "visibleUserAndAssistantMessages": false,
+    "partialAndFinalMessageUpdates": false,
+    "pageConsoleObservation": false,
+    "composerDrafts": false,
+    "formFieldValues": false,
+    "fullUrls": false,
+    "imageUrls": false,
+    "hiddenReasoning": false
+  },
+  "ui": {
+    "compactPopup": true,
+    "repositoryMetadataStatus": true,
+    "localOutboxStatus": true,
+    "epLocalLedgerStatus": true,
+    "dedicatedDashboardTab": false
+  },
+  "observationPersistence": {
+    "browserIndexedDbOutbox": true,
+    "localCollectorJsonl": true,
+    "localAppendOnlyReferenceLedger": true,
+    "localReadback": true,
+    "remoteEPTransport": false,
+    "remoteReceipt": false,
+    "remoteReadback": false,
+    "epPersistedVerified": false,
+    "historicalBackfill": false,
+    "localCollectorAckIsNotRemoteEPReceipt": true
+  },
+  "ep": {
+    "transportEnabled": false,
+    "normativeCandidateB2Bucket": "OCP-MCP",
+    "bucketAuthenticatedOrVerified": false,
+    "consumerContractVerified": false,
+    "allowlistApproved": false
+  }
+}
