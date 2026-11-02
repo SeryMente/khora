@@ -22,7 +22,7 @@
   },
   "README": {
     "path": "docs/frentes/harmonia/README.md",
-    "git_blob_sha1": "02cff2f655bc4d8faa30c4b0d46d1dcbbc2af016",
+    "git_blob_sha1": "85ec4f25f4177b697e1c339f189899fd24f5c858",
     "state": "PERSISTIDO_Y_VERIFICADO_EN_BRANCH_PR",
     "readback_exact": true
   },
@@ -50,7 +50,9 @@
     "merged": false,
     "chrome_accepted": false,
     "remote_ep_enabled": false,
-    "ci_state": "NOT_DIAGNOSTICABLE_NO_STEPS_LOGS_BLOB_NOT_FOUND"
+    "ci_state": "NOT_DIAGNOSTICABLE_NO_STEPS_LOGS_BLOB_NOT_FOUND",
+    "readme_correction_commit": "caf6ca287aad65121afe5e7dd0bb8ac13497e9ad",
+    "last_verified_head_before_manifest_update": "caf6ca287aad65121afe5e7dd0bb8ac13497e9ad"
   },
   "inventory_note": "Existing original/session records retain their historical-reference status unless explicitly revalidated. This cycle adds a chronicle and evidence record in the PR branch with read-back verification. Other prior entries were not rehashed. OCP v0.42 is proposed on the draft PR branch; canonical main remains v0.41 until merge.",
   "entries": [
@@ -413,7 +415,12 @@
     "ep_transport_enabled": false,
     "chrome_acceptance": false,
     "merge": false,
-    "deployment": false
+    "deployment": false,
+    "compare_after_readme_correction": {
+      "ahead_by": 6,
+      "behind_by": 0,
+      "branch_head_before_manifest_update": "caf6ca287aad65121afe5e7dd0bb8ac13497e9ad"
+    }
   },
   "latest_cycle_chronicle": {
     "path": "docs/frentes/harmonia/cronica/HARMONIA-LOCAL-FIRST-MAINLINE-G14-20261101.md",
