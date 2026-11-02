@@ -268,3 +268,16 @@ Después del commit `60f4f9d69a99adfc46c852e2c59d189ef4498cd3`, GitHub volvió a
 Los checks de despliegue Vercel continúan fallando con el destino de actualización del plan Hobby ante repositorio privado; Netlify también reporta un deploy-preview fallido. Estas señales no equivalen a una prueba de código ni justifican cambiar el proyecto productivo `khora-web` o desplegar desde otra cuenta.
 
 El último estado comprobado de PR #348 es abierto, en borrador y sin merge. No se ejecutó deploy, migración real, escritura en Backblaze, cambio de CORS ni backfill.
+
+
+### Reintento automático de CI tras la actualización documental — 2026-11-02
+
+El commit documental `8107fe6fdb0961c4b090a57324acbc692521c0cb` activó nuevas ejecuciones de PR para el mismo HEAD:
+
+- CI: run `41365015777`.
+- UI Quality: run `41365015804`.
+- khora-ok / gate: run `41365015929`.
+
+Los tres workflows volvieron a terminar con conclusión `failure`. La API de GitHub devolvió jobs completados con `logs_url=null` y `steps=null`; los intentos de descargar los logs anteriores del mismo patrón también respondieron `BlobNotFound` HTTP 404. No hay evidencia accesible para decidir si fallaron al preparar runner, checkout, instalar dependencias o ejecutar una prueba. La suite local focalizada y el build local están verdes, pero no sustituyen el CI remoto. No volver a reintentar a ciegas hasta disponer de diagnóstico de Actions.
+
+El dispositivo PC-8 continuó registrado como Online pero con último contacto de varios minutos y comandos RDC expirados. Por eso la actualización posterior del test privado y este apéndice se hicieron por GitHub Contents API (CLI/headless, sin navegador); el checkout local de PC-8 no se declaró sincronizado con los commits que se hicieron mientras estaba inaccesible.
