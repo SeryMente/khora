@@ -5,14 +5,16 @@
   "branch": "main",
   "ocp_path": "docs/frentes/harmonia/",
   "manifest_path": "docs/frentes/harmonia/documentos/MANIFIESTO-DOCUMENTAL.json",
-  "ocp_version": "0.41",
-  "ocp_blob_sha1": "57ec807b64299dab47425a6e51f18303c873cf84",
+  "ocp_version": "0.42",
+  "ocp_blob_sha1": "27f671eefaa87ac52792d0afff1d2e4e3deb6008",
   "responsibility": {
     "generation": 14,
     "owner_alias": "chatgpt-harmonia-01a19969-8e70-7dcb-b9fd-7db62736f279",
     "uuidv7_local_event": "01a19969-8e70-7dcb-b9fd-7db62736f279",
-    "control_blob_sha1": "41c4ace91267104eb472ffdec0fb27ed04651927",
-    "authorized_device_id": "7595d30a-bd63-4bc0-a274-f4ae90928247"
+    "control_blob_sha1": "90e24321237000fea6b594c62fc3564445c82bc6",
+    "authorized_device_id": "aacf2eb5-17f4-428e-9242-c24a1fe4a2ec",
+    "device_authorization_event": "01a199c8-8bc1-79fb-a4a8-e3088850c9bc",
+    "session_folio": null
   },
   "provenance_index": {
     "path": "docs/frentes/harmonia/originales/PROCEDENCIA.md",
@@ -22,17 +24,35 @@
   },
   "README": {
     "path": "docs/frentes/harmonia/README.md",
-    "git_blob_sha1": "c316044df956b9b3d133f3e6880bf9968819543f",
+    "git_blob_sha1": "9fd30f2d4f8c4600a36cd95e82f0e07a3799bd45",
     "state": "PERSISTIDO_Y_VERIFICADO",
     "readback_exact": true
   },
   "candidate_technical_branch": {
-    "branch": "feat/harmonia-ep-local-first-adapter-20261101",
+    "branch": "feat/harmonia-local-first-mainline-20261101",
     "head": "b1d007d63672bf06e50daa40d52bf1b228f398f3",
     "candidate_ocp_blob_sha1": "312ad814e83ec904ff6d9b75100e7979abc72ce3",
-    "merged": false
+    "merged": false,
+    "pull_request": 351,
+    "pull_request_url": "https://github.com/SeryMente/khora/pull/351",
+    "pull_request_state": "open",
+    "draft": true,
+    "main_base_at_creation": "8850b47fdfc2b24a670f653b1e3cf883f2bde055",
+    "current_main_has_advanced": true,
+    "branch_contains_current_control_blob": "90e24321237000fea6b594c62fc3564445c82bc6",
+    "branch_current_device_id": "aacf2eb5-17f4-428e-9242-c24a1fe4a2ec",
+    "local_first_validation": {
+      "tests": 10,
+      "pass": 10,
+      "fail": 0,
+      "exitCode": 0,
+      "node": "v24.22.2"
+    },
+    "chrome_accepted": false,
+    "remote_ep_enabled": false,
+    "ci_state": "GITHUB_ACTIONS_FAILURE_NO_STEPS_LOGS_BLOB_NOT_FOUND"
   },
-  "inventory_note": "Existing records are listed from the current Git main directory index. Their Git blob SHA/size are metadata; prior items were not rehashed or re-read in this cycle. The new export was fully read back and cotejated.",
+  "inventory_note": "Prior original/session entries are retained as historical inventory and were not rehashed in this cycle. This cycle adds one exact-readback chronicle and one exact-readback local validation evidence record. Main OCP is v0.42. FOL1 remains inactive; no global folio is allocated.",
   "entries": [
     {
       "document_id": "HAR-EXISTING-70663c69e843",
@@ -332,6 +352,28 @@
       "readback_method": "GitHub fetch_file from main; exact string comparison against RDC read_file source; also fetch_blob pre-publication exact comparison",
       "readback_exact": true,
       "revalidated_this_cycle": true
+    },
+    {
+      "document_id": "HAR-CHRONICLE-RDC-RESET-G14-20261101",
+      "original_name": "HARMONIA-RDC-RESET-G14-20261101.md",
+      "canonical_path": "docs/frentes/harmonia/cronica/HARMONIA-RDC-RESET-G14-20261101.md",
+      "git_blob_sha1": "62ad4a208d33608d71769ea79279c6164f276b99",
+      "sha256": null,
+      "classification": "cycle_chronicle",
+      "persistence_state": "PERSISTIDO_Y_VERIFICADO",
+      "readback_exact": true,
+      "revalidated_this_cycle": true
+    },
+    {
+      "document_id": "HAR-EVIDENCE-RDC-RESET-TEST-G14-20261101",
+      "original_name": "EV-HARMONIA-RDC-RESET-TEST-20261101.json",
+      "canonical_path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-RDC-RESET-TEST-20261101.json",
+      "git_blob_sha1": "180d046bc32c998513c455d71607b247fddb821b",
+      "sha256": null,
+      "classification": "validation_evidence",
+      "persistence_state": "PERSISTIDO_Y_VERIFICADO",
+      "readback_exact": true,
+      "revalidated_this_cycle": true
     }
   ],
   "chronicle": {
@@ -344,6 +386,66 @@
   "evidence": {
     "path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-G14-20261101.json",
     "git_blob_sha1": "b90a5fc2663b98c7f193b435a0266b2403f6df9b",
+    "state": "PERSISTIDO_Y_VERIFICADO",
+    "readback_exact": true
+  },
+  "main_canonical_ocp_version": "0.42",
+  "environment_reset": {
+    "declared_by_operator": true,
+    "state": "TOTAL_LOCAL_ENVIRONMENT_LOSS",
+    "authorized_device_id": "aacf2eb5-17f4-428e-9242-c24a1fe4a2ec",
+    "device_name": "015RENTA01",
+    "observed_user": "015RENTA01\\015RENTA01",
+    "observed_profile": "C:\\Users\\PC",
+    "observed_sid": "S-1-5-21-4061665785-3686036472-903815331-1003",
+    "recorded_at": "2026-11-01T19:03:39.457-06:00",
+    "prior_device_id": "7595d30a-bd63-4bc0-a274-f4ae90928247",
+    "prior_device_status": "historical_superseded"
+  },
+  "latest_cycle": {
+    "generation": 14,
+    "date": "2026-11-01",
+    "status": "LOCAL_VALIDATION_PASS_CHROME_EP_PENDING",
+    "main_canonical_ocp_version": "0.42",
+    "authorized_rdc_device": "015RENTA01",
+    "authorized_rdc_uuid": "aacf2eb5-17f4-428e-9242-c24a1fe4a2ec",
+    "workspace": "C:\\Users\\PC\\Desktop\\Khora\\khora-main",
+    "workspace_kind": "FRESH_PARTIAL_VALIDATION_WORKSPACE_NOT_FULL_CLONE",
+    "syntax_check": {
+      "pass": 8,
+      "fail": 0,
+      "node": "v24.22.2"
+    },
+    "local_first_tests": {
+      "tests": 10,
+      "pass": 10,
+      "fail": 0,
+      "exitCode": 0,
+      "durationMs": 2982.7589
+    },
+    "transferred_source_files": {
+      "count": 9,
+      "sha256OrGitBlobReadback": "EXACT_ALL_9"
+    },
+    "pr": 351,
+    "pr_state": "open",
+    "pr_draft": true,
+    "pr_merged": false,
+    "chrome_acceptance": false,
+    "ep_transport_enabled": false,
+    "b2_operations": false,
+    "neon_writes": false,
+    "deployment": false
+  },
+  "latest_cycle_chronicle": {
+    "path": "docs/frentes/harmonia/cronica/HARMONIA-RDC-RESET-G14-20261101.md",
+    "git_blob_sha1": "62ad4a208d33608d71769ea79279c6164f276b99",
+    "state": "PERSISTIDO_Y_VERIFICADO",
+    "readback_exact": true
+  },
+  "latest_cycle_evidence": {
+    "path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-RDC-RESET-TEST-20261101.json",
+    "git_blob_sha1": "180d046bc32c998513c455d71607b247fddb821b",
     "state": "PERSISTIDO_Y_VERIFICADO",
     "readback_exact": true
   }
