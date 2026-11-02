@@ -1821,6 +1821,13 @@ La transferencia de responsabilidad y el dispositivo PC-14 descritos en §46.1 s
 - El transporte EP sigue deshabilitado. OEP v0.3.27 / VCU-EP-v28 §91 establece OCP-MCP como destino B2 exclusivo; no se verificaron contrato/SDK, identidad/scopes, allowlist, bucket/key/prefix/permisos, recibo ni read-back remoto. No hay EP_PERSISTED_VERIFIED, backfill, escritura B2 o Neon.
 - No hubo merge, despliegue, cambios de infraestructura ni operación sobre datos de usuario.
 
+### 48.6. Evidencia y fuentes de lectura de vuelta
+
+- Evidencia estructurada de este ciclo: docs/frentes/harmonia/evidencias/EV-HARMONIA-RDC-RESET-TEST-20261101.json; lectura de vuelta exacta y blob registrado en el manifiesto documental.
+- Crónica del ciclo: docs/frentes/harmonia/cronica/HARMONIA-RDC-RESET-G14-20261101.md; lectura de vuelta exacta y blob registrado en el manifiesto documental.
+- Control vigente: docs/frentes/harmonia/CONTROL-RESPONSABILIDAD.json, generación 14, blob actual 90e24321237000fea6b594c62fc3564445c82bc6.
+
+
 ### 48.5. Dictamen
 
 - HECHO Y VERIFICADO: renovación RDC gen14 con UUID exacto; entorno parcial nuevo; nueve Git blobs cotejados; sintaxis 8/8 y suite local-first 10/10 PASS.
