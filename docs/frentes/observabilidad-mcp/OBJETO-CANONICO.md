@@ -471,7 +471,8 @@ El operador respondió afirmativamente a la pregunta explícita de sustitución 
 - `owner_thread=null`: la plataforma no expuso ID nativo.
 - Evento: `KHORA-MCP-TRANSFER-20261101-278FF01D`.
 - Commit de escritura inicial: `eb3f09383ea70f15e42ee7a4f2efb03984325512`.
-- Commit de read-back y verificación final: `87fbfdd4ab5f76978f7f016cde9381c274668ece`.
+- Commit de escritura/read-back de la transferencia: `87fbfdd4ab5f76978f7f016cde9381c274668ece`.
+- Commit de consolidación final del control y depuración del historial: `87a8ed32dbf1a3d8818e06e73e76c6d8766c022b`; blob vigente leído de vuelta: `4fba2187947730abca0cc338429dfacf4810594c`.
 - Blob final de `CONTROL-RESPONSABILIDAD.json`: `4fba2187947730abca0cc338429dfacf4810594c`.
 - La lectura final recuperó exactamente el contenido escrito y confirmó generación 9, alias/titular, titular anterior, corresponsable Jules y conteo de dos responsables activos.
 
