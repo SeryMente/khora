@@ -4,6 +4,7 @@ const COLLECTOR='http://127.0.0.1:47321';
 const TOKEN=String(globalThis.HARMONIA_TOKEN||'');
 const STORE={sessions:'harmoniaAutoSessions',enabled:'harmoniaAutoEnabled',events:'harmoniaEventCount',fingerprints:'harmoniaKnownSurfaceFingerprints',repositorySync:'harmoniaRepositorySync'};
 const REPO_BUILD_INFO='https://raw.githubusercontent.com/SeryMente/khora/main/apps/harmonia-observability/extension/build-info.json';
+const REPO_MANIFEST='https://raw.githubusercontent.com/SeryMente/khora/main/apps/harmonia-observability/extension/manifest.json';
 const REPO_CATALOG='https://raw.githubusercontent.com/SeryMente/khora/main/apps/harmonia-observability/coverage-catalog.json';
 const REPO_SYNC_ALARM='harmonia-repository-sync';
 const OUTBOX_RETRY_ALARM='harmonia-outbox-retry';
@@ -58,25 +59,38 @@ async function syncRepository(){
  const saved=await chrome.storage.local.get([STORE.repositorySync]);
  const previous=saved[STORE.repositorySync]||{};
  try{
-  const [localResponse,remoteBuildResponse,remoteCatalogResponse]=await Promise.all([
+  const [localResponse,remoteBuildResponse,remoteManifestResponse,remoteCatalogResponse]=await Promise.all([
    fetch(chrome.runtime.getURL('build-info.json'),{cache:'no-store'}),
    fetch(REPO_BUILD_INFO,{cache:'no-store',headers:{'Accept':'application/json'}}),
+   fetch(REPO_MANIFEST,{cache:'no-store',headers:{'Accept':'application/json'}}),
    fetch(REPO_CATALOG,{cache:'no-store',headers:{'Accept':'application/json'}})
   ]);
-  if(!localResponse.ok||!remoteBuildResponse.ok||!remoteCatalogResponse.ok)throw new Error('No se pudieron leer los metadatos y el catálogo desde main.');
-  const [localBuild,remoteBuild,remoteCatalog]=await Promise.all([localResponse.json(),remoteBuildResponse.json(),remoteCatalogResponse.json()]);
-  if(localBuild.schema!=='harmonia.repository-build.v1'||remoteBuild.schema!=='harmonia.repository-build.v1'||typeof remoteBuild.sourceRevision!=='string'||!/^([0-9a-f]{7,40})$/i.test(remoteBuild.sourceRevision))throw new Error('Los metadatos de versión del repositorio no superaron la validación.');
+  if(!localResponse.ok||!remoteCatalogResponse.ok)throw new Error('No se pudieron leer el build local o el catálogo desde main.');
+  const [localBuild,remoteCatalog]=await Promise.all([localResponse.json(),remoteCatalogResponse.json()]);
+  if(localBuild.schema!=='harmonia.repository-build.v1'||typeof localBuild.sourceRevision!=='string'||!/^([0-9a-f]{7,40})$/i.test(localBuild.sourceRevision))throw new Error('Los metadatos locales de versión no superaron la validación.');
   if(remoteCatalog.schema!=='harmonia.coverage-catalog.v1'||!Array.isArray(remoteCatalog.features)||!Array.isArray(remoteCatalog.sources))throw new Error('El catálogo del repositorio tiene un esquema inesperado.');
+  let remoteVersion=null,remoteRevision=null,revisionCheckMode='manifest-version-only';
+  if(remoteBuildResponse.ok){
+   const remoteBuild=await remoteBuildResponse.json();
+   if(remoteBuild.schema==='harmonia.repository-build.v1'&&typeof remoteBuild.version==='string'&&typeof remoteBuild.sourceRevision==='string'&&/^([0-9a-f]{7,40})$/i.test(remoteBuild.sourceRevision)){
+    remoteVersion=remoteBuild.version;remoteRevision=remoteBuild.sourceRevision;revisionCheckMode='build-info';
+   }
+  }
+  if(!remoteVersion){
+   if(!remoteManifestResponse.ok)throw new Error('No se encontró build-info.json ni manifest.json remoto válido en main.');
+   const remoteManifest=await remoteManifestResponse.json();
+   if(remoteManifest.manifest_version!==3||typeof remoteManifest.version!=='string'||!(/^\d+\.\d+\.\d+$/.test(remoteManifest.version)))throw new Error('El manifiesto MV3 remoto no superó la validación.');
+   remoteVersion=remoteManifest.version;
+  }
   const manifest=chrome.runtime.getManifest();
   const localVersion=String(manifest.version||localBuild.version||'0.0.0');
-  const remoteVersion=String(remoteBuild.version||'0.0.0');
-  const codeUpdateAvailable=compareVersions(remoteVersion,localVersion)>0||String(remoteBuild.sourceRevision)!==String(localBuild.sourceRevision);
+  const codeUpdateAvailable=compareVersions(remoteVersion,localVersion)>0||(remoteRevision!==null&&remoteRevision!==String(localBuild.sourceRevision));
   const catalogUpdateAvailable=String(remoteCatalog.version)!==String(localBuild.catalogVersion||'')||JSON.stringify(remoteCatalog)!==JSON.stringify(previous.catalog||null);
   const status=codeUpdateAvailable?'update-available':catalogUpdateAvailable?'catalog-updated':'current';
   const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(remoteCatalog)));
   const catalogSha256=[...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,'0')).join('');
   const state={schema:'harmonia.repository-sync.v1',repository:'SeryMente/khora',branch:'main',sourcePath:'apps/harmonia-observability',
-   status,checkedAt,lastSuccessfulSyncAt:checkedAt,localVersion,remoteVersion,localRevision:String(localBuild.sourceRevision),remoteRevision:String(remoteBuild.sourceRevision),
+   status,checkedAt,lastSuccessfulSyncAt:checkedAt,localVersion,remoteVersion,localRevision:String(localBuild.sourceRevision),remoteRevision,revisionCheckMode,
    updateAvailable:codeUpdateAvailable,catalogVersion:String(remoteCatalog.version||''),catalogSha256,catalog:remoteCatalog,error:null,
    policy:'Solo sincroniza metadatos y catálogo JSON validados; nunca descarga ni ejecuta JavaScript remoto.'};
   await chrome.storage.local.set({[STORE.repositorySync]:state});
