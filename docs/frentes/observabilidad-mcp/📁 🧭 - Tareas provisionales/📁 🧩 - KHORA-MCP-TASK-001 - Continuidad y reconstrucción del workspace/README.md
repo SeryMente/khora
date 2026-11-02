@@ -1,7 +1,7 @@
 # 📝 KHORA-MCP-TASK-001 · Continuidad documental y reconstrucción del workspace
 
 **Naturaleza:** OCP provisional de tarea; no es un frente independiente ni una unidad taxonómica canonizada.  
-**Estado:** `en_curso`  
+**Estado:** `completada`  
 **Responsabilidad:** heredada del control `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`, generación 9; titular global `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229` y autoridad arquitectónica modular Jules `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; esta tarea no tiene control, titularidad, sesión ni folio propios.  
 **task_id:** `KHORA-MCP-TASK-001`  
 **scope_ref:** `docs/frentes/observabilidad-mcp/`
@@ -94,3 +94,38 @@ El control fue transferido y verificado en generación 9 a `chatgpt-khora-mcp-01
 - Exactamente dos responsables activos; `session_folio=null`; FOL1 PREPARADO, NO ACTIVO.
 
 La tarea no cambia de alcance ni se cierra por esta transferencia. Continúan pendientes la reconstrucción/validación del checkout, instalación de dependencias permitidas, pruebas pertinentes del puente, consentimiento OAuth en el perfil actual y aceptación E2E autorizada de Jules.
+
+
+## Cierre verificado del workspace · ciclo 4 · 2026-11-01
+
+**Estado actual de la tarea:** `completada`. El cierre cubre continuidad documental y restauración/validación del checkout principal. No declara completadas las tareas General ni Jules, ni equivale a aceptación del frente KHORA-MCP completo.
+
+### Entorno y checkout
+
+- Dispositivo RDC: `015RENTA01`, ID `aacf2eb5-17f4-428e-9242-c24a1fe4a2ec`; perfil verificado `C:\Users\PC`.
+- Checkout dedicado: `C:\Users\PC\Desktop\Khora\khora-mcp-main`.
+- Remoto: `https://github.com/SeryMente/khora.git`; rama `main`.
+- Corte de código/documentación sometido a pruebas: `a9bed89b3bb0c48291b836348e2d264f11ece5f8`, igual a `origin/main` en el momento de la verificación.
+- Fast-forward posterior de documentación, sin cambios locales funcionales; artefacto ZIP producido por el build retirado después de cotejar que no estaba versionado. Checkout limpio al cierre de ese ciclo de sincronización.
+- `khora-main` incompleto y la rama divergente `khora-jules-main` se conservaron sin modificar, mergear ni rebasear.
+
+### Dependencias y pruebas
+
+- Node `v24.22.2`; npm `11.19.1`; Git portable preexistente MinGit `2.56.0.windows.4`.
+- Instalación basada en `package-lock.json` materializada. El wrapper PowerShell que invocó `npm ci --no-audit --no-fund` devolvió código 1 al elevar una advertencia npm por `node-domexception` desde stderr; por ello no se etiqueta ese comando como exit 0. La reconciliación posterior `npm ls --depth=0 --omit=optional` terminó con código 0 y reportó el árbol completo de dependencias.
+- TypeScript `npm run typecheck`: PASS, exit 0.
+- UI Review `npm run ui-review:check`: PASS, exit 0.
+- Contrato de navegación `npm run ui:contract`: PASS, exit 0.
+- Suite `npm run test:unit`: **572/572 PASS**, 0 fallos, 0 omitidos, exit 0. La comprobación del contrato local contra Metodología también pasó después de disponibilizar GitHub CLI portable `2.103.3`; se usó sin añadir credenciales ni modificar permanentemente PATH.
+- Build `npm run build`: **PASS**, exit 0; Next.js `16.4.0`, TypeScript completado y **78/78** páginas estáticas generadas.
+- Warnings no bloqueantes del build: convención `middleware` deprecada (Next.js recomienda `proxy`) y APIs detectadas como incompatibles con Edge Runtime en trazas de dependencias. Quedan registrados para tratamiento, no fueron corregidos en TASK-001.
+
+### Custodia local y límites
+
+- `.env`, `.env.local`, variantes development/production/test y `.vercel` ausentes en el checkout restaurado.
+- `node_modules` y `.next` excluidos por Git; `.khora-local/` ignorado y ausente. No se migró DPAPI ni se copió secreto, refresh token, cookie, Bearer o variable de Production.
+- El preflight de almacenamiento se mantuvo desactivado: `EXPERIENCE_STORAGE_PREFLIGHT=not_requested`; no se consultó ni modificó la base de datos.
+- El `AUTH_SECRET` de build fue aleatorio y efímero, limitado al proceso y retirado al terminar.
+- ZIP local `harmonia-v0.3.5.zip` generado por el script prebuild: 221,728 bytes, SHA-256 `5B0060C3B1C56CE5713A05FE732CD01417463D8E7E0BDEF70ED5C5D416A418B4`; retirado al concluir y no versionado.
+
+**Resultado:** se cumple el criterio de cierre de TASK-001: workspace principal restaurado en el perfil RDC vigente, remoto/HEAD cotejados, dependencias funcionales, pruebas pertinentes aprobadas, exclusiones locales verificadas y evidencia registrada. No se realizó consentimiento OAuth ni llamada autenticada a Jules; esas acciones pertenecen a TASK-003 y permanecen pendientes.
