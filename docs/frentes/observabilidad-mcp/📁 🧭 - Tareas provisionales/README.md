@@ -23,7 +23,7 @@ El patrón reproduce el índice de frente y un núcleo README por tarea empleado
 
 | Orden | ID local | Estado | Tarea | Núcleo |
 |---:|---|---|---|---|
-| 1 | KHORA-MCP-TASK-001 | en_curso | Reconstruir workspace y recuperar continuidad documental | [núcleo](./%F0%9F%93%81%20%F0%9F%A7%A9%20-%20KHORA-MCP-TASK-001%20-%20Continuidad%20y%20reconstrucci%C3%B3n%20del%20workspace/README.md) |
+| 1 | KHORA-MCP-TASK-001 | completada | Reconstruir workspace y recuperar continuidad documental | [núcleo](./%F0%9F%93%81%20%F0%9F%A7%A9%20-%20KHORA-MCP-TASK-001%20-%20Continuidad%20y%20reconstrucci%C3%B3n%20del%20workspace/README.md) |
 | 2 | KHORA-MCP-TASK-002 | en_curso | General — acceso MCP, catálogo, scopes y observabilidad | [núcleo](./%F0%9F%93%81%20%F0%9F%A7%A9%20-%20KHORA-MCP-TASK-002%20-%20General%20-%20acceso%20y%20observabilidad/README.md) |
 | 3 | KHORA-MCP-TASK-003 | en_curso | Jules — puente local OAuth/RDC y aceptación E2E | [núcleo](./%F0%9F%93%81%20%F0%9F%A7%A9%20-%20KHORA-MCP-TASK-003%20-%20Jules%20-%20puente%20local%20OAuth%20y%20RDC/README.md) |
 
@@ -75,3 +75,12 @@ Se asumió pérdida total del estado volátil de la sesión local anterior. Disp
 - Control blob de lectura de vuelta: `4fba2187947730abca0cc338429dfacf4810594c`; commit de verificación de transferencia: `87fbfdd4ab5f76978f7f016cde9381c274668ece`; commit de consolidación final del control: `87a8ed32dbf1a3d8818e06e73e76c6d8766c022b`.
 - El control conserva dos responsables activos; `session_folio=null`; FOL1 PREPARADO, NO ACTIVO.
 - La persistencia de export, manifiesto, OCP y tareas permanece en sus rutas; el checkout y las pruebas E2E de Jules continúan pendientes.
+
+
+## Cierre actual de TASK-001 · 2026-11-01
+
+La tarea de continuidad documental y reconstrucción del workspace queda **completada**. El checkout dedicado `C:\Users\PC\Desktop\Khora\khora-mcp-main` quedó en `main`, sincronizado con el repositorio canónico; `typecheck`, UI Review, contrato de navegación, suite unitaria (572/572) y build Next.js (78/78 páginas) pasaron. Se verificaron exclusiones de artefactos locales y ausencia de secretos transferidos.
+
+El detalle, las salvedades de instalación npm, los warnings de build y la evidencia por ciclo están en [BACKLOG-CHECKLIST.md](../BACKLOG-CHECKLIST.md) y el núcleo de [TASK-001](./%F0%9F%93%81%20%F0%9F%A7%A9%20-%20KHORA-MCP-TASK-001%20-%20Continuidad%20y%20reconstrucci%C3%B3n%20del%20workspace/README.md).
+
+**No implica:** consentimiento OAuth, DPAPI aprovisionado, lecturas Jules autenticadas, aceptación E2E ni cierre de TASK-002/TASK-003. Esos trabajos permanecen abiertos.
