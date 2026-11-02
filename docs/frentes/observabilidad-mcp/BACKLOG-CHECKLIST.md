@@ -44,7 +44,7 @@ Los estados se aplican a cada punto, no al conjunto de una tarea. No se cierran 
 - [x] Parsear `jules.ps1` y `credential.ps1` con el parser de PowerShell: PASS.
 - [x] Verificar que Git ignora `.khora-local/` y que la carpeta no existe en el checkout restaurado.
 - [x] Confirmar que `khora-web/node_modules` no está materializado en el nuevo checkout.
-- [ ] Inspeccionar y registrar el estado final de `.env.local`, `.vercel` y otros artefactos locales excluidos, sin leer ni copiar secretos.
+- [x] Verificar que `.env.local`, `.vercel`, `khora-web/node_modules` y `.khora-local` están ausentes del checkout restaurado, sin leer contenidos; confirmar las reglas de exclusión aplicables, incluida `.khora-local/` para la ruta DPAPI.
 - [ ] Instalar dependencias de forma permitida y reproducible.
 - [ ] Ejecutar en el checkout actual suite unitaria, typecheck, UI Review, contrato de navegación y build.
 - [ ] Cotejar las pruebas del checkout nuevo con el SHA exacto de `main` y registrar logs/resultados.
@@ -181,6 +181,14 @@ Los estados se aplican a cada punto, no al conjunto de una tarea. No se cierran 
 **No ejecutado:** OAuth autenticado, descubrimiento real de herramientas, consultas a Neon, pruebas automatizadas, rol efectivo DB, aislamiento real por sujeto y lectura real de observabilidad.
 
 **Resultado del ciclo:** baseline General parcialmente inspeccionado; su aceptación sigue pendiente y se añade una compuerta explícita de privacidad/sesión antes de declarar seguro el acceso a runtime. No se modificó Production, secretos, base de datos ni ramas.
+
+### Ciclo de trabajo 3 — sincronización del checkout y artefactos locales · 2026-11-01
+
+**Ejecutado y verificado:** checkout principal limpio antes de sincronizar; `git fetch origin main` y fast-forward no forzado `16b84131e4a61dfaca618570e4c241597fa38cf8 → 22c6a7c8ec83d6e705d8dce747f9c4ba43972b63`; read-back confirmó `HEAD = origin/main`, rama `main` y árbol limpio. Se comprobó que `.env.local`, `.vercel`, `khora-web/node_modules` y `.khora-local` no existen en el checkout; `.env.local`, `.vercel` y `node_modules` están ignorados y la ruta DPAPI dentro de `.khora-local/` está cubierta por la regla raíz. No se leyó contenido secreto ni se copió ningún artefacto.
+
+**No ejecutado:** instalación de dependencias, suite, typecheck, UI Review, contrato o build. La compuerta previa de npm permanece sin cambio causal.
+
+**Resultado del ciclo:** la continuidad del checkout queda sincronizada y su higiene local verificada. TASK-001 sigue `en_curso` por la instalación/pruebas pendientes.
 
 ## Límites permanentes
 
