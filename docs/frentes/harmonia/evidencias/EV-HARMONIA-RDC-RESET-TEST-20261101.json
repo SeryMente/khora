@@ -46,13 +46,38 @@
   },
   "candidate": {
     "repository": "SeryMente/khora",
-    "branch": "feat/harmonia-local-first-mainline-20261101",
-    "pr": 351,
-    "codeCommit": "db2b1e05a131ec37688124276f7c7dd6b381564d",
-    "workerBlob": "f8b9d4566f0cfe1ed06866ebf3a3f0eed9671254",
-    "popupBlob": "1c349e5f07434e7a472e335f7b78b43afb54984f",
-    "testSourceHead": "a530c3d489316f7cb7e742b2ba21bbca174f068a",
-    "branchControlBlob": "90e24321237000fea6b594c62fc3564445c82bc6"
+    "branch": "feat/harmonia-local-first-mainline-final-20261101",
+    "pullRequest": 353,
+    "pullRequestUrl": "https://github.com/SeryMente/khora/pull/353",
+    "pullRequestState": "open",
+    "draft": true,
+    "baseCommit": "874aece7bfa4491e69bfb47281296c8705c4a198",
+    "codeCommit": "a714d061c8c274a199267075b3b934aaa9725dac",
+    "buildMetadataCommit": "e72c38847a8f58446707cd44f4384eefb9f6cc1f",
+    "head": "e72c38847a8f58446707cd44f4384eefb9f6cc1f",
+    "compareAtLastCheck": {
+      "status": "ahead",
+      "aheadBy": 2,
+      "behindBy": 0
+    },
+    "buildInfoBlobSha1": "01b0f2b18de643b2b349720d164cb361365356ef",
+    "manifestVersion": "0.3.0",
+    "sourceRevision": "a714d061c8c274a199267075b3b934aaa9725dac",
+    "visibleMessageTextCapture": false,
+    "previousPrs": [
+      {
+        "number": 351,
+        "state": "closed",
+        "merged": false,
+        "supersededBy": 353
+      },
+      {
+        "number": 352,
+        "state": "closed",
+        "merged": false,
+        "supersededBy": 353
+      }
+    ]
   },
   "transferredFiles": [
     {
@@ -141,7 +166,67 @@
       "startup reconciles post-activation JSONL and rebuilds a lagging index without enqueueing history",
       "durable outbox is idempotent, retries, survives module restart and acknowledges only explicitly"
     ],
-    "scope": "HARMONIA local-first tests and syntax only; Node 24.22.2 on Windows. This is a fresh local execution, not the GitHub Actions runner and not Chrome acceptance."
+    "scope": "HARMONIA local-first tests and syntax only; Node 24.22.2 on Windows. This is a fresh local execution, not the GitHub Actions runner and not Chrome acceptance.",
+    "finalCandidateGitReadback": {
+      "branch": "feat/harmonia-local-first-mainline-final-20261101",
+      "files": 12,
+      "allExact": true,
+      "blobSha1s": [
+        ".github/workflows/harmonia-local-first.yml:e7cb8cd9726f639fe139cb281eba3612f06a7dc2",
+        "apps/harmonia-observability/EP-LOCAL-FIRST.md:7fe95ca2380aa3371c1f4da8afe877c4dc64283a",
+        "apps/harmonia-observability/collector/ep-consumer-adapter.js:430ab91ff4ba103df9266aa525461a12d1a98223",
+        "apps/harmonia-observability/collector/server.js:48888b7b6315b7b73edae6d7e9663c533505c3fd",
+        "apps/harmonia-observability/collector/tests/ep-consumer-adapter.test.js:e34f33c49269bcb0c719d8a8c827202346af4186",
+        "apps/harmonia-observability/collector/tests/server-local-first.integration.test.js:805b72660f50c91416c061f72a518cfd3c280354",
+        "apps/harmonia-observability/extension/build-info.json:01b0f2b18de643b2b349720d164cb361365356ef",
+        "apps/harmonia-observability/extension/durable-outbox.js:51b53b0daac91562e0f37204fbf40362390b45ee",
+        "apps/harmonia-observability/extension/popup.html:81d48bf4938c33a92fa0f3c70e15df607534690d",
+        "apps/harmonia-observability/extension/popup.js:1c349e5f07434e7a472e335f7b78b43afb54984f",
+        "apps/harmonia-observability/extension/service-worker.js:f8b9d4566f0cfe1ed06866ebf3a3f0eed9671254",
+        "apps/harmonia-observability/extension/tests/durable-outbox.test.js:c3581a411c8423f47e288a11db23c1ab58bb5c9d"
+      ]
+    },
+    "githubActionsFinalCandidate": {
+      "workflowHarmonia": {
+        "runId": 41372264801,
+        "conclusion": "failure",
+        "jobName": "local-first-tests",
+        "stepsCount": 0,
+        "logs": "BlobNotFound",
+        "rootCause": "NOT_DETERMINED"
+      },
+      "workflowCi": {
+        "runId": 41372264680,
+        "conclusion": "failure",
+        "jobs": [
+          {
+            "name": "api-tests",
+            "stepsCount": 0,
+            "logs": "BlobNotFound"
+          },
+          {
+            "name": "khora-web-gate",
+            "stepsCount": 0,
+            "logs": "BlobNotFound"
+          },
+          {
+            "name": "calidad",
+            "stepsCount": 0,
+            "logs": "BlobNotFound"
+          }
+        ],
+        "rootCause": "NOT_DETERMINED"
+      },
+      "workflowUiQuality": {
+        "runId": 41372222526,
+        "conclusion": "NOT_CAPTURED"
+      },
+      "workflowKhoraOk": {
+        "runId": 41372222491,
+        "conclusion": "NOT_CAPTURED"
+      },
+      "note": "Local Node v24.22.2 tests passed 10/10; GitHub Actions did not provide runnable step/log evidence."
+    }
   },
   "unchanged": {
     "chromeExtensionLoaded": false,
@@ -159,7 +244,7 @@
     "deployment": false
   },
   "blockers": [
-    "GitHub Actions jobs still report failure with zero recorded steps and BlobNotFound logs; root cause remains undetermined.",
+    "GitHub Actions for PR #353 still conclude failure with zero recorded steps and BlobNotFound logs; root cause remains undetermined.",
     "Chrome natural acceptance remains operator-owned and unperformed.",
     "Official versioned EP consumer contract, auth/scopes, approved allowlist, receipt and remote read-back remain unverified.",
     "OCP-MCP bucket/key/prefix permissions are not authenticated or verified.",
