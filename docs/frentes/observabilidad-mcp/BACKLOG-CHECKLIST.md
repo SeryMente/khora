@@ -90,11 +90,34 @@ Los estados se aplican a cada punto, no al conjunto de una tarea. No se cierran 
 
 ### Hallazgo de privacidad pendiente — no aceptado como seguro todavía
 
-- [!] Reconciliar la exposición de `detalle` y `metrics` por `mcp-observability.ts`: las consultas devuelven esos campos directamente y no filtran por `privacy_class`.
-- [!] Revisar la ruta heredada `RegistrarEventoParams`: el campo `metrics` se serializa a la columna sin pasar por `cleanSecretos` ni por `validateObservationPrivacy`; la redacción por patrones cubre mensaje/detalle, no equivale a validar todo contenido posible.
-- [!] Verificar si `runtime:read` autoriza deliberadamente una vista global. El filtro `session_id` es opcional y, por sí solo, no prueba aislamiento por sujeto/sesión.
+- [~] Mitigar y validar la exposición de `detalle` y `metrics` en la rama local `fix/mcp-runtime-privacy-20261101`; el cambio aún no está integrado ni desplegado.
+- [~] La proyección MCP ahora aplica una allowlist tipada y de rangos a métricas retornadas; la ruta heredada de persistencia sigue requiriendo validación integral y pruebas de ambas rutas de ingesta.
+- [~] La vista global está restringida al propietario configurado tanto en descubrimiento/invocación MCP como en emisión de tokens manuales; el aislamiento real por sujeto/sesión todavía requiere aceptación con identidad real.
 - [ ] Definir el filtro de privacidad/minimización esperado y agregar pruebas que cubran ambas rutas de ingesta, todos los campos retornados por MCP y el aislamiento entre sesiones/sujetos.
 - [ ] Ejecutar las pruebas y confirmar el comportamiento con una identidad real de solo lectura, sin consultar ni exportar contenido sensible.
+
+### Implementación candidata y verificación local — Ciclo 5 (parcial)
+
+**Procedencia:** el checkout RDC estaba en la rama local `fix/mcp-runtime-privacy-20261101`, con base `c85c39fbf7ed177e2bc90b682825addeb8b6a238` y modificaciones locales sin commit. Ese diff ya existía al iniciar esta fase; no se atribuye su autoría original. Se preservó y se continuó sobre esa rama. No se hizo reset, stash, checkout, merge ni rebase.
+
+**Mitigaciones locales verificadas por código:**
+- [x] Aplicar `MCP_GLOBAL_READ_OWNER_REQUIRED` para scopes `runtime:read` y `volcados:read` en publicación de `tools/list` y ejecución de handlers; el sujeto se compara en forma case-insensitive con `MCP_ALLOWED_EMAIL`.
+- [x] Aplicar el mismo control en el endpoint de emisión de tokens manuales y en `createManualMcpToken`, antes de generar/persistir un token. `jules:read` permanece como scope no global sujeto a sus propias ACL.
+- [x] Filtrar las consultas runtime por clases `PUBLIC_METRIC`, `ANONYMIZED_TELEMETRY` y `SYSTEM_AUDIT`; snapshots solo por `ANONYMIZED_RUNTIME_STATE`.
+- [x] Proyectar eventos a una allowlist explícita: no se devuelve `detalle`; métricas admitidas solo por claves, tipos y rangos conocidos; valores de `USER_DATA` se redactan.
+- [x] Proyectar estado de runtime a banderas, enumeraciones y contadores concretos; omitir campos libres, objetos anidados y rutas no permitidas.
+- [x] Aplicar el filtro `session_id` a las seis consultas de la instantánea, al cursor y a las consultas de eventos recientes e incrementales.
+
+**Verificaciones locales del branch:**
+- [x] Pruebas focalizadas: **48/48 PASS**, exit 0.
+- [x] Suite unitaria completa: **578/578 PASS**, 0 fallos, 0 omitidos, exit 0.
+- [x] `npm run typecheck`: PASS, exit 0.
+- [x] `npm run ui-review:check`: PASS, exit 0.
+- [x] `npm run ui:contract`: PASS, exit 0.
+
+**Pendiente de cierre del ciclo:** el build no se ejecutó o no pudo ser cotejado. El comando de solo lectura previo al build y consultas de sesión posteriores quedaron sin respuesta del relay RDC; el inventario aún mostraba el dispositivo como Online, pero con `Last seen` de cinco minutos. No se presume que el preflight haya concluido. No se verificó el estado Git final después de los cambios, no se hizo `git diff --check`, commit, push, despliegue ni llamada a DB/Production.
+
+**Estado:** mitigación candidata con pruebas locales aprobadas, pero sin build/read-back final; no se acepta todavía como arreglo integrado ni se cierra TASK-002. E2E de OAuth real, `tools/list` con identidad real, consulta autenticada de observabilidad y verificación del rol de BD permanecen pendientes.
 
 **Límite de evidencia:** los GET públicos solo verifican metadatos y el rechazo sin credencial. No se ejecutó OAuth real, `tools/list` autenticado, invocación de herramientas, query a Neon ni verificación del rol efectivo de la base de datos.
 
@@ -203,6 +226,12 @@ Los estados se aplican a cada punto, no al conjunto de una tarea. No se cierran 
 **Higiene/seguridad:** `.env*`, `.vercel` y `.khora-local` ausentes; dependencias y build ignorados por Git. El preflight de almacenamiento fue `not_requested`; no hubo consulta ni escritura a DB. `AUTH_SECRET` fue aleatorio, efímero y retirado del entorno al finalizar. Se produjo localmente el ZIP de Harmonia `0.3.5` (221,728 bytes; SHA-256 `5B0060C3B1C56CE5713A05FE732CD01417463D8E7E0BDEF70ED5C5D416A418B4`) y fue retirado después de verificar que no estaba versionado.
 
 **Resultado:** el criterio de TASK-001 se satisface y la tarea se marca `completada` en su núcleo y en el índice. El OCP se elevó a v0.3.12 (§28). No se realizó consentimiento OAuth, DPAPI real, llamada Jules autenticada, escritura Jules, migración, grant, merge funcional ni despliegue. TASK-002 y TASK-003 permanecen abiertas.
+
+### Ciclo de trabajo 5 — control de lectura global y privacidad runtime · 2026-11-01
+
+**Resultado parcial:** revisión del branch local `fix/mcp-runtime-privacy-20261101` y continuación de sus cambios preservados. Se añadió defensa en profundidad para reservar lecturas globales al propietario configurado y para proyectar datos runtime mediante allowlists por campo/tipo/rango. Las consultas se filtran por clase de privacidad y por sesión cuando se solicita. Las pruebas focalizadas pasaron 48/48; suite total 578/578; typecheck, UI Review y contrato, todos con exit 0.
+
+**Límite:** la rama tiene modificaciones sin commit y la autoría original del diff preexistente no está establecida. El build quedó pendiente porque el relay RDC dejó sin resolver la lectura de proceso/sesión tras un timeout. No se desplegó, no se leyó ni escribió DB/Production, y no se ejecutó OAuth con credenciales reales. TASK-002 sigue `en_curso`.
 
 ## Límites permanentes
 
