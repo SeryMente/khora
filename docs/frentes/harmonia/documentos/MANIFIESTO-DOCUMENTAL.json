@@ -6,7 +6,7 @@
   "ocp_path": "docs/frentes/harmonia/",
   "manifest_path": "docs/frentes/harmonia/documentos/MANIFIESTO-DOCUMENTAL.json",
   "ocp_version": "0.42",
-  "ocp_blob_sha1": "321ca065a2c9d1919382edd71869bd927b777641",
+  "ocp_blob_sha1": "d765be8e263abef7dd2f091fd2fa4c002918c00c",
   "responsibility": {
     "generation": 14,
     "owner_alias": "chatgpt-harmonia-01a19969-8e70-7dcb-b9fd-7db62736f279",
@@ -32,7 +32,7 @@
     "build_metadata_commit": "e263163f78b6509267ed21408f4d891355a30784",
     "first_documentation_commit": "adb3944b2235c04855784945bcfea23967285680",
     "last_branch_snapshot_before_final_docs": "09d8d5976245bc226e264d7969e5a1f920a4081c",
-    "candidate_ocp_blob_sha1": "321ca065a2c9d1919382edd71869bd927b777641",
+    "candidate_ocp_blob_sha1": "d765be8e263abef7dd2f091fd2fa4c002918c00c",
     "pull_request": 351,
     "pull_request_url": "https://github.com/SeryMente/khora/pull/351",
     "pull_request_state": "open",
@@ -52,7 +52,11 @@
     "remote_ep_enabled": false,
     "ci_state": "NOT_DIAGNOSTICABLE_NO_STEPS_LOGS_BLOB_NOT_FOUND",
     "readme_correction_commit": "caf6ca287aad65121afe5e7dd0bb8ac13497e9ad",
-    "last_verified_head_before_manifest_update": "caf6ca287aad65121afe5e7dd0bb8ac13497e9ad"
+    "last_verified_head_before_manifest_update": "caf6ca287aad65121afe5e7dd0bb8ac13497e9ad",
+    "repository_sync_fallback_commit": "ff7089dc41ee7979d9e1153eeffa4688c696ec18",
+    "repository_sync_fallback_worker_blob": "f8b9d4566f0cfe1ed06866ebf3a3f0eed9671254",
+    "ocp_fallback_documentation_commit": "4cd325a4f40aad2d36d3a96d4a03505714eb852a",
+    "last_verified_branch_head_before_manifest_refresh": "4cd325a4f40aad2d36d3a96d4a03505714eb852a"
   },
   "inventory_note": "Existing original/session records retain their historical-reference status unless explicitly revalidated. This cycle adds a chronicle and evidence record in the PR branch with read-back verification. Other prior entries were not rehashed. OCP v0.42 is proposed on the draft PR branch; canonical main remains v0.41 until merge.",
   "entries": [
@@ -420,7 +424,13 @@
       "ahead_by": 6,
       "behind_by": 0,
       "branch_head_before_manifest_update": "caf6ca287aad65121afe5e7dd0bb8ac13497e9ad"
-    }
+    },
+    "compare_at_last_pre_manifest_read": {
+      "ahead_by": 9,
+      "behind_by": 0,
+      "branch_head": "4cd325a4f40aad2d36d3a96d4a03505714eb852a"
+    },
+    "repository_sync_fallback": "IMPLEMENTED_IN_PR_BRANCH_READBACK_VERIFIED"
   },
   "latest_cycle_chronicle": {
     "path": "docs/frentes/harmonia/cronica/HARMONIA-LOCAL-FIRST-MAINLINE-G14-20261101.md",
@@ -432,7 +442,8 @@
     "path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-LOCAL-FIRST-G14-20261101.json",
     "git_blob_sha1": "c3ed7b183f0a91a016277913da7b76735df10574",
     "state": "PERSISTIDO_Y_VERIFICADO_EN_BRANCH_PR",
-    "readback_exact": true
+    "readback_exact": true,
+    "scope": "Historical snapshot before repository-sync manifest fallback worker fix; evidence JSON retains the worker blob then current. The worker fix is recorded separately in candidate_technical_branch and OCP §48.2."
   },
   "ocp_publication_state": "DRAFT_PR_BRANCH_NOT_MERGED",
   "main_canonical_ocp_version_at_base": "0.41"
