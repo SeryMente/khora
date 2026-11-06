@@ -3,7 +3,7 @@
 
 **Estado:** PROVISIONAL · materialización de trabajo para continuidad del sprint; no es canon normativo ni un segundo OCP.  
 **Fuente de estado:** [OCP Custodia](../OBJETO-CANONICO.md) y [control único de responsabilidad](../CONTROL-RESPONSABILIDAD.json).  
-**Responsabilidad observada:** generación 6 · alias `chatgpt-custodia-retoma-01a19495-f227-7f5d-8985-4648e1a9ffcb`; alias operativo local, no ID nativo.  
+**Responsabilidad observada:** generación 7 · alias `chatgpt-custodia-01a1b28b-f880-7bbc-b776-d9ac71d7e428`; alias operativo local, no ID nativo.  
 **Autorización del sprint:** [instrucción literal del operador](../originales/INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md).  
 **Coordinación de continuidad:** [COORDINACION-SPRINT-CUSTODIA-v0.2.md](../entregas/COORDINACION-SPRINT-CUSTODIA-v0.2.md).
 
@@ -11,13 +11,13 @@
 
 ## 1. Tareas existentes del frente
 
-Estas tareas ya existían en la lista provisional anterior y no se duplican ni renumeran. Sus descripciones y evidencia siguen viviendo en [LISTA-TAREAS-PROVISIONAL.md](../LISTA-TAREAS-PROVISIONAL.md).
+Estas tareas ya existían en la lista provisional anterior y no se duplican ni renumeran. Sus descripciones y evidencia siguen viviendo en [LISTA-TAREAS-PROVISIONAL.md](../LISTA-TAREAS-PROVISIONAL.md). CUSTODIA-04 dispone ahora de un expediente complementario de incidente, sin crear una tarea adicional.
 
 | Identificador | Estado observado | Fuente |
 |---|---|---|
 | CUSTODIA-01 | `EN CURSO` | [Lista provisional existente](../LISTA-TAREAS-PROVISIONAL.md) |
 | CUSTODIA-03 | `ABIERTA` | [Lista provisional existente](../LISTA-TAREAS-PROVISIONAL.md) |
-| CUSTODIA-04 | `EN CURSO` | [Lista provisional existente](../LISTA-TAREAS-PROVISIONAL.md) |
+| CUSTODIA-04 | `EN CURSO` | [Lista provisional](../LISTA-TAREAS-PROVISIONAL.md) · [Expediente de archivado Dictado → Custodia](./📁%20🧩%20-%20CUSTODIA-04%20-%20Corrección%20E2E%20de%20archivado%20Dictado-Custodia/README.md) |
 | CUSTODIA-02 | `RETIRADA` · no reutilizar | [Lista provisional existente](../LISTA-TAREAS-PROVISIONAL.md) |
 
 ## 2. Tareas provisionales del sprint de migración Blob → B2
