@@ -292,7 +292,7 @@ test.describe('Dictado por partes contract test', () => {
 
     await expect(page.locator('[data-ui-id="ingreso.custodia-status"]'))
       .toContainText('1 parte(s) con confirmación remota pendiente', { timeout: 15000 });
-    expect(audioAttempts).toBe(3);
+    await expect.poll(() => audioAttempts, { timeout: 15000 }).toBe(3);
     expect(archiveCalls).toBe(0);
 
     const retryArchive=page.getByRole('button', { name: 'Reintentar y archivar' });

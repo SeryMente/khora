@@ -1,4 +1,4 @@
-<!-- TASK_STATUS=PROVISIONAL; PARENT_TASK=CUSTODIA-04; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true; DIAGNOSTIC_STATUS=STATICALLY_VERIFIED; ROOT_CAUSE_OF_REPORTED_SESSION=UNDETERMINED; PRODUCT_FIX=IMPLEMENTED_IN_ISOLATED_BRANCH; VALIDATION=BLOCKED_NO_RUNNER -->
+<!-- TASK_STATUS=PROVISIONAL; PARENT_TASK=CUSTODIA-04; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true; DIAGNOSTIC_STATUS=STATICALLY_VERIFIED; ROOT_CAUSE_OF_REPORTED_SESSION=UNDETERMINED; PRODUCT_FIX=IMPLEMENTED_IN_ISOLATED_BRANCH; VALIDATION=LOCAL_E2E_BUILD_TYPECHECK_PASS_UNIT_BASELINE_571_OF_572 -->
 # CUSTODIA-04 · Incidente de archivado Dictado → Custodia
 
 **Estado:** `en_curso` · expediente provisional de la tarea existente CUSTODIA-04.  
@@ -341,3 +341,31 @@ La revisión de la punta posterior detectó una carrera posible: la acción secu
 **Bloqueo de validación:** los runners de GitHub Actions no se están asignando (jobs con runner 0 y cero pasos). No se usó una estación de trabajo remota distinta sin confirmar que fuera el entorno autorizado. Para completar la verificación hace falta una ejecución real de los controles desde un runner disponible o el checkout local autorizado. La implementación no se declara aceptada ni lista para desplegar hasta obtener esa evidencia.
 
 **Siguiente secuencia:** desbloquear un runner; ejecutar typecheck, unitarias, UI contracts, build y la prueba Playwright focalizada; corregir cualquier fallo real; ejecutar una prueba con proveedor autorizado no productivo y lectura física de vuelta; reconciliar el recibo con el manifiesto del servidor. Mantener PR en borrador mientras cualquiera de esas compuertas falle o permanezca sin evidencia. La punta de la rama después de la última sincronización es `7553847edac736e7346771340dc6be109a98d48d`; se incorporó `main` hasta `0aa7497a6316772ccf846620685a87b0711e346c` mediante merge commit de dos padres, sin cambiar `main`. La comparación contra ese `main` quedó `ahead 23 / behind 0`, merge base `0aa7497a6316772ccf846620685a87b0711e346c`; PR #354 conserva `base_sha=0aa7497a6316772ccf846620685a87b0711e346c`, `mergeable=true`, `draft=true`, `merged=false`. El árbol de la rama contiene de vuelta los blobs actuales de `CONTROL-RESPONSABILIDAD.json` (`8fa5721013b47b88729b38869c712863bc6a69d7`), `OBJETO-CANONICO.md` (`a1d83ccb7fd2b222af4b8f2d7754351467436219`), `MANIFIESTO-CUSTODIA.json` (`e7a7c0a2c75b0583032173db722e46ce0c08e0bb`) y el original exportado (blob `a022d13920cb80280dd3c5bb89475348f8c908b7`).
+
+
+### 12.7 Validación local por RDC · 2026-11-06
+
+**Entorno y preservación.** Se utilizó la conexión RDC local `PC10RCIF4EI4` y una copia temporal aislada en `%TEMP%\khora-custodia-04-verification-20261106`, obtenida desde `refs/pull/354/head` (`5728d0062f0925d4987fae4f2f491061c21120f8`). El clon preexistente `C:\Users\MantenimientoRCI\Desktop\Khora` permaneció intacto: estaba en `main`, 606 commits detrás y contenía cinco cambios locales ajenos sin confirmar. La copia temporal no usó credenciales, datos ni proveedores productivos. `npm ci --no-audit --no-fund` terminó con código 0 e instaló 683 paquetes.
+
+**Defecto adicional detectado y corregido durante la validación.** El primer `npm run typecheck` detectó `TS18048` en `IngresoView.tsx`: `audioPendiente` es opcional y se comparaba directamente con `0`. Se corrigió con `(v.audioPendiente ?? 0) > 0`, sin modificar ni relajar la compuerta de custodia. El segundo defecto era temporal del contrato de prueba: el estado pendiente se muestra antes de que finalice la política de tres intentos con backoff; la aserción leía el contador anticipadamente. Se sustituyó por `expect.poll(...).toBe(3)` con timeout acotado. No se cambió la política de subida.
+
+**Resultados ejecutados sobre el árbol de la PR más estos dos ajustes locales:**
+
+| Control | Resultado | Evidencia |
+|---|---|---|
+| `npm ci --no-audit --no-fund` | APROBADO | exit code 0; 683 paquetes |
+| `npm run typecheck` | APROBADO | exit code 0 después del ajuste opcional |
+| `npm run ui:contract` | APROBADO | exit code 0; contrato de navegación íntegro |
+| `npx playwright test --config=playwright.audio-custodia.local.config.ts` | APROBADO | 3/3 escenarios; exit code 0; 40.6 s |
+| `npm run build --ignore-scripts` | APROBADO CON ADVERTENCIAS | exit code 0; webpack, TypeScript interno, 78/78 páginas y trazas completadas |
+| `npm run test:unit` | PARCIAL | 571/572 aprobadas; una falla CUSTODY-12 descrita abajo |
+
+**E2E aprobado.** Los tres escenarios ejecutados son: (1) subida multipart, errores y límites; (2) tres respuestas 503, cuarto intento satisfactorio, manifiesto con SHA-256 verificado y exactamente una llamada de archivo ante doble activación; (3) respuesta 502 no-JSON que conserva el texto y mantiene cerrado `/api/dictado`. La configuración temporal Playwright utilizó servidor Next local, Chromium disponible y variables/datos sintéticos; no se incorporó al commit. La primera ejecución falló solo por lectura prematura del contador; tras sincronizar la expectativa con `expect.poll`, los tres escenarios pasaron.
+
+**Falla unitaria heredada, no atribuible a esta corrección.** `tests/unit/custody-regression.test.ts`, caso CUSTODY-12, exige el literal `parts[0].fuente_audio !== "audio_archivo"`; la ruta actual añade una condición legítima de compatibilidad `&& parts[0].driver !== "audio_archivo"`. Se cotejaron los blobs de ambos archivos entre la rama de la PR y `main`: son idénticos (`test a32e54fc3dec836f8a6a6bdd75d2549f9b6c9fef`; ruta `8f4172e23d6928b02994a0f6d5c8636a9dfb6223`). La falla está presente en la misma línea base `main`; no se alteró el test ni la ruta ajena al incidente. Resultado global unitario: 571 pass, 1 fail, 0 skipped.
+
+**Build y advertencias.** El build se ejecutó explícitamente con `--ignore-scripts` para separar la compilación Next del hook `prebuild`, cuyo `test:unit` de línea base contiene la falla CUSTODY-12 descrita. `next build --webpack` finalizó con código 0: compilación, TypeScript, 78 páginas estáticas y trazado de rutas. Persisten advertencias preexistentes: convención `middleware` deprecada y uso de APIs Node/CompressionStream/DecompressionStream en imports detectados por Edge Runtime. No se afirma que `npm run build` con todos los hooks previos haya pasado.
+
+**Estado, límites y siguiente paso.** La corrección de coordinación, el reintento automático antes de validar, el bloqueo ante persistencia de fallos y la exclusión mutua del archivado tienen pruebas locales E2E aprobadas. La causa runtime exacta de la captura originalmente reportada continúa NO DETERMINADA. No se hizo ensayo con proveedor real, lectura física/read-back en Blob, reconciliación contra base de datos productiva, acceso al audio del operador, merge ni despliegue. El build y los mocks no sustituyen esa evidencia. La falla CUSTODY-12 debe corregirse como deuda de la línea base, en un cambio separado, sin introducirla como parte artificial de este incidente.
+
+**PR #354:** permanece abierta en borrador y sin merge. `main` observado `0aa7497a6316772ccf846620685a87b0711e346c`; `Production` sin cambios. Los dos ajustes validados se deben publicar únicamente en la rama `fix/custodia-04-dictado-archivar-e2e-20261106`. La aceptación final de Custodia y la garantía del producto siguen NO CERTIFICADAS.
