@@ -182,6 +182,131 @@ test.describe('Dictado por partes contract test', () => {
     await expect(page.locator('[data-ui-id="ingreso.stats"]')).toContainText(/Audio: [1-9]\d* partes verificadas/);
   });
 
+  test('archive retries transient audio failures before sending the verified manifest', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('khora_auth_session', JSON.stringify({ authenticated: true, timestamp: Date.now() }));
+    });
+
+    let audioAttempts = 0;
+    let archiveCalls = 0;
+    let archivedPayload: any = null;
+    await page.route('**/api/audio', async (route) => {
+      audioAttempts += 1;
+      if (audioAttempts <= 3) {
+        await route.fulfill({
+          status: 503,
+          contentType: 'application/json',
+          body: JSON.stringify({ error: 'audio_temporarily_unavailable', detail: 'Temporary storage failure' }),
+        });
+        return;
+      }
+      const request = route.request();
+      const postData = request.postDataBuffer();
+      if (!postData) throw new Error('Missing audio multipart body');
+      const form = await new Request(request.url(), {
+        method: 'POST', headers: { 'content-type': request.headers()['content-type'] }, body: new Uint8Array(postData)
+      }).formData();
+      const audio = form.get('audio');
+      if (!(audio instanceof File)) throw new Error('Missing audio file');
+      const audioBytes = Buffer.from(await audio.arrayBuffer());
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          url: 'https://blob.vercel-storage.com/dictado/retry-success-part.webm.khc',
+          bytes: audioBytes.length,
+          cifrado: true,
+          sha256: createHash('sha256').update(audioBytes).digest('hex'),
+          verificado: true,
+        }),
+      });
+    });
+
+    await page.route('**/api/pulir', async (route) => {
+      const body = JSON.parse(route.request().postData() || '{}');
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ texto: body.texto, aceptado: true, motivo: 'ok', motivoRechazo: null }),
+      });
+    });
+
+    await page.addInitScript(() => {
+      class MockSpeechRecognition {
+        continuous = true;
+        interimResults = true;
+        lang = 'es-MX';
+        onstart: any = null;
+        onresult: any = null;
+        onerror: any = null;
+        onend: any = null;
+        _started = false;
+        start() {
+          if (this._started) return;
+          this._started = true;
+          if (this.onstart) setTimeout(() => {
+            if (!this._started) return;
+            this.onstart();
+            this.onresult?.({
+              resultIndex: 0,
+              results: [{ 0: { transcript: 'retry audio and archive safely' }, isFinal: true, length: 1 }],
+            });
+          }, 50);
+        }
+        stop() {
+          this._started = false;
+          if (this.onend) setTimeout(() => this.onend(), 50);
+        }
+        abort() {
+          this._started = false;
+          if (this.onend) setTimeout(() => this.onend(), 50);
+        }
+      }
+      (window as any).SpeechRecognition = MockSpeechRecognition;
+      (window as any).webkitSpeechRecognition = MockSpeechRecognition;
+    });
+
+    await page.route('**/api/dictado', async (route) => {
+      archiveCalls += 1;
+      archivedPayload = JSON.parse(route.request().postData() || '{}');
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'retry-verified-archive',
+          sessionId: archivedPayload.sessionId,
+          sha256: 'b'.repeat(64),
+          chars: archivedPayload.texto.length,
+          estado: 'archivado',
+        }),
+      });
+    });
+
+    await page.goto('/sistema/ingreso?modo=dictado');
+    await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0);
+    await expect(page.getByText('Salvaguarda preparada', { exact: true })).toBeVisible();
+
+    await page.locator('button:has-text("Iniciar dictado")').click();
+    await page.waitForTimeout(1000);
+    await page.locator('button:has-text("Detener")').click();
+
+    await expect(page.locator('[data-ui-id="ingreso.custodia-status"]'))
+      .toContainText('1 parte(s) con confirmación remota pendiente', { timeout: 15000 });
+    expect(audioAttempts).toBe(3);
+    expect(archiveCalls).toBe(0);
+
+    await page.locator('button:has-text("Archivar registro")').click();
+    await expect(page.locator('[data-ui-id="ingreso.btn-archivar"]'))
+      .toContainText('Captura archivada', { timeout: 15000 });
+
+    expect(audioAttempts).toBe(4);
+    expect(archiveCalls).toBe(1);
+    expect(archivedPayload).not.toBeNull();
+    expect(archivedPayload.audioPartes).toHaveLength(1);
+    expect(archivedPayload.audioPartes[0].verificado).toBe(true);
+    expect(archivedPayload.audioPartes[0].sha256).toMatch(/^[a-f0-9]{64}$/i);
+  });
+
   test('no-JSON audio failure blocks archive and preserves captured text', async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.setItem('khora_auth_session', JSON.stringify({ authenticated: true, timestamp: Date.now() }));
