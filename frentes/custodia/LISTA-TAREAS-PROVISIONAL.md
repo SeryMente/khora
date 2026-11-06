@@ -195,6 +195,18 @@ La propuesta continúa sin comprobar los bytes actuales de los objetos remotos n
 
 **Estado de este subalcance:** DIAGNÓSTICO ESTÁTICO DOCUMENTADO. El error de referencia que ya obra en el original es «No se puede archivar el registro: Khora no ha verificado la custodia íntegra de todas las partes de audio». El operador ahora recuerda una variante como «no se puede garantizar la integridad de la…»; no se presume que sea un mensaje diferente ni se exige repetirlo, salvo que el texto actual contradiga la cita anterior. El paréntesis se limita a una captura diagnóstica runtime/read-only y no autoriza corrección, despliegue ni datos productivos. Reproducción, logs de sesión, corrección de código, suites nuevas, prueba de proveedor, recuperación tras reinicio y aceptación siguen pendientes. No se declara garantía de producto.
 
+### Actualización posterior 2026-11-06 · instrucción de corrección longitudinal
+
+**Nueva instrucción directa del operador:** «encargate de manera longitudinal del defecto. Y coriggelo», seguida de la orden de documentar cuidadosamente la tarea provisional antes de continuar la corrección. Esta instrucción es posterior al diagnóstico estático descrito arriba.
+
+**Efecto acotado:** la restricción anterior de solo lectura para el paréntesis de «Archivar registro» queda ampliada exclusivamente para permitir corregir el defecto demostrado y ejecutar pruebas en una rama aislada y entornos no productivos. No autoriza merge, despliegue, cambios de configuración o credenciales productivas, SQL/backfill de producción, lectura de contenido personal ni eliminación/sobrescritura de originales. No cambia el control ni transfiere la titularidad de Custodia o Dictado.
+
+**Prioridad preservada:** CUSTODIA-03 continúa como prioridad formal #1 para el rescate de dictados ausentes/presuntamente perdidos. El trabajo de corrección de CUSTODIA-04 se desarrolla en rama aislada y no declara ni sustituye ningún rescate individual.
+
+**Expediente provisional:** [CUSTODIA-04 · Incidente de archivado Dictado → Custodia](./📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20CUSTODIA-04%20-%20Corrección%20E2E%20de%20archivado%20Dictado-Custodia/README.md). El expediente consolida diagnóstico estático verificado, diferencia entre defecto comprobado y causa runtime no determinada, propuesta de corrección, pruebas, criterios de aceptación, límites y procedencia.
+
+**Estado al registrar la actualización:** expediente documentado y leído de vuelta en rama; diagnóstico de omisión de reintentos automáticos confirmado estáticamente; causa de la captura específica todavía NO DETERMINADA; corrección de código aún no implementada; pruebas nuevas y proveedor no productivo pendientes. Garantías NO CERTIFICADAS.
+
 **Decisión de estructura:** no crear CUSTODIA-05. Estos criterios amplían CUSTODIA-04, cuyo objetivo existente ya abarca correcciones y pruebas E2E; crear un ID superior duplicaría el mismo resultado. CUSTODIA-02 permanece retirada y no se reutiliza.
 
 
