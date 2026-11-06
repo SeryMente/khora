@@ -243,7 +243,7 @@ Esta sección actualiza el estado de ejecución de §11. §11 conserva deliberad
 
 **Rama:** `fix/custodia-04-dictado-archivar-e2e-20261106`  
 **Base:** `d4f29f7044b80b30e01e00bf2ae2fc5f0207f0c2`  
-**Head observado de PR #354:** `1f69fb3f16c3d49f5a90e37a1a76f6625426445c`  
+**Head observado de PR #354:** `81c6c67c3c72cefe94c2f03c6ad05c9f5e6adfcb`  
 **PR:** [#354 · fix(dictado): reintentar custodia de audio antes de archivar](https://github.com/SeryMente/khora/pull/354) · OPEN · DRAFT · NOT MERGED.
 
 Cambios actuales leídos de vuelta:
