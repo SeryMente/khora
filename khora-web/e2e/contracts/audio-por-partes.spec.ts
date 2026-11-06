@@ -295,7 +295,13 @@ test.describe('Dictado por partes contract test', () => {
     expect(audioAttempts).toBe(3);
     expect(archiveCalls).toBe(0);
 
-    await page.locator('button:has-text("Archivar registro")').click();
+    const retryArchive=page.getByRole('button', { name: 'Reintentar y archivar' });
+    await expect(retryArchive).toBeVisible();
+    // Simula dos activaciones inmediatas por la misma captura: solo puede archivarse una vez.
+    await retryArchive.evaluate((element) => {
+      (element as HTMLButtonElement).click();
+      (element as HTMLButtonElement).click();
+    });
     await expect(page.locator('[data-ui-id="ingreso.btn-archivar"]'))
       .toContainText('Captura archivada', { timeout: 15000 });
 
