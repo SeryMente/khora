@@ -1,4 +1,4 @@
-<!-- TASK_STATUS=PROVISIONAL; PARENT_TASK=CUSTODIA-04; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true; DIAGNOSTIC_STATUS=STATICALLY_VERIFIED; ROOT_CAUSE_OF_REPORTED_SESSION=UNDETERMINED; PRODUCT_FIX=IMPLEMENTED_IN_ISOLATED_BRANCH; VALIDATION=LOCAL_E2E_3_OF_3_TYPECHECK_PASS_UNIT_572_OF_572_UI_CONTRACT_PASS_UI_REVIEW_PASS -->
+<!-- TASK_STATUS=PROVISIONAL; PARENT_TASK=CUSTODIA-04; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true; DIAGNOSTIC_STATUS=STATICALLY_VERIFIED; ROOT_CAUSE_OF_REPORTED_SESSION=UNDETERMINED; SESSION_ORIGIN=UNDETERMINED; PRODUCT_FIX=IMPLEMENTED_IN_ISOLATED_BRANCH; VALIDATION=LOCAL_E2E_3_OF_3_TYPECHECK_PASS_UNIT_572_OF_572_UI_CONTRACT_PASS_UI_REVIEW_PASS -->
 # CUSTODIA-04 · Incidente de archivado Dictado → Custodia
 
 **Estado:** `en_curso` · expediente provisional de la tarea existente CUSTODIA-04.  
@@ -23,7 +23,7 @@ La tarea conserva la prioridad formal vigente de Custodia: CUSTODIA-03 continúa
 
 ## 2. Enunciado del incidente
 
-El operador informó que se trataba de una **captura nueva**, no de una sesión recuperada: inició el dictado, detuvo la captura, obtuvo la transcripción y, al pulsar «Archivar registro», recibió el bloqueo.
+La transcripción fuente no contiene una confirmación expresa de si la sesión problemática era una captura nueva o una sesión recuperada: el asistente formuló esa pregunta, pero no consta respuesta del operador. El origen de la sesión queda **NO DETERMINADO**. Se corrige aquí una afirmación anterior del expediente que la clasificaba como captura nueva sin sustento literal.
 
 **Mensaje comunicado literalmente por el operador:**
 
@@ -407,3 +407,89 @@ Los seis jobs terminaron con `failure`, pero su lectura de pasos devolvió `step
 **Siguiente secuencia controlada:** publicar estos cambios y esta evidencia en la rama aislada/PR #354; comprobar que la nueva punta ejecuta CI en un runner real; después preparar una prueba separada con proveedor no productivo autorizado y lectura física de vuelta. Mantener el PR en borrador y no fusionar ni desplegar hasta satisfacer las compuertas pendientes. CUSTODIA-03 conserva su prioridad de rescate y no se modifica por este ciclo.
 
 [executed on device: PC10RCIF4EI4 (d0bbb2a3-d7b4-45e1-8870-652c2c3844fc)]
+
+
+### 12.9 Consolidación final del expediente y entrega a Custodia · 2026-11-06
+
+**Propósito.** Reunir la evidencia disponible sobre el bloqueo comunicado el 2026-11-06, reconciliar las notas anteriores con los resultados posteriores de la rama/PR y dejar un único punto de continuidad dentro de CUSTODIA-04. Esta actualización cierra la intervención paralela de diagnóstico y documentación de esta conversación; no declara aceptado el producto ni cierra CUSTODIA-04.
+
+#### A. Hechos de origen y procedencia
+
+- **Fuente primaria:** docs/frentes/dictado-voz/originales/ChatGPT-DICTADO-20261106-1540.txt; blob Git a022d13920cb80280dd3c5bb89475348f8c908b7. El archivo fuente local tuvo SHA-256 B59FA7524DDAEB8CAAA06A422BBC11415C4AB4814DC2E920AC80658675EE768A.
+- **Cita literal del operador:** «no se puede archivar el registro. Cora no ha verificado la custodia íntegra de todas las partes de audio». Se conserva «Cora» como literal comunicado, sin normalizarlo. En el código inspeccionado, el producto muestra «Khora» y la frase completa citada en la sección 2.
+- **Paráfrasis posterior:** «no se puede garantizar la integridad de la…». Es una evocación incompleta, no una segunda cadena de error verificada.
+- **Corrección de procedencia:** la transcripción pregunta si la sesión problemática era una captura nueva o una recuperación, pero no registra respuesta del operador. Por tanto, SESSION_ORIGIN=UNDETERMINED. La afirmación anterior que la clasificaba como captura nueva queda corregida; no debe utilizarse para seleccionar una causa raíz.
+- **Estado visible reportado:** había texto transcrito y el intento de «Archivar registro» fue rechazado. No se obtuvo request ID, identificador técnico de sesión, índice de parte, respuesta HTTP, reason code ni traza de red de esa ejecución.
+- **Frontera acordada:** Dictado abarca desde la entrada a su pantalla y el inicio de transcripción/captura hasta la activación de «Archivar registro». Ese mismo evento abre la responsabilidad de Custodia sobre verificación del manifiesto, persistencia durable, lectura de vuelta y recuperación. Es una frontera de contrato entre dos frentes, no un traspaso de titularidad.
+
+#### B. Diagnóstico y dictamen causal
+
+1. El texto de error se origina en khora-web/app/components/ingreso/IngresoWorkspace.tsx, dentro de guardar(), en la compuerta cliente anterior a POST /api/dictado.
+2. La compuerta exige partes de audio completas y verificadas: índices válidos/contiguos, bytes positivos, SHA-256 válido y verificado=true. El rechazo impide archivar una sesión que no acredita el audio esperado; no se debe quitar ni eludir.
+3. La rutina de subida realiza hasta tres intentos automáticos, con backoff de 1 s y 2 s. Si fallan, el error puede quedar absorbido y la función de reintento permanece en pendingUploadsRef; la transcripción puede continuar aunque haya una parte pendiente.
+4. Antes de la corrección, guardar() esperaba la subida actualmente referenciada, pero no drenaba toda la cola de reintentos pendientes antes de validar. Esta omisión está CONFIRMADA ESTÁTICAMENTE y constituye el defecto de coordinación corregido en esta rama.
+5. /api/audio autentica, calcula hash, cifra, almacena, relee/descifra y coteja bytes y SHA antes de registrar la parte como verificada. POST /api/dictado contrasta el manifiesto con las filas persistidas. evaluarCustodiaAudio() valida metadatos, pero no ejecuta por sí mismo un nuevo GET físico al proveedor durante el archivado.
+6. La evidencia estática demuestra una ruta por la que el cliente puede llegar a la compuerta con una parte pendiente; no demuestra que esa ruta ocurriera en la sesión específica. También existe el caso distinto de cero partes generadas/cierre incompleto; tampoco se comprobó para esa sesión.
+
+**Dictamen:** defecto de coordinación cliente (no drenar toda la cola de reintentos antes de validar) = CONFIRMADO EN CÓDIGO. Bloqueo de integridad de audio = CONDUCTA DE SEGURIDAD INTENCIONADA. Causa runtime exacta de la captura reportada = NO DETERMINADA. Origen nuevo/recuperado de la sesión = NO DETERMINADO. No afirmar que el audio de esa sesión se perdió.
+
+#### C. Solución persistida en la rama de corrección
+
+Rama: fix/custodia-04-dictado-archivar-e2e-20261106.  
+PR: [#354 · reintentar custodia de audio antes de archivar](https://github.com/SeryMente/khora/pull/354).  
+Commit de código y pruebas validado localmente: 55449a08719f04982dbfceb15ec28f43c7b68118.
+
+La corrección implementa:
+- drenaje secuencial single-flight de partes pendientes antes de volver a validar el manifiesto;
+- reutilización de sessionId, índice y bytes originales;
+- guarda síncrona single-flight para el archivado completo, evitando dos llamadas por activaciones duplicadas;
+- «Reintentar y archivar» reutiliza el mismo camino de guardado;
+- ante fallo persistente, mantiene el bloqueo de integridad y conserva texto/copia local; no llama a POST /api/dictado;
+- mantiene la validación autoritativa del servidor: no fuerza verificado, no inventa partes ni elimina el gate.
+
+También se incorporaron el ajuste del tipado opcional de audioPendiente, la aserción CUSTODY-14 de dependencias de guardar() y la sincronización E2E con los tres intentos/backoff existentes.
+
+#### D. Pruebas efectivamente ejecutadas
+
+Validación por RDC en worktree aislado C:\Users\fila4\Desktop\Khora\khora-custodia-04-validation. El checkout preexistente se mantuvo intacto. package-lock.json no se modificó. La instalación npm fue offline y con lifecycle scripts omitidos; el binario local ffmpeg.exe de ffmpeg-static 5.3.0 se restauró desde la misma versión y el SHA-256 del origen/destino coincidió: 04E1307997530F9CF2FE35CBA2CA7E8875CA91DA02F89D6C7243DF819C94AD00.
+
+| Control | Resultado registrado |
+|---|---|
+| npm run typecheck | APROBADO · exit 0 |
+| npm run test:unit | APROBADO · 572/572, 0 fallas, 0 omitidas |
+| npm run ui:contract | APROBADO · exit 0 |
+| npm run ui-review:check | APROBADO · exit 0 |
+| Playwright audio-por-partes.spec.ts | APROBADO · 3/3 en Chromium |
+| git diff --check | APROBADO · sin errores de whitespace |
+
+Los tres escenarios E2E fueron: (1) multipart, errores y límites; (2) tres 503 automáticos, cuarto intento explícito satisfactorio, checkpoint sintético confirmado, manifiesto verificado y doble activación con una sola llamada a archivo; (3) 502 persistente no-JSON, archivado bloqueado, texto conservado y ningún bypass.
+
+**Límite de estas pruebas:** Next/Chromium ejecutaron en local con datos sintéticos y respuestas simuladas para /api/audio, /api/dictado/checkpoint y /api/dictado. Las pruebas acreditan coordinación del cliente y contratos. No acreditan micrófono físico, escritura/read-back de Blob real, Neon real, archivo productivo, restauración tras reinicio ni disponibilidad actual de objetos. No se ejecutó npm run build sobre la punta combinada actual.
+
+#### E. CI remoto y estado de publicación
+
+Para el commit de código 55449a08719f04982dbfceb15ec28f43c7b68118 se observaron:
+- CI run 42308741732: khora-web-gate, api-tests, calidad;
+- UI Quality run 42308741716: UI Contract, UI E2E;
+- khora-ok run 42308741666.
+
+Los seis jobs reportaron failure, pero el detalle devuelto fue steps=[]: no llegaron a ejecutar comandos. Se clasifica como bloqueo de ejecución/runner, no como fallo de aserciones ni como CI aprobado. Los checks de Vercel/Netlify no habilitaron Preview por la restricción del plan ante repositorio privado de organización; tampoco constituyen prueba funcional.
+
+La PR #354 permanece OPEN · DRAFT · NOT MERGED. La comparación observada con main fue ahead 27 / behind 0, merge-base 0aa7497a6316772ccf846620685a87b0711e346c. main y Production no fueron modificados. No se realizó merge, deploy, cutover ni cambio de configuración/credenciales productivas.
+
+#### F. Pendientes que permanecen dentro de CUSTODIA-04
+
+1. Ejecutar los workflows en un runner real y resolver el bloqueo de Actions; revisar el resultado de la punta documental posterior sin confundir «workflow creado» con «pasos ejecutados».
+2. Ejecutar un ensayo con proveedor real autorizado en entorno no productivo: escribir, leer físicamente el objeto, descifrar cuando aplique, recalcular tamaño/SHA-256 y verificar el vínculo de sesión/manifiesto; conservar evidencia saneada y lectura de vuelta.
+3. Realizar el recorrido funcional autorizado Dictado → «Archivar registro» → recibo durable de Custodia, incluyendo reintento exitoso, fallo persistente y doble activación. No utilizar captura personal como fixture.
+4. Si se reproduce el caso original, adquirir telemetría minimizada: request ID, status/reason, índices y estados de partes, cierre/ACK, checkpoint y manifiesto. No copiar texto/audio, URL firmadas ni hashes completos al expediente.
+5. Conseguir aceptación funcional del operador; hasta entonces no declarar la garantía de producto certificada.
+
+#### G. Separación de incidentes y entrega
+
+- **Dictado ausente del 2026-10-28, última entrada visible reportada a las 17:08 y contador 40→20:** pertenece a CUSTODIA-03 (#1 rescate). No fue resuelto por este trabajo. La sesión candidata 20:29/264 checkpoints y las fuentes B2, Vercel Blob e IndexedDB mantienen los estados y límites registrados en el OCP/inventario; no se afirma que el dictado específico haya sido identificado, que la pérdida sea definitiva ni que se hayan recuperado unidades productivas.
+- **Unidades visibles en Recuperación:** permanecen en CUSTODIA-01 (#2); el catálogo completo y la verificación por unidad siguen pendientes.
+- **Error al archivar del 2026-11-06:** permanece dentro de CUSTODIA-04 (#3). Diagnóstico estático, solución implementada en rama y evidencia de pruebas locales quedan reunidos aquí y en PR #354.
+- **CUSTODIA-02** continúa retirada. **No crear CUSTODIA-05**: el subalcance ya pertenece a la CUSTODIA-04 existente.
+
+**Cierre de intervención de esta conversación:** la investigación documental y la corrección diagnóstica de este incidente se consideran ENTREGADAS A CUSTODIA-04. No queda una tarea paralela independiente de este hilo. CUSTODIA-04 continúa EN CURSO hasta superar las compuertas del apartado F; las garantías del producto siguen NO CERTIFICADAS. Este cierre no modifica titularidad, generación, autorización ni control de Custodia o Dictado.
