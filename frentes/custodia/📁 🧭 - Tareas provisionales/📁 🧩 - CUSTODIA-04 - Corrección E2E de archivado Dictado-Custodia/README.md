@@ -1,4 +1,4 @@
-<!-- TASK_STATUS=PROVISIONAL; PARENT_TASK=CUSTODIA-04; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true; DIAGNOSTIC_STATUS=STATICALLY_VERIFIED; ROOT_CAUSE_OF_REPORTED_SESSION=UNDETERMINED; PRODUCT_FIX=IMPLEMENTED_IN_ISOLATED_BRANCH; VALIDATION=LOCAL_E2E_BUILD_TYPECHECK_PASS_UNIT_BASELINE_571_OF_572 -->
+<!-- TASK_STATUS=PROVISIONAL; PARENT_TASK=CUSTODIA-04; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true; DIAGNOSTIC_STATUS=STATICALLY_VERIFIED; ROOT_CAUSE_OF_REPORTED_SESSION=UNDETERMINED; PRODUCT_FIX=IMPLEMENTED_IN_ISOLATED_BRANCH; VALIDATION=LOCAL_E2E_3_OF_3_TYPECHECK_PASS_UNIT_572_OF_572_UI_CONTRACT_PASS_UI_REVIEW_PASS -->
 # CUSTODIA-04 · Incidente de archivado Dictado → Custodia
 
 **Estado:** `en_curso` · expediente provisional de la tarea existente CUSTODIA-04.  
@@ -369,3 +369,41 @@ La revisión de la punta posterior detectó una carrera posible: la acción secu
 **Estado, límites y siguiente paso.** La corrección de coordinación, el reintento automático antes de validar, el bloqueo ante persistencia de fallos y la exclusión mutua del archivado tienen pruebas locales E2E aprobadas. La causa runtime exacta de la captura originalmente reportada continúa NO DETERMINADA. No se hizo ensayo con proveedor real, lectura física/read-back en Blob, reconciliación contra base de datos productiva, acceso al audio del operador, merge ni despliegue. El build y los mocks no sustituyen esa evidencia. La falla CUSTODY-12 debe corregirse como deuda de la línea base, en un cambio separado, sin introducirla como parte artificial de este incidente.
 
 **PR #354:** permanece abierta en borrador y sin merge. `main` observado `0aa7497a6316772ccf846620685a87b0711e346c`; `Production` sin cambios. Los dos ajustes validados se deben publicar únicamente en la rama `fix/custodia-04-dictado-archivar-e2e-20261106`. La aceptación final de Custodia y la garantía del producto siguen NO CERTIFICADAS.
+
+
+### 12.8 Validación local final por RDC · 2026-11-06 · árbol probado desde `5728d0062f0925d4987fae4f2f491061c21120f8`; sincronización posterior `68f9dbd5797932be5f2a84885f88cd23de7dbd6c`
+
+**Entorno y aislamiento.** Se ejecutó la validación en un *worktree* separado `C:\Users\fila4\Desktop\Khora\khora-custodia-04-validation`, detached exactamente en la punta remota indicada. El checkout `khora-main` preexistente se mantuvo intacto. El `package-lock.json` conserva el blob `987316f16dae22a60766b7354d81b34e11857960`; no se modificaron `package.json` ni lockfile. La instalación npm se hizo offline y sin lifecycle scripts. Para completar los tests del codec, se copió al worktree el ejecutable `ffmpeg.exe` de la instalación local que comparte la misma versión `ffmpeg-static 5.3.0`; la huella SHA-256 del binario origen y destino coincide: `04E1307997530F9CF2FE35CBA2CA7E8875CA91DA02F89D6C7243DF819C94AD00`. El ejecutable declara FFmpeg 6.1.1. Esta restauración fue exclusivamente local y no añadió archivos versionados.
+
+**Correcciones adicionales descubiertas durante la validación.**
+- `IngresoView.tsx`: la condición visible de «Reintentar y archivar» compara ahora `(v.audioPendiente ?? 0) > 0`; elimina TS18048 al tratar de forma segura el campo opcional. No relaja la compuerta de custodia ni cambia la regla de estado pendiente.
+- `custody-regression.test.ts` / CUSTODY-14: se actualizó la aserción estática de dependencias de `guardar()` para incluir `reintentarCustodia`, que ya forma parte del callback real. No altera comportamiento productivo.
+- `audio-por-partes.spec.ts`: la expectativa del contador espera explícitamente los tres intentos automáticos del helper mediante `expect.poll`; además, el escenario simula el recibo POST de `/api/dictado/checkpoint` con `sessionId`, `revisionId`, SHA-256 y longitud coherentes. Se conserva el contrato de tres intentos (backoff 1 s/2 s), un cuarto intento explícito satisfactorio y una sola llamada a `/api/dictado`. No se añadieron reintentos al cliente ni se deshabilitó la verificación del checkpoint.
+
+**Resultados finales observados en el worktree.**
+
+| Control | Resultado | Evidencia |
+|---|---|---|
+| `npm run typecheck` | APROBADO | exit 0, tras la guarda de `audioPendiente` opcional |
+| `npm run test:unit` | **APROBADO: 572/572** | 572 pass, 0 fail, 0 skipped; incluye 17/17 pruebas de Custodia y los dos tests reales de codec MP3 |
+| `npm run ui:contract` | APROBADO | exit 0; contrato de navegación íntegro |
+| `npm run ui-review:check` | APROBADO | exit 0; escenarios, ui_ids, componentes y prerender íntegros |
+| Playwright `audio-por-partes.spec.ts` | **APROBADO: 3/3** | Chromium; 34.8 s; salida y código 0 |
+| `git diff --check` | APROBADO | sin errores de whitespace |
+
+**E2E focalizada 3/3.** (1) carga multipart, errores y límites; (2) tres respuestas 503, persistencia visible de la cola, retry explícito satisfactorio, checkpoint confirmado, manifiesto con parte verificada y exactamente un archivado aun con doble activación; (3) 502 no-JSON persistente, texto conservado y ruta de archivado bloqueada. El servidor Next se inició manualmente con Webpack en localhost y variables sintéticas; Chromium utilizó una configuración Playwright temporal no versionada, eliminada antes del commit. Los endpoints de red del escenario E2E son simulados. Por tanto, este resultado valida la coordinación del navegador y sus contratos, no la disponibilidad real de Blob/Neon ni un archivo productivo.
+
+**Falla previa de unitarias resuelta/explicada.** La primera ejecución con `npm ci --ignore-scripts --offline` falló solo en los dos tests de codec porque el hook omitido no instaló `ffmpeg.exe`. Se cotejó versión 5.3.0, se restauró el binario idéntico en el worktree y se repitió el lote: **572/572 aprobadas**. Los otros tres controles UI/tipos y Playwright se ejecutaron también después de las modificaciones del código y de las pruebas.
+
+**CI remoto y checks externos.** Para la punta `5728d0062f0925d4987fae4f2f491061c21120f8`, GitHub Actions creó:
+- CI run `42302467260`: jobs `calidad`, `api-tests`, `khora-web-gate`.
+- UI Quality run `42302467188`: jobs `UI E2E`, `UI Contract`.
+- `khora-ok / gate` run `42302467165`: job `khora-ok`.
+
+Los seis jobs terminaron con `failure`, pero su lectura de pasos devolvió `steps=[]`; GitHub no ejecutó comandos de prueba. No se contabiliza como fallo de código ni como aprobación CI. Los checks de Vercel/Netlify continúan rechazando Preview por la restricción del plan frente a repositorio privado de organización; no son validación funcional de la aplicación.
+
+**Estado y límites.** La corrección de cliente pasa typecheck, suite unitaria completa, contrato UI, UI review y E2E focalizada en navegador. La ejecución local se realizó en un worktree derivado de `5728d006` con los deltas descritos. Durante la validación, la rama remota recibió `68f9dbd`, que incorporó de forma idéntica la guarda de `audioPendiente` y la espera `expect.poll`; al reconciliar, se conservan ambos cambios y se agregan el recibo sintético del checkpoint y la aserción de CUSTODY-14 actualizada. El conjunto de archivos de código/pruebas quedó equivalente al árbol probado. PR #354 sigue abierta, en borrador y sin merge. No se ejecutó build de producción, despliegue, cambio de `main`, lectura/escritura de base de datos productiva ni prueba con proveedor real no productivo. No se realizó lectura física posterior del objeto Blob real, no se verificó el micrófono físico y no hubo aceptación humana. La causa runtime exacta de la captura original sigue **NO DETERMINADA**. La aceptación de Custodia continúa **NO CERTIFICADA** hasta completar la prueba de proveedor no productivo/read-back y el recorrido físico autorizado.
+
+**Siguiente secuencia controlada:** publicar estos cambios y esta evidencia en la rama aislada/PR #354; comprobar que la nueva punta ejecuta CI en un runner real; después preparar una prueba separada con proveedor no productivo autorizado y lectura física de vuelta. Mantener el PR en borrador y no fusionar ni desplegar hasta satisfacer las compuertas pendientes. CUSTODIA-03 conserva su prioridad de rescate y no se modifica por este ciclo.
+
+[executed on device: PC10RCIF4EI4 (d0bbb2a3-d7b4-45e1-8870-652c2c3844fc)]

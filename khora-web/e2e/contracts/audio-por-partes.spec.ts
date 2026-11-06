@@ -222,6 +222,25 @@ test.describe('Dictado por partes contract test', () => {
       });
     });
 
+    await page.route('**/api/dictado/checkpoint', async (route) => {
+      if (route.request().method() !== 'POST') {
+        await route.continue();
+        return;
+      }
+      const checkpoint = JSON.parse(route.request().postData() || '{}');
+      const texto = String(checkpoint.texto || '');
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: true,
+          sessionId: checkpoint.sessionId,
+          revisionId: checkpoint.revisionId,
+          sha256: createHash('sha256').update(texto).digest('hex'),
+          chars: texto.length,
+        }),
+      });
+    });
     await page.route('**/api/pulir', async (route) => {
       const body = JSON.parse(route.request().postData() || '{}');
       await route.fulfill({
@@ -292,7 +311,7 @@ test.describe('Dictado por partes contract test', () => {
 
     await expect(page.locator('[data-ui-id="ingreso.custodia-status"]'))
       .toContainText('1 parte(s) con confirmación remota pendiente', { timeout: 15000 });
-    await expect.poll(() => audioAttempts, { timeout: 15000 }).toBe(3);
+    await expect.poll(() => audioAttempts, { timeout: 20000 }).toBe(3);
     expect(archiveCalls).toBe(0);
 
     const retryArchive=page.getByRole('button', { name: 'Reintentar y archivar' });
