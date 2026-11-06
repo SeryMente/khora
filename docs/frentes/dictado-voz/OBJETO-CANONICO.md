@@ -6,10 +6,10 @@
 - Identidad canónica: `DICTADO`; `MCP-OBS-DICTADO` queda como identidad agregada histórica.
 - Repositorio: `SeryMente/khora`, rama `main`.
 - OCP heredado: `docs/frentes/dictado-voz/`.
-- Versión: **v0.6.19 · DICTADO-v0.6.19**, no es versión de producto.
-- Estado: titularidad transferida a esta conversación el 2026-11-06 (generación 4→5); alcance de Dictado conservado; producto no revalidado funcionalmente.
-- Control: generación **5**, folio `PENDIENTE/NO ASIGNADO` (FOL1 PREPARADA, NO ACTIVA), alias operativo `chatgpt-dictado-01a1b26b-ef3c-788a-b7ea-e48d456f0beb`.
-- UUIDv7 local de esta conversación: `01a1b26b-ef3c-788a-b7ea-e48d456f0beb`; no es ID nativo de plataforma. Instancia: `chatgpt-dictado-INSTANCE-20261106-01A1B26BEF3C`.
+- Versión: **v0.6.20 · DICTADO-v0.6.20**, no es versión de producto.
+- Estado: titularidad transferida a esta conversación el 2026-11-06 (generación 5→6); original `ChatGPT-DICTADO-20261106-1540.txt` incorporado y cotejado; producto no revalidado funcionalmente.
+- Control: generación **6**, folio `PENDIENTE/NO ASIGNADO` (FOL1 PREPARADA, NO ACTIVA), alias operativo `chatgpt-dictado-01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`.
+- UUIDv7 local de esta conversación: `01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`; no es ID nativo de plataforma. Instancia: `chatgpt-dictado-INSTANCE-20261106-01A1B2E1A2DC7881AAC7AC9D900DD4E3`.
 - Frente independiente relacionado: Observabilidad MCP en `docs/frentes/observabilidad-mcp/`, con control propio sin titular asignado.
 - Custodia transversal conserva su propio OCP/titularidad; Dictado solo integra sus contratos.
 - Material fuera del alcance estricto se conserva en la crónica y queda clasificado en §4; no se borra ni reasigna automáticamente.
@@ -68,7 +68,7 @@ Los originales y evidencias previos permanecen en sus ubicaciones; no se crea un
 ## 5. Roles y colaboración
 
 - Operador: dueño del propósito, consentimiento, decisiones materiales y aceptación humana.
-- Asistencia responsable actual: esta instancia, control gen. 5; folio `PENDIENTE/NO ASIGNADO`; alias operativo `chatgpt-dictado-01a1b26b-ef3c-788a-b7ea-e48d456f0beb`; UUIDv7 local `01a1b26b-ef3c-788a-b7ea-e48d456f0beb`.
+- Asistencia responsable actual: esta instancia, control gen. 6; folio `PENDIENTE/NO ASIGNADO`; alias operativo `chatgpt-dictado-01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`; UUIDv7 local `01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`.
 - Constructor independiente: no asignado en C044; no inventar roles.
 - Observabilidad MCP: frente independiente sin titular asignado en C044.
 - Custodia: mantiene su titularidad transversal; Dictado consume sus contratos.
@@ -81,6 +81,7 @@ Los originales y evidencias previos permanecen en sus ubicaciones; no se crea un
 | Separar Dictado y Observabilidad MCP | Autorizada por instrucción directa C044 | Dos OCP y controles independientes. |
 | Transferir Dictado gen. 3→4 | Autorizada por respuesta afirmativa directa | Exclusivamente Dictado. |
 | Transferir Dictado gen. 4→5 | Autorizada por instrucción directa `Transfer Responsibility` del 2026-11-06 | Exclusivamente Dictado; no amplía permisos de código ni producción. |
+| Transferir Dictado gen. 5→6 | Autorizada por dos respuestas afirmativas del operador; la segunda confirmó `TRANSFER_RESPONSIBILITY` | Exclusivamente Dictado; gen. 6; sin folio porque FOL1 no está activa. |
 | Limitar Dictado a captura/transcripción/UI | Instrucción directa C044 | Benchmark, Diálogo, Ingreso general, MCP y publicación quedan fuera. |
 | Integración con Custodia | Contrato transversal existente | No transferir titularidad de Custodia. |
 | PR #335 | Candidato amplio de Ingreso U01–U06 | No se atribuye íntegramente a Dictado ni se fusiona por C044. |
@@ -93,13 +94,22 @@ La etapa mixta se conserva en la crónica y el Anexo A; sus citas no reactivan a
 
 - Repositorio privado `SeryMente/khora`; acceso GitHub de lectura/escritura verificado.
 - Rama `main`; base C044 `43ff0ad2bed21b375c658ac80e865d92aa7fd87b`.
-- RDC y entorno local no utilizados en este ciclo.
+- RDC utilizado para localizar, leer, obtener metadatos, calcular SHA-256 y preparar el original. No se abrió un checkout de desarrollo ni se modificó el entorno de producto.
 - Producción no consultada ni modificada.
 - Último release técnico histórico C030: main `f0dfbdcb2d79eb6289dacba272ddcc7ba2023063`, deployment `dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr`, observado 2026-10-18; no revalidado.
 - Antes de cambios en audio/captura/checkpoints/recuperación, leer `khora-web/docs/CUSTODIA-DICTADOS.md`.
 - C044 es una separación documental; no altera código de producto.
 
 ## 8. Estado vivo
+
+### Transferencia de responsabilidad gen. 5→6 — 2026-11-06
+
+- **Autorización:** dos respuestas directas «Si» del operador; la segunda respondió a la pregunta explícita «¿Confirmas TRANSFER_RESPONSIBILITY?». Operación: sustitución del titular exclusivamente de Dictado.
+- **Control previo:** generación 5; titular `chatgpt-dictado-01a1b26b-ef3c-788a-b7ea-e48d456f0beb`; blob `38afbbb1215a1fc821f5ac750fb9a055aa12dea7`.
+- **Control nuevo:** generación 6; titular `chatgpt-dictado-01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`; instancia `chatgpt-dictado-INSTANCE-20261106-01A1B2E1A2DC7881AAC7AC9D900DD4E3`; UUIDv7 local `01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`; evento `DICTADO-TRANSFER-20261106-900DD4E3`.
+- **Persistencia del control:** commit `aa11ece612866378296c34a3f9305071d58ad175`; blob nuevo `0536dc44354b6ee7938de59216bcbd9c1f6133cf`. Lectura de vuelta de `main`: generación, alias, instancia, evento, generación anterior, SHA anterior y UUID cotejados.
+- **Foliación:** `PENDIENTE/NO ASIGNADO`; FOL1 PREPARADA, NO ACTIVA. No se inventa folio ni se presenta el UUID local como ID nativo.
+- **Límite:** el traspaso no amplía permisos sobre código, credenciales, Custodia, proveedor, seguridad, workflows, despliegue, producción ni aceptación funcional.
 
 ### Transferencia de responsabilidad gen. 4→5 — 2026-11-06
 
@@ -150,6 +160,17 @@ No afirmar sincronización, titularidad, aceptación, pruebas, despliegue o lect
 - PR #335 sigue candidato amplio de Ingreso; PR #342/#343 se relacionan con Observabilidad MCP. Todos permanecen abiertos y sin fusionar.
 - No hubo cambios de producto ni pruebas en C044; aceptación física pendiente.
 
+
+### C045 — Retoma documental, transferencia gen. 5→6 e incorporación del original — 2026-11-06
+
+- **Instrucción de entrada:** «ChatGPT-DICTADO-20261106-1540.txt Documenta enpersistencia documental,del frente de trabajo Dictado. con rdc Y retoma desde y retoma repitiendo la salida del modelo del ultimo ciclo.» Se conserva la grafía del mensaje; la interpretación operativa fue localizar el original mediante RDC, adoptar el OCP Dictado, registrar la transferencia autorizada y preservar la salida final del modelo fuente.
+- **Gobernanza adquirida desde main:** Samantha v377 · NX-377m; Metacanon 1.28; GOW 2.17; DUG blob `54064c8fe00f872023a455f06596061ed69062ae`; commit de referencia `8ee2482866b3dd085e58e05006727256d0274376`. Se consultaron §ARR, P001/P004/P005/P037/P038/P043, la arquitectura OCP de Metacanon §29 y los ámbitos GOW Persistencia documental y Gestión conversacional. MCP-NORMATIVO: DESACTIVADO.
+- **Transferencia gen. 5→6:** autorizada expresamente por el operador y registrada en `CONTROL-RESPONSABILIDAD.json`; precondición SHA `38afbbb1215a1fc821f5ac750fb9a055aa12dea7`; commit `aa11ece612866378296c34a3f9305071d58ad175`; blob nuevo `0536dc44354b6ee7938de59216bcbd9c1f6133cf`; read-back verificado. Alias operativo `chatgpt-dictado-01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`; UUIDv7 local `01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`; no ID nativo. Folio sigue pendiente porque FOL1 no está activa.
+- **Original incorporado:** `originales/ChatGPT-DICTADO-20261106-1540.txt`. Fuente local RDC `C:\Users\fila4\Downloads\ChatGPT-DICTADO-20261106-1540.txt`; 70,248 bytes; 1,408 líneas; última actualización declarada 2026-11-06 15:38:23; exportación declarada 15:40:29. SHA-256 `B59FA7524DDAEB8CAAA06A422BBC11415C4AB4814DC2E920AC80658675EE768A`; Git blob `a022d13920cb80280dd3c5bb89475348f8c908b7`; commit `92f6c02044172143e01dee717aaf62f6e7ef588f`. Se comprobó round-trip UTF-8 y el SHA del blob remoto coincide con el blob de los bytes originales: identidad byte a byte verificada.
+- **Procedencia y límites:** el encabezado del original identifica ChatGPT Exporter y un enlace a la conversación fuente; se conserva como exportación de herramienta, no como exportación nativa exhaustiva de ChatGPT. Escaneo acotado de seis familias de patrones de credenciales: cero coincidencias; no equivale a certificación exhaustiva de ausencia de secretos. El destino `SeryMente/khora` fue verificado como privado.
+- **Última salida del modelo fuente:** el cierre persistido de la exportación, «SCI 354Q quedó activado. La bitácora inicial ya está registrada en la github.com; cada control tendrá su evidencia y resultado documentados.», fue recuperado y reproducido literalmente en la respuesta de retoma. No se reconstruyó ni se expandió la sigla SCI 354Q.
+- **SCI 354Q:** la exportación conserva la activación y el registro inicial en PR #354. El seguimiento diario ya existente no fue alterado ni ejecutado nuevamente en esta retoma; el estado de CI descrito en la exportación es histórico, no una revalidación actual.
+- **Alcance de este ciclo:** actualización documental del control, OCP y manifiesto. Sin cambios de código, pruebas, PR, configuración, credenciales, proveedor, despliegue, datos ni producción. El estado funcional del defecto de archivado permanece sujeto a la validación descrita por la tarea CUSTODIA-04 y el seguimiento SCI 354Q; no se declara resuelto por esta incorporación.
 
 ### C042 — Transferencia autorizada y verificable de titularidad — 2026-10-28
 
