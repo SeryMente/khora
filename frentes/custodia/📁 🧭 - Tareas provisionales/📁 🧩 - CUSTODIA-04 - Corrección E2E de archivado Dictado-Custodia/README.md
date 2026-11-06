@@ -5,7 +5,7 @@
 **Tipo:** expediente de incidente, corrección y aceptación E2E; subordinado al OCP Custodia.  
 **Identificador:** CUSTODIA-04, ya existente. Este expediente no crea otro identificador de tarea, no crea CUSTODIA-05 y no altera la numeración histórica.  
 **Alcance:** desde la entrada a la pantalla Dictado y el inicio explícito de captura hasta el clic en «Archivar registro»; desde ese clic, la comprobación del manifiesto, el archivado y el recibo durable de Custodia.  
-**Estado de garantía:** NO CERTIFICADA. El diagnóstico del defecto de coordinación estático está verificado; la causa runtime de la captura concreta sigue sin determinarse; la solución aún no está implementada ni probada.
+**Estado de garantía:** NO CERTIFICADA. El defecto de coordinación y la solución propuesta están documentados; la corrección está implementada en la rama aislada de PR #354. La causa runtime de la captura original y la validación automatizada/física siguen pendientes.
 
 ## 1. Instrucción y procedencia
 
@@ -294,6 +294,18 @@ Se reintentaron los jobs fallidos de las primeras ejecuciones; la siguiente ejec
 
 Los checks Vercel heredados para commits de PR devolvieron failure con destino de actualización del plan `github-private-org-to-hobby`; no son resultados de build/E2E. No se generó deployment Preview ni Production por esta PR.
 
+### 12.5 · Concurrencia entre «Reintentar y archivar» y «Archivar registro»
+
+La revisión de la punta posterior detectó una carrera posible: la acción secundaria podía iniciar el drenaje de reintentos y, antes de terminar, otro evento de archivo podía continuar por el camino principal. El drenaje de partes ya era *single-flight*, pero eso no garantizaba que la operación completa de archivado fuera única.
+
+**Corrección añadida:**
+- `archiveInFlightRef` protege la operación completa de archivo, de forma síncrona antes del primer `await`; una segunda activación retorna sin abrir otro POST.
+- «Reintentar y archivar» reutiliza directamente `guardar()`, que ya realiza el drenaje automático. Se elimina la secuencia separada «reintentar y luego llamar a guardar», origen de la ventana de carrera.
+- La liberación de la guarda queda en `finally`, incluso cuando hay fallo persistente o error de preparación.
+- La prueba de éxito ahora dispara dos activaciones inmediatas de «Reintentar y archivar» y exige una sola llamada a `/api/dictado` y un único manifiesto verificado.
+
+**Persistencia de esta corrección:** `6c124ed227782af1a6be90c31fce87ac9416aad3` (código) y `46a36cd856bd4d43f75ab5ee27ad80cf15485c15` (regresión). Lectura de vuelta de ambos archivos confirmada. Los cambios están en la rama aislada; no se afirma que la prueba se haya ejecutado.
+
 ### 12.4 Estado actualizado
 
 | Elemento | Estado |
@@ -302,6 +314,8 @@ Los checks Vercel heredados para commits de PR devolvieron failure con destino d
 | Defecto cliente de reintento omitido | CONFIRMADO ESTÁTICAMENTE |
 | Corrección del flujo de archivado | IMPLEMENTADA EN RAMA AISLADA |
 | Acción visible «Reintentar y archivar» | IMPLEMENTADA EN RAMA AISLADA |
+| Exclusión mutua del archivado completo entre acciones concurrentes | IMPLEMENTADA EN RAMA AISLADA |
+| Regresión de doble activación inmediata | AÑADIDA; NO EJECUTADA |
 | Prueba retry-transitorio→éxito | AÑADIDA; NO EJECUTADA |
 | Prueba fallo permanente y no-bypass | AMPLIADA; NO EJECUTADA |
 | Typecheck, unitarias, UI contract y build | PENDIENTES DE EJECUCIÓN |
