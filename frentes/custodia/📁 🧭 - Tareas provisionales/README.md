@@ -17,8 +17,10 @@ Estas tareas ya existían en la lista provisional anterior y no se duplican ni r
 |---|---|---|
 | CUSTODIA-01 | `EN CURSO` | [Lista provisional existente](../LISTA-TAREAS-PROVISIONAL.md) |
 | CUSTODIA-03 | `ABIERTA` | [Lista provisional existente](../LISTA-TAREAS-PROVISIONAL.md) |
-| CUSTODIA-04 | `EN CURSO` | [Lista provisional](../LISTA-TAREAS-PROVISIONAL.md) · [Expediente de archivado Dictado → Custodia](./📁%20🧩%20-%20CUSTODIA-04%20-%20Corrección%20E2E%20de%20archivado%20Dictado-Custodia/README.md) |
+| CUSTODIA-04 | `EN CURSO` · corrección en rama; validación local aprobada; aceptación pendiente | [Lista provisional v0.14](../LISTA-TAREAS-PROVISIONAL.md) · [Expediente consolidado 12.9 · Dictado → Custodia](./📁%20🧩%20-%20CUSTODIA-04%20-%20Corrección%20E2E%20de%20archivado%20Dictado-Custodia/README.md) · [PR #354 · DRAFT](https://github.com/SeryMente/khora/pull/354) |
 | CUSTODIA-02 | `RETIRADA` · no reutilizar | [Lista provisional existente](../LISTA-TAREAS-PROVISIONAL.md) |
+
+La intervención de diagnóstico y documentación del bloqueo del 2026-11-06 quedó entregada al expediente existente CUSTODIA-04. La tarea sigue EN CURSO: PR #354 permanece abierta en borrador, sin merge; la garantía de producto no está certificada. El origen de la sesión reportada y su causa runtime siguen no determinados. CUSTODIA-03 mantiene la prioridad #1 y CUSTODIA-01 la #2.
 
 ## 2. Tareas provisionales del sprint de migración Blob → B2
 
