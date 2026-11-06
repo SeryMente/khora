@@ -1,0 +1,1408 @@
+DICTADO
+
+User: Anonymous
+Created: 11/6/2026 13:38:33
+Updated: 11/6/2026 15:38:23
+Exported: 11/6/2026 15:40:29
+Link: https://chatgpt.com/c/6aee2cb8-85e0-83e8-a166-6aa3890966ac
+
+## Prompt:
+6/11/2026, 1:40:10 p.m.
+
+Enumera frentes de trabajo de repositorio Cora.
+
+## Response:
+6/11/2026, 1:38:36 p.m. · gpt-6-t-mini-mini
+
+Identificaré el repositorio Cora, revisaré su estructura y documentación disponible, y después agruparé los frentes de trabajo por objetivo y dependencias. No asumiré que “Cora” es “Khora”.
+
+La búsqueda en los repositorios conectados no identifica un proyecto llamado Cora; sí confirma que el repositorio privado SeryMente/metodologia está accesible. Estoy contrastando el marco metodológico antes de concluir si hay evidencia suficiente para enumerar frentes sin confundirlo con otro proyecto.
+
+El DUG v377 aclara que “Cora” se normaliza a “Khora” cuando el contexto apunta al producto/sistema; la distinción se conserva si se trata de otra entidad. Por el contexto de los repositorios que has trabajado, tomaré “Cora” como Khora, pero comprobaré qué repositorios y carpetas de frentes están realmente expuestos antes de enumerarlos.
+
+Buscó repositorios instalados relacionados con Cora
+
+Se buscó en 1 sitio web
+
+Buscados repositorios de Cora y metodología en GitHub y SeryMente
+
+Aclarando el repositorio
+
+Estoy interpretando “Cora” como “Khora” porque el contexto lo vincula con ese producto. Voy a verificar el repositorio y revisar sus secciones metodológicas relevantes para enumerar los frentes de trabajo.
+
+Aclarado el repositorio
+
+Consultó documentación ARR y DUG e investigó frentes de trabajo de Cora
+
+Revisando frentes activos
+
+Estoy verificando la estructura actual del repositorio para distinguir frentes principales, documentación heredada y tareas provisionales, y así enumerar únicamente las áreas de trabajo vigentes.
+
+Revisó frentes activos
+
+Enumerados frentes activos y documentación de repositorios Khora
+
+Evaluando estados actuales
+
+Detecto cinco frentes principales: dictado por voz, armonía, observabilidad MCP, tareas automáticas y custodia. También estoy separando documentación heredada y notas provisionales, porque algunos controles y objetos canónicos presentan versiones desalineadas.
+
+Evaluaste los estados actuales
+
+Cerrando la enumeración
+
+Confirmo cinco frentes principales: dictado por voz, armonía, observabilidad MCP, tareas automáticas y custodia. Estoy señalando por separado los desajustes documentales, sin mezclarlos con frentes provisionales o históricos.
+
+Cerraste la enumeración
+
+Consolidando frentes activos
+
+Estoy confirmando cinco frentes principales: dictado por voz, armonía, observabilidad MCP, tareas automáticas y custodia. El inventario del README es inconsistente; además, tareas automáticas carece de control separado y custodia muestra versiones desalineadas.
+
+Consolidaste los frentes activos
+
+Revisé documentación, estados canónicos y frentes OCP del repositorio
+
+Procesó durante 4m 23s
+
+Frentes de trabajo de Cora (Khora)
+
+Identificación: interpreto «Cora» como Khora, porque así lo establece el propio repositorio para este contexto. El repositorio canónico es github.com, rama main.
+
+Corte consultado: commit bdd549e · 2 de noviembre de 2026 · inventario de solo lectura.
+
+Se identifican cinco frentes de trabajo con objetos canónicos de persistencia (OCP) propios:
+
+#
+Frente
+Ruta canónica del OCP
+Versión documental
+Antigüedad
+1
+Dictado
+docs/frentes/dictado-voz/
+DICTADO-v0.6.18
+7.03.30
+2
+Khora MCP
+docs/frentes/observabilidad-mcp/
+v0.3.12
+4.17.33
+3
+Harmonia
+docs/frentes/harmonia/
+HARMONIA-v0.43
+4.18.11
+4
+Tareas automáticas
+docs/frentes/tareas-automaticas/
+TAREAS-v0.17
+17.23.59
+5
+Custodia transversal
+frentes/custodia/
+CUSTODIA-v0.14
+5.23.33
+
+Las edades corresponden al tiempo desde el último commit del OCP en main, en formato días.horas.minutos.
+
+Alcance y situación de cada frente
+
+1. Dictado
+
+Ingreso por voz: pantalla de dictado, captura iniciada explícitamente, transcripción, edición y continuidad del texto. Tiene control independiente, generación 4. Su estado documental indica responsabilidad transferida, pero el producto no está revalidado funcionalmente.
+
+2. Khora MCP
+
+Arquitectura e integración del servidor MCP: recursos, herramientas, prompts, autenticación, autorización, interoperabilidad, observabilidad y coordinación de módulos. Generación 9. La restauración del workspace y la validación local de la tarea TASK-001 constan como completadas; TASK-002 (General) y TASK-003 (Jules) siguen en curso. Jules conserva autoridad arquitectónica modular.
+
+3. Harmonia
+
+Observabilidad empírica de ChatGPT en Chrome, captura y transporte de eventos, con evolución hacia una arquitectura local-first. Generación 14. La candidata final tiene pruebas locales satisfactorias, pero CI, aceptación real en Chrome y transporte remoto siguen sin quedar acreditados. No debe confundirse una candidata validada localmente con una entrega aceptada o desplegada.
+
+4. Tareas automáticas
+
+Conversión de información útil —incluidos nuevos dictados— en tareas persistentes, con origen, fechas, corrección, descarte y finalización. La primera entrega, E1, sigue sin implementarse ni publicarse. Están pendientes la revisión material de la interfaz y la resolución del acceso al equipo/proyecto de Vercel, que registró respuestas 403.
+
+5. Custodia transversal
+
+Persistencia, seguridad y recuperación de información entre canales y proveedores. Incluye la migración Vercel Blob → Backblaze B2 en entornos no productivos, dentro de la autorización registrada. Hay tres tareas P0 en curso o abiertas: CUSTODIA-01, CUSTODIA-03 y CUSTODIA-04. CUSTODIA-02 fue retirada del plan activo. La recuperabilidad total del producto no está certificada.
+
+Elementos que no deben contarse como frentes independientes
+
+Jules es un módulo con autoridad arquitectónica propia dentro de Khora MCP, no un sexto frente.
+
+Las tareas provisionales de Continuidad, General y Jules pertenecen al OCP de Khora MCP.
+
+Las tareas provisionales de Custodia pertenecen a su OCP.
+
+Benchmark/feedback, Diálogo multipista, Ingreso general/crónica/metadatos, voz/síntomas y publicación editorial están documentados como paquetes fuera de Dictado y pendientes de adjudicación. No corresponde asignarles titularidad ni convertirlos en frentes por inferencia.
+
+Hallazgos de integridad del inventario
+
+El README.md contiene dos inventarios de OCP: el primero enumera cinco frentes y el segundo omite Khora MCP. Conviene reconciliar esa duplicación.
+
+El OCP de Tareas automáticas no presenta un CONTROL-RESPONSABILIDAD.json en la ruta revisada.
+
+En Custodia, el núcleo documental todavía menciona generación 5, mientras que el control vigente registra generación 6. Esa discrepancia requiere reconciliación antes de asumir o modificar el frente.
+
+Resultado: cinco OCP identificados; no he modificado archivos, controles, titularidades ni rutas.
+
+Registro de salida y gobernanza
+
+IPZ: v0.7 · edad NO VERIFICADA · instalación nativa NO VERIFICADA.
+
+DUG: Samantha v377 · NX-377m · 4.21.40.
+
+Metacanon: 1.28 · GOW: 2.17.
+
+CONV: PENDIENTE/NO ASIGNADO.
+
+CICLO: PENDIENTE/NO ASIGNADO.
+
+A: «Enumera frentes de trabajo de repositorio Cora.» · folio PENDIENTE/NO ASIGNADO.
+
+B: esta respuesta · folio PENDIENTE/NO ASIGNADO.
+
+FOL1: PREPARADA, NO ACTIVA.
+
+MCP-NORMATIVO: DESACTIVADO.
+
+Una siguiente mejora útil sería vigilar semanalmente los cinco OCP y detectar cambios de estado, titularidad, versión y desalineaciones documentales.
+
+¿Quieres que realice esa revisión semanal y te entregue únicamente los cambios y bloqueos?
+
+## Prompt:
+6/11/2026, 1:53:31 p.m.
+
+asume responsabilidad del frente de trabajo dictado.
+
+## Response:
+6/11/2026, 1:51:53 p.m. · gpt-6-t-mini-mini
+
+Voy a comprobar el control vigente de Dictado y su objeto canónico en main antes de cambiar titularidad. La instrucción identifica el frente, pero el procedimiento exige resolver explícitamente cualquier titular activo y distinguir transferencia de corresponsabilidad.
+
+Confirmada autorización para transferir titularidad o agregar corresponsabilidad del frente Dictado
+
+Procesó durante 18s
+
+Frente localizado y control vigente comprobado. La titularidad todavía no ha sido modificada.
+
+(Adjudicación pendiente)
+
+Frente: Dictado
+Repositorio: SeryMente/khora
+Rama: main
+OCP: docs/frentes/dictado-voz/
+Versión documental: DICTADO-v0.6.18
+
+El control autoritativo registra:
+
+Estado: assigned.
+
+Generación: 4.
+
+Titular actual: chatgpt-dictado-ses-20261030-97109848.
+
+SHA del control: a954353055ef30770aae0b5ca40e1f61cfc3d8dd.
+
+¿Autorizas que esta conversación sustituya al titular actual y asuma exclusivamente Dictado (TRANSFER_RESPONSIBILITY), o que se incorpore como segunda responsable sin desplazarlo (ADD_CO_RESPONSIBLE)?
+
+La respuesta determinará la actualización condicionada por SHA, incremento de generación y lectura de vuelta del control.
+
+Gobernanza adquirida: DUG Samantha v377 · NX-377m; Metacanon 1.28; GOW 2.17. MCP-NORMATIVO: DESACTIVADO.
+
+IPZ v0.7 · edad NO VERIFICADA.
+CONV/CICLO/A/B: folios PENDIENTES / NO ASIGNADOS.
+FOL1: PREPARADA, NO ACTIVA.
+
+## Prompt:
+6/11/2026, 1:54:19 p.m.
+
+Transfer Responsibility
+
+## Response:
+6/11/2026, 1:52:38 p.m. · gpt-6-t-mini-mini
+
+La instrucción “Transfer Responsibility” autoriza sustituir al titular registrado de Dictado; no incorpora una segunda sesión. Haré el traspaso únicamente en ese OCP, condicionado a que el control siga en la misma generación y SHA, y verificaré la escritura mediante lectura de vuelta.
+
+El control ya refleja la generación 5. Ahora alineo el núcleo OBJETO-CANONICO.md con esa titularidad y con la gobernanza vigente; mantendré intactos el alcance técnico y los pendientes de aceptación del producto.
+
+El núcleo operativo también quedó alineado: DICTADO-v0.6.19, titularidad generación 5 y referencia a DUG v377. La lectura de vuelta confirmó la actualización y preservó el historial de C044; no se modificó código ni producción.
+
+Procesando autorización explícita
+
+Estoy interpretando “Transfer Responsibility” como una autorización directa. Antes de ejecutar la operación, debo volver a verificar el control más reciente, generar un identificador de sesión único y confirmar que no exista una colisión.
+
+Procesó la autorización explícita
+
+Verificando requisitos previos
+
+Estoy confirmando la hora local, revisando nuevamente el control vigente y comprobando el alcance de los repositorios disponibles. Después generaré el identificador de sesión y validaré que el folio no esté duplicado antes de continuar.
+
+Preparando la transferencia
+
+Estoy generando ahora un folio de sesión único, verificando que no se repita y volviendo a leer el control vigente antes de registrar el cambio de responsabilidad.
+
+Verificó requisitos previos y preparó la transferencia
+
+Preparaste transferencia formal, actualizaste operaciones y verificaste registros de control
+
+Generando UUIDv7 y folio de transferencia
+
+Generaste UUIDv7 y folio de transferencia
+
+Validando alcance y continuidad
+
+Estoy comprobando los repositorios disponibles y preservando el historial de asignación anterior. También estoy preparando los nuevos identificadores y campos de control necesarios para que la transferencia quede trazable y consistente.
+
+Resolviendo la folioación
+
+Estoy priorizando que no se emita un folio mientras FOL1 siga preparada, no activa. Mantendré la transferencia trazable mediante un alias operativo, un identificador local y el historial de asignaciones previas.
+
+Dando seguimiento operativo
+
+Estoy dejando la transferencia preparada con historial preservado, alias operativo e identificador local. Como FOL1 aún no está activa, mantengo la folioación pendiente y registro esa condición explícitamente para evitar una asignación inválida.
+
+Validé alcance, resolví folioación y di seguimiento operativo
+
+Verificó y buscó colisiones de identificadores, actualizando responsabilidad de Dictado
+
+Actualicé el OCP y el objeto canónico de Dictado
+
+Buscando en la web
+
+Calculaste fechas y antigüedad de commits por ruta
+
+Cerrando transferencia operativa
+
+Estoy registrando la responsabilidad con un alias operativo y un identificador local, preservando el historial anterior. La folioación permanece pendiente porque FOL1 aún no está activa; continuaré con una revisión documental antes de modificar código.
+
+Cerraste la transferencia operativa
+
+Calculando antigüedad de commits y revisando estado del PR
+
+Procesó durante 3m 39s
+
+(Transferencia ejecutada y verificada)
+
+La responsabilidad de Dictado ya es de esta conversación.
+
+La actualización del control autoritativo se publicó en main y se leyó de vuelta satisfactoriamente.
+
+Campo
+Resultado
+Operación
+TRANSFER_RESPONSIBILITY
+Generación anterior
+4
+Generación nueva
+5
+Titular anterior
+Sustituido
+Nuevo titular
+chatgpt-dictado-01a1b26b-ef3c-788a-b7ea-e48d456f0beb
+UUIDv7 local
+01a1b26b-ef3c-788a-b7ea-e48d456f0beb
+Folio de sesión
+PENDIENTE / NO ASIGNADO
+
+Evidencia GitHub:
+
+Commit: b779d7beea3c7b03316bf8165e11cedb94d3b4ea
+
+SHA anterior: a954353055ef30770aae0b5ca40e1f61cfc3d8dd
+
+SHA nuevo: 38afbbb1215a1fc821f5ac750fb9a055aa12dea7
+
+Lectura de vuelta: 11 comprobaciones satisfactorias.
+
+Estado de incorporación
+
+(Titularidad vigente · generación 5)
+
+Repositorio: SeryMente/khora · main
+
+Se actualizaron y verificaron ambos documentos:
+
+github.com.
+
+github.com.
+
+Nueva versión documental: DICTADO-v0.6.19.
+
+Commit de actualización del núcleo: 2ed0904336e6009b0f101167d8673e54116c014c.
+
+Alcance asumido
+
+Responsabilidad exclusiva sobre:
+
+Pantalla y experiencia de dictado.
+
+Captura explícita de voz y micrófono.
+
+Transcripción y edición.
+
+Continuidad y recuperación del texto.
+
+Integración con los contratos de Custodia.
+
+Pruebas y aceptación técnica del frente, respetando sus autorizaciones específicas.
+
+Primer diagnóstico de continuidad
+
+He leído el contrato github.com.
+
+(Pendiente de revalidación)
+
+La implementación está documentada como existente en rama, pero no certificada en producción. También constaté que PR #335 está cerrada sin merge; no debe tratarse como una entrega integrada de Dictado.
+
+El siguiente trabajo será contrastar la implementación actual con los criterios de aceptación, empezando por captura, checkpoints, persistencia y recuperación. No he modificado código ni producción.
+
+Registro operativo
+
+Identificador
+Estado
+IPZ
+v0.7 · edad NO VERIFICADA
+DUG
+Samantha v377 · NX-377m
+Metacanon
+1.28
+GOW
+2.17
+CONV
+PENDIENTE / NO ASIGNADO
+CICLO
+PENDIENTE / NO ASIGNADO
+A / B
+Folios PENDIENTES / NO ASIGNADOS
+FOL1
+PREPARADA · NO ACTIVA
+MCP-NORMATIVO
+DESACTIVADO
+
+Antigüedad desde último commit:
+
+Ruta
+d.h.m
+Metodología DUG
+4.21.57
+Khora main
+0.00.00
+OCP Dictado
+0.00.00
+Control Dictado
+0.00.00
+
+La responsabilidad documental está transferida y verificada. La aceptación funcional del producto sigue pendiente.
+
+## Prompt:
+6/11/2026, 2:09:26 p.m.
+
+Bueno, mira, además de lo que tengas pendiente, que yo no sé qué será, debemos esta sesión de asegurarnos que el dictado sea funcional de extremo a extremo. ¿A qué me refiero por de extremo a extremo? La responsabilidad de este frente de trabajo empieza ahí donde el usuario ingresa a la pantalla dictado, pasando por el momento en el que el usuario presiona el botón de iniciar transcripción, o no sé cómo se tenga iniciar dictado en la versión actual, hasta el momento en el que se hace clic en el botón archivar registro. Tal es el alcance de tu ámbito de responsabilidad para el frente dictado de este repositorio y nos vamos a asegurar que esté funcionando de extremo a extremo. De hecho, se sabe que en este momento no lo está, ya que me está dando un error al momento de hacer clic en el botón archivar registro. Me dice... a ver, ahorita te voy a decir qué dice, permíteme. En algunos momentos más te voy a decir qué es lo que me aparece por error cuando hago clic en el botón archivar registro. Nada más voy a dictar un poco. Es importante... bueno, ¿qué más te puedo añadir para complementar? Lo que le dicto al sistema, que armonices con el frente de trabajo custodia, cuyo ámbito de responsabilidad comienza ahí donde hago clic en el botón archivar registro y bueno, no te corresponde a ti saber dónde acaba, pero sí saber que ese instante en el que hago clic en el botón archivar registro es el mismo instante en el que empieza el ámbito de responsabilidad del frente de trabajo custodia para que armonices con las necesidades de ese otro frente de trabajo. El error que aparece es: no se puede archivar el registro. Cora no ha verificado la custodia íntegra de todas las partes de audio. Ese es el error que me debe de... que debes de ver a ver si corresponde a tu ámbito o al de custodia. Investígalo.
+
+## Response:
+6/11/2026, 2:07:53 p.m. · gpt-6-t-mini-mini
+
+Tomo el alcance como una cadena continua: entrada a la pantalla Dictado → inicio de transcripción → captura y procesamiento del audio → preparación del registro → clic en «Archivar registro». Ese clic es la frontera contractual con Custodia: Dictado debe entregar un registro íntegro y trazable; Custodia verifica y conserva sus partes. Voy a rastrear el error desde la interfaz hasta la validación que lo emite y distinguir si la causa está antes de la frontera, en el contrato entre frentes o dentro de Custodia. La primera pasada será de lectura, sin modificar código ni producción.
+
+La comparación ya muestra dos compuertas distintas, no una sola: una validación preliminar en Dictado con los metadatos que conserva la sesión, y otra validación autoritativa en el servidor al archivar contra las filas persistidas de dictado_audio_parte. También encontré un antecedente documentado del mismo mensaje tras recuperar una captura; es una pista relevante, no prueba de que la sesión actual sea la misma ni de que el audio se haya perdido. Ahora estoy comprobando si la recuperación entrega a Dictado el manifiesto de partes actualizado o solo el que quedó guardado en el checkpoint.
+
+Estoy afinando un punto antes de cerrar el diagnóstico: la recuperación tiene una reconciliación de partes en el cliente antes de crear la sesión recuperada. Por eso no basta con señalar el total=0 de la rutina de Custodia; hay que comprobar si ese manifiesto llega actualizado desde el catálogo en el caso normal, o si una ruta de recuperación local/legacy puede saltarse esa reconciliación. No voy a etiquetar esa ruta como causa del incidente sin verificar esa secuencia.
+
+Revisando el error
+
+Estoy ubicando la validación previa al envío y los archivos relacionados con audio y custodia. Quiero comparar el componente, la ruta y las funciones auxiliares para encontrar dónde se marca incorrectamente el audio como incompleto.
+
+Revisé el error
+
+Investigaste la custodia, validación, archivado y recuperación de audio
+
+Detectando la causa
+
+Estoy relacionando el error con una recuperación cuyo manifiesto conserva cero partes de audio, aunque el servidor podría tenerlas. En ese caso, el cliente espera audio, calcula cero partes válidas y bloquea el archivado como si faltara integridad.
+
+Afinando el diagnóstico
+
+Estoy atribuyendo la causa más probable a la recuperación de Custodia: se crea una sesión hija sin copiar partes cuando el manifiesto antiguo declara cero, aunque existan registros de audio. El bloqueo del cliente entonces evita archivar una sesión incompleta.
+
+Detectaste la causa y afinaste el diagnóstico
+
+Verificó PRs, rama principal y lecturas de recuperación y dictado
+
+Consultado el estado del PR #340 y sus proyectos
+
+Consultó equipos, proyectos y el PR #340 de Khora
+
+Consultados equipos, proyectos, PR #340 y hora actual
+
+Buscando en la web
+
+Investigaste errores de producción y verificaste metadatos del despliegue
+
+Verificaste metadatos del despliegue y commit principal
+
+Verificada la ancestralidad y versión del despliegue de producción
+
+Comparaste historiales de commits y despliegues
+
+Comparaste historial y fecha del despliegue de producción
+
+Verificando producción
+
+Estoy comparando la versión publicada con el código actual. Los archivos centrales comparten la misma implementación, así que el defecto de recuperación parece seguir activo y no depender de una diferencia reciente entre ramas.
+
+Verificaste la producción
+
+Evaluando las pruebas
+
+Estoy revisando la cobertura funcional: las pruebas actuales simulan servicios y verifican bloqueos, pero no prueban un archivado exitoso completo. La recuperación con manifiestos vacíos sigue siendo el escenario principal por corregir y validar de extremo a extremo.
+
+Aislando el escenario
+
+Necesito confirmar si la sesión problemática proviene de una recuperación o de una captura nueva. Esa diferencia determina si corrijo la reconstrucción de partes o el preflight del archivado.
+
+Aislando el escenario
+
+Necesito confirmar si la sesión problemática proviene de una recuperación o de una captura nueva. Esa diferencia determina si corrijo la reconstrucción de partes o el preflight del archivado.
+
+Evaluaste y aislaste el escenario de pruebas
+
+Precisando el origen
+
+El bloqueo ocurre antes de archivar: la interfaz detecta que espera audio, pero tiene cero partes válidas. Si la captura es nueva, investigaré la subida; si fue recuperada, revisaré la reconstrucción del manifiesto de audio.
+
+Precisó el origen
+
+Auditó el flujo histórico de dictado, archivado y despliegue productivo
+
+Concluyendo diagnóstico
+
+El bloqueo ocurre antes del archivado porque la interfaz espera audio, pero registra cero partes válidas. La causa más probable es una recuperación que reconstruyó texto sin copiar el manifiesto de audio; necesito confirmar si ocurrió aquí.
+
+Concluyó el diagnóstico
+
+Consolidando hallazgos
+
+Confirmé que el bloqueo ocurre antes de archivar. En una sesión nueva apunta a una subida incompleta; en una recuperación, a partes de audio no reconstruidas. Las pruebas actuales no validan un archivado real exitoso.
+
+¿La captura problemática fue recuperada o recién iniciada?
+
+Consolidaste los hallazgos
+
+Diagnosticó la custodia de audio y recuperación de dictado
+
+Concluyendo diagnóstico
+
+Estoy confirmando que el mensaje lo genera Dictado antes de archivar, pero el caso de recuperación puede originarse en Custodia: se recupera texto sin partes de audio y el preflight bloquea correctamente. Las pruebas actuales usan simulaciones, no un archivo exitoso completo.
+
+Separando escenarios
+
+Necesito distinguir una captura nueva de una recuperación remota. En una captura nueva, buscaré cargas fallidas o partes pendientes; en una recuperación, revisaré por qué el manifiesto reconstruido queda vacío. ¿Cuál de las dos es?
+
+Aclarando el diagnóstico
+
+Estoy confirmando que el mensaje lo genera Dictado antes de enviar el archivado. En recuperación remota, Custodia puede restaurar texto sin enlazar partes de audio; entonces Dictado detecta audio esperado, pero cero partes confirmadas.
+
+La prueba E2E actual simula micrófono, subidas y respuestas del servidor; no valida un archivado exitoso real. Necesito saber: ¿falló una captura nueva o una recuperación del catálogo remoto?
+
+Buscando en la web
+
+Procesó durante 8m 29s
+
+Hallazgo inicial
+
+El mensaje no parece originarse en el botón de la interfaz: el botón «Archivar registro» delega la operación a un manejador (onGuardar). Además, existe una prueba de contrato que espera precisamente ese error cuando una sesión de voz no tiene audio verificado. Esto indica que hay una compuerta deliberada para impedir que se archive como completo un registro cuya custodia de audio no está acreditada.
+
+Todavía no atribuyo el fallo a Custodia: falta comprobar por qué la sesión llega a esa compuerta sin todas sus partes verificadas. Puede ser un defecto previo de Dictado al preparar o entregar los segmentos, un defecto de Custodia al recibir/verificar/registrar las partes, o una incompatibilidad entre ambos contratos.
+
+Atribución del error
+
+Ya localicé el punto exacto que genera el texto: khora-web/app/components/ingreso/IngresoWorkspace.tsx, dentro de guardar(). Antes de enviar el registro a POST /api/dictado, Dictado comprueba que las partes esperadas sean contiguas y que cada una tenga verificado=true, bytes positivos y SHA-256 válido. Si el control falla, muestra el mensaje y sale de la función.
+
+Por tanto, hay una distinción importante:
+
+La emisión del error y el bloqueo del botón pertenecen a Dictado. El rechazo ocurre en la interfaz/controlador de Ingreso, antes de invocar el archivado del servidor.
+
+La evidencia que Dictado está evaluando procede de la custodia de audio. La confirmación de cada parte viene del flujo de subida y verificación de /api/audio.
+
+Esto delimita la frontera, pero aún no demuestra si Dictado está evaluando una lista incompleta/obsoleta o si Custodia no confirmó alguna parte. Estoy siguiendo el dato desde la subida, pasando por la recuperación de checkpoints, hasta esa condición de bloqueo.
+
+Un hallazgo adicional: producción y main no coinciden
+
+La consulta de solo lectura a Vercel encontró un despliegue de producción READY para khora-web, pero su SHA es 953e69484eabb4e8dc8221d1d8fc188373531bfa; el main que había leído momentos antes apuntaba a 2ed0904336e6009b0f101167d8673e54116c014c. No voy a asumir que producción ejecuta el código que acabamos de inspeccionar: esa diferencia debe resolverse antes de atribuir el fallo real a una línea concreta de producción. Tampoco aparecieron errores de aplicación agrupados en las rutas consultadas; la única agrupación devuelta fue una advertencia de configuración SSL en checkpoint, que no explica por sí sola el mensaje de archivo.
+
+Causa técnica identificada para capturas recuperadas
+
+Encontré una ruta concreta que puede producir exactamente este bloqueo:
+
+Cuando se recupera una captura del catálogo remoto, IngresoWorkspace.tsx consulta la sesión para identificar si es un diálogo, pero no aprovecha el audioPartes que devuelve esa consulta para actualizar el punto elegido. Envía a recuperar la revisión histórica original.
+
+La rutina de Custodia (recuperarCheckpoint) sí consulta las partes persistidas, pero decide cuántas copiar usando únicamente corteAudio.hastaParte o audioPartes.length de esa revisión. Si el manifiesto histórico está vacío, calcula cero y no vincula ninguna parte a la sesión recuperada, aunque la sesión de origen pudiera tener filas de audio verificadas.
+
+La pantalla recupera el texto y mantiene fuenteEntrada="microfono", pero recibe cero partes. Al archivar, el control de Dictado detecta que se esperaba audio y bloquea el registro con el mensaje que reportaste.
+
+La responsabilidad es compartida en esa ruta: Dictado no refresca el manifiesto al recuperar desde el catálogo remoto; Custodia clona el audio basándose en un manifiesto histórico que puede estar incompleto. No significa que el audio original haya sido borrado: el defecto puede estar en la vinculación de las partes a la nueva sesión recuperada.
+
+Esto es una causa reproducible por código bajo esa condición, no una comprobación de los datos de tu captura actual: no he consultado registros ni objetos de audio productivos.
+
+Resultado de la investigación
+
+El mensaje lo genera Dictado; la causa puede estar en el contrato de recuperación de Custodia. No son responsabilidades excluyentes.
+
+1. Dónde se produce el error
+
+En IngresoWorkspace.tsx, el manejador de «Archivar registro» valida el manifiesto de audio antes de enviar POST /api/dictado.
+
+Para una captura de micrófono exige que todas las partes esperadas estén presentes, ordenadas, verificadas, con bytes positivos y SHA-256 válido. Cuando no se cumple, genera el mensaje y termina la operación. Por eso:
+
+El mensaje y el bloqueo previo a la petición corresponden a Dictado.
+
+La evidencia que Dictado necesita para superar esa validación depende de la recepción y verificación de partes realizada por Custodia.
+
+github.com.
+
+2. El defecto concreto que encontré
+
+Hay una inconsistencia en la recuperación de capturas del catálogo remoto:
+
+Dictado consulta el punto remoto seleccionado, pero en esa ruta utiliza la consulta para comprobar si se trata de un diálogo. No incorpora el manifiesto de audio devuelto a la revisión que va a recuperar.
+
+Custodia consulta las partes persistidas, pero decide cuántas debe copiar a la nueva sesión a partir del manifiesto de la revisión histórica: corteAudio.hastaParte o audioPartes.length.
+
+Si esa revisión no contiene manifiesto, el total calculado puede ser cero. Custodia no copia entonces ninguna parte a la nueva sesión.
+
+Dictado recupera el texto, conserva la fuente de entrada como micrófono y, al intentar archivar, detecta que se esperaba audio pero no hay partes verificadas.
+
+Referencias: github.com y github.com.
+
+Además, el catálogo calcula el número visible de partes a partir del manifiesto del checkpoint, aunque su consulta también obtiene el número de filas verificadas en la tabla de audio. Eso puede hacer que el catálogo no represente fielmente el audio que todavía está vinculado a la sesión de origen.
+
+Conclusión condicionada: si el registro que intentas archivar proviene de una recuperación remota y su checkpoint carecía de manifiesto, esta ruta explica el error. No demuestra que el audio original se haya borrado; el problema puede ser que sus referencias no se hayan transferido a la nueva sesión.
+
+3. Custodia ya tiene antecedentes de esta brecha
+
+El OCP de Custodia registra dos hallazgos todavía pendientes:
+
+F-13/R-09: al archivar se comprueban metadatos de las partes, pero no se vuelven a leer los bytes del objeto remoto para recalcular su SHA-256.
+
+F-14/R-10: la propuesta de recuperación legacy de la PR #339 no resuelve correctamente todos los casos de manifiestos o cortes vacíos.
+
+Las PR github.com y github.com están cerradas y no fusionadas. No las considero arreglos integrados ni las trataría como candidatas listas para fusionar.
+
+github.com.
+
+4. La cobertura de pruebas no certifica el recorrido completo
+
+La prueba actual audio-por-partes.spec.ts usa un dispositivo de audio simulado, sustituye el reconocimiento de voz y responde con mocks a /api/audio y /api/dictado.
+
+Comprueba dos escenarios negativos: que un fallo de subida de audio impida archivar y que un error del servidor se muestre correctamente. El escenario con subida simulada satisfactoria fuerza después un error HTTP 500 al archivar. No acredita un archivo exitoso de extremo a extremo con persistencia real de las partes y aceptación de Custodia.
+
+github.com.
+
+También consulté producción: khora-web.vercel.app/api/version confirma el commit 953e69484eabb4e8dc8221d1d8fc188373531bfa. main está en 2ed0904336e6009b0f101167d8673e54116c014c y lleva 110 commits adicionales; los archivos principales de Dictado y recuperación que comparé conservan los mismos SHA de blob en ambas puntas. En los errores agrupados de Vercel durante los últimos siete días solo apareció una advertencia SSL en checkpoint, no una excepción que explique este mensaje. Eso es coherente con un rechazo local: cuando Dictado bloquea antes de enviar POST /api/dictado, el servidor no recibe esa operación.
+
+Frontera de responsabilidad
+
+Propongo manejar el recorrido como un único contrato E2E con responsabilidades diferenciadas:
+
+Tramo
+Responsabilidad
+Entrada a la pantalla, controles y estado de preparación
+Dictado
+Inicio, permisos, micrófono, grabadora y reconocimiento
+Dictado
+División del audio, subida y recepción de acuses
+Integración Dictado–Custodia
+Transcripción, edición y continuidad
+Dictado
+Recuperación de texto y preparación del manifiesto
+Integración Dictado–Custodia
+Clic en «Archivar registro» y formación de la petición
+Dictado
+Validación autoritativa, persistencia y conservación de partes
+Custodia
+
+El clic es la frontera compartida: Dictado debe entregar un manifiesto íntegro; Custodia debe verificarlo y responder con una confirmación de archivo. No debemos solucionar un fallo relajando la validación que protege el audio.
+
+No he modificado código, datos productivos ni despliegues. Tampoco he consultado el contenido de tu sesión productiva; por ello, la condición concreta de tu registro sigue sin verificarse.
+
+El dato que necesito para discriminar la causa
+
+¿El registro que no puedes archivar es una captura que recuperaste desde «Recuperar capturas» del catálogo remoto, o es una captura nueva que acabas de iniciar y detener en esta misma pantalla?
+
+Esa diferencia determina si debemos seguir primero la ruta de recuperación remota o la de subida y confirmación de partes de una captura nueva.
+
+Registro de continuidad
+
+IPZ: v0.7 · antigüedad NO VERIFICADA.
+
+DUG: Samantha v377 · NX-377m · Metacanon 1.28 · GOW 2.17 · edad 4.22.18.
+
+CONV: PENDIENTE/NO ASIGNADO · OCP: PENDIENTE/NO ASIGNADO.
+
+CICLO: PENDIENTE/NO ASIGNADO · OCP: PENDIENTE/NO ASIGNADO.
+
+A: PENDIENTE/NO ASIGNADO · OCP: PENDIENTE/NO ASIGNADO.
+
+B: PENDIENTE/NO ASIGNADO · OCP: PENDIENTE/NO ASIGNADO.
+
+UUIDv7 local: 01a1b26b-ef3c-788a-b7ea-e48d456f0beb.
+
+Titularidad Dictado: generación 5 · alias chatgpt-dictado-01a1b26b-ef3c-788a-b7ea-e48d456f0beb.
+
+Khora main: 2ed0904336e6009b0f101167d8673e54116c014c · edad 0.00.21.
+
+OCP Dictado: v0.6.19 · edad 0.00.21.
+
+Control Dictado: generación 5 · edad 0.00.22.
+
+Folio de sesión: PENDIENTE/NO ASIGNADO · FOL1 PREPARADA, NO ACTIVA.
+
+MCP-NORMATIVO: DESACTIVADO.
+
+## Prompt:
+6/11/2026, 3:03:45 p.m.
+
+No,  el error se presenta al momento de dar c,lick en archivar registro, del audio transcrito. cuando ya detuve la captura y estoy  lsiuto para guardar. Si te di la leyenda de lerror tal y como aparece?
+
+## Response:
+6/11/2026, 3:02:13 p.m. · gpt-6-t-mini-mini
+
+Voy a seguir ahora exclusivamente el camino del micrófono nuevo: creación de cada segmento, confirmación de /api/audio, actualización del manifiesto en memoria y cálculo de partesGeneradas al archivar. También contrastaré ese código con el commit que realmente está publicado en producción; no usaré la ruta de recuperación como premisa.
+
+La inspección del flujo del micrófono apunta a una causa más cercana: la subida de audio puede fallar y quedar marcada como pendiente, pero la función que archiva no reintenta automáticamente esas partes pendientes antes de aplicar el bloqueo. Estoy verificando ahora el validador y la respuesta concreta que produciría esa condición. La consulta de logs de Vercel con una ventana de dos horas fue rechazada por la retención del plan; la reduciré a 30 minutos, sin interpretar ese rechazo como ausencia de errores.
+
+Corrigiendo el diagnóstico
+
+No, no la reproduje exactamente: cambié “Cora” por “Khora”. Además, la grabación era nueva, no recuperada; retiro esa hipótesis y revisaré específicamente el flujo actual de captura y archivado del micrófono.
+
+Revisando versiones y flujo
+
+Estoy comparando producción con la versión actual, porque podrían diferir. La ruta de audio nuevo sí espera la subida y transcripción, pero revisaré dónde se marca una parte como verificada antes de archivar.
+
+Corregí el diagnóstico y revisé versiones y flujo
+
+Aislando la causa
+
+La transcripción puede completarse aunque la custodia de una parte falle. Estoy verificando si una subida queda pendiente y, aun así, el archivado intenta validarla; eso explicaría exactamente el mensaje mostrado.
+
+Aislaste la causa
+
+Investigó los flujos de grabación, carga, custodia, transcripción y concurrencia de audio
+
+Investigaste errores en carga y finalización de audio
+
+Evalué la custodia de audio, registros de producción y concurrencia
+
+Confirmando el fallo probable
+
+El flujo permite transcribir una grabación aunque una parte no quede vinculada o verificada. Luego, al archivar, no reintenta automáticamente esa parte y muestra el error. Estoy comprobando si la versión publicada presenta exactamente esa condición.
+
+Confirmaste el fallo probable
+
+Reintentó logs recientes y revisó custodia de audio e ingreso
+
+Cerrando la hipótesis
+
+No hay registros recientes que confirmen una causa concreta. La ruta más probable sigue siendo: la transcripción terminó, pero una parte de audio quedó sin vincular o verificar; el archivado no la reintenta y bloquea correctamente.
+
+Precisando la corrección
+
+El flujo actual permite continuar después de fallar una subida de audio y solo bloquea al archivar. Para hacerlo funcional, debo cambiarlo para reintentar o detener el proceso antes; todavía necesito autorización explícita para modificar código.
+
+Precisada la corrección y cerrada la hipótesis
+
+Investigaste fallas y errores en cargas y custodia de audio
+
+Investigaste fallo de confirmación de audio en producción
+
+Auditó y corrigió el flujo de audio E2E
+
+Confirmando el diagnóstico
+
+Tienes razón: el error aparece al intentar archivar, después de una grabación nueva y transcrita. El flujo actual permite que una subida de audio quede pendiente; luego el archivado detecta esa parte sin verificación y se bloquea.
+
+Ajustando el flujo
+
+La transcripción y la grabación son tuberías separadas: el texto puede completarse aunque el audio no genere una parte válida o falle su verificación. Debo modificar Dictado para reintentar pendientes antes de archivar, manteniendo el bloqueo si la custodia sigue incompleta.
+
+Confirmando la causa
+
+La transcripción y la grabación son procesos separados. El texto puede completarse aunque una parte de audio falle al subir o verificar; luego el archivado detecta esa parte pendiente y muestra la leyenda.
+
+La corrección debe reintentar las partes pendientes antes de archivar, sin omitir la validación de custodia.
+
+Confirmaste el diagnóstico, ajustaste el flujo y confirmaste la causa
+
+Investigaste y diagnosticaste el fallo de confirmación de audio en producción
+
+Procesó durante 1m 58s
+
+Sí. Me diste la leyenda literalmente así:
+
+«No se puede archivar el registro. Cora no ha verificado la custodia íntegra de todas las partes de audio».
+
+Debo corregir dos cosas de mi respuesta anterior: sustituí «Cora» por «Khora» al citarla, así que no reproduje el mensaje exacto; y atribuí demasiado peso a la recuperación de capturas.
+
+Con tu aclaración, el caso que debemos investigar es otro: captura nueva, micrófono detenido, transcripción ya disponible y error al archivar. La hipótesis de recuperación remota no explica este escenario y la retiro como explicación del incidente.
+
+Diagnóstico para una captura nueva
+
+(Defecto probable identificado en el flujo de subida)
+
+El origen más probable es que la transcripción se completa, pero alguna parte del audio no obtiene confirmación de custodia.
+
+Son dos procesos distintos: el reconocimiento de voz puede producir texto mientras MediaRecorder graba y envía el audio en segmentos. Por tanto, que veas la transcripción terminada no demuestra que el audio haya quedado almacenado y verificado.
+
+Encontré tres hechos importantes en el código:
+
+subirAudioCustodiado exige una respuesta satisfactoria de /api/audio, con verificado=true, SHA-256 válido y bytes coincidentes. Reintenta hasta tres veces.
+
+Si los intentos fallan, Dictado conserva la parte en una cola de subidas pendientes. No la incorpora al manifiesto de partes verificadas.
+
+Al archivar, guardar() espera la cola de subida que ya está ejecutándose, pero no procesa automáticamente las partes que quedaron pendientes. Después aplica la validación de integridad y muestra el error.
+
+Esto está respaldado por una prueba E2E existente: simula que el reconocimiento devuelve texto, pero /api/audio responde 502 Bad Gateway; al pulsar «Archivar registro», espera precisamente que el sistema bloquee el archivo y conserve el texto.
+
+github.com
+
+github.com
+
+github.com
+
+Qué significa para la distribución de responsabilidades
+
+Dictado: debe esperar y reintentar las partes pendientes antes de dar por terminada la captura o permitir que el usuario archive.
+
+Custodia: debe confirmar que cada parte se almacenó, se pudo releer, se verificó su integridad y quedó vinculada a la sesión. La ruta /api/audio realiza esa operación.
+
+No debemos quitar el bloqueo de integridad. Debemos conseguir que el flujo complete correctamente la custodia antes de llegar a él.
+
+La producción está identificada en el commit 953e69484eabb4e8dc8221d1d8fc188373531bfa. Los archivos relevantes que contrasté tienen los mismos SHA que en main; por tanto, la lógica que describo también está en el código publicado. Los logs recientes de Vercel no devolvieron registros de /api/audio, así que todavía no puedo identificar qué respuesta HTTP recibió tu captura concreta.
+
+Siguiente intervención propuesta
+
+El primer arreglo debe estar en Dictado:
+
+Drenar y reintentar la cola de partes pendientes al detener la grabación.
+
+Hacer que «Archivar registro» espere las confirmaciones definitivas antes de validar.
+
+Si Custodia sigue rechazando una parte, mostrar cuál falló y por qué, conservando el audio local.
+
+Añadir una prueba E2E que simule un primer fallo 503, un reintento satisfactorio y el archivado final; además del escenario de fallo permanente.
+
+¿Autorizas que implemente este arreglo en Dictado y sus pruebas, sin modificar todavía el código propietario de Custodia ni desplegar en producción?
+
+Vigilar regresiones E2E de Dictado
+
+Registro de continuidad
+
+IPZ: v0.7 · edad NO VERIFICADA.
+
+DUG: Samantha v377 · NX-377m · Metacanon 1.28 · GOW 2.17 · edad 4.23.05.
+
+CONV / OCP: PENDIENTE / NO ASIGNADO.
+
+CICLO / OCP: PENDIENTE / NO ASIGNADO.
+
+A / OCP: PENDIENTE / NO ASIGNADO.
+
+B / OCP: PENDIENTE / NO ASIGNADO.
+
+UUIDv7 local: 01a1b26b-ef3c-788a-b7ea-e48d456f0beb.
+
+Dictado: generación 5 · versión OCP v0.6.19.
+
+main: 2ed0904336e6009b0f101167d8673e54116c014c · edad 0.01.07.
+
+OCP Dictado: SHA 48585abc3d9d590710235fdbd07cbaacab996de0 · edad 0.01.07.
+
+Control Dictado: SHA 38afbbb1215a1fc821f5ac750fb9a055aa12dea7 · edad 0.01.08.
+
+FOL1: PREPARADA, NO ACTIVA; folio PENDIENTE/NO ASIGNADO.
+
+MCP-NORMATIVO: DESACTIVADO.
+
+Estado de esta intervención: investigación de lectura completada; modificaciones de código NO AUTORIZADAS todavía; producción sin cambios.
+
+## Prompt:
+6/11/2026, 3:07:52 p.m.
+
+Primero quiero saber el diagnóstico verificado objetivamente.
+
+## Response:
+6/11/2026, 3:06:20 p.m. · gpt-6-t-mini-mini
+
+Voy a separar tres niveles de evidencia: lo que demuestra el código desplegado, lo que demuestra una prueba reproducible y lo que todavía no puede atribuirse a tu captura concreta. No trataré una causa probable como si fuera un hecho observado.
+
+La evidencia ya permite una conclusión concreta: el despliegue de producción contiene una prueba que simula el fallo de /api/audio y verifica que aparece precisamente ese bloqueo de archivo. También he confirmado que el código espera la promesa de subida, pero esa promesa absorbe el error y deja la parte pendiente; esperar esa promesa no equivale a que el audio haya quedado verificado. Estoy comprobando ahora los criterios exactos de integridad y los reintentos para delimitar qué queda demostrado y qué no.
+
+Verificando errores y archivos desplegados
+
+Revisados errores de Vercel, audio y producción en código desplegado
+
+Evaluaste errores de runtime en producción
+
+Revisaste errores de audio y código desplegado
+
+Precisando el diagnóstico
+
+Estoy confirmando que el bloqueo ocurre en el cliente cuando algún fragmento no aparece como verificado. Eso puede deberse a una carga pendiente, rechazada o incompleta; sin registros de red, no puedo atribuirlo a un error específico del servidor.
+
+Precisado el diagnóstico
+
+Verificó errores y archivos desplegados
+
+Delimitando hallazgos confirmados
+
+Estoy distinguiendo entre evidencia de código y causa del evento real. Confirmé que el cliente bloquea la finalización cuando algún fragmento no está verificado, pero no puedo determinar cuál carga falló sin registros de ejecución.
+
+Aclarando el alcance
+
+Estoy separando el defecto confirmado del caso concreto: la interfaz bloquea si falta una verificación, pero la causa exacta de esa carga sigue sin confirmarse porque faltan registros de ejecución.
+
+Confirmando el flujo
+
+Estoy verificando que el archivado termina antes de solicitar /api/dictado; una prueba reproduce el bloqueo con una respuesta 502. Sin datos del evento original, la causa exacta de la carga sigue abierta.
+
+Confirmado el alcance, flujo y hallazgos verificados
+
+Aislando la falla confirmada
+
+Confirmé que el bloqueo ocurre en la validación local de fragmentos: si alguno queda sin verificar, el archivado termina antes de solicitar /api/dictado. La causa original puede ser red, respuesta HTTP o registro incompleto; sin telemetría del evento, no puedo distinguirlas.
+
+Cerrando el diagnóstico
+
+Confirmé que el archivado se detiene en la validación local cuando algún fragmento no está verificado. El registro concreto aún requiere telemetría técnica; sin ella, no puedo atribuir la causa a red, servidor o persistencia.
+
+Diagnóstico confirmado
+
+Confirmé que el bloqueo nace en la validación local de fragmentos: si uno queda sin verificar, el archivado termina antes de solicitar la transcripción. El mecanismo se reproduce con una respuesta 502 simulada; la causa original aún requiere telemetría del evento específico.
+
+Confirmaste y cerraste el diagnóstico de la falla
+
+Verificado fallo de custodia y persistencia de telemetría desplegada
+
+Procesó durante 1m 25s
+
+Diagnóstico verificado
+
+El bloqueo se origina en la validación local de Dictado, no en el proceso de transcripción ni en la solicitud final de archivado. El mecanismo que lo activa está comprobado en el código de producción y tiene una prueba automatizada que reproduce el escenario descrito.
+
+Hay, sin embargo, una distinción importante: está verificado el mecanismo del fallo, pero todavía no está identificada la causa técnica concreta que dejó sin verificar una o más partes de tu captura.
+
+1. Qué está demostrado
+
+(Verificado en código de producción)
+
+La versión de producción que inspeccioné corresponde al commit 953e69484eabb4e8dc8221d1d8fc188373531bfa, desplegado en khora-web.
+
+La secuencia demostrada es:
+
+La captura produce segmentos de audio. Dictado los envía a /api/audio y espera una respuesta que confirme su verificación.
+
+Una subida puede fallar. El cliente realiza hasta tres intentos. Si no obtiene una respuesta válida, conserva la función de reintento en pendingUploadsRef y registra la parte como pendiente.
+
+El error de subida no detiene necesariamente la transcripción. La excepción queda absorbida dentro de la rutina de subida. Por eso detener() puede continuar y terminar el procesamiento de texto aunque el audio no esté verificado.
+
+Archivar no ejecuta el reintento pendiente. guardar() espera la promesa de subida, pero no invoca reintentarCustodia().
+
+La validación de integridad falla. Dictado comprueba que estén todas las partes esperadas, que sus índices sean consecutivos, que tengan bytes y SHA-256 válidos y que cada una figure como verificada.
+
+Se presenta el mensaje y se interrumpe el proceso. La función retorna antes de enviar la petición a /api/dictado.
+
+Fuentes del despliegue:
+
+Subida de partes y gestión del fallo.
+
+Reintento explícito y detención.
+
+Validación y bloqueo del archivado.
+
+Criterios de integridad de Custodia.
+
+2. Reproducción del escenario
+
+(Caso contemplado en prueba automatizada)
+
+En el archivo de pruebas E2E existe un escenario llamado:
+
+no-JSON audio failure blocks archive and preserves captured text
+
+La prueba simula lo siguiente:
+
+/api/audio responde HTTP 502 con Bad Gateway - Connection refused.
+
+El reconocimiento de voz entrega texto.
+
+Se detiene la captura.
+
+Se pulsa «Archivar registro».
+
+La petición a /api/dictado no debe producirse.
+
+La interfaz debe mostrar el bloqueo por falta de custodia íntegra.
+
+La prueba está escrita expresamente para ese comportamiento. No estoy afirmando que la haya ejecutado durante esta investigación; he verificado sus instrucciones y aserciones en el código del commit de producción.
+
+Consultar la prueba E2E de audio por partes.
+
+3. Qué no está demostrado todavía
+
+(Causa de esta captura: pendiente de verificación)
+
+No he comprobado cuál de estas situaciones ocurrió realmente durante tu captura:
+
+Posible causa
+Estado
+Fallo de red o tiempo de espera al subir una parte
+No determinado
+Respuesta HTTP 4xx/5xx de /api/audio
+No determinada
+Fallo al releer y verificar el objeto almacenado
+No determinado
+Fallo al registrar el vínculo de la parte con la sesión
+No determinado
+Parte pendiente o ausente en el manifiesto de Dictado
+Compatible con el bloqueo, pero no individualizado
+
+La ruta de Custodia puede devolver, entre otras, respuestas 502 si falla la verificación posterior al almacenamiento y 503 si el audio se almacenó pero no pudo vincularse a la sesión. Por tanto, no sería correcto atribuir el fallo exclusivamente a la red o exclusivamente a Custodia sin observar la respuesta concreta.
+
+También consulté los errores agregados de Vercel para /api/audio y /api/dictado en los últimos siete días: no aparecieron grupos de errores de ejecución. Eso no descarta respuestas HTTP fallidas manejadas por la aplicación, porque varios de esos fallos se convierten en respuestas controladas y no necesariamente aparecen como excepciones de ejecución.
+
+4. Conclusión técnica
+
+El diagnóstico verificable es el siguiente:
+
+Dictado permite que la transcripción termine aunque una o más partes de audio sigan pendientes de verificación. Al intentar archivar, comprueba correctamente que falta evidencia de custodia y bloquea el registro. Sin embargo, no intenta recuperar automáticamente esas partes antes de aplicar el bloqueo.
+
+Esto separa dos asuntos:
+
+La salvaguarda de integridad funciona: no permite archivar una captura de audio incompleta o no verificada.
+
+La recuperación del flujo tiene un defecto: el archivado no drena la cola de subidas pendientes ni ofrece por sí mismo una recuperación automática antes de rechazar la operación.
+
+La causa material de la incidencia -qué parte falló y por qué- permanece sin determinar. No he modificado código, configuración, base de datos, almacenamiento ni despliegues.
+
+5. Evidencia necesaria para cerrar el diagnóstico de tu captura
+
+El código registra un evento PARTE_AUDIO_SUBIDA_FALLIDA con metadatos técnicos como part_index, http_status, reason_code y estado de conectividad. La observabilidad envía esos eventos a /api/eventos, cuyo almacenamiento utiliza la tabla eventos_sistema.
+
+Eso permite una comprobación mucho más específica que inferir la causa desde el mensaje de la interfaz. No he consultado esos registros de producción ni el contenido de los objetos de audio.
+
+¿Autorizas que consulte exclusivamente los metadatos técnicos de los eventos de esa captura en producción, en modo de solo lectura, sin abrir ni descargar audio y sin modificar ningún dato?
+
+Registro de trazabilidad
+
+IPZ: v0.7 · edad NO VERIFICADA.
+
+DUG: Samantha v377 · NX-377m · MetaCanon 1.28 · GOW 2.17 · edad NO VERIFICADA.
+
+CONV: PENDIENTE / NO ASIGNADO.
+
+CICLO: PENDIENTE / NO ASIGNADO.
+
+A: PENDIENTE / NO ASIGNADO.
+
+B: PENDIENTE / NO ASIGNADO.
+
+UUIDv7 local de continuidad: 01a1b26b-ef3c-788a-b7ea-e48d456f0beb.
+
+Frente: Dictado · generación 5.
+
+OCP: v0.6.19 · SHA 48585abc3d9d590710235fdbd07cbaacab996de0.
+
+Commit de producción inspeccionado: 953e69484eabb4e8dc8221d1d8fc188373531bfa.
+
+FOL1: PREPARADA · NO ACTIVA.
+
+MCP-NORMATIVO: DESACTIVADO.
+
+## Prompt:
+6/11/2026, 3:12:16 p.m.
+
+¿Corresponde a dictado o a custodia este incidente?
+
+## Response:
+6/11/2026, 3:10:46 p.m. · gpt-6-t-mini-mini
+
+Asignando responsabilidad
+
+El bloqueo observado corresponde a Dictado: genera el error y no reintenta. La causa subyacente podría estar en Custodia, pero aún no está verificada. Por ahora, asignaría el incidente operativo a Dictado y abriría una investigación conjunta con Custodia.
+
+Separando responsabilidades
+
+El defecto confirmado corresponde a Dictado: muestra el bloqueo y no reintenta. Custodia solo debe asumirlo si se confirma una falla en almacenamiento o verificación. Por ahora, lo clasificaría como incidente de Dictado con investigación conjunta de Custodia.
+
+Ajustando el límite
+
+Aunque el clic marca el inicio formal de Custodia, la operación se detiene dentro de Dictado antes de entregar la solicitud. Por eso, asigno el incidente a Dictado; Custodia queda como causa potencial aún no demostrada.
+
+Ajustaste límites y separaste responsabilidades
+
+Procesó durante 13s
+
+El defecto comprobado corresponde a Dictado. La posible causa que dejó el audio sin verificar todavía podría corresponder a Custodia.
+
+La distinción es importante:
+
+Hecho
+Frente responsable
+Una subida falla y la parte queda pendiente
+Depende de dónde se produjo el fallo; aún no determinado
+Dictado permite terminar la transcripción con partes pendientes
+Dictado
+Dictado no reintenta esas partes antes de bloquear el archivado
+Dictado — defecto comprobado
+Almacenamiento, relectura, comprobación SHA-256 y vinculación de la parte
+Custodia
+Mostrar el error y detener el archivado antes de transferir el registro
+Dictado
+
+Hay un dato decisivo: el código ejecuta la validación dentro de guardar() y retorna antes de enviar la solicitud a /api/dictado. Por tanto, no está demostrado que Custodia haya recibido una solicitud de archivado ni que haya rechazado el registro.
+
+Clasificación que propongo
+
+Incidente funcional confirmado: Dictado.
+
+Incidente técnico subyacente: pendiente de determinar; podría estar en Custodia.
+
+Incidente de integración entre frentes: sí, porque Dictado debe coordinarse con las confirmaciones que emite Custodia.
+
+No imputaría todavía un fallo a Custodia sin comprobar qué sucedió con la parte concreta. Tampoco trasladaría a Custodia el defecto de recuperación que ya hemos identificado en Dictado.
+
+Así se conserva la separación de responsabilidades: Dictado debe entregar correctamente el registro preparado; Custodia debe acreditar y conservar íntegramente sus partes.
+
+Trazabilidad
+
+IPZ: v0.7 · edad NO VERIFICADA.
+
+DUG: Samantha v377 · NX-377m · MetaCanon 1.28 · GOW 2.17 · edad NO VERIFICADA.
+
+CONV / CICLO / A / B: PENDIENTE / NO ASIGNADO.
+
+UUIDv7 local de continuidad: 01a1b26b-ef3c-788a-b7ea-e48d456f0beb.
+
+Dictado: generación 5 · OCP v0.6.19.
+
+FOL1: PREPARADA · NO ACTIVA.
+
+MCP-NORMATIVO: DESACTIVADO.
+
+## Prompt:
+6/11/2026, 3:20:04 p.m.
+
+Bueno sin importar el ambito ,encargate de manera longitudinal del defecto. Y  coriggelo.  Es supremamentem inportanbte que lo hagas rapido.  Vida o muerte.
+
+## Response:
+6/11/2026, 3:18:33 p.m. · gpt-6-t-mini-mini
+
+Lo trataré como un defecto crítico de continuidad e integridad, no como un problema aislado de interfaz. Voy a rastrear el recorrido completo entre Dictado y Custodia, corregir la coordinación y las condiciones de reintento sin permitir que se archive audio no verificado, y validar el arreglo con pruebas de regresión. Empezaré por una rama aislada; no modificaré datos ni desplegaré en producción sin una autorización específica para esas operaciones. Si “vida o muerte” describe un peligro inmediato para una persona, no dependas de Khora: contacta ahora a emergencias (911 en México).
+
+La lectura del estado canónico actual cambió una premisa importante: main avanzó después del commit desplegado y Custodia tiene una instrucción vigente de priorizar primero la recuperación de registros potencialmente perdidos. No voy a saltarme esa prioridad ni a apropiarme de la titularidad del frente Custodia. Estoy comprobando su control y su contrato para asumir la corrección transversal del defecto respetando esas fronteras.
+
+Evaluando la urgencia
+
+Estoy tratando esto como un incidente crítico. Primero confirmaré si existe peligro inmediato para personas; después revisaré el defecto en todo el flujo, incluyendo Dictado, Custodia, controles y despliegue, y aplicaré una corrección verificable sin alterar datos innecesariamente.
+
+Aplicando corrección integral
+
+Estoy tratando esto como un P0: si alguien corre peligro inmediato, hay que llamar al 911 y buscar ayuda presencial. Luego revisaré ARR y DUG, rastrearé el flujo completo, corregiré ambos frentes y validaré pruebas antes de cualquier despliegue.
+
+Evaluada la urgencia y aplicada una corrección integral
+
+Verificó gobernanza canónica, controles Custodia y estado documental del repositorio
+
+Analizando duplicados y reintentos
+
+Estoy verificando que el cierre espere cargas pendientes, reintente sin duplicar partes y conserve el mismo identificador de sesión e índice. También revisaré la idempotencia del servidor antes de modificar ambos lados.
+
+Cerrando la corrección
+
+Estoy integrando el reintento dentro del archivado: esperaré cargas activas, repetiré pendientes una sola vez, comprobaré que no queden partes sin custodiar y bloquearé el cierre si persiste una falla, conservando detalles para diagnóstico.
+
+Analizada la duplicación y cerrada la corrección
+
+Priorizando el flujo completo
+
+Estoy siguiendo el defecto registrado en Custodia y conectándolo con Dictado: el archivado debe reintentar, validar que no queden cargas pendientes y conservar trazabilidad antes de confirmar la operación.
+
+Verificando el alcance
+
+Estoy confirmando el estado actual del código y las tareas relacionadas antes de tocar nada. La corrección abarcará el flujo compartido, mantendrá la trazabilidad y evitará cambios irreversibles o despliegues prematuros.
+
+Priorizado el flujo completo y verificado el alcance
+
+Preparando el cambio
+
+Voy a convertir el reintento en una etapa obligatoria del archivado, mantener el estado pendiente ante fallas, evitar concurrencia y añadir pruebas que cubran cargas incompletas, reintentos exitosos y bloqueos persistentes.
+
+Afinando la implementación
+
+Estoy separando el drenaje interno de cargas del botón manual para reutilizarlo al detener y archivar. Así, el sistema reintentará temprano y volverá a verificar antes de cerrar, sin duplicar tareas simultáneas.
+
+Preparaste el cambio y afinaste la implementación
+
+Corrigiendo reintentos y archivado seguro de audio
+
+Procesó durante 3m 17s
+
+## Prompt:
+6/11/2026, 3:21:46 p.m.
+
+documenta cuidadosamente una forma de tarea provisional, como las que tiene custodia para sus propios asuntos en este frente de trabajo, antes de continuar a resolver lo más rápido posible lo que toca. Ahí incluye tu diagnóstico, tu verificación del diagnóstico, tu solución y todo lo que tiene que ver con este incidente.
+
+## Response:
+6/11/2026, 3:21:53 p.m. · gpt-6-t-mini-mini
+
+Voy a documentar primero el incidente dentro de la tarea existente CUSTODIA-04, sin crear un identificador nuevo ni alterar la prioridad de rescate ya registrada. La ficha dejará separados hechos verificados, hipótesis aún abiertas, alcance de la corrección, pruebas exigidas, riesgos y criterios de cierre. Después continuaré con el arreglo en una rama aislada y comprobaré cada cambio; producción permanecerá intacta.
+
+La ficha ya tiene base documental y rama de trabajo aislada (fix/custodia-04-dictado-archivar-e2e-20261106). La documentación distinguirá tres resultados distintos: el defecto de coordinación confirmado por lectura de código, la causa runtime de la captura concreta aún desconocida y la corrección propuesta, que todavía no se declarará implementada hasta superar las pruebas.
+
+El expediente quedó persistido y releído en la rama: incluye diagnóstico, límites forenses, diseño de solución, criterios de aceptación y el estado real —todavía sin corrección de código—. También quedó enlazado desde el índice de tareas de Custodia y la lista provisional, sin crear un nuevo ID ni alterar la prioridad de rescate CUSTODIA-03. Ahora paso a la corrección ejecutable en esa misma rama.
+
+Consolidando la solución
+
+Estoy definiendo una corrección transversal: vaciaré cargas pendientes de forma serial, esperaré operaciones activas, validaré integridad e idempotencia, bloquearé archivados incompletos y cubriré cada escenario con pruebas automatizadas antes de promover cambios.
+
+Consolidó la solución
+
+Documentando autorización y plan de corrección CUSTODIA-04
+
+Integrando el parche
+
+Estoy ajustando el archivado para reintentar antes de validar contenido, aceptar audio pendiente aunque la transcripción esté vacía y bloquear solo cuando persista una parte sin confirmar.
+
+Integraste el parche
+
+Creaste y verificaste expediente, índices, autorización y commits de CUSTODIA-04
+
+Corrigiendo reintentos
+
+Estoy aislando la causa: el archivado valida antes de vaciar la cola pendiente. La corrección debe esperar cargas activas, reintentar cada parte secuencialmente, verificar que no queden pendientes y bloquear el archivado mostrando índices y detalles claros si persiste el fallo.
+
+Corrigiendo custodia de audio
+
+Estoy priorizando el defecto de archivado: verificaré las cargas pendientes antes de guardar, reintentaré automáticamente las partes fallidas, conservaré estados claros y agregaré pruebas para éxito tras reintento y bloqueo ante fallos persistentes.
+
+Corregí los reintentos y la custodia de audio
+
+Inspeccionó el repositorio e implementó reintentos seguros de custodia de audio
+
+Corrigiendo el flujo
+
+Estoy ajustando el archivado para reintentar automáticamente las partes de audio pendientes, validar nuevamente la custodia completa y mostrar motivos concretos cuando todavía falten confirmaciones. También estoy agregando una prueba de extremo a extremo para verificar ese caso.
+
+Corrigió el flujo
+
+Agregaste y validaste pruebas E2E de reintentos y custodia de audio
+
+Inspeccionó flujos CI, auto-merge, despliegues y estados de ramas
+
+Creaste un PR borrador e investigaste fallos de CI en GitHub Actions
+
+Reintentaste trabajos fallidos y verificaste ejecuciones, pruebas y runners de GitHub Actions
+
+Revisaste dispositivos disponibles para validar la ejecución
+
+Implementaste reintentos de custodia, validaciones, audio, documentación y CI
+
+Agregaste pruebas de reintento, actualizaste documentación y verificaste ejecuciones CI recientes
+
+Inspeccionó la configuración del dispositivo remoto
+
+Revisé y continué implementando IngresoView para corregir custodia y archivado
+
+Actualizaste pruebas, expedientes, tareas, evidencias y estado de la PR
+
+Verificaste ejecuciones CI, cambios, PR y despliegue de producción
+
+Verificado el despliegue final y los archivos modificados
+
+Verificaste archivos, tareas, PR y despliegue final de producción
+
+Obtuvo detalles estructurados del despliegue
+
+Evaluando la corrección
+
+Estoy enfocando el defecto como un problema de confirmación de audio: conservar partes pendientes, reintentarlas antes de archivar, validar continuidad e informar índices específicos. También estoy preparando pruebas para fallos transitorios y permanentes, sin asumir todavía que el despliegue esté autorizado o completado.
+
+Evalué la corrección
+
+Verificaste y actualizaste el expediente y estado final de CUSTODIA-04
+
+Procesó durante 12m 54s
+
+CUSTODIA-04 · Dictado → Custodia
+
+(Expediente documentado y corrección implementada en rama) (Validación pendiente)
+
+He avanzado la corrección transversal y la he documentado en la tarea provisional existente CUSTODIA-04. No creé una tarea duplicada ni alteré la prioridad de recuperación CUSTODIA-03.
+
+1. Expediente documental
+
+La ficha incluye el incidente, la cita literal que reportaste, el diagnóstico, su evidencia, las hipótesis que siguen abiertas, la solución, las pruebas previstas, los criterios de aceptación y las restricciones operativas.
+
+github.com
+
+github.com
+
+2. Corrección implementada
+
+En la rama aislada fix/custodia-04-dictado-archivar-e2e-20261106 incorporé:
+
+Reintento secuencial y exclusivo de las partes de audio pendientes.
+
+Espera de las subidas en curso antes de validar el archivado.
+
+Reintento automático al pulsar «Archivar registro».
+
+Acción visible «Reintentar y archivar» cuando persisten partes pendientes.
+
+Diagnóstico de las partes faltantes y conservación del texto y de las copias locales si el reintento falla.
+
+Se conserva la salvaguarda de integridad: ninguna parte se declara verificada sin confirmación y el servidor sigue siendo la autoridad de Custodia. Un fallo permanente continúa bloqueando el archivo.
+
+3. Pruebas incorporadas
+
+Amplié audio-por-partes.spec.ts con dos escenarios:
+
+Escenario
+Comportamiento esperado
+Tres respuestas 503 y después una respuesta satisfactoria
+Reintentar automáticamente y archivar una sola vez con el manifiesto verificado
+Fallo permanente 502, incluso tras reintento explícito
+Mantener el bloqueo, no llamar a /api/dictado y conservar la transcripción
+
+(No ejecutadas)
+
+4. Bloqueo de validación
+
+Abrí la github.com, que permanece en borrador.
+
+GitHub Actions intentó ejecutar CI, UI Quality y khora-ok, pero los jobs terminaron antes de ejecutar pasos. La evidencia devuelta fue:
+
+runner_id = 0
+
+runner_name vacío
+
+steps = []
+
+Reintenté los jobs y el resultado fue el mismo. Por tanto, no sería correcto afirmar que el parche pasó TypeScript, las pruebas unitarias, Playwright o la compilación.
+
+Los checks de Vercel también fallaron por el requisito de actualización del plan para el repositorio privado; no son resultados de pruebas funcionales.
+
+5. Estado de producción
+
+(Sin cambios productivos)
+
+Elemento
+Estado
+Rama de corrección
+Implementada
+PR #354
+Abierta · borrador
+main
+Sin cambios
+Production
+Sin cambios
+Deployment actual
+dpl_6Ndatsufuk5iLFzvbzHpwNQCh6HB · READY
+Proveedor real no productivo
+Pendiente
+Lectura física de vuelta
+Pendiente
+Aceptación funcional
+Pendiente
+
+El parche corrige el defecto de coordinación comprobado estáticamente. Sin embargo, la causa runtime exacta de tu captura sigue sin determinarse; tampoco está demostrado todavía que el parche funcione contra el proveedor real.
+
+Para completar la validación hacen falta un runner operativo o el checkout en una estación de trabajo autorizada. No utilicé un equipo remoto cuya autorización como entorno de trabajo no estuviera confirmada.
+
+6. Siguiente ciclo
+
+La secuencia pendiente es: ejecutar typecheck y pruebas unitarias, ejecutar Playwright, corregir cualquier regresión real, probar almacenamiento y lectura de vuelta en un entorno no productivo, y después someter la PR a aceptación.
+
+No haré merge ni despliegue a producción sin la autorización correspondiente.
+
+Trazabilidad
+
+IPZ: v0.7 · edad NO VERIFICADA.
+
+DUG: Samantha v377 · NX-377m · Metacanon 1.28 · GOW 2.17 · edad NO VERIFICADA.
+
+CONV / CICLO / A / B: PENDIENTE / NO ASIGNADO.
+
+UUIDv7 local: 01a1b26b-ef3c-788a-b7ea-e48d456f0beb.
+
+Tarea existente: CUSTODIA-04.
+
+Dictado: generación 5 · OCP v0.6.19.
+
+Custodia: generación 7; titularidad independiente sin cambios.
+
+Rama: fix/custodia-04-dictado-archivar-e2e-20261106.
+
+Head actual de PR: 21a2aefb697bf2eda3ee4e14a78621e85214220f.
+
+FOL1: PREPARADA · NO ACTIVA.
+
+MCP-NORMATIVO: DESACTIVADO.
+
+La corrección está preparada, pero no la declararé resuelta hasta que las pruebas se ejecuten y acrediten el recorrido completo.
+
+¿Quieres que vigile diariamente el CI de la github.com y te avise cuando haya runners disponibles y resultados verificables?
+
+Vigilar CI de PR #354
+
+## Prompt:
+6/11/2026, 3:38:01 p.m.
+
+Hazlo, documenta a cada parte del camino. SCI 354Q es, en pocas palabras.
+
+## Response:
+6/11/2026, 3:36:39 p.m. · gpt-6-t-mini-mini
+
+Voy a tratar SCI 354Q como la denominación breve que acabas de asignar, sin inventar una expansión. Configuraré la vigilancia diaria de la PR #354 y dejaré documentado el recorrido de cada control: consulta, evidencia, resultado, bloqueo, corrección, revalidación y cierre.
+
+La línea base de SCI 354Q queda clara: la PR #354 sigue abierta y en borrador; en la última ejecución consultada, los seis jobs de CI/UI/gate reportaron runner_id=0 y cero pasos. Por tanto, seguimos sin un resultado técnico de pruebas. Voy a registrar esa primera fotografía en la conversación de la PR y usarla como comparación para los siguientes días.
+
+Interpretando la solicitud
+
+Estoy entendiendo “SCI 354Q” como el nombre breve de una automatización para revisar diariamente el PR 354, verificar CI, runners, trabajos, estado, despliegues y documentar cada etapa en un expediente provisional, probablemente mediante GitHub.
+
+Diseñando la automatización
+
+Estoy preparando una tarea diaria llamada “SCI 354Q” para revisar el PR 354, registrar CI, runners, trabajos, despliegues y cambios de estado, y documentar cada paso en un archivo del repositorio.
+
+Interpreté la solicitud y diseñé la automatización
+
+Verificando el seguimiento
+
+Estoy afinando una revisión diaria que comprobará el estado real del PR 354, registrará cada intento en el repositorio y avisará únicamente cuando existan runners disponibles y resultados verificables, evitando cambios automáticos innecesarios.
+
+Verificaste el seguimiento
+
+Documentando el monitoreo diario
+
+Estoy definiendo un registro diario en el PR que detalle estado, runners, trabajos, pasos ejecutados y resultados verificables. También registraré bloqueos o fallas, manteniendo intactos el código y el estado de la solicitud.
+
+Documentado el monitoreo diario
+
+Buscando en la web
+
+Documentaste y automatizaste el seguimiento diario del PR y CI
+
+Documentado el estado de CI y programado seguimiento diario del PR
+
+Procesó durante 1m 34s
+
+SCI 354Q quedó activado. La bitácora inicial ya está registrada en la github.com; cada control tendrá su evidencia y resultado documentados.
+
+Trazabilidad: IPZ v0.7 · edad NO VERIFICADA | DUG Samantha v377 · NX-377m | CONV/CICLO/A/B: PENDIENTE / NO ASIGNADO | FOL1: PREPARADA · NO ACTIVA | UUIDv7 local: NO ASIGNADO.
+
+
+
+Powered by ChatGPT Exporter (https://www.chatgptexporter.com)
