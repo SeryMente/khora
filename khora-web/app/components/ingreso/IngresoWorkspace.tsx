@@ -76,6 +76,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
   const finalizandoRef=useRef(false);
   const pendingUploadsRef=useRef(new Map<number,()=>Promise<void>>());
   const retryCustodyInFlightRef=useRef<Promise<void>|null>(null);
+  const archiveInFlightRef=useRef(false);
   const [audioPendiente,setAudioPendiente]=useState(0);
   const [custodiaDetalle,setCustodiaDetalle]=useState("");
   const [generandoTitulo, setGenerandoTitulo] = useState(false);
@@ -1187,6 +1188,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
   }, [estado, detenerGrabacion, estabilizarEmision, guardarCheckpoint]);
 
   const guardar = useCallback(async () => {
+    if(archiveInFlightRef.current)return;
     setError("");
     setResultado("");
     if (archivado) {
@@ -1208,6 +1210,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       return;
     }
     if (!sesionIdRef.current) sesionIdRef.current = generarSesionId();
+    archiveInFlightRef.current=true;
     setGuardando(true);
     const saveStartedAt = Date.now();
     observarDictado("GUARDADO_DICTADO_INICIADO", { outcome: "PENDING", metrics: { chars_current: texto.length, part_count: partesSubidasRef.current.length } });
@@ -1316,16 +1319,17 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       setError(String(e));
     } finally {
       setGuardando(false);
-      await enviarEventosObservabilidadDictado();
+      try { await enviarEventosObservabilidadDictado(); }
+      finally { archiveInFlightRef.current=false; }
     }
   }, [archivado, texto, titulo, pulidosOk, observarDictado, guardarCheckpoint, reintentarCustodia]);
 
 
   const reintentarYArchivar=useCallback(async()=>{
-    if(guardando||finalizandoRef.current||activoRef.current)return;
-    const confirmada=await reintentarCustodia();
-    if(confirmada)await guardar();
-  },[guardando,reintentarCustodia,guardar]);
+    if(finalizandoRef.current||activoRef.current)return;
+    // Reutiliza el mismo camino de archivo; no abre una segunda operación de retry.
+    await guardar();
+  },[guardar]);
 
   const exportarMp3Conservado = useCallback(async()=>{
     const id=sesionIdRef.current;if(!id)return;
