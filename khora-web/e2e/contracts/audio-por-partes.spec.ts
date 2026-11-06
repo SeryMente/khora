@@ -410,5 +410,11 @@ test.describe('Dictado por partes contract test', () => {
     await expect(page.getByRole('button', { name: 'Reintentar y archivar' })).toBeVisible();
     const errorAlert = page.locator('[data-ui-id="ingreso.msg-error"]').filter({ hasText: /No se puede archivar el registro.*custodia íntegra/i });
     await expect(errorAlert).toBeVisible();
+
+    // A persistent storage failure must keep the server archive endpoint closed after explicit retry too.
+    await page.getByRole('button', { name: 'Reintentar y archivar' }).click();
+    await expect(errorAlert).toBeVisible({ timeout: 15000 });
+    expect(dictadoPayload).toBeNull();
+    await expect(page.locator('[data-ui-id="ingreso.textarea"]')).toHaveValue(/saving even with failed audio upload/i);
   });
 });
