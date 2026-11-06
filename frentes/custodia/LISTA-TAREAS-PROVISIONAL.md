@@ -237,3 +237,6 @@ La propuesta continúa sin comprobar los bytes actuales de los objetos remotos n
 - **Salida de ejecución parcial C007:** [originales/SALIDA-MODELO-CUSTODIA-IMPLEMENTACION-PARCIAL-2026-10-28.md](originales/SALIDA-MODELO-CUSTODIA-IMPLEMENTACION-PARCIAL-2026-10-28.md), commit `423115ff56c8ae10fb9abd02d0fd978eddfaf2a8`.
 - **Salida de validación de integración C008:** [originales/SALIDA-MODELO-CUSTODIA-VALIDACION-INTEGRACION-2026-10-28.md](originales/SALIDA-MODELO-CUSTODIA-VALIDACION-INTEGRACION-2026-10-28.md), commit `ba57b98cf4045f57e841add13e5d1b9d64895d41`.
 - **Estado de ejecución:** no se recuperaron ni inspeccionaron dictados como parte de esta modificación documental.
+
+
+**Actualización de sincronización CUSTODIA-04 · 2026-11-06:** rama aislada actualizada a `main` `0aa7497a6316772ccf846620685a87b0711e346c` sin tocar `main`; commit de merge de dos padres `7553847edac736e7346771340dc6be109a98d48d`. Comparación `ahead 23 / behind 0`; PR #354 `mergeable=true`, `draft=true`. CI en esa punta terminó sin asignar runner (`42302390805`, cero pasos); validación real pendiente.
