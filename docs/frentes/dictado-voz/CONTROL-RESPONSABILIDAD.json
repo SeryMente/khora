@@ -6,32 +6,32 @@
   "state_object": "docs/frentes/dictado-voz/OBJETO-CANONICO.md",
   "status": "assigned",
   "owner_thread": null,
-  "owner_alias": "chatgpt-dictado-01a1b26b-ef3c-788a-b7ea-e48d456f0beb",
+  "owner_alias": "chatgpt-dictado-01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3",
   "owner_alias_type": "operational_alias_not_native_thread_id",
-  "instance": "chatgpt-dictado-INSTANCE-20261106-01A1B26BEF3C",
+  "instance": "chatgpt-dictado-INSTANCE-20261106-01A1B2E1A2DC7881AAC7AC9D900DD4E3",
   "session_folio": "PENDIENTE/NO ASIGNADO",
-  "generation": 5,
+  "generation": 6,
   "expiry": null,
-  "authorization_ref": "Instrucción directa del operador en esta conversación, 2026-11-06 (America/Mexico_City): “Transfer Responsibility”, en respuesta a la pregunta explícita de sustituir al titular actual de Dictado o incorporar una segunda responsable. Autoriza TRANSFER_RESPONSIBILITY exclusivamente para Dictado.",
-  "authorization_event": "DICTADO-TRANSFER-20261106-EAD64490",
-  "previous_owner": "chatgpt-dictado-ses-20261030-97109848",
+  "authorization_ref": "Instrucción directa del operador en esta conversación, 2026-11-06 (America/Mexico_City): respondió «Si» y confirmó expresamente la operación TRANSFER_RESPONSIBILITY para sustituir al titular de generación 5. La autorización cubre exclusivamente el frente Dictado.",
+  "authorization_event": "DICTADO-TRANSFER-20261106-900DD4E3",
+  "previous_owner": "chatgpt-dictado-01a1b26b-ef3c-788a-b7ea-e48d456f0beb",
   "previous_authorization_ref": "Current ChatGPT conversation, 2026-10-30: operator answered “Si” to exclusive transfer of Dictado; full message in C044 cronica. Native conversation ID not exposed.",
   "previous_acquired_at": "2026-10-30",
-  "prior_generation": 4,
-  "previous_blob": "a954353055ef30770aae0b5ca40e1f61cfc3d8dd",
-  "base_blob_sha": "a954353055ef30770aae0b5ca40e1f61cfc3d8dd",
-  "assignment_method": "TRANSFER_RESPONSIBILITY autorizada explícitamente. Relectura inmediata del control en main: SHA y generación 4 cotejados. Escritura condicionada por SHA actual (GitHub Contents API); generación incrementada 4→5. Lectura de vuelta canónica y cotejo requeridos antes de declarar el traspaso verificado.",
+  "prior_generation": 5,
+  "previous_blob": "38afbbb1215a1fc821f5ac750fb9a055aa12dea7",
+  "base_blob_sha": "38afbbb1215a1fc821f5ac750fb9a055aa12dea7",
+  "assignment_method": "TRANSFER_RESPONSIBILITY autorizada explícitamente mediante dos respuestas afirmativas a preguntas inequívocas sobre sustitución del titular. Se volvió a leer el control en main, cotejando SHA y generación 5; actualización condicionada por el SHA observado. Requiere lectura de vuelta canónica y cotejo antes de declarar verificado.",
   "authorization_original": {
     "source": "Direct operator message 2026-10-30; preserved verbatim in OBJETO-CANONICO.md §11."
   },
-  "local_conversation_uuidv7": "01a1b26b-ef3c-788a-b7ea-e48d456f0beb",
+  "local_conversation_uuidv7": "01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3",
   "folio_collision_check": {
-    "searched_scope": "Búsqueda de código exacta en SeryMente/khora y alcance org:SeryMente expuesto por el conector para alias operativo y UUIDv7 locales; cero coincidencias indexadas. El índice puede ser incompleto.",
+    "searched_scope": "Búsqueda exacta de alias y UUIDv7 en el índice de código accesible de org:SeryMente: cero coincidencias; cobertura del índice potencialmente incompleta.",
     "repositories_searched": [
-      "SeryMente/khora"
+      "org:SeryMente (búsqueda exacta indexada)"
     ],
-    "alias": "chatgpt-dictado-01a1b26b-ef3c-788a-b7ea-e48d456f0beb",
-    "uuidv7": "01a1b26b-ef3c-788a-b7ea-e48d456f0beb",
+    "alias": "chatgpt-dictado-01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3",
+    "uuidv7": "01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3",
     "matches_found": 0,
     "global_uniqueness": "not_verified"
   },
@@ -39,21 +39,21 @@
   "bootstrap_scope": "Dictado only: dictation screen, explicit voice capture, transcription, transcript editing and continuation. No code, credentials, provider, security, deploy or production permission.",
   "enforcement": "cooperative registry; no server fencing of arbitrary writes",
   "transfer_authorization": {
-    "verbatim": "Transfer Responsibility",
-    "authorization_question": "¿Autorizas que esta conversación sustituya al titular actual y asuma exclusivamente Dictado (TRANSFER_RESPONSIBILITY), o que se incorpore como segunda responsable sin desplazarlo (ADD_CO_RESPONSIBLE)?",
-    "provenance": "Mensaje directo del operador en esta conversación, 2026-11-06, America/Mexico_City.",
-    "event_id": "DICTADO-TRANSFER-20261106-EAD64490",
-    "previous_owner": "chatgpt-dictado-ses-20261030-97109848",
-    "previous_generation": 4,
-    "previous_blob_sha": "a954353055ef30770aae0b5ca40e1f61cfc3d8dd",
-    "recipient_alias": "chatgpt-dictado-01a1b26b-ef3c-788a-b7ea-e48d456f0beb",
-    "recipient_instance": "chatgpt-dictado-INSTANCE-20261106-01A1B26BEF3C",
-    "new_generation": 5,
-    "source_main_revision": "a954353055ef30770aae0b5ca40e1f61cfc3d8dd",
-    "local_conversation_uuidv7": "01a1b26b-ef3c-788a-b7ea-e48d456f0beb",
+    "verbatim": "Si",
+    "authorization_question": "¿Confirmas TRANSFER_RESPONSIBILITY? Esto sustituye al titular de generación 5 por esta conversación y eleva el control a generación 6.",
+    "provenance": "Dos respuestas directas del operador en esta conversación, 2026-11-06, America/Mexico_City; la segunda responde a una pregunta que nombra explícitamente TRANSFER_RESPONSIBILITY.",
+    "event_id": "DICTADO-TRANSFER-20261106-900DD4E3",
+    "previous_owner": "chatgpt-dictado-01a1b26b-ef3c-788a-b7ea-e48d456f0beb",
+    "previous_generation": 5,
+    "previous_blob_sha": "38afbbb1215a1fc821f5ac750fb9a055aa12dea7",
+    "recipient_alias": "chatgpt-dictado-01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3",
+    "recipient_instance": "chatgpt-dictado-INSTANCE-20261106-01A1B2E1A2DC7881AAC7AC9D900DD4E3",
+    "new_generation": 6,
+    "source_main_revision": "38afbbb1215a1fc821f5ac750fb9a055aa12dea7",
+    "local_conversation_uuidv7": "01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3",
     "operation": "TRANSFER_RESPONSIBILITY",
-    "result": "authorized; compare-and-swap commit and same-cycle canonical read-back verified",
-    "readback_verified": true
+    "result": "authorized; CAS write submitted; canonical read-back pending",
+    "readback_verified": false
   },
   "previous_transfer_authorization": {
     "verbatim": "Sí.",
@@ -72,15 +72,16 @@
   "previous_assignment": {
     "status": "assigned",
     "owner_thread": null,
-    "owner_alias": "chatgpt-dictado-ses-20261030-97109848",
+    "owner_alias": "chatgpt-dictado-01a1b26b-ef3c-788a-b7ea-e48d456f0beb",
     "owner_alias_type": "operational_alias_not_native_thread_id",
-    "instance": "chatgpt-dictado-ses-20261030-97109848",
-    "session_folio": "SES-20261030-97109848",
-    "generation": 4,
-    "authorization_ref": "Current ChatGPT conversation, 2026-10-30: operator answered “Si” to exclusive transfer of Dictado; full message in C044 cronica. Native conversation ID not exposed.",
-    "authorization_event": "DICTADO-TRANSFER-C044-SES-20261030-97109848",
-    "acquired_at": "2026-10-30",
-    "control_blob_sha": "a954353055ef30770aae0b5ca40e1f61cfc3d8dd"
+    "instance": "chatgpt-dictado-INSTANCE-20261106-01A1B26BEF3C",
+    "session_folio": "PENDIENTE/NO ASIGNADO",
+    "generation": 5,
+    "authorization_ref": "Instrucción directa del operador en esta conversación, 2026-11-06 (America/Mexico_City): “Transfer Responsibility”, en respuesta a la pregunta explícita de sustituir al titular actual de Dictado o incorporar una segunda responsable. Autoriza TRANSFER_RESPONSIBILITY exclusivamente para Dictado.",
+    "authorization_event": "DICTADO-TRANSFER-20261106-EAD64490",
+    "acquired_at": "2026-11-06",
+    "control_blob_sha": "38afbbb1215a1fc821f5ac750fb9a055aa12dea7",
+    "local_conversation_uuidv7": "01a1b26b-ef3c-788a-b7ea-e48d456f0beb"
   },
   "transfer_history": [
     {
@@ -111,8 +112,26 @@
       "local_conversation_uuidv7": "01a18d84-31e0-7dca-b0f7-90e4b3c58f12",
       "result": "authorized; CAS write and canonical read-back are recorded as verified in this cycle.",
       "readback_verified": true
+    },
+    {
+      "verbatim": "Si",
+      "authorization_question": "¿Confirmas TRANSFER_RESPONSIBILITY? Esto sustituye al titular de generación 5 por esta conversación y eleva el control a generación 6.",
+      "provenance": "Dos respuestas directas del operador en esta conversación, 2026-11-06, America/Mexico_City.",
+      "event_id": "DICTADO-TRANSFER-20261106-900DD4E3",
+      "previous_owner": "chatgpt-dictado-01a1b26b-ef3c-788a-b7ea-e48d456f0beb",
+      "previous_generation": 5,
+      "previous_blob_sha": "38afbbb1215a1fc821f5ac750fb9a055aa12dea7",
+      "recipient_alias": "chatgpt-dictado-01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3",
+      "recipient_instance": "chatgpt-dictado-INSTANCE-20261106-01A1B2E1A2DC7881AAC7AC9D900DD4E3",
+      "new_generation": 6,
+      "source_main_revision": "38afbbb1215a1fc821f5ac750fb9a055aa12dea7",
+      "local_conversation_uuidv7": "01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3",
+      "operation": "TRANSFER_RESPONSIBILITY",
+      "result": "authorized; CAS write submitted; canonical read-back pending",
+      "readback_verified": false
     }
   ],
   "session_folio_status": "PENDIENTE/NO ASIGNADO",
-  "folio_status_note": "No se emite folio de sesión porque FOL1 está PREPARADA, NO ACTIVA. Se conserva PENDIENTE/NO ASIGNADO hasta activación verificable y read-back del registro maestro."
+  "folio_status_note": "No se emite folio de sesión porque FOL1 está PREPARADA, NO ACTIVA. Se conserva PENDIENTE/NO ASIGNADO hasta activación verificable y read-back del registro maestro.",
+  "previous_generation": 5
 }
