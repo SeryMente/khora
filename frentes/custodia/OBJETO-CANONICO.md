@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.28; OBJECT_VERSION=0.16; OBJECT_SEAL=CUSTODIA-v0.16; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.28; OBJECT_VERSION=0.17; OBJECT_SEAL=CUSTODIA-v0.17; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · RESPONSABILIDAD DOCUMENTAL EN GENERACIÓN 7 · ORDEN OPERATIVO: CUSTODIA-03 (#1, RESCATE DE DICTADOS AUSENTES/PRESUNTAMENTE PERDIDOS) → CUSTODIA-01 (#2, UNIDADES VISIBLES) → CUSTODIA-04 (#3, CORRECCIÓN SISTÉMICA; PARÉNTESIS BREVE SOBRE ARCHIVAR REGISTRO) · DICTAMEN C014 SIN CAMBIO: RECUPERACIÓN TOTAL NO DEMOSTRADA · GARANTÍAS DE PRODUCTO NO CERTIFICADAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.16. Metacanon: 1.28. Gobierno general consultado: Samantha v377 · NX-377m; GOW 2.17. Fuente central SeryMente/metodologia/main: blob 54064c8fe00f872023a455f06596061ed69062ae. Este ciclo reordena prioridades y documenta rutas candidatas; no equivale a recuperación productiva ni certificación de bytes.
+> **ESTADO · VIVO · RESPONSABILIDAD DOCUMENTAL EN GENERACIÓN 7 · ORDEN OPERATIVO: CUSTODIA-03 (#1, RESCATE DE DICTADOS AUSENTES/PRESUNTAMENTE PERDIDOS) → CUSTODIA-01 (#2, UNIDADES VISIBLES) → CUSTODIA-04 (#3, CORRECCIÓN SISTÉMICA EN RAMA AISLADA PR #354; VALIDACIÓN LOCAL PASADA; ACEPTACIÓN PENDIENTE) · DICTAMEN C014 SIN CAMBIO: RECUPERACIÓN TOTAL NO DEMOSTRADA · GARANTÍAS DE PRODUCTO NO CERTIFICADAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.16. Metacanon: 1.28. Gobierno general consultado: Samantha v377 · NX-377m; GOW 2.17. Fuente central SeryMente/metodologia/main: blob 54064c8fe00f872023a455f06596061ed69062ae. Esta versión consolida la evidencia del bloqueo de archivado Dictado→Custodia y su corrección en rama aislada; no equivale a recuperación productiva ni certificación de bytes.
 
 ## 1. Control e identidad
 
@@ -105,19 +105,19 @@ Custodia es el frente transversal que define, verifica y gobierna las garantías
 
 ## 8. Estado vivo
 
-**Estado del frente: CUSTODIA-03 ABIERTA (P0 · PRIORIDAD #1: RESCATE DE AUSENTES) — CUSTODIA-01 EN CURSO (P0 · PRIORIDAD #2: UNIDADES VISIBLES) — CUSTODIA-04 EN CURSO (P0 · PRIORIDAD #3: CORRECCIÓN SISTÉMICA; DIAGNÓSTICO DE ARCHIVADO COMO PARÉNTESIS) — GARANTÍAS DE PRODUCTO NO CERTIFICADAS. CUSTODIA-02 RETIRADA DEL PLAN ACTIVO. RESPONSABILIDAD DOCUMENTAL TRANSFERIDA A GENERACIÓN 7.**
+**Estado del frente: CUSTODIA-03 ABIERTA (P0 · PRIORIDAD #1: RESCATE DE AUSENTES) — CUSTODIA-01 EN CURSO (P0 · PRIORIDAD #2: UNIDADES VISIBLES) — CUSTODIA-04 EN CURSO (P0 · PRIORIDAD #3: CORRECCIÓN SISTÉMICA EN RAMA AISLADA PR #354; VALIDACIÓN LOCAL APROBADA; ACEPTACIÓN/LECTURA FÍSICA PENDIENTES) — GARANTÍAS DE PRODUCTO NO CERTIFICADAS. CUSTODIA-02 RETIRADA DEL PLAN ACTIVO. RESPONSABILIDAD DOCUMENTAL TRANSFERIDA A GENERACIÓN 7.**
 
 **Secuencia operativa vigente · 2026-11-06**
 
 1. **CUSTODIA-03 — rescate prioritario de lo presuntamente perdido.** Primero cotejar bajo la cuenta propietaria y con la bóveda desbloqueada el candidato textual del 28-10 a las 20:29 (264 checkpoints). En el corte C014 esta sesión no tenía filas de partes de audio en Neon; es candidata a rescate de texto, no evidencia de audio recuperable. Si no coincide, ampliar a las siete sesiones/1,038 checkpoints posteriores a las 17:08. En paralelo, sin esperar a cerrar la búsqueda textual, comprobar por lectura física los candidatos B2 y Vercel Blob; revisar IndexedDB solo en el perfil original autorizado y otras fuentes del propietario si están disponibles.
 2. **CUSTODIA-01 — catálogo visible.** Después de la primera pasada del candidato ausente, recorrer todas las páginas de Ingresos → Dictado → Recuperación y restaurar/verificar cada unidad visible, sin desplazar un rescate positivo de CUSTODIA-03.
-3. **CUSTODIA-04 — corrección sistémica.** El análisis estático del error «No se puede archivar el registro: Khora no ha verificado la custodia íntegra de todas las partes de audio» ya está documentado. Mantener un paréntesis breve/read-only para confirmar el texto actual y estado runtime si no interrumpe el rescate. No anteponer correcciones de código, producción o despliegues a la recuperación de fuentes históricas.
+3. **CUSTODIA-04 — corrección sistémica.** El defecto de coordinación del archivado quedó confirmado estáticamente y corregido en la rama aislada de PR #354; typecheck, unitarias, contratos UI, revisión UI y E2E focalizada pasaron localmente. La PR sigue abierta en borrador, sin merge. CI remoto no ejecutó pasos y falta ensayo con proveedor no productivo, lectura física de vuelta, diagnóstico runtime de la sesión original y aceptación humana. Este trabajo no antepone la publicación ni desplaza el rescate de CUSTODIA-03 o el catálogo de CUSTODIA-01.
 
-La secuencia operativa detallada, los candidatos y sus límites están en [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md) v0.13. Los IDs existentes se conservan; no se abre una tarea CUSTODIA-05.
+La secuencia operativa detallada, los candidatos y sus límites están en [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md) v0.14. Los IDs existentes se conservan; no se abre una tarea CUSTODIA-05.
 
 **Dictamen vigente de recuperabilidad C014 — respuesta: NO.** No existe evidencia suficiente para afirmar que toda la información pueda recuperarse. Esto **no** significa que todo esté perdido: se han localizado checkpoints remotos posteriores al incidente, seis sesiones históricas con referencias B2, referencias Vercel Blob y cinco grupos IndexedDB auditados en octubre. Cada ruta conserva límites distintos: los checkpoints siguen cifrados y no se abrió su contenido; los objetos B2/Blob no se descargaron de nuevo ni se recalculó su SHA actual; la copia IndexedDB original no está disponible en el equipo conectado. El dictado específico esperado después de las 17:08 del 28-10-2026 todavía no está identificado. **Unidades recuperadas y verificadas en esta investigación: 0. Pérdida definitiva declarada: 0.**
 
-El detalle operativo vigente sigue en [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md) v0.13. Es una materialización auxiliar provisional, no un segundo estado vivo; su diseño metodológico continúa sin certificación y CUSTODIA-02 no se reactiva.
+El detalle operativo vigente sigue en [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md) v0.14. Es una materialización auxiliar provisional, no un segundo estado vivo; su diseño metodológico continúa sin certificación y CUSTODIA-02 no se reactiva.
 
 ### Confirmado en las fuentes consultadas
 
@@ -132,7 +132,7 @@ El detalle operativo vigente sigue en [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS
 - **F-13/R-09:** el validador de audio comprueba índices/continuidad, bytes declarados, formato del SHA-256 almacenado y estado de verificación, pero no lee los bytes actuales del proveedor ni recalcula SHA-256 sobre ellos. La propuesta distingue mejor el audio legacy, pero no demuestra disponibilidad/integridad real de los objetos remotos.
 - **F-14/R-10:** en la propuesta #339, el fallback legacy solo se activa cuando no existe `corteAudio`. Si existe un objeto `corteAudio` con `hastaParte=0` y hay filas de audio, el total sigue en cero y el flujo no copia esas partes, aunque la UI candidata pueda mostrar `storedAudioParts > 0`. Es un defecto confirmado en el código candidato, no una incidencia productiva medida.
 - Por eso la propuesta no debe fusionarse tal como está. Debe cubrir tanto corte ausente como corte explícitamente vacío, conservar audio sin sincronía inventada o bloquear la acción con mensaje explícito, y comprobar lectura de vuelta. Por separado R-09 exige lectura real y hash de bytes de los objetos.
-- **Hallazgo de retoma sin folio independiente (2026-11-06) · Compuerta de archivado Dictado→Custodia:** IngresoWorkspace.tsx::guardar() puede emitir el mensaje de falta de custodia antes de llamar a /api/dictado. Entre las rutas estáticas observadas: parte de audio pendiente en pendingUploadsRef tras fallo de subida (aunque exista copia local) y captura de micrófono con cero partes generadas. La compuerta no discrimina la causa ni ejecuta por sí misma todos los reintentos pendientes. Es defecto/riesgo de UX y coordinación de frontera observado en código, no causa raíz demostrada de la sesión concreta. El contrato final también debe separar read-back al subir, manifiesto DB y disponibilidad física actual del objeto; la ruta de archivado coteja metadatos/manifiesto, no hace un GET de cada objeto Blob en ese punto.
+- **Hallazgo de retoma sin folio independiente (2026-11-06) · Compuerta de archivado Dictado→Custodia:** IngresoWorkspace.tsx::guardar() puede emitir el mensaje de falta de custodia antes de llamar a /api/dictado. Se confirmó estáticamente que una subida fallida puede dejar una parte pendiente en pendingUploadsRef y que el archivado original no drenaba toda esa cola antes de validar. Este defecto de coordinación quedó corregido en la rama aislada PR #354 mediante drenaje secuencial single-flight y guarda del archivado completo. El caso distinto de cero partes generadas/cierre incompleto sigue sin asociarse a la sesión original. La compuerta de integridad se conserva. El contrato final también debe separar read-back al subir, manifiesto DB y disponibilidad física actual del objeto; la ruta de archivado coteja metadatos/manifiesto, no hace un GET de cada objeto Blob en ese punto.
 
 ### Pendiente de evidencia productiva
 
@@ -141,7 +141,7 @@ El detalle operativo vigente sigue en [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS
 - Lectura real, descifrado/decodificación y SHA-256 recalculado de objetos remotos; lectura de vuelta del destino recuperado bajo el propietario autorizado.
 - Mapa del primer punto de persistencia por canal de adquisición, almacenes/proveedores, uso de Vercel Blob y eventual migración a Backblaze.
 - Pruebas de interrupción de checkpoint, cierre/reinicio/cambio de perfil, recuperación de texto y audio, integridad y procedencia.
-- Reconciliación desde una rama limpia basada en `main` vigente (PR #339 quedó cerrada sin merge; rama histórica divergida, no reutilizarla sin reconciliación) y repetición de controles; resolución de CI y de la vía de publicación compatible con el repositorio privado.
+- Resolución de CI y de la vía de publicación compatible con el repositorio privado. La corrección del archivado ya está en una rama nueva basada en `main` (PR #354); PR #339 sigue siendo una propuesta histórica cerrada sin merge y no se reutiliza.
 - Capturar el diagnóstico runtime de una sesión real bajo identidad autorizada: estados de partes, índices, pending uploads, cierre/ACK, checkpoint, respuesta de red y manifiesto de servidor; no incluir texto, audio ni hashes completos en telemetría documental.
 
 El catálogo autenticado no se obtuvo en C010/C011/C012/C014 ni en esta retoma: **0 unidades productivas nuevas cotejadas y 0 recuperaciones productivas nuevas**. El dictado reportado como ausente continúa sin localizarse; su pérdida definitiva no está demostrada. CUSTODIA-01, CUSTODIA-03 y CUSTODIA-04 permanecen abiertas según sus criterios de aceptación. La inspección estática de esta retoma no cambia el dictamen productivo ni certifica recuperabilidad; no se declara cero pérdidas.
@@ -165,6 +165,24 @@ El catálogo autenticado no se obtuvo en C010/C011/C012/C014 ni en esta retoma: 
 **Resultado:** mensaje originado por la ruta UI de Dictado; verificación de integridad y persistencia bajo responsabilidad compartida con Custodia. Dos rutas posibles identificadas en código, causa runtime no demostrada. No se cambió código, datos, credenciales, proveedor, despliegue ni producción. Garantías NO CERTIFICADAS.
 
 **Estructura:** no se crea CUSTODIA-05; se amplía CUSTODIA-04, que ya cubre corrección y pruebas E2E. CUSTODIA-01 y CUSTODIA-03 siguen abiertas por falta de catálogo autenticado y verificaciones por unidad.
+
+
+### Consolidación de CUSTODIA-04 y cierre de intervención diagnóstica · 2026-11-06
+
+El expediente de detalle se encuentra en [Tareas provisionales · CUSTODIA-04 · consolidación 12.9](📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20CUSTODIA-04%20-%20Corrección%20E2E%20de%20archivado%20Dictado-Custodia/README.md). Su lista auxiliar vigente es [LISTA-TAREAS-PROVISIONAL.md v0.14](LISTA-TAREAS-PROVISIONAL.md); el índice auxiliar está en [Tareas provisionales](📁%20🧭%20-%20Tareas%20provisionales/README.md). Estos materiales son subordinados al presente OCP; no crean un nuevo OCP ni otra tarea.
+
+**Procedencia corregida:** el original de Dictado del 2026-11-06 reporta el mensaje «no se puede archivar el registro. Cora no ha verificado la custodia íntegra de todas las partes de audio». La aplicación inspeccionada muestra la variante con «Khora». La transcripción fuente pregunta si la sesión fue una captura nueva o recuperada, pero no contiene respuesta; origen de sesión = NO DETERMINADO. La causa runtime concreta también es NO DETERMINADA.
+
+**Resultado técnico:** el preflight que emite el mensaje se ubica en Dictado, en guardar(), antes de POST /api/dictado; la integridad de las partes pertenece al contrato de Custodia. El defecto de coordinación confirmado era que el flujo de archivado no drenaba toda la cola de subidas pendientes después de los intentos automáticos fallidos. La corrección de rama agrega reintentos secuenciales single-flight antes de validar, protección single-flight del archivo, acción «Reintentar y archivar» en el mismo camino y preservación de texto/copia local cuando persiste el fallo. No se debilitó el manifiesto ni la validación del servidor.
+
+**Validación local del código** (commit 55449a08719f04982dbfceb15ec28f43c7b68118): typecheck APROBADO; unitarias 572/572; UI contract APROBADO; UI review APROBADO; Playwright 3/3; git diff --check APROBADO. Los escenarios E2E utilizaron API simulada/datos sintéticos; no equivalen a GET/read-back físico del proveedor.
+
+**Estado externo y límites:** los seis jobs remotos de Actions consultados para el commit de código acabaron con failure y steps=[]; no ejecutaron comandos. Los checks Vercel/Netlify no generaron Preview por la restricción del plan para repositorio privado de organización. PR #354 permanece OPEN · DRAFT · NOT MERGED, 27 ahead / 0 behind respecto de main en la comparación observada. No se modificaron main, Production, DB ni credenciales; no hubo merge o despliegue. No se ejecutó build sobre la punta combinada actual.
+
+**Cierre de esta intervención:** diagnóstico y documentación del incidente de archivado entregados a CUSTODIA-04. No permanece una tarea paralela separada a cargo de esta conversación. CUSTODIA-04 sigue EN CURSO hasta CI ejecutado, proveedor real no productivo con lectura física de vuelta, recorrido completo y aceptación. Garantías del producto NO CERTIFICADAS.
+
+**Separación de prioridades:** CUSTODIA-03 (#1) mantiene el rescate del dictado ausente del 28-10 (última entrada visible comunicada 17:08; contador reportado 40→20; candidato 20:29/264 checkpoints no identificado). CUSTODIA-01 (#2) mantiene el catálogo visible. CUSTODIA-04 (#3) contiene el bloqueo de archivado del 06-11 y la corrección sistémica. No se declara pérdida definitiva ni recuperación productiva; CUSTODIA-02 sigue retirada y no se crea CUSTODIA-05.
+
 
 ## 9. Aceptación y viabilidad
 
@@ -447,7 +465,7 @@ Instrucción para una conversación futura:
 
 ## 13. Persistencia y revisión
 
-**Versión actualizada en esta retoma:** CUSTODIA-v0.16. Se conserva el control de responsabilidad en generación 7; se actualizan el orden operativo, la crónica, la instrucción original de reordenamiento y la lista provisional v0.13. El inventario y el informe de incidente permanecen como evidencia enlazada, no como un segundo estado vivo. No se modificaron código, base de datos, objetos productivos, credenciales, proveedor ni despliegue.
+**Versión actualizada en esta consolidación:** CUSTODIA-v0.17. Se conserva el control único de responsabilidad en generación 7. Se actualizan el dictamen vivo y la crónica de CUSTODIA-04, la lista provisional v0.14 y el índice de tareas. El expediente de incidente contiene la fuente, el diagnóstico, la solución, las pruebas y los límites. No se modificaron main, DB, objetos productivos, credenciales, proveedor ni despliegue.
 
 - **Núcleo único:** frentes/custodia/OBJETO-CANONICO.md.
 - **Control único:** frentes/custodia/CONTROL-RESPONSABILIDAD.json.
@@ -463,7 +481,11 @@ Instrucción para una conversación futura:
 - **Original de la autorización del relevo:** frentes/custodia/originales/INSTRUCCION-TRANSFERENCIA-RESPONSABILIDAD-2026-10-29.md; blob `240a27710d1de76fd9a5eeeb9ce97fdb6b987104`, commit `9fb5bd3a03158e1435009153c38be489c901c155`.
 - **Lista auxiliar provisional de tareas (anterior):** v0.11, blob `9bd90fb79ef767dfbe4214e35ace7150c34bc6bc`.
 - **Lista auxiliar provisional anterior:** v0.12, blob `1edc4ae9f4c1c856a208f043e7df5dac07c0a5dc`.
-- **Lista auxiliar provisional vigente:** frentes/custodia/LISTA-TAREAS-PROVISIONAL.md v0.13, blob `69a361f3f019f86dad117afba0ac12f40fc42bd6`; read-back confirmó versión 0.13, orden CUSTODIA-03 → CUSTODIA-01 → CUSTODIA-04 y los candidatos priorizados.
+- **Lista auxiliar provisional anterior:** frentes/custodia/LISTA-TAREAS-PROVISIONAL.md v0.13, blob histórico `69a361f3f019f86dad117afba0ac12f40fc42bd6`.
+- **Lista auxiliar provisional vigente:** frentes/custodia/LISTA-TAREAS-PROVISIONAL.md v0.14, blob `c2cf5f8f7fb5bc8841b4ae511adc0b55650f4546`; read-back confirmó el estado de CUSTODIA-04, su evidencia y la prioridad CUSTODIA-03 → CUSTODIA-01 → CUSTODIA-04.
+- **Índice de tareas provisionales vigente:** frentes/custodia/📁 🧭 - Tareas provisionales/README.md, blob `680b15567754b70d04ad7412594e0845b81f6aac`; enlaza el expediente y mantiene intactos CUSTODIA-01, CUSTODIA-03, CUSTODIA-02 y tareas B2.
+- **Expediente CUSTODIA-04 · Incidente de archivado Dictado→Custodia:** frentes/custodia/📁 🧭 - Tareas provisionales/📁 🧩 - CUSTODIA-04 - Corrección E2E de archivado Dictado-Custodia/README.md, consolidación 12.9, blob `0012f3b66f0173387a4c8ee3eb8f9948ef59004b`; lectura de vuelta exacta confirmada.
+- **Código y pruebas de la corrección:** rama `fix/custodia-04-dictado-archivar-e2e-20261106`, commit `55449a08719f04982dbfceb15ec28f43c7b68118`, PR [#354](https://github.com/SeryMente/khora/pull/354), abierta en borrador, sin merge.
 - **Inventario provisional de hallazgos:** frentes/custodia/evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md (v0.9, blob `c14900bb0d594b3d07199de3963e341718f1677c`).
 - **Informe provisional del incidente de dictado ausente y conteo 40→20:** frentes/custodia/evidencias/INCIDENTE-DICTADO-AUSENTE-Y-CONTEO-40-20-2026-10-28.md (v0.6, blob `a59c32b54a9e44df2c8bc29ea30ba9d143a1a029`). El incidente sigue abierto; en C010 no se obtuvo evidencia nueva del registro productivo concreto.
 - **Salida visible del ciclo C007:** frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-IMPLEMENTACION-PARCIAL-2026-10-28.md (blob `8ef201f99dc23a00e092ee5f78788bb8692f4e05`).
