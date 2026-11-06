@@ -1,18 +1,20 @@
-<!-- LIST_VERSION=0.11; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.12; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.11.
-- **Última actualización:** 2026-10-29 (C011).
+- **Versión de esta lista provisional:** 0.12.
+- **Última actualización:** 2026-11-06 (ciclo documental de retoma; control documental gen. 7).
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
 - **Última lectura de metodología del ciclo 2 (referencia histórica):** Samantha v352 · NX-352m; Metacanon 1.21; GOW v2.3; blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
 - **Última lectura metodológica histórica (ciclo 4):** Samantha v356 · NX-356m; Metacanon 1.22; GOW v2.6; blob `c364e179e8e9b6a3d566a8e690dfa1a7cce91798`.
 - **Última lectura metodológica histórica (C008):** Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; blob `89a28e4d05f5baab9c4b86abdb9fbfc532690c75`.
-- **Revalidación metodológica C009–C011:** Samantha v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`, leído de `SeryMente/metodologia/main` el 2026-10-29. La lista sigue provisional; ni el relevo ni estos ciclos certifican su diseño.
-- **Alcance actual del plan:** tres tareas activas: recuperar y verificar las unidades visibles (CUSTODIA-01); investigar capturas ausentes o aparentemente irrecuperables y cuantificar las lagunas (CUSTODIA-03); completar la investigación y actualizar/certificar el sistema de recuperabilidad mediante correcciones y pruebas de extremo a extremo (CUSTODIA-04). CUSTODIA-02 permanece retirada y su identificador no se reutiliza. No se afirma que estas tres tareas sean el inventario exhaustivo de todas las obligaciones futuras del frente.
+- **Revalidación metodológica C009–C011 (histórica):** Samantha v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`, leído de `SeryMente/metodologia/main` el 2026-10-29.
+- **Gobierno vigente consultado en esta retoma (2026-11-06):** Samantha v377 · NX-377m; Metacanon 1.28; GOW 2.17; DUG blob `54064c8fe00f872023a455f06596061ed69062ae`; commit main `8ee2482866b3dd085e58e05006727256d0274376`. Se revisó la cascada, P001/P004/P005/P037/P038/P039/P041/P042/P043, Metacanon §§4, 28, 29, 38, 41, 42, 44 y 46–47, y los términos GOW de OCP/SPDF/persistencia. MCP-NORMATIVO: DESACTIVADO.
+La lista sigue provisional; ni el relevo ni esta revalidación certifican su diseño.
+- **Alcance actual del plan:** tres tareas activas: recuperar y verificar las unidades visibles (CUSTODIA-01); investigar capturas ausentes o aparentemente irrecuperables y cuantificar las lagunas (CUSTODIA-03); completar la investigación y actualizar/certificar el sistema de recuperabilidad mediante correcciones y pruebas de extremo a extremo, incorporando el contrato Dictado→Custodia en el evento «Archivar registro» (CUSTODIA-04). CUSTODIA-02 permanece retirada y su identificador no se reutiliza. No se afirma que estas tres tareas sean el inventario exhaustivo de todas las obligaciones futuras del frente.
 - **Regla provisional de custodia de información:** no copiar a este repositorio el texto o audio de dictados reales, secretos, credenciales ni identificadores personales innecesarios. Registrar resultados mediante evidencia minimizada y sanitizada, en el soporte autorizado que corresponda.
 
 - **Secuencia de ejecución acordada en el ciclo C006:**
@@ -104,7 +106,7 @@
 
 **Prioridad:** P0 · CRÍTICA · Depende de la línea base y de los hallazgos de CUSTODIA-01 y CUSTODIA-03.
 
-**Estado:** EN CURSO — la corrección permanece aislada; PR #339 sigue abierta en borrador, sin fusionar ni desplegar. En C009 se verificó que la rama `fix/custodia-recovery-reconcile-20261028` está divergida respecto de `main` (la comparación confirma divergencia; la distancia exacta se recalculará antes de integrar). Los controles y pruebas registrados en C008 corresponden a aquella punta, no a una rama reconciliada con el `main` actual. No hay catálogo productivo cotejado ni recuperaciones de producción.
+**Estado:** EN CURSO — investigación estática del contrato Dictado→Custodia incorporada el 2026-11-06; no hay corrección de producto ni validación funcional nueva. PR #339 se cerró sin merge el 2026-10-30 (`merged=false`); su rama `fix/custodia-recovery-reconcile-20261028` estaba divergida en C013 (18 commits ahead / 82 behind frente a `main`, merge-base `b8926d4ad2643805e119f55d0b9b3b58779fd8df`). No reutilizarla sin reconciliación y repetición completa de controles. No hay catálogo productivo cotejado ni recuperaciones de producción.
 
 **Objetivo:** concluir la investigación de las brechas de recuperabilidad identificadas y actualizar KHORA para que las unidades admisibles puedan catalogarse, recuperarse y verificarse de manera consistente. No se considera lograda la recuperabilidad por el mero hecho de modificar o compilar código.
 
@@ -134,9 +136,37 @@ La propuesta continúa sin comprobar los bytes actuales de los objetos remotos n
 
 **Relación con las otras tareas:** CUSTODIA-04 resuelve las causas sistémicas y deja la capacidad de recuperación al corriente; no sustituye la recuperación individual de CUSTODIA-01 ni demuestra por sí misma el destino del dictado ausente investigado por CUSTODIA-03.
 
+### Subalcance incorporado 2026-11-06 · Contrato E2E Dictado→Custodia al archivar registro
+
+**Límite de responsabilidad acordado por el operador:** Dictado responde desde la entrada a la pantalla Dictado hasta el clic en «Archivar registro»; Custodia asume desde ese mismo evento la verificación y el cierre durable. El clic es una frontera compartida, no una transferencia de titularidad entre OCP.
+
+**Diagnóstico estático (sin reproducción de la sesión):** en `khora-web/app/components/ingreso/IngresoWorkspace.tsx`, `guardar()` muestra el mensaje «No se puede archivar el registro: Khora no ha verificado la custodia íntegra de todas las partes de audio» antes del POST `/api/dictado`. La compuerta valida partes presentes, índices, bytes, SHA-256 y estado verificado. Una subida fallida puede quedar en `pendingUploadsRef` y conservar solo una copia IndexedDB local; el flujo de archivar espera la subida en curso, pero no garantiza ejecutar todos los reintentos pendientes antes de validar. Una captura de micrófono sin partes generadas también falla, aunque el mismo mensaje genérico no distingue ese caso. Son rutas de código posibles, no la causa forense de la sesión del operador.
+
+**Contrato de Custodia observado:** `/api/audio` hace GET/read-back del objeto tras la escritura y coteja tamaño/SHA-256 descifrado antes de marcarlo verificado. `guardarDictado()` contrasta las partes recibidas con filas de manifiesto ya persistidas en `dictado_audio_parte`. `evaluarCustodiaAudio()` verifica metadatos del manifiesto, pero no lee por sí mismo el Blob actual en la validación final. Se mantiene abierto F-13/R-09: presencia de metadatos no equivale a disponibilidad física actual. La prueba `e2e/contracts/audio-por-partes.spec.ts` simula `verificado:true`; no acredita el proveedor físico, restauración tras reinicio ni recuperabilidad E2E.
+
+**Criterios adicionales de aceptación:**
+1. Dictado debe cerrar la captura explícitamente, recoger el último chunk y esperar ACK de cierre, finalización de la grabadora y todas las subidas; no debe existir chunk ni operación de subida pendiente al solicitar el sellado.
+2. Antes de archivar, reconciliar el número esperado de partes con índices únicos y contiguos y el manifiesto del servidor. Ante una parte faltante, reintentar automáticamente de forma idempotente y preservar el original local; no presentar el rechazo genérico como diagnóstico suficiente.
+3. Hacer que reintentar y archivar sea seguro ante timeout, ACK tardío y respuesta perdida; el mismo `sessionId` y firma de manifiesto deben resolver el mismo registro, sin duplicarlo ni sobrescribir otra captura.
+4. Custodia debe validar sesión/propietario, orden, cantidad, bytes, SHA-256, referencias del proveedor y estado de verificación del manifiesto; separar explícitamente «verificado al subir», «manifiesto persistido» y «objeto físicamente recuperable ahora».
+5. La aceptación de recuperabilidad de audio exige leer el objeto real del proveedor autorizado, descifrar si aplica, recalcular tamaño y SHA-256, y realizar lectura de vuelta de destino conservando el original. Metadatos o una respuesta simulada no satisfacen el criterio.
+6. Conservar checkpoint recuperable de texto completo/parcial y estado de audio durante la captura y ante el fallo de archivado. Una falla de audio no puede borrar, descartar ni bloquear el acceso al texto ya capturado. Distinguir estado local y remoto; no borrar copia local antes del recibo durable de Custodia.
+7. Tras recarga, cierre/reapertura del navegador y recuperación desde una sesión autorizada, reconstruir el texto y las partes admisibles con identidad, integridad y procedencia verificables.
+8. La interfaz debe exponer un estado simple y accionable para el usuario: «Reintentar y archivar» como acción principal, progreso y una razón concreta (cero partes, parte pendiente, índice faltante/duplicado, SHA/bytes inválidos, ACK de cierre ausente, checkpoint no confirmado o almacén no disponible). Telemetría sin texto/audio ni SHA completo.
+9. Ejecutar pruebas unitarias, integración y navegador con fallos inyectados: cero/una/múltiples partes, corte final, upload fallido, timeout, ACK tardío, duplicados, índices no contiguos, retry, idempotencia, recarga y restauración. Añadir un ensayo no productivo con proveedor real autorizado y lectura de vuelta; la simulación de proveedor no reemplaza esa prueba.
+10. Evaluar usabilidad con usuarios representativos de TDAH: reducir pasos y carga de memoria, evitar mensajes ambiguos y pérdida silenciosa, y permitir recuperar/continuar sin exigir una secuencia manual compleja. Es criterio de usabilidad a medir; no constituye afirmación clínica ni promesa terapéutica.
+
+**Estado de este subalcance:** DIAGNÓSTICO ESTÁTICO DOCUMENTADO; reproducción, logs de sesión, corrección de código, suites nuevas, prueba de proveedor, recuperación tras reinicio y aceptación del operador siguen pendientes. No se declara garantía de producto.
+
+**Decisión de estructura:** no crear CUSTODIA-05. Estos criterios amplían CUSTODIA-04, cuyo objetivo existente ya abarca correcciones y pruebas E2E; crear un ID superior duplicaría el mismo resultado. CUSTODIA-02 permanece retirada y no se reutiliza.
+
+
 ---
 
 ## Registro de cambios
+
+- **2026-11-06 · CUSTODIA-RETOMA-DIAGNOSTICO-DICTADO · versión 0.12:** instrucción literal conservada en `originales/ChatGPT-CUSTODIA-20261106-1424.txt` (blob `c1cb21131cc4576a4787bdb5fc76bcb978295610`). Se retoma responsabilidad documental mediante `TRANSFER_RESPONSIBILITY`, generación 6→7; control leído de vuelta. Se incorpora en CUSTODIA-04 el contrato E2E Dictado→Custodia, compuerta de archivado, reintentos, conservación de checkpoints, lectura física y criterios específicos de prueba/usabilidad. No se crea CUSTODIA-05. Se corrige el estado actual de PR #339: cerrada sin merge; su rama sigue divergida. La investigación fue estática en main: no se reprodujo la sesión, no se ejecutaron pruebas y no se modificó producto, datos o despliegue. CUSTODIA-01 y CUSTODIA-03 permanecen abiertas; garantías no certificadas.
+
 
 - **2026-10-28 · Creación provisional:** se añaden únicamente las dos tareas expresamente solicitadas. CUSTODIA-01 queda primera por urgencia; CUSTODIA-02 queda pendiente para revisar el diseño de la propia lista.
 - **2026-10-28 · Revisión documental previa al cierre del ciclo 2:** se actualizó la referencia metodológica hasta Samantha v352 y se confirmó por lectura de vuelta que el documento conserva exactamente dos tareas. La versión 0.2 no validaba el diseño.
