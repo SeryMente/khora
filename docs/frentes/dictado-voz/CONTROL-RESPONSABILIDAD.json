@@ -20,7 +20,7 @@
   "prior_generation": 5,
   "previous_blob": "38afbbb1215a1fc821f5ac750fb9a055aa12dea7",
   "base_blob_sha": "38afbbb1215a1fc821f5ac750fb9a055aa12dea7",
-  "assignment_method": "TRANSFER_RESPONSIBILITY autorizada explícitamente mediante dos respuestas afirmativas a preguntas inequívocas sobre sustitución del titular. Se volvió a leer el control en main, cotejando SHA y generación 5; actualización condicionada por el SHA observado. Requiere lectura de vuelta canónica y cotejo antes de declarar verificado.",
+  "assignment_method": "TRANSFER_RESPONSIBILITY autorizada explícitamente mediante dos respuestas afirmativas inequívocas. Se cotejó en preescritura generación 5 y SHA 38afbbb1215a1fc821f5ac750fb9a055aa12dea7; actualización condicionada ejecutada y lectura de vuelta canónica cotejada en main: generación 6, alias, instancia, evento, UUIDv7 local, folio pendiente y referencia SHA.",
   "authorization_original": {
     "source": "Direct operator message 2026-10-30; preserved verbatim in OBJETO-CANONICO.md §11."
   },
@@ -52,8 +52,8 @@
     "source_main_revision": "38afbbb1215a1fc821f5ac750fb9a055aa12dea7",
     "local_conversation_uuidv7": "01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3",
     "operation": "TRANSFER_RESPONSIBILITY",
-    "result": "authorized; CAS write submitted; canonical read-back pending",
-    "readback_verified": false
+    "result": "authorized; compare-and-swap write and canonical read-back verified",
+    "readback_verified": true
   },
   "previous_transfer_authorization": {
     "verbatim": "Sí.",
@@ -127,8 +127,8 @@
       "source_main_revision": "38afbbb1215a1fc821f5ac750fb9a055aa12dea7",
       "local_conversation_uuidv7": "01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3",
       "operation": "TRANSFER_RESPONSIBILITY",
-      "result": "authorized; CAS write submitted; canonical read-back pending",
-      "readback_verified": false
+      "result": "authorized; compare-and-swap write and canonical read-back verified",
+      "readback_verified": true
     }
   ],
   "session_folio_status": "PENDIENTE/NO ASIGNADO",

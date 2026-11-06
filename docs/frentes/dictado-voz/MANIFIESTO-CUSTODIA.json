@@ -7,12 +7,12 @@
     "repo": "SeryMente/metodologia",
     "path": "gobernanza/METAPROMPT-CANONICO-SAMANTHA.html",
     "ref": "main",
-    "blob": "501f7f6ec8bfd0a8289eb0c1e3897c19a0281be7",
-    "version": "1.25",
-    "sam_version": "v363 · NX-363m",
-    "gow_version": "2.12",
-    "read_at": "2026-10-30",
-    "main_commit": "b4bc9f8ef4485e44973e9c17f6c4f9a1119d698d"
+    "blob": "54064c8fe00f872023a455f06596061ed69062ae",
+    "version": "1.28",
+    "sam_version": "v377 · NX-377m",
+    "gow_version": "2.17",
+    "read_at": "2026-11-06",
+    "main_commit": "8ee2482866b3dd085e58e05006727256d0274376"
   },
   "original_source": {
     "repo": "SeryMente/khora",
@@ -255,9 +255,9 @@
     },
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 171135,
-      "sha256": "6971d5b59246ca5566cfcb4172c6f51c2f6547f34cd42fb914ae905853c0295a",
-      "git_blob_sha": "5a83c8ca417191a37adcfc4a7e8216e0f16be06d"
+      "bytes": 178372,
+      "sha256": "0DB41B2442A3F58F539346702DBE43AEC2B156FAD01BB3102ED519CC54A4D894",
+      "git_blob_sha": "a1d83ccb7fd2b222af4b8f2d7754351467436219"
     },
     {
       "path": "evidencias/dialogo.test.ts",
@@ -351,9 +351,9 @@
     },
     {
       "path": "CONTROL-RESPONSABILIDAD.json",
-      "bytes": 4680,
-      "sha256": "64ebacecc7bf42b648613778c705f80095163fb392e91dd4af5ecb49c334b719",
-      "git_blob_sha": "a954353055ef30770aae0b5ca40e1f61cfc3d8dd"
+      "bytes": 9169,
+      "sha256": "8FC99E589D48DF4D1B28FE9FA2B21D0F5C58BA3C80CA81A0A0D2A0BA75A6FE23",
+      "git_blob_sha": "8fa5721013b47b88729b38869c712863bc6a69d7"
     },
     {
       "path": "originales/CONTINUIDAD-C031-20261022.jsonl",
@@ -384,6 +384,34 @@
       "bytes": 1040,
       "sha256": "c8c72b628608521f92c9e292f49ac5505ef459191f094c9bf70b82fc783610a3",
       "git_blob_sha": "d53571b2e01c9d9f64c3949d0d4531a40eae59c3"
+    },
+    {
+      "path": "originales/ChatGPT-DICTADO-20261106-1540.txt",
+      "bytes": 70248,
+      "sha256": "B59FA7524DDAEB8CAAA06A422BBC11415C4AB4814DC2E920AC80658675EE768A",
+      "git_blob_sha": "a022d13920cb80280dd3c5bb89475348f8c908b7",
+      "source": {
+        "kind": "ChatGPT Exporter text export",
+        "local_source_path": "C:\\Users\\fila4\\Downloads\\ChatGPT-DICTADO-20261106-1540.txt",
+        "created_at": "2026-11-06T21:40:29.378Z",
+        "modified_at": "2026-11-06T21:40:29.615Z",
+        "exported_at": "2026-11-06T21:40:29Z",
+        "last_updated_in_export": "2026-11-06 15:38:23",
+        "source_conversation_url": "https://chatgpt.com/c/6aee2cb8-85e0-83e8-a166-6aa3890966ac",
+        "lines": 1408,
+        "byte_identity_verified": true,
+        "verification": "RDC local SHA-256 plus Git blob SHA equality after read-back; UTF-8 round-trip preserved all bytes.",
+        "credential_pattern_scan": {
+          "github_pat": 0,
+          "gh_token": 0,
+          "bearer": 0,
+          "openai_key": 0,
+          "private_key": 0,
+          "vercel_token": 0,
+          "limitation": "Limited pattern scan only; not a comprehensive secret audit."
+        },
+        "native_platform_export": false
+      }
     }
   ],
   "runtime_references": [
@@ -494,12 +522,12 @@
     "no_secret_values_in_manifest": true
   },
   "current_preparation": {
-    "version": "0.6.18",
+    "version": "0.6.20",
     "baseSha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "receipt": "evidencias/C030-release.json",
-    "state": "C044 committed to main at 016203fab19807e7c2068742a65323cec3b0a135; Dictado OCP/control and discovery indexes read back. No product code, tests, credentials, deployment or acceptance changes."
+    "state": "C045 final: original export byte identity verified; transfer control generation 6 read back; OCP v0.6.20 and manifest updated and read back. No product code, tests, PR actions, credentials, provider, deployment or production changes."
   },
-  "latestEvent": "C044 — Dictado transferido a generación 4; Observabilidad MCP separado con control propio sin titular; paquetes no dictados excluidos del alcance y preservados; sin cambios de producto ni pruebas.",
+  "latestEvent": "C045 — Retoma documental, transferencia de Dictado de generación 5 a 6 e incorporación byte a byte de ChatGPT-DICTADO-20261106-1540.txt; OCP y manifiesto actualizados. Sin cambios de producto, pruebas, PR ni producción.",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -525,8 +553,8 @@
     "physicalAcceptance": false,
     "technicalPublicationVerified": true
   },
-  "latest_cycle": "C044",
-  "canonical_version": "0.6.18",
+  "latest_cycle": "C045",
+  "canonical_version": "0.6.20",
   "latest_candidate": {
     "pr": 335,
     "url": "https://github.com/SeryMente/khora/pull/335",
@@ -615,23 +643,24 @@
     "repo": "SeryMente/metodologia",
     "path": "gobernanza/METAPROMPT-CANONICO-SAMANTHA.html",
     "ref": "main",
-    "blob": "501f7f6ec8bfd0a8289eb0c1e3897c19a0281be7",
-    "version": "1.25",
-    "sam_version": "v363 · NX-363m",
-    "gow_version": "2.12",
-    "read_at": "2026-10-30",
-    "main_commit": "b4bc9f8ef4485e44973e9c17f6c4f9a1119d698d"
+    "blob": "54064c8fe00f872023a455f06596061ed69062ae",
+    "version": "1.28",
+    "sam_version": "v377 · NX-377m",
+    "gow_version": "2.17",
+    "read_at": "2026-11-06",
+    "main_commit": "8ee2482866b3dd085e58e05006727256d0274376"
   },
   "responsibility_control": {
     "path": "CONTROL-RESPONSABILIDAD.json",
     "full_path": "docs/frentes/dictado-voz/CONTROL-RESPONSABILIDAD.json",
-    "blob": "a954353055ef30770aae0b5ca40e1f61cfc3d8dd",
-    "commit": "016203fab19807e7c2068742a65323cec3b0a135",
-    "generation": 4,
+    "blob": "8fa5721013b47b88729b38869c712863bc6a69d7",
+    "commit": "d9e9e84820916dddb1ce31ba975d7f49265f9802",
+    "generation": 6,
     "status": "assigned",
-    "session_folio": "SES-20261030-97109848",
-    "owner_alias": "chatgpt-dictado-ses-20261030-97109848",
-    "local_conversation_uuidv7": "01a18d84-31e0-7dca-b0f7-90e4b3c58f12",
+    "session_folio": "PENDIENTE/NO ASIGNADO",
+    "owner_alias": "chatgpt-dictado-01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3",
+    "local_conversation_uuidv7": "01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3",
+    "readback_verified": true,
     "global_uniqueness": "not_verified"
   },
   "conversation_continuity": {
@@ -645,15 +674,15 @@
     "native_conversation_id_exposed": false,
     "complete_native_export": false
   },
-  "latest_product_event": "C042 — no product code/tests/deployment changes; last technically verified product release remains C030 (main f0dfbdcb2d79eb6289dacba272ddcc7ba2023063, deployment dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr); physical acceptance and global gate remain pending, not revalidated in C042.",
+  "latest_product_event": "C045 — no code, tests, PR, deployment, data, credentials or production changes. The audio-archive defect remains under CUSTODIA-04/SCI 354Q validation; the source export's PR #354/CI status is historical in this cycle, not revalidated.",
   "latest_object": {
-    "version": "0.6.18",
+    "version": "0.6.20",
     "ref": "main",
-    "blob_sha": "5a83c8ca417191a37adcfc4a7e8216e0f16be06d",
-    "commit": "016203fab19807e7c2068742a65323cec3b0a135",
-    "bytes": 171135,
-    "sha256": "6971d5b59246ca5566cfcb4172c6f51c2f6547f34cd42fb914ae905853c0295a",
-    "state": "C044: separation and ownership transfer committed in main and verified by canonical read-back. No product changes or functional acceptance."
+    "blob_sha": "a1d83ccb7fd2b222af4b8f2d7754351467436219",
+    "commit": "0f9369d7ee0101fc581bb2230f079aa452f2d216",
+    "bytes": 178372,
+    "sha256": "0DB41B2442A3F58F539346702DBE43AEC2B156FAD01BB3102ED519CC54A4D894",
+    "state": "C045: transfer generation 5→6 and original export preserved byte-for-byte; control, OCP and manifest read back. No product code, tests, deployment or functional acceptance."
   },
   "recent_verbatim_instruction_ingestion": {
     "path": "originales/INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl",
@@ -698,5 +727,17 @@
     "observability_mcp_control_blob": "e710b17cb5f6d793846a1ac692ec78103ed111d7",
     "dictation_object_blob": "5a83c8ca417191a37adcfc4a7e8216e0f16be06d",
     "readback_verified": true
+  },
+  "source_export_ingestion": {
+    "path": "originales/ChatGPT-DICTADO-20261106-1540.txt",
+    "commit": "92f6c02044172143e01dee717aaf62f6e7ef588f",
+    "git_blob_sha": "a022d13920cb80280dd3c5bb89475348f8c908b7",
+    "sha256": "B59FA7524DDAEB8CAAA06A422BBC11415C4AB4814DC2E920AC80658675EE768A",
+    "bytes": 70248,
+    "lines": 1408,
+    "export_tool": "ChatGPT Exporter",
+    "native_platform_export": false,
+    "final_model_output_reproduced_verbatim": true,
+    "c045": "C045"
   }
 }
