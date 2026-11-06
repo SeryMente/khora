@@ -1,64 +1,65 @@
 {
-  "schema": "khora-mcp-functional-module/1",
-  "id": "jules",
-  "name": "Jules",
-  "version": "0.1.0",
-  "status": "implementation_in_progress",
-  "kind": "server_side_mcp_module",
-  "parent": {
-    "front": "KHORA-MCP",
-    "ocp": "docs/frentes/observabilidad-mcp/",
-    "control": "docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json",
-    "control_generation": 8,
-    "independent_control": false,
-    "active_responsibility_scope": "module:jules",
-    "module_alias": "chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314"
-  },
-  "runtime": {
-    "entrypoint": "khora-web/lib/server/mcp-jules.ts",
-    "registration_export": "registerMcpModules → registerJulesMcpModule",
-    "host": "khora-web/app/api/mcp/route.ts",
-    "transport": "shared_streamable_http",
-    "endpoint": "/api/mcp",
-    "registry": "khora-web/lib/server/mcp-module-registry.ts"
-  },
-  "tools": [
-    {
-      "id": "jules_list_sources",
-      "scope": "jules:read"
-    },
-    {
-      "id": "jules_list_sessions",
-      "scope": "jules:read"
-    },
-    {
-      "id": "jules_get_session",
-      "scope": "jules:read"
-    },
-    {
-      "id": "jules_list_activities",
-      "scope": "jules:read"
-    },
-    {
-      "id": "jules_create_session",
-      "scope": "jules:write"
-    },
-    {
-      "id": "jules_send_message",
-      "scope": "jules:write"
-    },
-    {
-      "id": "jules_approve_plan",
-      "scope": "jules:write"
-    }
-  ],
-  "normative_turn_required": false,
-  "security": {
-    "acl": "exact subject/source/branch/capability; fail-closed",
-    "api_key": "server environment only; never commit or export",
-    "plan_approval": "required for every subject; only jules_approve_plan approves a pending plan",
-    "local_bridge": "OAuth 2.1 Authorization Code + PKCE; refresh token protected by DPAPI CurrentUser",
-    "no_production_mutation_until_operator_acceptance": true
-  },
-  "task_ref": "docs/frentes/observabilidad-mcp/📁 🧭 - Tareas provisionales/📁 🧩 - KHORA-MCP-TASK-003 - Jules - puente local OAuth y RDC/README.md"
+    "schema":  "khora-mcp-functional-module/1",
+    "id":  "jules",
+    "name":  "Jules",
+    "version":  "0.1.0",
+    "status":  "implementation_in_progress",
+    "kind":  "server_side_mcp_module",
+    "parent":  {
+                   "front":  "KHORA-MCP",
+                   "ocp":  "docs/frentes/observabilidad-mcp/",
+                   "control":  "docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json",
+                   "control_generation":  9,
+                   "independent_control":  false,
+                   "active_responsibility_scope":  "module:jules",
+                   "module_alias":  "chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314"
+               },
+    "runtime":  {
+                    "entrypoint":  "khora-web/lib/server/mcp-jules.ts",
+                    "registration_export":  "registerMcpModules ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ registerJulesMcpModule",
+                    "host":  "khora-web/app/api/mcp/route.ts",
+                    "transport":  "shared_streamable_http",
+                    "endpoint":  "/api/mcp",
+                    "registry":  "khora-web/lib/server/mcp-module-registry.ts",
+                    "client_host":  "ChatGPT Desktop/Codex shared user config: ~/.codex/config.toml; remote Streamable HTTP + OAuth CIMD"
+                },
+    "tools":  [
+                  {
+                      "id":  "jules_list_sources",
+                      "scope":  "jules:read"
+                  },
+                  {
+                      "id":  "jules_list_sessions",
+                      "scope":  "jules:read"
+                  },
+                  {
+                      "id":  "jules_get_session",
+                      "scope":  "jules:read"
+                  },
+                  {
+                      "id":  "jules_list_activities",
+                      "scope":  "jules:read"
+                  },
+                  {
+                      "id":  "jules_create_session",
+                      "scope":  "jules:write"
+                  },
+                  {
+                      "id":  "jules_send_message",
+                      "scope":  "jules:write"
+                  },
+                  {
+                      "id":  "jules_approve_plan",
+                      "scope":  "jules:write"
+                  }
+              ],
+    "normative_turn_required":  false,
+    "security":  {
+                     "acl":  "exact subject/source/branch/capability; fail-closed",
+                     "api_key":  "server environment only; never commit or export",
+                     "plan_approval":  "requirePlanApproval=true for every subject; explicit jules_approve_plan with plan_id and plan_sha256",
+                     "local_bridge":  "Fallback only: local stdio via RDC with OAuth PKCE and DPAPI CurrentUser",
+                     "no_production_mutation_until_operator_acceptance":  true
+                 },
+    "task_ref":  "docs/frentes/observabilidad-mcp/📁 🧭 - Tareas provisionales/📁 🧩 - KHORA-MCP-TASK-003 - Jules - puente local OAuth y RDC/README.md"
 }

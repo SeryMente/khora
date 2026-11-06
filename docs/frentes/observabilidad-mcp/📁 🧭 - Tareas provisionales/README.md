@@ -23,17 +23,17 @@ El patrón reproduce el índice de frente y un núcleo README por tarea empleado
 
 | Orden | ID local | Estado | Tarea | Núcleo |
 |---:|---|---|---|---|
-| 1 | KHORA-MCP-TASK-001 | completada | Reconstruir workspace y recuperar continuidad documental | [núcleo](./%F0%9F%93%81%20%F0%9F%A7%A9%20-%20KHORA-MCP-TASK-001%20-%20Continuidad%20y%20reconstrucci%C3%B3n%20del%20workspace/README.md) |
-| 2 | KHORA-MCP-TASK-002 | en_curso | General — acceso MCP, catálogo, scopes y observabilidad | [núcleo](./%F0%9F%93%81%20%F0%9F%A7%A9%20-%20KHORA-MCP-TASK-002%20-%20General%20-%20acceso%20y%20observabilidad/README.md) |
-| 3 | KHORA-MCP-TASK-003 | en_curso | Jules — puente local OAuth/RDC y aceptación E2E | [núcleo](./%F0%9F%93%81%20%F0%9F%A7%A9%20-%20KHORA-MCP-TASK-003%20-%20Jules%20-%20puente%20local%20OAuth%20y%20RDC/README.md) |
+| 1 | KHORA-MCP-TASK-003 | en_curso | **Jules — integración ChatGPT Desktop/Codex, OAuth CIMD y ciclo de desarrollo E2E** | [núcleo](./%F0%9F%93%81%20%F0%9F%A7%A9%20-%20KHORA-MCP-TASK-003%20-%20Jules%20-%20puente%20local%20OAuth%20y%20RDC/README.md) |
+| 2 | KHORA-MCP-TASK-001 | completada | Continuidad documental y reconstrucción del workspace — antecedente cerrado | [núcleo](./%F0%9F%93%81%20%F0%9F%A7%A9%20-%20KHORA-MCP-TASK-001%20-%20Continuidad%20y%20reconstrucci%C3%B3n%20del%20workspace/README.md) |
+| 3 | KHORA-MCP-TASK-002 | en_curso | General — trabajo MCP transversal no bloqueante para el resultado Jules | [núcleo](./%F0%9F%93%81%20%F0%9F%A7%A9%20-%20KHORA-MCP-TASK-002%20-%20General%20-%20acceso%20y%20observabilidad/README.md) |
 
 ## Secuencia y criterio de orden
 
-1. **Continuidad primero:** conservar los originales, reinstanciar el workspace en el equipo Windows RDC realmente conectado y comprobar el checkout. El PC-14 anterior está fuera de línea y no se presupone que su perfil o DPAPI sean transferibles.
-2. **General después:** asegurar la base MCP compartida —endpoint, transporte, autenticación, catálogo, scopes, consultas y límites—. Jules depende de esta base y no debe validarse contra un contrato MCP no comprobado.
-3. **Jules al final:** continuar desde el puente ya integrado, completar el Preview/configuración no sensible, obtener consentimiento OAuth del propietario en el navegador y verificar las siete herramientas y lecturas reales. La prueba de humo es de lectura; no crea sesiones ni aprueba planes.
+1. **TASK-003 Jules — prioridad única activa:** integrar ChatGPT Desktop/Codex por el endpoint MCP remoto de Khora con OAuth CIMD, validar las siete herramientas y completar el método de encargo, revisión/aprobación de plan, seguimiento y verificación del resultado.
+2. **TASK-001 Continuidad — cerrada:** conservarla como antecedente completado. No consume más trabajo operativo salvo que una pérdida real de workspace obligue a reabrirla.
+3. **TASK-002 General — fuera de la ruta crítica Jules:** permanece en su estado histórico en_curso, sin declararla completada ni eliminarla. Solo se atienden los contratos compartidos mínimos que bloqueen de manera demostrable la autenticación, el catálogo, scopes o transporte que utiliza Jules. El diagnóstico general de observabilidad, Dictado y Custodia no condiciona el cierre del resultado Jules.
 
-El orden es operativo, no introduce prioridad universal, fecha límite ni responsable independiente. No se crean tareas paralelas para cada defecto de Preview, despliegue o consentimiento: esos puntos pertenecen al objeto Jules o a General según el contrato afectado.
+Este orden es específico para el resultado solicitado; no crea prioridades globales, tareas nuevas, responsables ni dependencias adicionales. El puente local stdio/RDC queda como contingencia. No se requiere culminar toda TASK-002 para completar la integración ChatGPT–Jules.
 
 ## Estado de continuidad · 2026-10-31
 

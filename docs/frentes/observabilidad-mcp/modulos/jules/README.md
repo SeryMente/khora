@@ -4,8 +4,8 @@
 **Estado:** implementación modular en curso; no aceptado end-to-end.  
 **FT padre:** KHORA-MCP.  
 **OCP heredado:** `docs/frentes/observabilidad-mcp/`.  
-**Control heredado:** `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`, generación 8. No existe control de responsabilidad independiente para el módulo.  
-**Titular del FT padre:** `chatgpt-khora-mcp-01a19962-c730-7308-975-5bb49e2d`.  
+**Control heredado:** `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`, generación 9. No existe control de responsabilidad independiente para el módulo.
+**Titular del FT padre:** `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229`.
 **Corresponsabilidad acotada al módulo:** `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314` (alias operativo local; no es ID nativo).  
 **Evento de incorporación:** `KHORA-MCP-ADD-CO-RESPONSIBLE-JULES-20261101-8585E314`.
 
@@ -15,7 +15,7 @@
 
 > Espera da mnarcha atras, y haz que en  vez de asumir frente de Khora MCP, asumas y crees modulo Jules, en Khora MCP, ya hay infraestrucutra para modulos.
 
-**Interpretación operativa:** encapsular la integración Jules como módulo funcional del servidor MCP de Khora, manteniendo sus siete herramientas, contratos, scopes especializados, cliente upstream, ACL por recurso, puente local OAuth/RDC, telemetría/diagnóstico, pruebas y documentación. Jules continúa siendo una capacidad del endpoint MCP único, no un segundo servidor, FT, OCP ni control de responsabilidad.
+**Interpretación operativa:** encapsular la integración Jules como módulo funcional del servidor MCP de Khora, manteniendo sus siete herramientas, contratos, scopes especializados, cliente upstream, ACL por recurso, conexión ChatGPT Desktop/Codex por OAuth CIMD, y puente local OAuth/RDC como contingencia, telemetría/diagnóstico, pruebas y documentación. Jules continúa siendo una capacidad del endpoint MCP único, no un segundo servidor, FT, OCP ni control de responsabilidad.
 
 ## 2. Naturaleza y límites
 
@@ -40,7 +40,8 @@ El servidor MCP de Khora ya organiza capacidades en servicios separados bajo `kh
 | Host MCP único | `khora-web/app/api/mcp/route.ts` | Provee autenticación Bearer/OAuth, servidor, transporte y contexto; registra el módulo. |
 | Cliente upstream | `khora-web/lib/jules/client.ts` | Acceso al API de Jules. |
 | ACL | `khora-web/lib/server/jules-access.ts` | Valida sujeto, fuente, rama y capacidad en modo fail-closed. |
-| Puente local | `khora-web/tools/jules-rdc-bridge/` | Cliente MCP por stdio con OAuth PKCE y custodia local DPAPI CurrentUser. |
+| Cliente ChatGPT Desktop/Codex | C:\Users\<usuario>\.codex\config.toml | Cliente Streamable HTTP del host MCP único, OAuth/CIMD y PKCE; configuración compartida con Codex CLI/IDE. |
+| Puente local alternativo | `khora-web/tools/jules-rdc-bridge/` | Cliente MCP por stdio con OAuth PKCE y custodia local DPAPI CurrentUser. |
 | Tarea de ejecución | [KHORA-MCP-TASK-003](../../📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20KHORA-MCP-TASK-003%20-%20Jules%20-%20puente%20local%20OAuth%20y%20RDC/README.md) | Conserva el plan de trabajo y la aceptación del puente local. |
 
 ## 4. Catálogo funcional
@@ -70,24 +71,26 @@ Las herramientas Jules usan sus scopes propios y no requieren `norm:turn`; se ma
 
 ## 6. Estado y evidencia
 
-**Implementado en la rama:** extracción del bloque de handlers a `mcp-jules.ts`; el host registra el módulo mediante `registerJulesMcpModule`; el fixture de pruebas transpila y carga el módulo separado; el test de contrato comprueba el registro modular y la existencia de las siete herramientas y scopes.
+**Implementado en el checkout reconciliado:** módulo mcp-jules.ts registrado en el host común; siete herramientas/handlers y scopes separados; consentimiento CIMD/OAuth preparado para ChatGPT Desktop/Codex. La creación de sesión en el módulo exige requirePlanApproval=true para todos los sujetos.
 
-**Pendiente de ejecutar/verificar:** suite unitaria, TypeScript, lint, build y CI de esta rama; pruebas OAuth/RDC en el perfil vigente; smoke test autenticado de solo lectura de fuentes/sesiones; revisión de logs y reconciliación de cualquier fallo. Los resultados históricos del PC-14 no se presentan como ejecución actual.
+**Verificado en el corte 2026-11-06:** 53/53 pruebas focalizadas OAuth/Jules; suite completa 572/572; typecheck, contrato UI y UI Review PASS; build Next.js 16.4.0 PASS con 78/78 páginas. La configuración local khora_jules HTTP/OAuth fue leída de vuelta. Production acepta la metadata/callback CIMD ChatGPT y redirige a login normal, pero no se completó consentimiento ni invocación autenticada.
 
-**No realizado:** merge, despliegue, cambios de Production, rotación/eliminación de secretos, migraciones o escrituras/deletes en Neon, creación de sesión Jules real o aprobación de plan.
+**Bloqueo explícito de escritura:** Production consultado sigue desplegado en 953e69484eabb4e8dc8221d1d8fc188373531bfa, donde el propietario puede evitar la aprobación (requirePlanApproval: !developerOwner). El módulo extraído de la rama obliga a aprobación en todos los casos. El host ChatGPT local expone únicamente las cuatro herramientas read-only hasta que la corrección se publique y compruebe.
+
+**No realizado:** OAuth consent real, token autenticado, tools/list live, lecturas reales de fuentes/sesiones, creación de sesión, envío de mensaje, aprobación de plan, merge de PR o despliegue nuevo.
 
 ## 7. Criterios de aceptación del módulo
 
-1. El host MCP único registra los siete handlers desde `mcp-jules.ts`; no hay endpoint duplicado.
-2. `tools/list`, `MCP_TOOL_SCOPES`, metadata OAuth, consentimiento, intercambio de tokens y tokens manuales concuerdan.
-3. Las cuatro lecturas requieren `jules:read`; las tres escrituras requieren `jules:write`; no se añade `norm:turn` a Jules por implicación.
-4. ACL y validación exacta de fuente/rama siguen fail-closed.
-5. Los tests cubren autorización, límites de recursos, plan cambiante y errores saneados.
-6. La suite y build se ejecutan en la rama actual y se conservan sus salidas verificables.
-7. La prueba local OAuth/RDC se completa con consentimiento visible, refresh token bajo DPAPI CurrentUser del SID vigente y read-back.
-8. Las lecturas autenticadas reales devuelven fuentes/sesiones y se verifica su procedencia.
-9. El operador acepta la evidencia antes de cualquier merge/deploy o modificación de Production.
+1. El host MCP único registra los siete handlers desde mcp-jules.ts; no hay endpoint duplicado.
+2. ChatGPT Desktop/Codex conecta por Streamable HTTP a /api/mcp mediante OAuth/CIMD y consentimiento del propietario.
+3. tools/list, metadata OAuth, scopes y handlers concuerdan: cuatro lecturas jules:read, tres escrituras jules:write, sin norm:turn para Jules.
+4. Toda creación aplica requirePlanApproval=true, también al propietario; jules_approve_plan exige plan_id y plan_sha256.
+5. ACL por sujeto/fuente/rama/capacidad y validación de recursos siguen fail-closed; residual T22 documentado.
+6. Suite, typecheck, contratos y build se ejecutan y conservan por SHA.
+7. Fuentes, sesiones y actividades reales se leen con identidad autenticada; posteriormente, un encargo real autorizado se procesa con aprobación humana del plan, seguimiento y verificación de PR/commit/tests.
+8. La configuración local no contiene Bearer literal ni secretos; la escritura requiere scopes y aprobación explícita por herramienta.
+9. El puente local RDC/DPAPI queda como alternativa, no como dependencia de la integración Desktop.
 
 ## 8. Próximo checkpoint
 
-Completar pruebas locales del módulo extraído, resolver cualquier discrepancia de importación/fixture, actualizar la crónica del OCP padre y dejar una PR de revisión sin merge. La aceptación de escritura Jules se excluye del smoke test de lectura y requerirá instrucción expresa independiente.
+Completar el consentimiento OAuth desde ChatGPT Desktop/Codex y verificar cuatro herramientas de lectura en vivo. Mantener las escrituras deshabilitadas hasta publicar y comprobar en Production la exigencia requirePlanApproval=true para todos los sujetos; después, ampliar scope y catálogo de escritura con aprobación del operador. No crear una sesión real durante el smoke test.

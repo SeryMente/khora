@@ -4,7 +4,7 @@
 - Frente único vigente: **Khora MCP**; identidad canónica `KHORA-MCP`.
 - Nombre e identidad histórica: **Observabilidad MCP** / `OBSERVABILIDAD-MCP`. La ruta heredada `docs/frentes/observabilidad-mcp/` se conserva; no se migra ni duplica el OCP o su control.
 - Repositorio: `SeryMente/khora`; OCP único: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`; control único: `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`.
-- OCP: **v0.3.12**. Control de responsabilidad: **generación 9**, titular global operativo `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229`.
+- OCP: **v0.3.13**. Control de responsabilidad: **generación 9**, titular global operativo `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229`.
 - La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local del titular global registrado: `01a199dd-30ba-7843-92ae-278ff01d4229`; no es un ID nativo.
 - Corresponsable arquitectónico del módulo Jules: `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; su autoridad es modular y no equivale a titularidad global.
 - Folio global y folio de sesión: **PENDIENTE / NO ASIGNADO**; FOL1 está PREPARADO, NO ACTIVO. El control vigente tiene `session_folio: null`; el candidato anterior se conserva solo como antecedente no emitido en el registro de corrección.
@@ -74,7 +74,17 @@ La verificación de B debe distinguir:
 - **Cliente MCP local operado mediante RDC:** alternativa legítima para invocar Khora desde un cliente compatible instalado/autorizado en el equipo; no equivale a que ChatGPT Free tenga herramientas MCP nativas.
 - **Handoff manual ChatGPT ↔ cliente local:** viable como asistencia humana, pero no se etiqueta como integración ni ejecución autónoma de ChatGPT.
 
-### 4.5 Exclusiones
+### 4.5 ChatGPT Desktop/Codex — ruta principal de integración Jules
+La ruta operativa seleccionada es ChatGPT Desktop mediante el host MCP de Codex, conectado directamente al endpoint remoto compartido https://khora-web.vercel.app/api/mcp por transporte Streamable HTTP. La aplicación de escritorio, Codex CLI y la integración IDE comparten el archivo de configuración de usuario C:\Users\<usuario>\.codex\config.toml; no se crea un host, endpoint ni servidor Jules paralelo.
+
+El servidor se registra como cliente OAuth público de ChatGPT mediante su documento CIMD oficial (https://chatgpt.com/oauth/client.json), callback oficial https://chatgpt.com/connector_platform_oauth_redirect, Authorization Code + PKCE S256 y recurso canónico del MCP. No se configura un Bearer literal, no se copia un token a un archivo de configuración, no se extraen cookies ni secretos del navegador y no se exporta JULES_API_KEY fuera de Production.
+
+La configuración inicial expone únicamente las cuatro herramientas de lectura (jules:read + offline_access) hasta que Production contenga la exigencia obligatoria de aprobación de plan para el propietario. La configuración mantiene aprobación de usuario para las herramientas de escritura (default_tools_approval_mode = "writes"); cuando el servidor y su consentimiento OAuth estén preparados, se habilitarán explícitamente jules:write y las tres herramientas de escritura. Los límites de herramienta y scope se verifican conjuntamente contra tools/list, los handlers y la metadata OAuth.
+
+Esta ruta de Desktop/Codex es distinta de la conexión MCP personalizada de ChatGPT web, cuyos requisitos de plan y permisos se describen en §4.3. El puente bridge.mjs por stdio/RDC con PKCE y DPAPI CurrentUser se conserva como contingencia técnica, no como dependencia ni como sustituto de la conexión de escritorio. El callback loopback del DCR nativo devolvió invalid_redirect_uri en el Production desplegado y no se utiliza como ruta principal.
+
+El consentimiento real del propietario en la aplicación de escritorio sigue siendo explícito y no se simula. El read-back de config.toml, la metadata CIMD y una redirección al inicio de sesión solo acreditan preparación/validación previa; no acreditan todavía una sesión OAuth autorizada, tools/list autenticado ni lecturas Jules reales.
+### 4.6 Exclusiones
 No incluye la pantalla/micrófono, transcripción o reparación UX de Dictado; cambios al frente/ACL/datos de Custodia; creación de un segundo almacén autoritativo; exposición de audio, transcripciones, secretos o payloads sensibles; permisos globales; administración general de Jules; cambios de credenciales no aprobados; ni escrituras de base de datos fuera de la migración ACL y sus concesiones expresamente autorizadas.
 
 ## 5. Roles y colaboración
@@ -113,19 +123,21 @@ La publicación de código queda sujeta a pruebas y a los pasos de integración 
 - Las pruebas deben verificar rechazo sin ACL, lectura autorizada, denegación de escritura sin `jules:write` y exposición mínima en `tools/list`.
 
 ## 9. Aceptación
-El frente solo se considera aceptado cuando:
-1. El código de `main` coincide con el SHA de la implementación aprobada.
-2. Migración y privilegios ACL se verifican en la base productiva; `KHORA_READONLY_DATABASE_URL` está configurada. El rol efectivo se verifica al habilitar sujetos adicionales que consulten ACL; el propietario evita esa consulta.
-3. El `sub` OAuth del propietario se coteja con `MCP_ALLOWED_EMAIL`, y la cuenta Jules configurada publica fuentes/ramas reales; grants exactos solo para sujetos adicionales.
-4. OAuth metadata, scopes, `tools/list` y handlers concuerdan en Production.
-5. Suite automatizada y tests de contrato pasan; CI incluye evidencia de ejecución real.
-6. La cuenta ChatGPT/espacio de trabajo permite conexión MCP personalizada con escritura; la aplicación se registra por OAuth y tools/list descubre las siete herramientas Jules.
-7. Un cliente MCP compatible ejecuta lectura y escritura en la cuenta Jules configurada y verifica los límites/denegaciones.
-8. Se documenta el cliente efectivamente usado: ChatGPT web nativo, o alternativa local/API claramente diferenciada.
-9. Se verifica saneamiento de datos y se conserva el residual T22.
+El módulo Jules se considera aceptado cuando:
+1. La versión aprobada del módulo está integrada en el único host MCP de KHORA-MCP y main contiene el SHA exacto revisado.
+2. El cliente ChatGPT Desktop/Codex se autentica mediante CIMD + OAuth Authorization Code/PKCE, con consentimiento explícito del propietario y sin Bearer manual ni extracción de sesión.
+3. tools/list, metadata OAuth, scopes y handlers concuerdan: cuatro lecturas jules:read; tres escrituras jules:write; sin norm:turn para Jules.
+4. Toda creación de sesión exige requirePlanApproval=true, también para el propietario; jules_approve_plan coteja plan_id y plan_sha256, relee estado/actividades y conserva documentado el residual T22.
+5. Las cuatro lecturas devuelven datos reales autenticados de fuentes, sesiones y actividades, con controles fail-closed y proyección saneada.
+6. Las escrituras se habilitan solo tras el consentimiento/scope requerido, aprobación por herramienta en ChatGPT y una petición concreta del operador. El primer ciclo de escritura crea una sesión controlada, revisa el plan, obtiene aprobación explícita, supervisa actividades y verifica la PR/resultado sin auto-merge.
+7. La suite, typecheck, contratos y build pasan sobre el SHA exacto; CI remoto solo cuenta si ejecuta pasos reales. Se conservan resultados locales cuando CI no dispone de runner.
+8. Se verifica la conexión desde la aplicación de escritorio efectivamente utilizada; no se confunde con ChatGPT web ni con el puente local alternativo.
+9. Se documentan SHA, identidad autenticada, scopes, fuentes/branch, sesión, plan, actividades, PR, pruebas, límites y read-back. No se declara aceptación E2E por metadata, build o tests sintéticos.
 
-Estado actual: **IMPLEMENTACIÓN Y BUILD DE PREVIEW VERIFICADOS; CAMBIO DE ACCESO DEL PROPIETARIO INCORPORADO A LA RAMA; ACEPTACIÓN CHATGPT/JULES END-TO-END PENDIENTE**. El build de Preview no sustituye la conexión OAuth real desde ChatGPT ni una llamada real a Jules.
+Estado al corte 2026-11-06: IMPLEMENTACIÓN LOCAL Y BUILD VERIFICADOS; 572/572 UNITARIAS, TYPECHECK, CONTRATOS Y UI REVIEW PASS; CONFIGURACIÓN CHATGPT DESKTOP/CODEX PREPARADA EN SOLO LECTURA; CONSENTIMIENTO OAUTH Y LECTURAS AUTENTICADAS REALES PENDIENTES; ESCRITURAS BLOQUEADAS HASTA CORREGIR LA APROBACIÓN OBLIGATORIA DEL PLAN EN PRODUCTION.
 
+## 10. Formato de ciclo
+Registrar titularidad/generación, DUG/Metacanon/GOW, SHA base y resultado, diferencia de rama, migración/read-back, tests, entorno y URL, identidad/scopes, aceptación, límites y siguiente acción. Distinguir propuesto, autorizado, intentado, ejecutado, verificado y aceptado.
 ## 10. Formato de ciclo
 Registrar titularidad/generación, DUG/Metacanon/GOW, SHA base y resultado, diferencia de rama, migración/read-back, tests, entorno y URL, identidad/scopes, aceptación, límites y siguiente acción. Distinguir propuesto, autorizado, intentado, ejecutado, verificado y aceptado.
 
@@ -524,3 +536,39 @@ Se completó la tarea provisional `KHORA-MCP-TASK-001` en el perfil RDC vigente:
 `KHORA-MCP-TASK-001` queda **completada** conforme a su criterio de cierre: workspace restaurado, remoto/HEAD cotejados, dependencias utilizables, pruebas y build satisfactorios, higiene local comprobada y evidencias persistidas en [BACKLOG-CHECKLIST.md](./BACKLOG-CHECKLIST.md) y el núcleo de TASK-001.
 
 TASK-002 General continúa `en_curso`, con la compuerta de privacidad de observabilidad descrita en el checklist. TASK-003 Jules continúa `en_curso` y conserva su autoridad arquitectónica modular. El cierre de TASK-001 no altera el control generación 9 ni amplía permisos productivos.
+## 29. Integración ChatGPT Desktop/Codex con el módulo Jules — corte 2026-11-06
+
+### 29.1 Resultado buscado y decisión de transporte
+El único resultado operativo de esta intervención es que ChatGPT pueda delegar trabajo de desarrollo a Jules mediante el módulo module:jules del único OCP KHORA-MCP y procesar el ciclo completo de encargo, plan, aprobación, seguimiento y verificación. La ruta principal seleccionada es ChatGPT Desktop/Codex → Streamable HTTP → https://khora-web.vercel.app/api/mcp → siete herramientas Jules. No se abre un frente, OCP, control, endpoint ni servidor paralelo.
+
+La configuración de usuario de Codex/ChatGPT Desktop se encuentra en C:\Users\fila4\.codex\config.toml; se comparte con Codex CLI y la integración IDE. Se registró khora_jules por HTTP/OAuth CIMD. SHA-256 anterior 436AAC90D674C197FB7A2AFDA31A175B1EC8F9479F6427C2B40BA27442D8BD0; SHA-256 tras configuración de solo lectura 4E43B3E96B2344B78E4EF025AD60638255F4CC37C6760B3D5C7DCC9456CD8637. Read-back y codex mcp list confirmaron URL, servidor, scopes, herramientas expuestas y ausencia de command/Bearer literal en este bloque.
+
+Configuración preparada: jules:read offline_access; herramientas habilitadas jules_list_sources, jules_list_sessions, jules_get_session y jules_list_activities; aprobación de usuario para escrituras (default_tools_approval_mode = "writes"). Las escrituras no se publican en esta fase.
+
+### 29.2 Validación OAuth en Production
+El deployment consultado dpl_6Ndatsufuk5iLFzvbzHpwNQCh6HB permanece READY en Production sobre el commit 953e69484eabb4e8dc8221d1d8fc188373531bfa. Metadata del Authorization Server y del Protected Resource devolvieron HTTP 200; /api/mcp sin credencial devolvió HTTP 401 esperado.
+
+Se obtuvo el documento oficial CIMD https://chatgpt.com/oauth/client.json; client_id, callback https://chatgpt.com/connector_platform_oauth_redirect y método público none se cotejaron. Una solicitud OAuth de preflight con PKCE S256, recurso canónico y scopes jules:read jules:write offline_access fue aceptada por la validación de cliente/redirect/scopes y redirigida con HTTP 307 al inicio de sesión habitual de Khora. Esto no completa login ni consentimiento y no es evidencia de token emitido.
+
+El DCR de cliente local con callback http://127.0.0.1:<puerto>/oauth/callback devolvió HTTP 400 invalid_redirect_uri en el deployment consultado. Por ello no se utiliza como ruta principal. No se copió ningún secreto de Vercel/Production a Windows y no se leyó valor alguno de las variables sensibles.
+
+### 29.3 Reconciliación y evidencia local
+Se reconstruyó el checkout en C:\Users\fila4\Desktop\Khora\khora-main, perfil CENTRAL\fila4, rama feat/khora-mcp-module-jules-20261101. Se integró localmente origin/main sin conflictos mediante merge no forzado: commit 190ed77cf0faadeae1ae7b9e5909177a0aad23d3; origin/main era d4f29f7044b80b30e01e00bf2ae2fc5f0207f0c2. El merge no se ha publicado ni se ha fusionado la PR #349.
+
+En ese checkout:
+- Pruebas focalizadas OAuth/Jules: 53/53 PASS.
+- Suite unitaria completa: 572/572 PASS, 0 fallos, 0 omitidos.
+- npm run typecheck: PASS.
+- npm run ui:contract: PASS.
+- npm run ui-review:check: PASS.
+- npx next build --webpack: PASS, Next.js 16.4.0, TypeScript completado y 78/78 páginas estáticas. Warnings no bloqueantes observados: convención middleware deprecada y referencias Edge Runtime en dependencias.
+- FFmpeg de ffmpeg-static se materializó únicamente para que las dos pruebas reales de codec corrieran; SHA-256 del binario 04E1307997530F9CF2FE35CBA2CA7E8875CA91DA02F89D6C7243DF819C94AD00. TEMP/TMP se fijaron al perfil fila4. No se ejecutó preflight de almacenamiento, ni se leyó/escribió DB.
+
+### 29.4 Compuertas pendientes y orden inmediato
+1. Recargar ChatGPT Desktop desde su interfaz para que lea la configuración MCP de usuario; completar el consentimiento OAuth oficial que la aplicación presente. El consentimiento no se simula desde RDC.
+2. Verificar conexión autenticada, tools/list real y lecturas reales de fuentes, sesiones y actividades. Todavía no se ha obtenido token, no hay consentimiento otorgado y ninguna de las herramientas se ha invocado autenticada.
+3. Corregir en el módulo desplegable jules_create_session: el main/Production consultado permite que el propietario cree una sesión con requirePlanApproval: false (!developerOwner). El módulo separado de la rama exige requirePlanApproval: true para todos los sujetos. Esa protección debe estar en el código revisado y publicado antes de habilitar jules:write.
+4. Mantener los cuatro read tools como único catálogo expuesto en la configuración de ChatGPT hasta que la protección obligatoria de aprobación esté desplegada y comprobada. Después, ampliar scopes a jules:read jules:write offline_access y habilitar las otras tres herramientas con aprobación writes.
+5. Ejecutar un encargo real acotado cuando el operador lo solicite: crear sesión en fuente/rama elegidas, inspeccionar el plan y su SHA-256, presentar el plan al operador, aprobarlo solo con autorización explícita, seguir actividades y verificar PR/commit/tests. Merge y despliegue quedan fuera sin autorización específica.
+
+Preview no tiene las variables OAuth/MCP productivas y no se copiarán secretos de Production a Preview. El runner CI remoto observado históricamente no ejecutó steps (runner_id=0, steps=[]); se debe reintentar solo si existe un cambio causal de infraestructura. No se declara OAuth, lectura real ni aceptación E2E completada en este corte.
