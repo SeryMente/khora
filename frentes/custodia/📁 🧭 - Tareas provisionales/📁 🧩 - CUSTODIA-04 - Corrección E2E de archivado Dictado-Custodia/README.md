@@ -1,4 +1,4 @@
-<!-- TASK_STATUS=PROVISIONAL; PARENT_TASK=CUSTODIA-04; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true; DIAGNOSTIC_STATUS=STATICALLY_VERIFIED; ROOT_CAUSE_OF_REPORTED_SESSION=UNDETERMINED; PRODUCT_FIX=IMPLEMENTED_IN_ISOLATED_BRANCH; VALIDATION_PENDING -->
+<!-- TASK_STATUS=PROVISIONAL; PARENT_TASK=CUSTODIA-04; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true; DIAGNOSTIC_STATUS=STATICALLY_VERIFIED; ROOT_CAUSE_OF_REPORTED_SESSION=UNDETERMINED; PRODUCT_FIX=IMPLEMENTED_IN_ISOLATED_BRANCH; VALIDATION=BLOCKED_NO_RUNNER -->
 # CUSTODIA-04 · Incidente de archivado Dictado → Custodia
 
 **Estado:** `en_curso` · expediente provisional de la tarea existente CUSTODIA-04.  
@@ -294,6 +294,8 @@ Se reintentaron los jobs fallidos de las primeras ejecuciones; la siguiente ejec
 
 Los checks Vercel heredados para commits de PR devolvieron failure con destino de actualización del plan `github-private-org-to-hobby`; no son resultados de build/E2E. No se generó deployment Preview ni Production por esta PR.
 
+En la punta final documentada `56a7f713168c36d0780a590b572ac9e17c622097`, GitHub volvió a crear las tres ejecuciones `CI` (`42301830097`), `UI Quality` (`42301830081`) y `khora-ok / gate` (`42301830015`). A las `2026-11-06T22:04:31Z`, los seis jobs asociados reportaron `runner_id=0`, `runner_name=""`, `steps=[]` y conclusión `failure`. Se confirma por tanto que tampoco esta punta ejecutó los controles; no se infiere fallo de código ni aprobación.
+
 ### 12.5 · Concurrencia entre «Reintentar y archivar» y «Archivar registro»
 
 La revisión de la punta posterior detectó una carrera posible: la acción secundaria podía iniciar el drenaje de reintentos y, antes de terminar, otro evento de archivo podía continuar por el camino principal. El drenaje de partes ya era *single-flight*, pero eso no garantizaba que la operación completa de archivado fuera única.
@@ -329,4 +331,4 @@ La revisión de la punta posterior detectó una carrera posible: la acción secu
 
 **Bloqueo de validación:** los runners de GitHub Actions no se están asignando (jobs con runner 0 y cero pasos). No se usó una estación de trabajo remota distinta sin confirmar que fuera el entorno autorizado. Para completar la verificación hace falta una ejecución real de los controles desde un runner disponible o el checkout local autorizado. La implementación no se declara aceptada ni lista para desplegar hasta obtener esa evidencia.
 
-**Siguiente secuencia:** desbloquear un runner; ejecutar typecheck, unitarias, UI contracts, build y la prueba Playwright focalizada; corregir cualquier fallo real; ejecutar una prueba con proveedor autorizado no productivo y lectura física de vuelta; reconciliar el recibo con el manifiesto del servidor. Mantener PR en borrador mientras cualquiera de esas compuertas falle o permanezca sin evidencia.
+**Siguiente secuencia:** desbloquear un runner; ejecutar typecheck, unitarias, UI contracts, build y la prueba Playwright focalizada; corregir cualquier fallo real; ejecutar una prueba con proveedor autorizado no productivo y lectura física de vuelta; reconciliar el recibo con el manifiesto del servidor. Mantener PR en borrador mientras cualquiera de esas compuertas falle o permanezca sin evidencia. La punta final de la rama tras el expediente y la actualización de la descripción de PR #354 es `56a7f713168c36d0780a590b572ac9e17c622097`; el último `main` observado es `aa11ece612866378296c34a3f9305071d58ad175`. La PR conserva `base_sha=d4f29f7044b80b30e01e00bf2ae2fc5f0207f0c2` y GitHub la reporta mergeable, pero permanece borrador y no se integró.
