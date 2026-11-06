@@ -17,7 +17,8 @@ La lista sigue provisional; ni el relevo ni esta revalidación certifican su dis
 - **Alcance y orden operativo vigente:** (1) CUSTODIA-03, prioridad inmediata: localizar, cotejar y rescatar primero los dictados considerados ausentes/perdidos y las fuentes históricas con potencial de recuperación; (2) CUSTODIA-01: recuperar y verificar después todas las unidades visibles en Ingresos → Dictado → Recuperación; (3) CUSTODIA-04: corregir las brechas sistémicas y certificar el flujo E2E. En CUSTODIA-04 se permite un paréntesis breve, de solo lectura, para revisar el error «Archivar registro», pero no desplaza ni demora el rescate ni autoriza por sí mismo cambios de producto/producción. CUSTODIA-02 permanece retirada y su identificador no se reutiliza. No se afirma que estas tres tareas sean el inventario exhaustivo de todas las obligaciones futuras del frente.
 - **Regla provisional de custodia de información:** no copiar a este repositorio el texto o audio de dictados reales, secretos, credenciales ni identificadores personales innecesarios. Registrar resultados mediante evidencia minimizada y sanitizada, en el soporte autorizado que corresponda.
 
-- **
+### Secuencia de ejecución · antecedente histórico y secuencia vigente
+
 Secuencia histórica (C006; antecedente conservado y supersedido por la secuencia operativa vigente del 2026-11-06):
   1. Línea base no destructiva de CUSTODIA-03.
   2. Recuperación de CUSTODIA-01 en paralelo con investigación de ausencias.
