@@ -1321,6 +1321,12 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
   }, [archivado, texto, titulo, pulidosOk, observarDictado, guardarCheckpoint, reintentarCustodia]);
 
 
+  const reintentarYArchivar=useCallback(async()=>{
+    if(guardando||finalizandoRef.current||activoRef.current)return;
+    const confirmada=await reintentarCustodia();
+    if(confirmada)await guardar();
+  },[guardando,reintentarCustodia,guardar]);
+
   const exportarMp3Conservado = useCallback(async()=>{
     const id=sesionIdRef.current;if(!id)return;
     setExportandoAudio(true);setError("");
@@ -1675,7 +1681,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
         onPrepararChrome: prepararChrome,
         onDialogoChange:(enabled)=>{if(enabled&&!texto.trim()&&!conAudio&&!titulo.trim()&&estado!=="dictando"&&!guardando)onDialogo();},
         onDetener: detener,
-        onReintentarCustodia:()=>void reintentarCustodia(),
+        onReintentarCustodia:()=>void reintentarYArchivar(),
         onGuardar: guardar,
         onRetranscribir: ejecutarTranscripcionAutoritativa,
         onAdjuntarClick: () => fileInputRef.current?.click(),
