@@ -207,6 +207,8 @@ La propuesta continúa sin comprobar los bytes actuales de los objetos remotos n
 
 **Estado al registrar la actualización:** expediente documentado y leído de vuelta en rama; diagnóstico de omisión de reintentos automáticos confirmado estáticamente; causa de la captura específica todavía NO DETERMINADA; corrección de código aún no implementada; pruebas nuevas y proveedor no productivo pendientes. Garantías NO CERTIFICADAS.
 
+**Actualización de ejecución posterior · 2026-11-06:** se implementó en la rama aislada `fix/custodia-04-dictado-archivar-e2e-20261106` una barrera *single-flight* de reintentos, drenaje automático antes de validar y acción visible «Reintentar y archivar», manteniendo el bloqueo cuando persiste una parte sin confirmación. Se añadieron pruebas de 503 transitorio→éxito y 502 persistente con preservación del texto/no-bypass. PR [#354](https://github.com/SeryMente/khora/pull/354) abierta en borrador, sin merge. La validación de CI sigue bloqueada antes de los pasos: las ejecuciones consultadas fallan con `runner_id=0`, `runner_name=""` y `steps=[]`; no se afirma que typecheck, pruebas o build se hayan ejecutado. El proveedor real no productivo, read-back físico, causa runtime de la sesión reportada y aceptación siguen pendientes. Main/Production no se modificaron. El expediente detallado CUSTODIA-04 conserva el historial y la evidencia.
+
 **Decisión de estructura:** no crear CUSTODIA-05. Estos criterios amplían CUSTODIA-04, cuyo objetivo existente ya abarca correcciones y pruebas E2E; crear un ID superior duplicaría el mismo resultado. CUSTODIA-02 permanece retirada y no se reutiliza.
 
 
