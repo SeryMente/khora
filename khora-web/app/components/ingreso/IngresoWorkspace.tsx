@@ -1223,7 +1223,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
           : "La cola de subida no pudo cerrarse; la captura permanece sin sellar.";
         setCustodiaDetalle(actual=>[detallePendientes,actual].filter(Boolean).join(" "));
         setCustodiaEstado("Archivo detenido: quedan partes de audio sin confirmar.");
-        setError("No se puede archivar el registro: "+detallePendientes+" No se omitirá ninguna parte; el texto y las copias locales se conservan.");
+        setError("No se puede archivar el registro: Khora no ha verificado la custodia íntegra de todas las partes de audio. "+detallePendientes+" No se omitirá ninguna parte; el texto y las copias locales se conservan.");
         observarDictado("ARCHIVO_BLOQUEADO_POR_AUDIO_PENDIENTE",{severity:"WARN",outcome:"PARTIAL",reasonCode:"audio_parts_pending",metrics:{part_count:partesSubidasRef.current.length,pending_chunks:pendientes.length}});
         return;
       }
