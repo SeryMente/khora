@@ -256,8 +256,8 @@
     {
       "path": "OBJETO-CANONICO.md",
       "bytes": 178372,
-      "sha256": "CFE3573F04D5348DF88179D32E6BC01AFAED2A8CB5C0E0F193DED0112E41233D",
-      "git_blob_sha": "b6a9871557a81603a370839f3729947bd12ff568"
+      "sha256": "0DB41B2442A3F58F539346702DBE43AEC2B156FAD01BB3102ED519CC54A4D894",
+      "git_blob_sha": "a1d83ccb7fd2b222af4b8f2d7754351467436219"
     },
     {
       "path": "evidencias/dialogo.test.ts",
@@ -351,9 +351,9 @@
     },
     {
       "path": "CONTROL-RESPONSABILIDAD.json",
-      "bytes": 9131,
-      "sha256": "2AD0BA32269A8A9C3B610A040E804A86676D32C36CF23C1551B4CFF1BBC5B481",
-      "git_blob_sha": "0536dc44354b6ee7938de59216bcbd9c1f6133cf"
+      "bytes": 9169,
+      "sha256": "8FC99E589D48DF4D1B28FE9FA2B21D0F5C58BA3C80CA81A0A0D2A0BA75A6FE23",
+      "git_blob_sha": "8fa5721013b47b88729b38869c712863bc6a69d7"
     },
     {
       "path": "originales/CONTINUIDAD-C031-20261022.jsonl",
@@ -525,7 +525,7 @@
     "version": "0.6.20",
     "baseSha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "receipt": "evidencias/C030-release.json",
-    "state": "C045: titularidad gen. 6 y original exportado incorporados; OCP/control/manifiesto releídos. No product code, tests, PR state, credentials, deployments or production changes."
+    "state": "C045 final: original export byte identity verified; transfer control generation 6 read back; OCP v0.6.20 and manifest updated and read back. No product code, tests, PR actions, credentials, provider, deployment or production changes."
   },
   "latestEvent": "C045 — Retoma documental, transferencia de Dictado de generación 5 a 6 e incorporación byte a byte de ChatGPT-DICTADO-20261106-1540.txt; OCP y manifiesto actualizados. Sin cambios de producto, pruebas, PR ni producción.",
   "latest_verified_release": {
@@ -653,13 +653,14 @@
   "responsibility_control": {
     "path": "CONTROL-RESPONSABILIDAD.json",
     "full_path": "docs/frentes/dictado-voz/CONTROL-RESPONSABILIDAD.json",
-    "blob": "0536dc44354b6ee7938de59216bcbd9c1f6133cf",
-    "commit": "aa11ece612866378296c34a3f9305071d58ad175",
+    "blob": "8fa5721013b47b88729b38869c712863bc6a69d7",
+    "commit": "d9e9e84820916dddb1ce31ba975d7f49265f9802",
     "generation": 6,
     "status": "assigned",
     "session_folio": "PENDIENTE/NO ASIGNADO",
     "owner_alias": "chatgpt-dictado-01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3",
     "local_conversation_uuidv7": "01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3",
+    "readback_verified": true,
     "global_uniqueness": "not_verified"
   },
   "conversation_continuity": {
@@ -677,11 +678,11 @@
   "latest_object": {
     "version": "0.6.20",
     "ref": "main",
-    "blob_sha": "b6a9871557a81603a370839f3729947bd12ff568",
-    "commit": "88e7a2088b692c78540ecbce15c7e6f553d52b61",
+    "blob_sha": "a1d83ccb7fd2b222af4b8f2d7754351467436219",
+    "commit": "0f9369d7ee0101fc581bb2230f079aa452f2d216",
     "bytes": 178372,
-    "sha256": "CFE3573F04D5348DF88179D32E6BC01AFAED2A8CB5C0E0F193DED0112E41233D",
-    "state": "C045: transfer generation 5→6; original export preserved byte-for-byte; no product code, tests, deployment or functional acceptance."
+    "sha256": "0DB41B2442A3F58F539346702DBE43AEC2B156FAD01BB3102ED519CC54A4D894",
+    "state": "C045: transfer generation 5→6 and original export preserved byte-for-byte; control, OCP and manifest read back. No product code, tests, deployment or functional acceptance."
   },
   "recent_verbatim_instruction_ingestion": {
     "path": "originales/INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl",
