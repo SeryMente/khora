@@ -1,4 +1,4 @@
-<!-- TASK_STATUS=PROVISIONAL; PARENT_TASK=CUSTODIA-04; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true; DIAGNOSTIC_STATUS=STATICALLY_VERIFIED; ROOT_CAUSE_OF_REPORTED_SESSION=UNDETERMINED; PRODUCT_FIX=NOT_IMPLEMENTED -->
+<!-- TASK_STATUS=PROVISIONAL; PARENT_TASK=CUSTODIA-04; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true; DIAGNOSTIC_STATUS=STATICALLY_VERIFIED; ROOT_CAUSE_OF_REPORTED_SESSION=UNDETERMINED; PRODUCT_FIX=IMPLEMENTED_IN_ISOLATED_BRANCH; VALIDATION_PENDING -->
 # CUSTODIA-04 · Incidente de archivado Dictado → Custodia
 
 **Estado:** `en_curso` · expediente provisional de la tarea existente CUSTODIA-04.  
@@ -233,3 +233,86 @@ El expediente solo podrá cerrarse cuando:
 ## Registro de cambios
 
 - **2026-11-06 · Alta de expediente CUSTODIA-04 / Incidente de archivado Dictado→Custodia:** se estructura el diagnóstico, las verificaciones, límites forenses, solución y criterios E2E a partir del commit productivo `953e694...` y de `main` `d4f29f7...`. No se modifica código en esta operación documental. El defecto cliente de reintento omitido queda confirmado estáticamente; la causa runtime de la captura del operador sigue abierta.
+
+
+## 12. Actualización de ejecución · 2026-11-06 · implementación en rama
+
+Esta sección actualiza el estado de ejecución de §11. §11 conserva deliberadamente la fotografía histórica del instante en que se creó el expediente; no debe interpretarse como estado actual.
+
+### 12.1 Corrección implementada en la rama aislada
+
+**Rama:** `fix/custodia-04-dictado-archivar-e2e-20261106`  
+**Base:** `d4f29f7044b80b30e01e00bf2ae2fc5f0207f0c2`  
+**Head observado de PR #354:** `1f69fb3f16c3d49f5a90e37a1a76f6625426445c`  
+**PR:** [#354 · fix(dictado): reintentar custodia de audio antes de archivar](https://github.com/SeryMente/khora/pull/354) · OPEN · DRAFT · NOT MERGED.
+
+Cambios actuales leídos de vuelta:
+
+| Archivo | Blob SHA actual |
+|---|---|
+| `khora-web/app/components/ingreso/IngresoWorkspace.tsx` | `1b36f7fb9bca46f66686cd9a72964b84e12c938e` |
+| `khora-web/app/components/shared/IngresoView.tsx` | `7170dca2e7efa7506f00cb9fa6d8cf4467821db1` |
+| `khora-web/e2e/contracts/audio-por-partes.spec.ts` | `8470889c17bb8cb334501c4913a3a4dce0be8946` |
+
+La corrección del cliente ahora:
+
+1. Serializa los drenajes de reintento mediante una promesa *single-flight* para evitar dos recorridos concurrentes de la misma cola.
+2. Rechaza iniciar el drenaje mientras la captura siga activa o finalizando.
+3. Espera la subida que ya estaba en curso y recorre las partes pendientes en orden de índice, reutilizando el cierre de subida existente y sus mismas identidades/contenidos.
+4. Al pulsar «Archivar registro», guarda checkpoint, espera la subida actual y drena automáticamente los reintentos antes de validar el manifiesto y llamar a `/api/dictado`.
+5. Si una parte continúa pendiente, no invoca el endpoint de archivo; conserva texto y copia local, mantiene el bloqueo de integridad y muestra los índices pendientes.
+6. Alinea el diagnóstico del manifiesto con el evaluador común para detallar si faltan partes, hay índices inválidos o no se cumple bytes/SHA/estado verificado.
+7. Ofrece «Reintentar y archivar» como acción visible directamente cuando el contador de partes pendientes es mayor que cero. La acción solo continúa al archivo si el reintento obtiene confirmación; no se ofrece para errores de manifiesto sin elementos pendientes en la cola.
+
+La compuerta de Custodia en servidor no se eliminó, relajó ni sustituyó. No se modificó el endpoint productivo, el esquema DB, el proveedor, credenciales ni configuración de producción.
+
+### 12.2 Regresión añadida
+
+En `audio-por-partes.spec.ts` se añadió el caso `archive retries transient audio failures before sending the verified manifest`:
+
+- simula que las tres tentativas iniciales responden 503;
+- confirma que al detener queda una parte pendiente y aún no se llama a `/api/dictado`;
+- al pulsar «Archivar registro», la cuarta petición de audio se confirma con bytes y SHA calculados sobre el Blob de la prueba;
+- exige una sola llamada de archivo y que el manifiesto enviado contenga una parte con `verificado:true` y SHA-256 válido.
+
+El caso permanente 502 se conserva y ahora comprueba que el texto sigue en el editor, que aparece la acción «Reintentar y archivar» y que, al reiterar el fallo permanente, el endpoint de archivo sigue sin ser llamado y el texto continúa disponible.
+
+Estas pruebas son contratos de navegador con proveedor simulado. No demuestran almacenamiento físico, disponibilidad actual del Blob ni integración productiva.
+
+### 12.3 Estado real de validación automatizada
+
+Se abrió PR #354 como **borrador** para activar los workflows de CI, UI Quality y `khora-ok / gate`, sin habilitar el auto-merge ni el despliegue de producción.
+
+GitHub Actions inició ejecuciones para las puntas de los commits `863da9d0e03b5ad95ec3caef7053f7ad062777bd`, `87d8cc3f11624039ce7488e3d72948ecb21148fd` y `bfcf6c17f40d538f7f851beaaa7a363974c67ccf`. En las consultas de detalle a cada job, GitHub devolvió:
+
+- `runner_id = 0`;
+- `runner_name = ""`;
+- `steps = []`;
+- conclusión `failure` en aproximadamente 2–3 segundos.
+
+Se reintentaron los jobs fallidos de las primeras ejecuciones; la siguiente ejecución volvió a terminar sin asignar runner ni ejecutar pasos. Por tanto, **no existe evidencia de que typecheck, unitarias, UI contract, build o Playwright se hayan ejecutado**. El estado no debe interpretarse como fallo de aserciones de producto ni como aprobación de código.
+
+Los checks Vercel heredados para commits de PR devolvieron failure con destino de actualización del plan `github-private-org-to-hobby`; no son resultados de build/E2E. No se generó deployment Preview ni Production por esta PR.
+
+### 12.4 Estado actualizado
+
+| Elemento | Estado |
+|---|---|
+| Expediente provisional documentado y enlazado | VERIFICADO EN RAMA |
+| Defecto cliente de reintento omitido | CONFIRMADO ESTÁTICAMENTE |
+| Corrección del flujo de archivado | IMPLEMENTADA EN RAMA AISLADA |
+| Acción visible «Reintentar y archivar» | IMPLEMENTADA EN RAMA AISLADA |
+| Prueba retry-transitorio→éxito | AÑADIDA; NO EJECUTADA |
+| Prueba fallo permanente y no-bypass | AMPLIADA; NO EJECUTADA |
+| Typecheck, unitarias, UI contract y build | PENDIENTES DE EJECUCIÓN |
+| Suite Playwright | PENDIENTE DE EJECUCIÓN |
+| Proveedor real no productivo y read-back físico | PENDIENTES |
+| Causa runtime de la captura original | NO DETERMINADA |
+| Verificación de esta captura real del operador | NO REALIZADA |
+| PR #354 | OPEN · DRAFT · NOT MERGED |
+| Main / Production | SIN CAMBIOS EN ESTE CICLO |
+| Aceptación del operador | PENDIENTE |
+
+**Bloqueo de validación:** los runners de GitHub Actions no se están asignando (jobs con runner 0 y cero pasos). No se usó una estación de trabajo remota distinta sin confirmar que fuera el entorno autorizado. Para completar la verificación hace falta una ejecución real de los controles desde un runner disponible o el checkout local autorizado. La implementación no se declara aceptada ni lista para desplegar hasta obtener esa evidencia.
+
+**Siguiente secuencia:** desbloquear un runner; ejecutar typecheck, unitarias, UI contracts, build y la prueba Playwright focalizada; corregir cualquier fallo real; ejecutar una prueba con proveedor autorizado no productivo y lectura física de vuelta; reconciliar el recibo con el manifiesto del servidor. Mantener PR en borrador mientras cualquiera de esas compuertas falle o permanezca sin evidencia.
