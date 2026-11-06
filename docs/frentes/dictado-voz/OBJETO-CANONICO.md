@@ -6,10 +6,10 @@
 - Identidad canónica: `DICTADO`; `MCP-OBS-DICTADO` queda como identidad agregada histórica.
 - Repositorio: `SeryMente/khora`, rama `main`.
 - OCP heredado: `docs/frentes/dictado-voz/`.
-- Versión: **v0.6.18 · DICTADO-v0.6.18**, no es versión de producto.
-- Estado: C044 · responsabilidad transferida · alcance separado · producto no revalidado.
-- Control: generación **4**, folio `SES-20261030-97109848`, alias operativo `chatgpt-dictado-ses-20261030-97109848`.
-- UUIDv7 local de esta conversación: `01a18d84-31e0-7dca-b0f7-90e4b3c58f12`; no es ID nativo de plataforma.
+- Versión: **v0.6.19 · DICTADO-v0.6.19**, no es versión de producto.
+- Estado: titularidad transferida a esta conversación el 2026-11-06 (generación 4→5); alcance de Dictado conservado; producto no revalidado funcionalmente.
+- Control: generación **5**, folio `PENDIENTE/NO ASIGNADO` (FOL1 PREPARADA, NO ACTIVA), alias operativo `chatgpt-dictado-01a1b26b-ef3c-788a-b7ea-e48d456f0beb`.
+- UUIDv7 local de esta conversación: `01a1b26b-ef3c-788a-b7ea-e48d456f0beb`; no es ID nativo de plataforma. Instancia: `chatgpt-dictado-INSTANCE-20261106-01A1B26BEF3C`.
 - Frente independiente relacionado: Observabilidad MCP en `docs/frentes/observabilidad-mcp/`, con control propio sin titular asignado.
 - Custodia transversal conserva su propio OCP/titularidad; Dictado solo integra sus contratos.
 - Material fuera del alcance estricto se conserva en la crónica y queda clasificado en §4; no se borra ni reasigna automáticamente.
@@ -29,14 +29,14 @@ Los contenidos de la etapa mixta permanecen como historia con procedencia; su in
 ## 3. Referencia metodológica
 
 Fuente: `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`.
-- **DUG:** Samantha v363 · NX-363m.
-- **Metacanon:** 1.25.
-- **GOW:** 2.12.
-- **Blob:** `501f7f6ec8bfd0a8289eb0c1e3897c19a0281be7`; commit main `b4bc9f8ef4485e44973e9c17f6c4f9a1119d698d`.
-- **Lectura:** 2026-10-30.
+- **DUG:** Samantha v377 · NX-377m.
+- **Metacanon:** 1.28.
+- **GOW:** 2.17.
+- **Blob DUG:** `54064c8fe00f872023a455f06596061ed69062ae`; commit main `8ee2482866b3dd085e58e05006727256d0274376` (2026-11-01T21:57:30Z).
+- **Lectura:** 2026-11-06.
 - **MCP-NORMATIVO:** DESACTIVADO.
 
-Se revisaron P001, P004, P005, P037, P038; Metacanon §§39, 42, 47, 48 y 51; y el vocabulario inicial/GOW. El propósito original del nuevo frente Observabilidad MCP está preservado verbatim en su OCP con interpretación separada. El MCP-NORMATIVO del DUG es distinto del servidor MCP de producto de Khora.
+Se leyó §ARR y se adquirió el DUG vigente; se revisaron la cascada y los principios pertinentes P001, P004, P005, P035, P037–P043, junto con Metacanon §§4, 29, 42, 46–48 y GOW 2.17. MCP-NORMATIVO permanece DESACTIVADO. El propósito original del nuevo frente Observabilidad MCP está preservado verbatim en su OCP con interpretación separada. El MCP-NORMATIVO del DUG es distinto del servidor MCP de producto de Khora.
 
 ## 4. Propósito y alcance
 
@@ -68,7 +68,7 @@ Los originales y evidencias previos permanecen en sus ubicaciones; no se crea un
 ## 5. Roles y colaboración
 
 - Operador: dueño del propósito, consentimiento, decisiones materiales y aceptación humana.
-- Asistencia responsable actual: esta instancia, control gen. 4 y folio `SES-20261030-97109848`; alias operativo `chatgpt-dictado-ses-20261030-97109848`.
+- Asistencia responsable actual: esta instancia, control gen. 5; folio `PENDIENTE/NO ASIGNADO`; alias operativo `chatgpt-dictado-01a1b26b-ef3c-788a-b7ea-e48d456f0beb`; UUIDv7 local `01a1b26b-ef3c-788a-b7ea-e48d456f0beb`.
 - Constructor independiente: no asignado en C044; no inventar roles.
 - Observabilidad MCP: frente independiente sin titular asignado en C044.
 - Custodia: mantiene su titularidad transversal; Dictado consume sus contratos.
@@ -80,6 +80,7 @@ Los originales y evidencias previos permanecen en sus ubicaciones; no se crea un
 |---|---|---|
 | Separar Dictado y Observabilidad MCP | Autorizada por instrucción directa C044 | Dos OCP y controles independientes. |
 | Transferir Dictado gen. 3→4 | Autorizada por respuesta afirmativa directa | Exclusivamente Dictado. |
+| Transferir Dictado gen. 4→5 | Autorizada por instrucción directa `Transfer Responsibility` del 2026-11-06 | Exclusivamente Dictado; no amplía permisos de código ni producción. |
 | Limitar Dictado a captura/transcripción/UI | Instrucción directa C044 | Benchmark, Diálogo, Ingreso general, MCP y publicación quedan fuera. |
 | Integración con Custodia | Contrato transversal existente | No transferir titularidad de Custodia. |
 | PR #335 | Candidato amplio de Ingreso U01–U06 | No se atribuye íntegramente a Dictado ni se fusiona por C044. |
@@ -99,6 +100,16 @@ La etapa mixta se conserva en la crónica y el Anexo A; sus citas no reactivan a
 - C044 es una separación documental; no altera código de producto.
 
 ## 8. Estado vivo
+
+### Transferencia de responsabilidad gen. 4→5 — 2026-11-06
+
+- **Autorización literal:** «Transfer Responsibility», elegida por el operador en respuesta a la alternativa explícita entre sustituir al titular y añadir una segunda sesión. Operación ejecutada: `TRANSFER_RESPONSIBILITY`; no se añadió corresponsable.
+- **Control previo:** generación 4; titular `chatgpt-dictado-ses-20261030-97109848`; blob `a954353055ef30770aae0b5ca40e1f61cfc3d8dd`.
+- **Control vigente:** generación 5; alias `chatgpt-dictado-01a1b26b-ef3c-788a-b7ea-e48d456f0beb`; instancia `chatgpt-dictado-INSTANCE-20261106-01A1B26BEF3C`; UUIDv7 local `01a1b26b-ef3c-788a-b7ea-e48d456f0beb`; evento `DICTADO-TRANSFER-20261106-EAD64490`.
+- **Persistencia del control:** commit `b779d7beea3c7b03316bf8165e11cedb94d3b4ea`; blob nuevo `38afbbb1215a1fc821f5ac750fb9a055aa12dea7`. Lectura de vuelta en `main`: 11 comprobaciones satisfactorias de generación, titularidad, autorización, evento, identidad local, folio y SHA.
+- **Folio de sesión:** PENDIENTE/NO ASIGNADO. FOL1 está PREPARADA, NO ACTIVA; no se emite un folio hasta que la activación sea verificable.
+- **Alcance:** responsabilidad exclusiva del OCP Dictado. No autoriza cambios de código, credenciales, proveedores, seguridad, workflows, despliegue, producción o aceptación funcional. No se ejecutaron pruebas ni cambios de producto durante el traspaso.
+- **Estado funcional heredado:** permanece NO REVALIDADO; el cambio de titularidad no acredita que el producto esté corregido o aceptado.
 
 ### C044 · transferencia y separación
 Control anterior: blob `ff3a148420e547323717a620c1c5b695a4fa79e5`, generación 3, titular `chatgpt-dictado-voz-SES-20261028-Q7M4N9K2`, folio `SES-20261028-Q7M4N9K2`. El operador autorizó sustituir exclusivamente esa titularidad. Se registra generación 4, folio `SES-20261030-97109848`, alias `chatgpt-dictado-ses-20261030-97109848`, UUIDv7 local `01a18d84-31e0-7dca-b0f7-90e4b3c58f12` y evento `DICTADO-TRANSFER-C044-SES-20261030-97109848`. La declaración de transferencia se considera completada tras cotejar la lectura de vuelta.

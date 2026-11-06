@@ -1,0 +1,83 @@
+REGISTRO DOCUMENTAL DEL FRENTE CUSTODIA
+Archivo: ChatGPT-CUSTODIA-20261106-1424.txt
+Repositorio: SeryMente/khora
+Rama: main
+Ruta canónica: frentes/custodia/originales/
+Fecha del insumo: 2026-11-06
+Hora declarada en nombre de archivo: 14:24 America/Mexico_City (parte del nombre solicitado; no acredita hora exacta de captura del archivo)
+Clase: original textual parcial de instrucción del operador + registro de análisis documental
+Alcance de transcripción: conserva literalmente el segmento de dictado que el operador delimitó. No es una exportación nativa completa de la conversación ni del entorno RDC.
+
+PROCEDENCIA Y LÍMITES
+El operador solicitó documentar esta sesión mediante persistencia documental, retomar la responsabilidad del frente Custodia con autorización previa y revisar el dictado que sigue. La instrucción verbal se conserva literalmente abajo. El registro técnico de RDC fue recibido, pero no se reproduce en este archivo: contenía un código temporal de vinculación, correo y otros identificadores de dispositivo innecesarios para el diagnóstico. Se conserva solo el resultado operativo minimizado: la estación declarada 015RENTA01 no figuró online en la consulta; la estación que sí figuró online era distinta y su perfil local quedó excluido por la regla metodológica de perfil Windows. No se hizo ninguna escritura local por RDC.
+
+A — SEGMENTO VERBATIM RECIBIDO DEL OPERADOR
+
+FIN DE SEGMENTO PARA DICTADO
+Bueno, mira, además de lo que tengas pendiente, que yo no sé qué será, debemos esta sesión de asegurarnos que el dictado sea funcional de extremo a extremo. ¿A qué me refiero por de extremo a extremo? La responsabilidad de este frente de trabajo empieza ahí donde el usuario ingresa a la pantalla dictado, pasando por el momento en el que el usuario presiona el botón de iniciar transcripción, o no sé cómo se tenga iniciar dictado en la versión actual, hasta el momento en el que se hace clic en el botón archivar registro. Tal es el alcance de tu ámbito de responsabilidad para el frente dictado de este repositorio y nos vamos a asegurar que esté funcionando de extremo a extremo. De hecho, se sabe que en este momento no lo está, ya que me está dando un error al momento de hacer clic en el botón archivar registro. Me dice... a ver, ahorita te voy a decir qué dice, permíteme. En algunos momentos más te voy a decir qué es lo que me aparece por error cuando hago clic en el botón archivar registro. Nada más voy a dictar un poco. Es importante... bueno, ¿qué más te puedo añadir para complementar? Lo que le dicto al sistema, que armonices con el frente de trabajo custodia, cuyo ámbito de responsabilidad comienza ahí donde hago clic en el botón archivar registro y bueno, no te corresponde a ti saber dónde acaba, pero sí saber que ese instante en el que hago clic en el botón archivar registro es el mismo instante en el que empieza el ámbito de responsabilidad del frente de trabajo custodia para que armonices con las necesidades de ese otro frente de trabajo. El error que aparece es: no se puede archivar el registro. Cora no ha verificado la custodia íntegra de todas las partes de audio. Ese es el error que me debe de... que debes de ver a ver si corresponde a tu ámbito o al de custodia. Investígalo.
+FIN DE SEGMENTO PARA DICTADO
+
+B — ANÁLISIS DEL LÍMITE ENTRE FRENTES
+El operador define dos responsabilidades que comparten un evento de frontera, sin convertirlas en un único frente:
+- Dictado: empieza al entrar en la pantalla Dictado y cubre el inicio, la adquisición/captura, transcripción, conservación incremental, cierre de la grabación, finalización de partes y preparación de un registro archivatable.
+- Custodia: empieza exactamente cuando el usuario activa «Archivar registro». Desde ese evento verifica el contrato de integridad presentado por Dictado, coteja las partes contra el manifiesto persistido del servidor, evita sellar registros incompletos y mantiene una ruta de recuperación comprobable.
+- Interfaz compartida: el clic en «Archivar registro» es el mismo evento temporal en que termina la responsabilidad de Dictado y comienza la de Custodia. La integración debe tener un contrato explícito y pruebas conjuntas. Custodia no debe exigir evidencia que Dictado no exponga; Dictado no debe declarar archivado ni borrar sus copias locales antes de recibir confirmación durable de Custodia.
+
+ERROR REPORTADO (CITA DEL OPERADOR)
+«No se puede archivar el registro. Cora no ha verificado la custodia íntegra de todas las partes de audio.»
+El texto del cliente localizado actualmente en el repositorio usa «Khora»: «No se puede archivar el registro: Khora no ha verificado la custodia íntegra de todas las partes de audio.» Se conserva la forma «Cora» en la cita del operador y no se altera retroactivamente.
+
+IDENTIDAD DEL REPOSITORIO Y FUENTES LEÍDAS
+- Repositorio: SeryMente/khora, rama main.
+- Commit de main leído: 2ed0904336e6009b0f101167d8673e54116c014c.
+- OCP único de Custodia: frentes/custodia/OBJETO-CANONICO.md.
+- Control único: frentes/custodia/CONTROL-RESPONSABILIDAD.json.
+- Lista auxiliar provisional: frentes/custodia/LISTA-TAREAS-PROVISIONAL.md.
+- DUG canónico: SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html; Samantha v377 · NX-377m; Metacanon 1.28; GOW 2.17; blob SHA 54064c8fe00f872023a455f06596061ed69062ae; commit main 8ee2482866b3dd085e58e05006727256d0274376.
+- MCP-NORMATIVO: DESACTIVADO; no se afirma verificación normativa por MCP.
+
+HALLAZGOS TÉCNICOS EN CÓDIGO — ESTÁTICOS, NO REPRODUCCIÓN EN EJECUCIÓN
+1. En khora-web/app/components/ingreso/IngresoWorkspace.tsx, la función guardar() ejecuta una compuerta cliente y emite el error anterior antes de enviar el POST a /api/dictado. El rechazo visible se origina, por tanto, en la ruta de interfaz de Dictado, no en una respuesta HTTP de la ruta de archivado.
+2. Para fuentes de audio esperadas (micrófono, chrome_live_caption y audio_archivo), el cliente exige partes verificadas, bytes positivos, SHA-256 de 64 caracteres hexadecimales y continuidad de índices. Para micrófono también compara el número de partes generadas con las partes disponibles.
+3. La subida de una parte se hace por subirParteActual(). El cliente intenta conservar primero un original local en IndexedDB y después llama a subirAudioCustodiado(). Si la subida remota falla, la parte queda en pendingUploadsRef y el usuario ve una indicación de fallo/reintento. El error de subida se captura y la promesa puede resolverse después de registrar el pendiente. El botón de archivado espera la promesa de subida en curso, pero la compuerta no ejecuta por sí sola todos los reintentos pendientes antes de rechazar.
+4. Si una subida falla, la parte no aparece en partesSubidasRef como verificada; la compuerta vuelve a rechazar el archivado. Si una captura de micrófono genera cero partes, la compuerta también la clasifica como audio no íntegro. El mensaje genérico no separa ambos escenarios ni informa índice/causa concreta.
+5. Cuando la subida sí tiene éxito, khora-web/app/api/audio/route.ts vuelve a leer el objeto desde Vercel Blob, lo descifra si corresponde y compara el tamaño y el SHA-256 recalculado antes de registrar la parte como verificada. Esta lectura de vuelta demuestra el control en el momento de subida; no demuestra por sí sola la disponibilidad física futura del objeto.
+6. En khora-web/lib/audio/custodia.ts, evaluarCustodiaAudio() valida manifiesto, cantidad/índices, bytes, SHA-256 declarado y estado_verificacion. No vuelve a leer el objeto físico remoto en esa validación.
+7. En khora-web/lib/server/dictado.ts, guardarDictado() coteja la cantidad y firma de las partes recibidas desde el cliente con las filas persistidas de dictado_audio_parte, valida sus metadatos y rechaza discrepancias. El cierre de archivado no hace por sí solo un nuevo GET del objeto Blob en ese punto.
+8. La prueba khora-web/e2e/contracts/audio-por-partes.spec.ts simula el resultado de /api/audio con verificado:true y prueba el envío de audioPartes al POST /api/dictado. También simula un fallo de subida. No prueba escritura/lectura física real del proveedor, reinicio del navegador, rehidratación de todas las partes, ni la recuperación final a partir del objeto remoto.
+9. Hay antecedente en Custodia F-13/R-09: metadatos y SHA declarados en una fila no equivalen a una lectura física actual del objeto y recálculo de SHA. El contrato E2E debe mantener separados «verificado al subir», «presente en el manifiesto servidor» y «recuperable ahora mediante lectura real».
+
+DICTAMEN ACOTADO
+- Propiedad del mensaje mostrado: Dictado, porque la compuerta cliente lo muestra antes de iniciar el POST.
+- Responsabilidad del estado comprobado: compartida. Dictado controla captura, finalización de grabación, generación/cola/reintento de partes y exactitud del manifiesto que envía. Custodia controla la persistencia verificada, conciliación contra el manifiesto servidor, protección de originales, disponibilidad y capacidad de recuperación.
+- No se ha identificado todavía la causa raíz de la sesión concreta del operador: no se adquirió el estado de sus pendingUploads, partesRaw, partesSubidas, manifest/DB rows, eventos de cierre, respuesta de red ni logs de sesión. Las dos causas señaladas (fallo de subida pendiente y captura con cero partes generadas) son rutas posibles demostradas por lectura de código, no un diagnóstico forense de la captura.
+- No se modificó código, base de datos, datos de producción, credenciales, almacenamiento, selector de proveedor ni despliegues. No se ejecutaron pruebas locales ni pruebas contra producción.
+
+CRITERIOS PROPUESTOS PARA CUSTODIA-04 — CONTRATO DICTADO→CUSTODIA
+1. Cerrar la grabación de manera explícita y esperar el evento/acuse de fin de captura; recoger el último chunk y comprobar que no quedan chunks ni subidas en curso/pendientes.
+2. Antes del POST de archivado, comparar el total esperado de partes con índices únicos, contiguos y verificados; si falta una parte, reintentar automáticamente de forma idempotente y conservar el original local; no presentar el caso como «archivado».
+3. Hacer que el reintento de archivado sea seguro ante duplicados, timeout y respuesta perdida: el sessionId y la firma del manifiesto deben resolver el mismo registro sin duplicarlo ni sobrescribir otra captura.
+4. Cotejar el manifiesto de navegador con el manifiesto de servidor vinculado a la sesión. La verificación de Custodia debe comprobar referencias, cantidad, orden, bytes y SHA conforme al contrato acordado.
+5. Separar evidencia de metadatos de lectura física: antes de declarar una garantía de recuperación, leer el objeto almacenado desde el proveedor autorizado, descifrarlo cuando corresponda y recalcular bytes/SHA-256; después cotejar mediante lectura de vuelta del destino, preservando siempre el origen.
+6. Conservar checkpoint recuperable de texto, texto parcial y evidencia de partes durante la captura y antes de archivar. Una falla de audio no debe borrar ni inutilizar texto ya producido. La copia local y la copia remota deben tener estados distintos y explícitos.
+7. Después de recargar/cerrar/reabrir el flujo en un perfil autorizado, reconstruir la sesión desde fuentes persistidas y demostrar que el texto y el audio admisible pueden recuperarse con identidad y procedencia.
+8. La interfaz debe dar una acción primaria clara para «Reintentar y archivar» y un estado concreto y comprensible, con causa discriminada (parte pendiente, parte no generada, índice ausente/duplicado, SHA/bytes inválidos, falta de confirmación del cierre, checkpoint no confirmado o almacenamiento no disponible). No mostrar hashes completos ni contenido privado en telemetría.
+9. Validar mediante pruebas unitarias, integración y navegador, incluyendo fallas inyectadas de red/Blob, ACK tardío, cierre, 0 partes, un único segmento, múltiples segmentos, índices no contiguos/duplicados, timeout, retry idempotente, recarga del navegador y restauración desde servidor. La prueba que simula verificado:true no basta como aceptación.
+10. Validar el comportamiento con usuarios representativos de TDAH: minimizar pasos, impedir pérdida silenciosa, reducir mensajes ambiguos y mantener una ruta recuperable sin exigir que el usuario recuerde ejecutar una operación manual compleja. Esto es un criterio de usabilidad a evaluar; no una afirmación clínica ni una garantía terapéutica.
+
+TAREAS EXISTENTES Y DECISIÓN DE ESTRUCTURA
+- CUSTODIA-01 sigue EN CURSO: recuperar y verificar cada unidad del inventario real de Ingresos → Dictado → Recuperación. Sin catálogo autenticado adquirido en este ciclo; no se declara cero elementos.
+- CUSTODIA-03 sigue ABIERTA: investigar capturas esperadas no visibles y determinar su estado mediante fuentes autorizadas. No se concluye pérdida definitiva.
+- CUSTODIA-04 sigue EN CURSO P0 y recibe este subalcance prioritario: contrato de extremo a extremo Dictado→Custodia en el evento Archivar registro, reintento idempotente, persistencia de checkpoints, lectura física/recuperación, diagnóstico accionable y pruebas integradas.
+- No se crea una cuarta tarea superior ni se reutiliza CUSTODIA-02 (retirada). No se crea CUSTODIA-05 porque el alcance ya pertenece a CUSTODIA-04; el registro de tareas documentará la ampliación para no duplicar un mismo resultado bajo IDs distintos.
+- Las garantías de producto continúan NO CERTIFICADAS hasta cumplir criterios y obtener evidencia en el entorno autorizado.
+
+RESPONSABILIDAD, AUTORIZACIÓN Y EJECUCIÓN
+La autorización previa que el operador invoca fue localizada en el control vigente de Custodia, que registraba generación 6 y titular previo. La instrucción actual de retomar el frente se interpreta como TRANSFER_RESPONSIBILITY (sustitución del titular), no como ADD_CO_RESPONSIBLE. El relevo documental se registra mediante UUIDv7 local y alias operativo; el identificador nativo de conversación no fue expuesto por la plataforma. El folio de sesión permanece PENDIENTE/NO ASIGNADO porque FOL1 no se ha demostrado ACTIVO.
+La autorización previa habilita mantener el OCP y crear/actualizar la persistencia provisional; también conserva el alcance histórico de trabajo en ramas/entornos aislados no productivos para la migración de almacenamiento. No autoriza por sí sola modificar el producto, credenciales, producción, despliegues/cutover, SQL/backfill de producción, seguridad/configuración real del bucket ni eliminar originales. La investigación de código de este registro fue lectura estática remota.
+La lectura RDC confirmó que 015RENTA01 no estaba online en la lista de dispositivos. El equipo alternativo que aparecía online resolvió el perfil C:\Users\MantenimientoRCI; Metacanon §41.2 / P036 excluye expresamente ese perfil como raíz operativa. Se detuvo la intervención local después de la inspección de solo lectura; no se escribió ni se copió ningún artefacto a ese equipo. La persistencia que se solicite en este registro se materializa remotamente en GitHub main y se verifica por lectura de vuelta; no debe confundirse con persistencia local por RDC.
+
+ANTECEDENTE DOCUMENTAL NO DISPONIBLE
+La salida previa solicitada en el historial como ChatGPT-CUSTODIA-20261031-1458.txt no fue localizada en el OCP en las fuentes consultadas. Este archivo no la sustituye y no reconstruye su contenido. La última salida previa del modelo queda NO DISPONIBLE / NO VERIFICADA para esta reinstanciación.
+
+FIN DEL REGISTRO DOCUMENTAL
