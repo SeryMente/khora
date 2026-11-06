@@ -406,6 +406,7 @@ test.describe('Dictado por partes contract test', () => {
     // AUD-05: una sesión de voz sin audio verificado NO puede archivarse.
     expect(dictadoPayload).toBeNull();
 
+    await expect(page.locator('[data-ui-id="ingreso.textarea"]')).toHaveValue(/saving even with failed audio upload/i);
     const errorAlert = page.locator('[data-ui-id="ingreso.msg-error"]').filter({ hasText: /No se puede archivar el registro.*custodia íntegra/i });
     await expect(errorAlert).toBeVisible();
   });
