@@ -35,7 +35,31 @@ async function b2Json<T>(auth:B2Auth, operation:string, payload:Record<string,un
   });
   return jsonResponse<T>(response, `storage_b2_${operation}_failed`);
 }
-async function authorize():Promise<B2Auth> {
+function fileDownloadUrl(auth:B2Auth,bucket:string,key:string) {
+  const encoded=key.split('/').map(encodeURIComponent).join('/');
+  return `${auth.apiInfo.storageApi.downloadUrl.replace(/\/+$/, '')}/file/${encodeURIComponent(bucket)}/${encoded}`;
+}
+async function uploadUrl(auth:B2Auth) {
+  const c=storageLocation();
+  if (!c.bucketId) throw new Error('storage_b2_bucket_config_missing');
+  return b2Json<{bucketId:string;uploadUrl:string;authorizationToken:string}>(auth,'b2_get_upload_url',{bucketId:c.bucketId});
+}
+async function uploadFile(url:string,token:string,key:string,data:Buffer) {
+  const response=await fetch(url,{
+    method:'POST',
+    headers:{
+      Authorization:token,
+      'X-Bz-File-Name':encodeURIComponent(key),
+      'Content-Type':'application/octet-stream',
+      'Content-Length':String(data.length),
+      'X-Bz-Content-Sha1':createHash('sha1').update(data).digest('hex'),
+      'X-Bz-Server-Side-Encryption':'AES256',
+    },
+    body:new Uint8Array(data),
+    cache:'no-store',redirect:'error',signal:AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  });
+  return jsonResponse<{fileId:string;fileName:string;contentLength:number;serverSideEncryption?:{mode:string;algorithm:string}}>(response,'storage_b2_upload_failed');
+}async function authorize():Promise<B2Auth> {
   if (authCache && authCache.expiresAt > Date.now() + 60000) return authCache.auth;
   const { keyId, applicationKey } = credentials();
   const response = await fetch(`https://api.backblazeb2.com/b2api/${API_VERSION}/b2_authorize_account`, {
