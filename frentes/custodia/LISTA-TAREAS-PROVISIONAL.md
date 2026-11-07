@@ -1,11 +1,11 @@
-<!-- LIST_VERSION=0.14; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.15; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.14.
-- **Última actualización:** 2026-11-07 (transferencia de responsabilidad a gen. 8; actualización de estado PR #354; prioridades de recuperación preservadas).
+- **Versión de esta lista provisional:** 0.15.
+- **Última actualización:** 2026-11-07 (seguimiento remoto PR #354; rama divergida y solapamiento documental identificados; titularidad gen. 8).
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
 - **Última lectura de metodología del ciclo 2 (referencia histórica):** Samantha v352 · NX-352m; Metacanon 1.21; GOW v2.3; blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
@@ -143,7 +143,7 @@ Secuencia histórica (C006; antecedente conservado y supersedido por la secuenci
 
 **Prioridad:** P0 · CRÍTICA · PRIORIDAD OPERATIVA #3. La corrección sistémica va después de preservar los candidatos de CUSTODIA-03 y avanzar el catálogo CUSTODIA-01; solo se permite en paralelo el paréntesis de diagnóstico del archivo.
 
-**Estado:** EN CURSO · TERCERA LÍNEA OPERATIVA. Diagnóstico estático documentado y corrección del recorrido de reintento/archivado implementada en rama aislada mediante PR [#354](https://github.com/SeryMente/khora/pull/354), todavía abierta y sin merge. La descripción vigente de la PR documenta validaciones locales aprobadas (typecheck; unitarias 572/572; contrato UI; UI review; Playwright E2E 3/3; diff-check). GitHub Actions no ejecutó pasos en los seis jobs observados (`steps=[]`); no equivale a CI aprobado. En ese corte no se ejecutó `npm run build` ni ensayo con proveedor físico real no productivo. El siguiente paréntesis diagnóstico/runtime continúa subordinado al rescate y no debe interrumpir CUSTODIA-03 ni CUSTODIA-01. La causa runtime exacta de la captura reportada sigue NO DETERMINADA; garantías de producto NO CERTIFICADAS.
+**Estado:** EN CURSO · TERCERA LÍNEA OPERATIVA. Diagnóstico estático documentado y corrección del recorrido de reintento/archivado implementada en rama aislada mediante PR [#354](https://github.com/SeryMente/khora/pull/354), todavía OPEN · DRAFT · NOT MERGED. Su expediente documenta validaciones locales (typecheck; unitarias 572/572; UI Contract; UI Review; Playwright E2E 3/3; diff-check) para el commit `55449a0`; no se atribuyen a una punta posterior no validada. Seis jobs remotos asociados terminaron failure con pasos vacíos; no es CI aprobado. En ese corte no se ejecutó `npm run build` ni ensayo con proveedor físico real no productivo. La comparación actual contra main reporta rama divergida: 32 commits ahead / 7 behind, merge-base `0aa7497a6316772ccf846620685a87b0711e346c`. La PR modifica también `OBJETO-CANONICO.md` y `LISTA-TAREAS-PROVISIONAL.md`, cuyos contenidos en main fueron actualizados después; requiere reconciliación documental antes de integración. No hacer merge/rebase automático. La causa runtime exacta de la captura sigue NO DETERMINADA; garantías de producto NO CERTIFICADAS.
 
 **Objetivo:** concluir la investigación de las brechas de recuperabilidad identificadas y actualizar KHORA para que las unidades admisibles puedan catalogarse, recuperarse y verificarse de manera consistente. No se considera lograda la recuperabilidad por el mero hecho de modificar o compilar código.
 
@@ -209,10 +209,21 @@ La propuesta continúa sin comprobar los bytes actuales de los objetos remotos n
 - La transferencia documental del frente se ejecutó de generación 7 → 8 tras el «Si» explícito del operador; control leído de vuelta. El folio de sesión continúa PENDIENTE/NO ASIGNADO porque FOL1 no está ACTIVO. No se crea CUSTODIA-05 ni se reactiva CUSTODIA-02.
 
 
+### Seguimiento PR #354 · fotografía remota 2026-11-07
+
+- **Estado:** OPEN · DRAFT · NOT MERGED. Se consultó rama `fix/custodia-04-dictado-archivar-e2e-20261106`; comparación con `main`: **diverged**, 32 commits ahead / 7 behind, merge-base `0aa7497a6316772ccf846620685a87b0711e346c`. No se intentó rebase, merge, rerun ni push.
+- **Solapamiento:** los ocho archivos de PR incluyen `OBJETO-CANONICO.md` y `LISTA-TAREAS-PROVISIONAL.md`. La rama conserva snapshots de Custodia en generación 7; `main` ya está en generación 8. Reconciliar ambas rutas documentales antes de cualquier integración; conservar el control gen. 8 y no sobrescribir estado canónico.
+- **CI:** runs `42308741732` (CI), `42308741716` (UI Quality) y `42308741666` (khora-ok/gate). Jobs `128208028419`, `128208028719`, `128208028973`, `128208046111`, `128208046680` y `128208066638` terminaron completed/failure; la consulta de pasos individuales devolvió `[]` para los seis. Por tanto no ejecutaron pruebas. Los contextos Vercel/Netlify continúan rechazados por la restricción del plan/repositorio privado; no son pruebas de código.
+- **Validación local del expediente PR:** commit `55449a08719f04982dbfceb15ec28f43c7b68118`: typecheck, 572/572 unitarias, UI Contract, UI Review, Playwright 3/3 y diff-check reportados aprobados. E2E utiliza respuestas simuladas; `npm run build` no se ejecutó en ese corte. Sin proveedor físico no productivo ni read-back actual.
+- **Evidencia:** [SEGUIMIENTO-PR354-RECONCILIACION-20261107.md](evidencias/SEGUIMIENTO-PR354-RECONCILIACION-20261107.md), blob `9f986a773dcd55bb922d13a9ad8aa6517133d010`. La corrección candidata permanece sin integrar y el producto NO CERTIFICADO.
+
+
 ---
 
 - **2026-11-06 · REORDENAMIENTO-PRIORIDAD-RESCATE · versión 0.13:** se preserva la instrucción literal en [originales/INSTRUCCION-REORDENAMIENTO-PRIORIDAD-RECUPERACION-20261106.md](originales/INSTRUCCION-REORDENAMIENTO-PRIORIDAD-RECUPERACION-20261106.md). La secuencia vigente pasa a CUSTODIA-03 (#1: rescate de ausentes y fuentes candidatas), CUSTODIA-01 (#2: unidades visibles) y CUSTODIA-04 (#3: corrección sistémica); el diagnóstico de «Archivar registro» queda como paréntesis limitado. CUSTODIA-03 se amplía y se coloca primero en el documento, preservando sus identificadores y la historia de tareas. Se prioriza el candidato textual 28-10 20:29/264 checkpoints, seguido de las siete sesiones/1,038 checkpoints, B2, Vercel Blob, IndexedDB del perfil original y otras fuentes autorizadas. Ninguna ruta se declara recuperada por metadatos históricos; no se realizó recuperación productiva en esta actualización.
 ## Registro de cambios
+
+- **2026-11-07 · SEGUIMIENTO-PR354-RECONCILIACION · versión 0.15:** se añade fotografía de rama PR #354 divergida (32 ahead/7 behind), solapamiento de los dos documentos de Custodia con main gen. 8 y seis jobs remotos sin pasos. Se preservan resultados locales reportados para SHA 55449a0, se aclara que no equivalen a CI ni proveedor físico, y se prohíbe inferir aceptación/merge. CUSTODIA-03 → CUSTODIA-01 → CUSTODIA-04 sigue vigente.
 
 - **2026-11-07 · CUSTODIA-TRANSFER-20261107 · versión 0.14:** transferencia de titularidad documental/operativa a generación 8 por autorización expresa «Si» y actualización condicionada por SHA del control; lectura de vuelta verificada. Se actualiza el estado de CUSTODIA-04 con la evidencia actualmente documentada en PR #354: corrección en rama y validaciones locales, CI sin pasos, sin build en ese corte y sin prueba física con proveedor real no productivo. Se mantienen las prioridades CUSTODIA-03 → CUSTODIA-01 → CUSTODIA-04; el frente y sus garantías continúan abiertos/no certificados.
 
