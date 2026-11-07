@@ -4,22 +4,22 @@
 
 ## 1. Decisión de cuenta y credencial
 
-- Usar una **cuenta Backblaze B2 separada y dedicada a KHORA**. No reutilizar la cuenta/bucket de EP (OCP-MCP) ni mezclar prefijos de ambos frentes.
-- Usar exclusivamente la **Master Application Key de la cuenta KHORA** como credencial operativa B2, sin crear claves individuales adicionales, conforme a la instrucción del operador.
-- La Master Key tiene alcance administrativo/global dentro de esa cuenta. La separación de cuenta limita el radio de impacto, pero no convierte la clave en una credencial de mínimo privilegio. No usarla en navegador, cliente, extensión, logs, argumentos de proceso, Git ni chat. Mantenerla solo en el servidor y en la bóveda cifrada de secretos.
-- No crear, rotar ni revocar claves durante la preparación de persistencia. No usar b2 key create como paso de instalación.
-- Los nombres de variables que ya consume el adaptador son una interfaz de compatibilidad, no una afirmación de que exista una Application Key individual:
-  - KHORA_B2_KEY_ID = **Master Key ID** de la cuenta KHORA.
-  - KHORA_B2_APPLICATION_KEY = **Master Application Key** de la cuenta KHORA.
-  - KHORA_B2_BUCKET_NAME = bucket dedicado de KHORA.
-  - KHORA_B2_REGION = región real del bucket.
+- Usar la **cuenta Backblaze B2 existente del operador**, vinculada a su correo principal. No crear otra cuenta, no cambiar de identidad y no volver a provisionar un mecanismo que EP ya haya establecido.
+- Reutilizar el mecanismo operativo B2 de EP como base, conservando el aislamiento entre proyectos. Khora debe operar exclusivamente dentro del bucket/prefijo que se le haya asignado; el namespace de Khora será `khora/` y nunca se listará, modificará ni escribirá en el prefijo de EP `ep-ocp/`.
+- La credencial ya autorizada se mantiene exclusivamente en la bóveda/entorno servidor; no usarla en navegador, cliente, extensión, logs, argumentos de proceso, Git ni chat. No leer, copiar ni volver a escribir secretos si la configuración existente puede utilizarse de forma segura.
+- No crear, rotar ni revocar claves ni buckets durante esta migración salvo que el mecanismo existente demuestre una carencia imprescindible y el operador la autorice expresamente.
+- Los nombres de variables que consume el adaptador representan la configuración B2 existente para Khora; no implican que deba crearse otra cuenta:
+  - KHORA_B2_KEY_ID = identificador de la Application Key autorizada.
+  - KHORA_B2_APPLICATION_KEY = secreto de esa misma key, solo en servidor.
+  - KHORA_B2_BUCKET_NAME = bucket autorizado para el namespace Khora.
+  - KHORA_B2_REGION = región efectiva del bucket.
 - Guardar los dos valores maestros en la bóveda de secretos autorizada, mediante captura en memoria y UI enmascarada; comprobar descifrado/read-back, ACL y respaldo. No mostrar ni registrar valores. No volver a escribir credenciales si ya existen y el cotejo exacto confirma que coinciden.
 
 ## 2. Camino mínimo y reproducible
 
-1. **Cuenta y bucket:** confirmar que la cuenta es la de KHORA; crear/seleccionar un bucket privado dedicado. Mantener separados bucket de pruebas y bucket productivo. Registrar nombre, bucket ID y región, nunca secretos.
+1. **Cuenta y espacio:** usar la cuenta ya existente del operador. Reutilizar el bucket/ mecanismo B2 ya configurado por EP solo con un namespace de Khora claramente aislado (`khora/`); no tocar `ep-ocp/`. No crear cuentas ni buckets para acelerar esta migración salvo autorización expresa posterior.
 2. **Bóveda:** verificar Master Key ID + Master Application Key en la bóveda; no pasar secretos por clipboard salvo captura segura controlada, no incluirlos en comandos ni archivos .env versionados.
-3. **Autenticación CLI aislada:** usar una caché B2 independiente de EP y de cualquier caché histórica. Inyectar la credencial solo al proceso que ejecuta la operación y restaurar/eliminar las variables al terminar. Ejecutar account authorize y account get; comprobar que la identidad corresponde a la cuenta KHORA.
+3. **Autenticación CLI aislada:** reutilizar la autenticación existente sin duplicar cuentas; mantener separado el contexto local de sesión/caché de Khora para evitar contaminación accidental de comandos entre namespaces. Inyectar la credencial solo al proceso que ejecuta la operación y restaurar/eliminar las variables al terminar. Ejecutar account authorize y account get; comprobar que la identidad corresponde a la cuenta B2 existente.
 4. **Preflight no destructivo:** consultar bucket, región, privacidad, cifrado, CORS y lifecycle. No modificar configuración automáticamente. La Master Key permite acciones globales; limitar cada comando por código y revisión al bucket KHORA y a los prefijos previstos.
 5. **Transporte de aplicación:** reutilizar khora-web/lib/server/object-storage.ts. El servidor usa el SDK S3-compatible; el cliente nunca recibe la Master Key. Las cargas temporales se hacen con URL firmada de un solo objeto, expiración breve y CORS de origen exacto.
 6. **Cifrado e integridad:** conservar el sobre cifrado KHC1 de KHORA y exigir SSE-B2/AES256. Tras subir, leer físicamente el objeto, comparar SHA-256 de los bytes cifrados, descifrar y comparar tamaño y SHA-256 del contenido claro.
@@ -41,12 +41,12 @@
 
 ## 4. Variables y límites del código actual
 
-El adaptador y el preflight actuales leen KHORA_B2_KEY_ID y KHORA_B2_APPLICATION_KEY. Se pueden poblar con los valores de la Master Key de la **cuenta separada KHORA** sin crear Application Keys individuales. La Master Key permanece exclusivamente en el servidor. Los guards del migrador E2E deben conservarse: branch/base allowlisted, store ID sintético y bucket de pruebas con prefijo no productivo. No sustituir esos guards por la cuenta productiva ni apuntar el fixture a neondb.
+El adaptador y el preflight actuales leen KHORA_B2_KEY_ID y KHORA_B2_APPLICATION_KEY. Se pueden poblar con los valores de la Master Key de la cuenta B2 existente del operador sin crear Application Keys individuales. La Master Key permanece exclusivamente en el servidor. Los guards del migrador E2E deben conservarse: branch/base allowlisted, store ID sintético y bucket de pruebas con prefijo no productivo. No sustituir esos guards por la cuenta productiva ni apuntar el fixture a neondb.
 
 El preflight puede crear y retirar objetos sintéticos de diagnóstico dentro de sus prefijos propios; nunca debe enumerar, descargar ni borrar objetos de usuario. Las reglas CORS deben permitir únicamente el origen exacto de KHORA y los headers necesarios.
 
 ## 5. Estado y criterio de cierre
 
-Esta nota documenta el camino; no demuestra que la Master Key KHORA ya exista, esté guardada, autenticada o conectada. La rama CUSTODIA-B2 inspeccionada contiene adaptador dual, ledger y migrador reanudable, pero el PR #348 sigue en borrador y la validación E2E real está pendiente. El siguiente paso operativo es provisionar/verificar la cuenta KHORA separada y sus valores Master mediante la bóveda, después ejecutar preflight y E2E sintético en los destinos allowlisted. No se autoriza aquí migrar datos reales, modificar Neon productivo, cambiar el selector de producción, desplegar ni borrar Vercel Blob.
+Esta nota documenta el camino; no demuestra que la Master Key KHORA ya exista, esté guardada, autenticada o conectada. La rama CUSTODIA-B2 inspeccionada contiene adaptador dual, ledger y migrador reanudable, pero el PR #348 sigue en borrador y la validación E2E real está pendiente. El siguiente paso operativo es reutilizar la configuración B2 ya existente mediante la bóveda y verificar únicamente la identidad, el bucket/namespace asignado a Khora, después ejecutar preflight y E2E sintético en los destinos allowlisted. No se autoriza aquí migrar datos reales, modificar Neon productivo, cambiar el selector de producción, desplegar ni borrar Vercel Blob.
 
-**Principio de operación:** una cuenta separada por proyecto + Master Key de esa cuenta en bóveda cifrada + caché B2 aislada + bucket privado dedicado + KHC1/SSE-B2 + backfill reanudable + read-back SHA-256 + referencias transaccionales + originales Blob retenidos.
+**Principio de operación:** cuenta B2 existente del operador + aislamiento de namespace Khora frente a EP + credencial en bóveda + KHC1/SSE-B2 + backfill reanudable + read-back SHA-256 + referencias transaccionales + originales Blob retenidos.
