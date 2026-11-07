@@ -493,3 +493,17 @@ La PR #354 permanece OPEN · DRAFT · NOT MERGED. La comparación observada con 
 - **CUSTODIA-02** continúa retirada. **No crear CUSTODIA-05**: el subalcance ya pertenece a la CUSTODIA-04 existente.
 
 **Cierre de intervención de esta conversación:** la investigación documental y la corrección diagnóstica de este incidente se consideran ENTREGADAS A CUSTODIA-04. No queda una tarea paralela independiente de este hilo. CUSTODIA-04 continúa EN CURSO hasta superar las compuertas del apartado F; las garantías del producto siguen NO CERTIFICADAS. Este cierre no modifica titularidad, generación, autorización ni control de Custodia o Dictado.
+
+
+### 12.10 Bloqueo material de mergeabilidad y divergencia · control SCI 354Q · 2026-11-07
+
+**Corte:** 2026-11-07 16:07 America/Mexico_City. Esta sección registra la fotografía del head anterior a esta actualización documental; no describe el SHA que producirá este commit.
+
+- PR #354 verificada: OPEN · DRAFT · NOT MERGED; rama `fix/custodia-04-dictado-archivar-e2e-20261106`, base declarada `main`.
+- Head examinado: `53f2a5a99b92cd72067d0d20799171ffb225e44d`. El head histórico de la bitácora inicial era `21a2aefb697bf2eda3ee4e14a78621e85214220f`; por tanto, la punta cambió.
+- Metadata REST de PR: `mergeable=false`, `mergeable_state=dirty`. El ref vivo de `main` observado fue `7be5712a19aa98837e6d34449585ecb40e634af3`; el ref de la rama fue el head anterior indicado. Compare `main...rama`: DIVERGED, 32 commits ahead, 44 behind, merge-base `0aa7497a6316772ccf846620685a87b0711e346c`. GitHub señala estado `dirty`; los archivos concretos en conflicto no se determinaron en este control.
+- En el head examinado, CI run [42311230342](https://github.com/SeryMente/khora/actions/runs/42311230342), UI Quality run [42311229909](https://github.com/SeryMente/khora/actions/runs/42311229909) y khora-ok / gate run [42311230072](https://github.com/SeryMente/khora/actions/runs/42311230072) tienen dos intentos observados. En ambos intentos, los seis jobs finalizaron `completed/failure` con `runner_id=0`, `runner_name=""` y `steps=[]`; ninguno ejecutó comandos. Los logs del segundo intento devolvieron HTTP 404 `BlobNotFound`; no hay salida de tests que diagnosticar.
+- Checks externos permanecen separados: cinco contextos Vercel y el deploy-preview Netlify reportan failure. Los comentarios de sus bots atribuyen el bloqueo a restricciones de despliegue para repositorio privado de organización en los planes actuales; son bloqueos de Preview, no resultados de pruebas de producto.
+- Clasificación de este corte: `RUNNER_NO_DISPONIBLE` y `CHECK_EXTERNO_BLOQUEADO`; además, bloqueo de mergeabilidad `dirty` que requiere reconciliar la divergencia. No hay evidencia de `FALLO_DE_PRODUCTO`, `RESULTADO_VERIFICABLE` ni `CONTROLES_DE_CÓDIGO_APROBADOS` en Actions.
+
+**Acción pendiente:** una persona con autoridad debe revisar/reconciliar la divergencia de `main` y resolver los conflictos que GitHub marca como `dirty`; después debe obtenerse ejecución CI en runners reales sobre la nueva punta. Este registro no rebasea, fusiona, cambia la base, ejecuta reruns ni altera código. La PR permanece en borrador. Los resultados locales consignados en 12.9 no sustituyen la validación remota de la punta vigente ni la prueba no productiva de proveedor/read-back. CUSTODIA-03 conserva su prioridad formal.
