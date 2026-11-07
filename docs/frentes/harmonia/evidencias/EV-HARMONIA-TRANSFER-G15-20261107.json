@@ -1,0 +1,102 @@
+{
+  "schema": "harmonia-transfer-evidence/1",
+  "front": "harmonia",
+  "event": "HARMONIA-TRANSFER-01a1b6ca-4543-7578-85d9-7624877c2e80",
+  "event_uuidv7_local": "01a1b6ca-4543-7578-85d9-7624877c2e80",
+  "date": "2026-11-07",
+  "operation": "TRANSFER_RESPONSIBILITY",
+  "state": "CONTROL_TRANSFER_EXECUTED_AND_READBACK_VERIFIED",
+  "authorization": {
+    "literal": "Si",
+    "scope": "Replace the gen14 owner with this conversation for the Harmonia front only",
+    "authorized_at": "2026-11-07T16:14:31.747Z"
+  },
+  "previous_owner": {
+    "generation": 14,
+    "alias": "chatgpt-harmonia-01a19969-8e70-7dcb-b9fd-7db62736f279",
+    "device_id": "aacf2eb5-17f4-428e-9242-c24a1fe4a2ec"
+  },
+  "new_owner": {
+    "generation": 15,
+    "alias": "chatgpt-harmonia-01a1b6ca-4543-7578-85d9-7624877c2e80",
+    "alias_type": "operational_alias_not_native_thread_id",
+    "native_conversation_id": null,
+    "session_folio": null
+  },
+  "rdc": {
+    "device_name": "PC10RCIF4EI4",
+    "device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
+    "online_verified": true,
+    "platform": "Windows 11 Pro",
+    "user": "CENTRAL\\MantenimientoRCI",
+    "profile": "C:\\Users\\MantenimientoRCI",
+    "sid": "S-1-5-21-1529298404-1161420656-882029410-2126",
+    "scope": "Harmonia continuity OCP only"
+  },
+  "compare_and_swap": {
+    "base_commit": "0aa7497a6316772ccf846620685a87b0711e346c",
+    "base_control_blob_sha1": "90e24321237000fea6b594c62fc3564445c82bc6",
+    "base_generation": 14,
+    "preconditions_matched": true,
+    "commit": "6f330f2301f2f2b55988ecbb5285c2b3a45621b7",
+    "push": "SUCCESS_FAST_FORWARD_NON_FORCE",
+    "working_tree_after_push": "CLEAN",
+    "readback_branch": "main",
+    "readback_generation": 15,
+    "readback_owner_alias": "chatgpt-harmonia-01a1b6ca-4543-7578-85d9-7624877c2e80",
+    "readback_device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
+    "readback_control_blob_sha1": "0e090e1f3537b75891344af812e576e39a5f5e02",
+    "previous_owner_preserved": true,
+    "transfer_history_prefix_preserved": true,
+    "previous_authorized_device_preserved": true,
+    "cooperative_registry_only": true
+  },
+  "foliation": {
+    "FOL1": "PREPARADO_PENDIENTE_ACTIVACION",
+    "conversation_folio": null,
+    "cycle_folio": null,
+    "a_folio": null,
+    "b_folio": null,
+    "global_uniqueness_claimed": false
+  },
+  "documentary_capture": {
+    "requested_original": "ChatGPT-HARMONIA-20261106-1715",
+    "status": "NO_CAPTURADO_NO_LOCALIZADO_EN_RUTAS_CONSULTADAS",
+    "canonical_manifest_entry_created": false,
+    "searches": [
+      {
+        "path": "C:\\Users\\MantenimientoRCI",
+        "completed": true,
+        "matches": 0,
+        "warning": "Some files were inaccessible; coverage may be incomplete"
+      },
+      {
+        "path": "C:\\Users\\MantenimientoRCI\\Downloads",
+        "completed": true,
+        "matches": 0
+      },
+      {
+        "path": "C:\\Users\\MantenimientoRCI\\Desktop",
+        "completed": true,
+        "matches": 0,
+        "warning": "Some files were inaccessible; coverage may be incomplete"
+      }
+    ],
+    "source_bytes_available": false,
+    "reconstructed_export": false,
+    "prior_export_used_as_substitute": false,
+    "required_next_step": "Operator supplies original export bytes or an accessible exact source path; preserve verbatim and verify read-back per ART-014/P041."
+  },
+  "technical_scope": {
+    "ocp_prior_version": "0.43",
+    "ocp_new_version": "0.44",
+    "code_changed": false,
+    "pr353_merge": false,
+    "chrome_acceptance": false,
+    "ep_remote_persistence": false,
+    "b2": false,
+    "neon": false,
+    "backfill": false,
+    "deployment": false
+  }
+}

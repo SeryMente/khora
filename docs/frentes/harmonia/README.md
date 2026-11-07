@@ -7,14 +7,15 @@ Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). El OCP conse
 - [Control exclusivo](CONTROL-RESPONSABILIDAD.json): actualmente asignado a la instancia y generación que constan en el JSON; no es un bootstrap sin propietario. Preparar el traspaso no transfiere la titularidad.
 - [Originales](originales/PROCEDENCIA.md), [crónica](cronica/HARMONIA-INSTANCIACION-01.md) y [revisión](evidencias/HARMONIA-INSTANCIACION-01-revision.json).
 
-## Estado vigente · 2026-11-01 · generación 14
+## Estado vigente · 2026-11-07 · generación 15
 
-- OCP canónico main: v0.43 / HARMONIA-v0.43, §§46–49.
-- Control: generación 14; alias operativo chatgpt-harmonia-01a19969-8e70-7dcb-b9fd-7db62736f279.
-- RDC activo: 015RENTA01, UUID aacf2eb5-17f4-428e-9242-c24a1fe4a2ec; usuario 015RENTA01\\015RENTA01; perfil C:\\Users\\PC; SID S-1-5-21-4061665785-3686036472-903815331-1003. PC-8 queda preservado como dispositivo histórico supersedido tras la pérdida total del entorno local.
-- Original persistido y leído de vuelta: originales/ChatGPT-HARMONIA-20261101-1709.md; 174033 bytes; SHA-256 A3F10DAF7055B3B16B3F978909C9AFC77ECC6EA8486DF43FE50647297AAA00A6; Git blob 1e1ddd38fd4e3b7c6a1d6cb429467430e4d80ab5.
-- Procedencia y estado: originales/PROCEDENCIA.md; documentos/MANIFIESTO-DOCUMENTAL.json; cronica/HARMONIA-RETOMA-G14-20261101.md. Evidencia: evidencias/EV-HARMONIA-G14-20261101.json.
-- Candidata local-first final: [PR #353](https://github.com/SeryMente/khora/pull/353), rama feat/harmonia-local-first-mainline-final-20261101, abierta en borrador y sin merge; compare 2 commits ahead / 0 behind al crearla. PR #351 y PR #352 se cerraron sin merge y quedaron sustituidas. En RDC fresco 015RENTA01: sintaxis 8/8 PASS y suite local-first 10/10 PASS con Node v24.22.2; duración 2.9827589 s. GitHub Actions de PR #353 vuelve a fallar sin pasos/logs disponibles; causa no determinada. Chrome y EP remoto pendientes.
+- OCP canónico main: v0.44 / HARMONIA-v0.44, secciones 46–50.
+- Control: generación 15; alias operativo chatgpt-harmonia-01a1b6ca-4543-7578-85d9-7624877c2e80; owner_thread=null (ID nativo no expuesto); session_folio=null (FOL1 no activa).
+- RDC autorizado para esta continuidad: PC10RCIF4EI4, UUID d0bbb2a3-d7b4-45e1-8870-652c2c3844fc; Windows 11 Pro; usuario CENTRAL\MantenimientoRCI; perfil C:\Users\MantenimientoRCI; SID S-1-5-21-1529298404-1161420656-882029410-2126.
+- Transferencia gen14 a gen15 por CAS y push fast-forward no forzado: commit 6f330f2301f2f2b55988ecbb5285c2b3a45621b7; control blob releído 0e090e1f3537b75891344af812e576e39a5f5e02. El titular anterior y el historial de generaciones permanecen preservados.
+- Export ChatGPT-HARMONIA-20261106-1715: NO CAPTURADO / NO LOCALIZADO EN RUTAS CONSULTADAS. Búsquedas por nombre exacto: cero coincidencias en Downloads y Desktop; cero en el perfil con aviso de directorios inaccesibles. No se creó sustituto. El original ChatGPT-HARMONIA-20261101-1709.md permanece como antecedente verificado y no lo reemplaza.
+- Crónica y evidencia de transferencia: cronica/HARMONIA-TRANSFER-G15-20261107.md y evidencias/EV-HARMONIA-TRANSFER-G15-20261107.json; revisar su estado en el manifiesto documental.
+- Estado técnico conservado: PR #353 sigue como draft sin merge según el último corte técnico. CI, Chrome y EP remoto permanecen no aceptados/no verificados; sin B2, Neon, backfill o despliegue acreditados.
 
 ## Antecedentes históricos de código y aceptación (no vigentes)
 

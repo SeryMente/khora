@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: harmonia. Versión del objeto **0.43**; sello **HARMONIA-v0.43**; corte de estado **2026-11-01**. §§37–45 conservan antecedentes históricos, incluida la transferencia gen12 y el cierre NCL-OCP. §46 conserva la fotografía técnica de la candidata local-first v0.40 en rama separada y la titularidad gen13, ambas supersedidas en responsabilidad por §47. §47 registra la transferencia gen13→gen14 a PC-8 y la captura documental del original ChatGPT-HARMONIA-20261101-1709.md. §48 registra la renovación del dispositivo RDC tras pérdida total del entorno local y la validación local 10/10 de la candidata local-first en rama de revisión; no supone aceptación Chrome, integración del código en main ni transporte EP. La regla permanente §36.1-36.2 conserva la aceptación natural exclusivamente en manos del operador.
+- Identificador del frente: harmonia. Versión del objeto **0.44**; sello **HARMONIA-v0.44**; corte de estado **2026-11-07**. §§37–45 conservan antecedentes históricos, incluida la transferencia gen12 y el cierre NCL-OCP. §46 conserva la fotografía técnica de la candidata local-first v0.40 en rama separada y la titularidad gen13, ambas supersedidas en responsabilidad por §47. §47 registra la transferencia gen13→gen14 a PC-8 y la captura documental del original ChatGPT-HARMONIA-20261101-1709.md. §48 registra la renovación del dispositivo RDC tras pérdida total del entorno local y la validación local 10/10 de la candidata local-first en rama de revisión; no supone aceptación Chrome, integración del código en main ni transporte EP. La regla permanente §36.1-36.2 conserva la aceptación natural exclusivamente en manos del operador.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -1867,3 +1867,40 @@ La transferencia de responsabilidad y el dispositivo PC-14 descritos en §46.1 s
 - Dictamen: candidata local-first reconstruida sin divergencia respecto al main de base; pruebas locales PASS y hashes exactos; PR #353 continúa draft. CI, Chrome, EP remoto, merge y despliegue no aceptados.
 
 - OCP canónico: v0.43 / HARMONIA-v0.43. El incremento documental registra la sustitución de candidatas; no declara integrada la implementación.
+
+
+## 50. Transferencia de responsabilidad a generación 15 y captura documental pendiente · 2026-11-07
+
+### 50.1. Autorización y adjudicación
+
+- El operador autorizó expresamente TRANSFER_RESPONSIBILITY con la respuesta literal Si, sustituyendo al titular de la generación 14. La selección de terminal fue expresa: PC10RCIF4EI4, UUID RDC d0bbb2a3-d7b4-45e1-8870-652c2c3844fc.
+- Titular anterior preservado: chatgpt-harmonia-01a19969-8e70-7dcb-b9fd-7db62736f279, generación 14, dispositivo autorizado anterior aacf2eb5-17f4-428e-9242-c24a1fe4a2ec. El alias y el historial previo se conservaron en previous_owner y transfer_history; el historial existente permanece como prefijo exacto.
+- Nuevo titular operativo: chatgpt-harmonia-01a1b6ca-4543-7578-85d9-7624877c2e80, generación 15. Es un alias operativo vinculado al evento UUIDv7 local 01a1b6ca-4543-7578-85d9-7624877c2e80, no un ID nativo de ChatGPT. owner_thread=null porque la plataforma no expuso un identificador nativo. session_folio=null: FOL1 sigue PREPARADO_PENDIENTE_ACTIVACION; no se inventó folio.
+- La identidad de PC10 se verificó en vivo mediante RDC y PowerShell: Windows 11 Pro; CENTRAL\MantenimientoRCI; perfil C:\Users\MantenimientoRCI; SID S-1-5-21-1529298404-1161420656-882029410-2126. Alcance autorizado: continuidad de este OCP Harmonia en ese UUID exacto; no se transfieren permisos a otros frentes ni a otros dispositivos.
+
+### 50.2. CAS, publicación y lectura de vuelta
+
+- Precondición leída en main: HEAD 0aa7497a6316772ccf846620685a87b0711e346c; blob base del control 90e24321237000fea6b594c62fc3564445c82bc6; generación 14 y titular anterior coincidentes; workspace limpio.
+- Commit de transferencia publicado por RDC mediante push fast-forward no forzado: 6f330f2301f2f2b55988ecbb5285c2b3a45621b7 (transfer(harmonia): responsibility generation 15). El push terminó con PUSH=SUCCESS; workspace limpio.
+- Control actualizado y leído de vuelta desde main: docs/frentes/harmonia/CONTROL-RESPONSABILIDAD.json, blob 0e090e1f3537b75891344af812e576e39a5f5e02. La lectura de vuelta confirmó generación 15, alias nuevo, UUID PC10 exacto, evento de autorización, propietario anterior, historial de transferencias y dispositivo histórico previo sin alteración.
+- Este control es cooperativo y no constituye un bloqueo server-side para escritores que eludan la comparación; el push normal no forzado rechaza cualquier avance no fast-forward.
+
+### 50.3. Solicitud de exportación y estado documental
+
+- Export solicitado: ChatGPT-HARMONIA-20261106-1715 (extensión no presupuesta). No figura en el manifiesto actual ni en el inventario de originales/ de main.
+- La búsqueda por nombre exacto terminó con cero coincidencias en C:\Users\MantenimientoRCI\Downloads y C:\Users\MantenimientoRCI\Desktop. La búsqueda del perfil C:\Users\MantenimientoRCI también devolvió cero coincidencias, pero RDC advirtió que algunos directorios eran inaccesibles; por ello la cobertura total no está demostrada.
+- Estado del original requerido: NO CAPTURADO / NO LOCALIZADO EN RUTAS CONSULTADAS. No se creó un archivo sustituto, no se reconstruyó un export desde memoria y no se declaró persistencia. El original previo ChatGPT-HARMONIA-20261101-1709.md permanece como antecedente separado, ya persistido y verificado; no sustituye al archivo solicitado.
+- Siguiente requisito documental: disponer del archivo exportado original o de una ruta accesible que contenga sus bytes. En cuanto esté disponible, preservar el original sin transformación en originales/, registrar procedencia y actualizar el manifiesto; declarar PERSISTIDO_Y_VERIFICADO solo tras read-back y cotejo de integridad.
+
+### 50.4. Límites de alcance
+
+- Esta transferencia no cambia el estado técnico de la candidata local-first: PR #353 permanece abierta en borrador y sin merge según el corte documentado en la sección 49. CI/GitHub Actions, aceptación natural Chrome y contrato/recibo/read-back EP remoto siguen pendientes; no hay B2, Neon, backfill ni despliegue acreditados por esta transferencia.
+- La versión documental pasa a 0.44 / HARMONIA-v0.44. La actualización no integra código técnico ni declara aceptado el producto.
+
+### 50.5. Evidencia
+
+- Crónica: docs/frentes/harmonia/cronica/HARMONIA-TRANSFER-G15-20261107.md.
+- Evidencia estructurada: docs/frentes/harmonia/evidencias/EV-HARMONIA-TRANSFER-G15-20261107.json.
+- Manifiesto y procedencia: documentos/MANIFIESTO-DOCUMENTAL.json y originales/PROCEDENCIA.md.
+
+---

@@ -56,3 +56,16 @@ SHA-256 del archivo JSONL: 8a5f2ea2ed6c2ddf76d5d4bbe3758dd6dde638df68fef026df346
 - Ubicación canónica en `main`: `docs/frentes/harmonia/originales/ChatGPT-HARMONIA-20261101-1709.md`; commit de incorporación `c47324e9234d2a89c8211f4c1fa64707c93995ba`. La lectura de vuelta desde la ruta publicada en `main` coincidió exactamente con el texto recuperado mediante RDC: 174.033 bytes, 3.540 líneas y mismo blob Git `1e1ddd38fd4e3b7c6a1d6cb429467430e4d80ab5`.
 - Naturaleza: original de conversación para continuidad, no telemetría, fuente normativa ni sustituto del OCP. La última salida visible se conserva en `../cronica/HARMONIA-RETOMA-G14-20261101.md`; las afirmaciones técnicas del export se mantienen como antecedentes hasta contrastarlas con artefactos vigentes.
 
+
+
+## Transferencia de responsabilidad - generación 15 - 2026-11-07
+
+- Autorización literal del operador: Si, en respuesta a la solicitud de transferencia de responsabilidad del frente Harmonia de generación 14 a esta continuidad.
+- Selección expresa de terminal: PC10RCIF4EI4, UUID d0bbb2a3-d7b4-45e1-8870-652c2c3844fc. La identidad viva verificada fue CENTRAL\MantenimientoRCI, perfil C:\Users\MantenimientoRCI, SID S-1-5-21-1529298404-1161420656-882029410-2126, Windows 11 Pro.
+- Evento UUIDv7 local: 01a1b6ca-4543-7578-85d9-7624877c2e80; alias operativo nuevo: chatgpt-harmonia-01a1b6ca-4543-7578-85d9-7624877c2e80. La plataforma no expuso el ID nativo de conversación; no se inventa uno. No se asignó folio porque FOL1 sigue inactiva.
+- Transferencia publicada por RDC en main, commit 6f330f2301f2f2b55988ecbb5285c2b3a45621b7; el control se releyó desde main en generación 15 y conserva al titular/historial gen14.
+
+## Solicitud de exportación - ChatGPT-HARMONIA-20261106-1715
+
+- El original no fue localizado en el inventario canónico ni por búsqueda exacta en Downloads y Desktop del perfil verificado. La búsqueda del perfil completo informó cero coincidencias, pero hubo directorios inaccesibles y no puede declararse exhaustiva.
+- Estado: NO CAPTURADO / NO LOCALIZADO EN RUTAS CONSULTADAS. No se creó un derivado sustituto. Se requiere que los bytes originales o una ruta accesible se pongan a disposición para cumplir P041.

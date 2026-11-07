@@ -5,28 +5,29 @@
   "branch": "main",
   "ocp_path": "docs/frentes/harmonia/",
   "manifest_path": "docs/frentes/harmonia/documentos/MANIFIESTO-DOCUMENTAL.json",
-  "ocp_version": "0.43",
-  "ocp_blob_sha1": "d1cf7981eafccf318f6c80bc8aa860a84175f7f4",
+  "ocp_version": "0.44",
+  "ocp_blob_sha1": "69d460839af8bf805e587c5c639e24c0c795437e",
   "responsibility": {
-    "generation": 14,
-    "owner_alias": "chatgpt-harmonia-01a19969-8e70-7dcb-b9fd-7db62736f279",
-    "uuidv7_local_event": "01a19969-8e70-7dcb-b9fd-7db62736f279",
-    "control_blob_sha1": "90e24321237000fea6b594c62fc3564445c82bc6",
-    "authorized_device_id": "aacf2eb5-17f4-428e-9242-c24a1fe4a2ec",
-    "device_authorization_event": "01a199c8-8bc1-79fb-a4a8-e3088850c9bc",
+    "generation": 15,
+    "owner_alias": "chatgpt-harmonia-01a1b6ca-4543-7578-85d9-7624877c2e80",
+    "uuidv7_local_event": "01a1b6ca-4543-7578-85d9-7624877c2e80",
+    "control_blob_sha1": "0e090e1f3537b75891344af812e576e39a5f5e02",
+    "authorized_device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
+    "device_authorization_event": "01a1b6ca-4543-7578-85d9-7624877c2e80",
+    "authorization_event": "HARMONIA-TRANSFER-01a1b6ca-4543-7578-85d9-7624877c2e80",
     "session_folio": null
   },
   "provenance_index": {
     "path": "docs/frentes/harmonia/originales/PROCEDENCIA.md",
-    "git_blob_sha1": "2dffaee2a22d85947f4f6658211cf0074ce520d1",
-    "state": "PERSISTIDO_Y_VERIFICADO",
-    "readback_exact": true
+    "git_blob_sha1": "b056fce1588f618a55244c3bb4dcf5a57882f10e",
+    "state": "ESCRITO_PENDIENTE_READBACK",
+    "readback_exact": false
   },
   "README": {
     "path": "docs/frentes/harmonia/README.md",
-    "git_blob_sha1": "1d7dda5685efeac29b20a08fd496916c0a51fdd7",
-    "state": "PERSISTIDO_Y_VERIFICADO",
-    "readback_exact": true
+    "git_blob_sha1": "adc978fb40f853c41f58aacbefc433757807e3ed",
+    "state": "ESCRITO_PENDIENTE_READBACK",
+    "readback_exact": false
   },
   "candidate_technical_branch": {
     "branch": "feat/harmonia-local-first-mainline-final-20261101",
@@ -402,22 +403,43 @@
       "persistence_state": "PERSISTIDO_Y_VERIFICADO",
       "readback_exact": true,
       "revalidated_this_cycle": true
+    },
+    {
+      "document_id": "HAR-CHRONICLE-TRANSFER-G15-20261107",
+      "original_name": "HARMONIA-TRANSFER-G15-20261107.md",
+      "canonical_path": "docs/frentes/harmonia/cronica/HARMONIA-TRANSFER-G15-20261107.md",
+      "byte_size": 4075,
+      "sha256": "77A6562FF277090472FCE6BB8BF601ADE505C1D0FACB0DA68624E1D20E37CF9A",
+      "git_blob_sha1": "8a4e3b0f991dc6bd0fc920cc5b99a583a30573df",
+      "classification": "responsibility_transfer_chronicle",
+      "persistence_state": "ESCRITO_PENDIENTE_READBACK",
+      "readback_exact": false
+    },
+    {
+      "document_id": "HAR-EVIDENCE-TRANSFER-G15-20261107",
+      "original_name": "EV-HARMONIA-TRANSFER-G15-20261107.json",
+      "canonical_path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-TRANSFER-G15-20261107.json",
+      "byte_size": 3649,
+      "sha256": "1EB892949F408A97AD5900361AD27C53E016064567821BA54E3724D918C1F68F",
+      "git_blob_sha1": "a1a7793408ff92e89ff5bb8bf5d55069086e4912",
+      "classification": "responsibility_transfer_evidence",
+      "persistence_state": "ESCRITO_PENDIENTE_READBACK",
+      "readback_exact": false
     }
   ],
   "chronicle": {
-    "path": "docs/frentes/harmonia/cronica/HARMONIA-RETOMA-G14-20261101.md",
-    "git_blob_sha1": "41d381fc828add3fdfc72d0d9c197ec1df56a48e",
-    "state": "PERSISTIDO_Y_VERIFICADO",
-    "last_visible_output_reproduced": true,
-    "readback_exact": true
+    "path": "docs/frentes/harmonia/cronica/HARMONIA-TRANSFER-G15-20261107.md",
+    "git_blob_sha1": "8a4e3b0f991dc6bd0fc920cc5b99a583a30573df",
+    "state": "ESCRITO_PENDIENTE_READBACK",
+    "readback_exact": false
   },
   "evidence": {
-    "path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-G14-20261101.json",
-    "git_blob_sha1": "b90a5fc2663b98c7f193b435a0266b2403f6df9b",
-    "state": "PERSISTIDO_Y_VERIFICADO",
-    "readback_exact": true
+    "path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-TRANSFER-G15-20261107.json",
+    "git_blob_sha1": "a1a7793408ff92e89ff5bb8bf5d55069086e4912",
+    "state": "ESCRITO_PENDIENTE_READBACK",
+    "readback_exact": false
   },
-  "main_canonical_ocp_version": "0.43",
+  "main_canonical_ocp_version": "0.44",
   "environment_reset": {
     "declared_by_operator": true,
     "state": "TOTAL_LOCAL_ENVIRONMENT_LOSS",
@@ -475,5 +497,65 @@
     "git_blob_sha1": "8611c3353a86cc1b05c2f6ddefebe5d0fe209fd4",
     "state": "PERSISTIDO_Y_VERIFICADO",
     "readback_exact": true
+  },
+  "previous_responsibility": {
+    "generation": 14,
+    "owner_alias": "chatgpt-harmonia-01a19969-8e70-7dcb-b9fd-7db62736f279",
+    "uuidv7_local_event": "01a19969-8e70-7dcb-b9fd-7db62736f279",
+    "control_blob_sha1": "90e24321237000fea6b594c62fc3564445c82bc6",
+    "authorized_device_id": "aacf2eb5-17f4-428e-9242-c24a1fe4a2ec",
+    "device_authorization_event": "01a199c8-8bc1-79fb-a4a8-e3088850c9bc",
+    "session_folio": null
+  },
+  "previous_chronicle": {
+    "path": "docs/frentes/harmonia/cronica/HARMONIA-RETOMA-G14-20261101.md",
+    "git_blob_sha1": "41d381fc828add3fdfc72d0d9c197ec1df56a48e",
+    "state": "PERSISTIDO_Y_VERIFICADO",
+    "last_visible_output_reproduced": true,
+    "readback_exact": true
+  },
+  "previous_evidence": {
+    "path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-G14-20261101.json",
+    "git_blob_sha1": "b90a5fc2663b98c7f193b435a0266b2403f6df9b",
+    "state": "PERSISTIDO_Y_VERIFICADO",
+    "readback_exact": true
+  },
+  "latest_responsibility_transfer": {
+    "event": "HARMONIA-TRANSFER-01a1b6ca-4543-7578-85d9-7624877c2e80",
+    "event_uuidv7_local": "01a1b6ca-4543-7578-85d9-7624877c2e80",
+    "generation_from": 14,
+    "generation_to": 15,
+    "control_commit": "6f330f2301f2f2b55988ecbb5285c2b3a45621b7",
+    "control_blob_sha1": "0e090e1f3537b75891344af812e576e39a5f5e02",
+    "readback_verified": true,
+    "documentary_original_status": "NO_CAPTURADO_NO_LOCALIZADO_EN_RUTAS_CONSULTADAS",
+    "chronicle_path": "docs/frentes/harmonia/cronica/HARMONIA-TRANSFER-G15-20261107.md",
+    "evidence_path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-TRANSFER-G15-20261107.json",
+    "manifest_documents_state": "ESCRITO_PENDIENTE_READBACK"
+  },
+  "capture_pending": {
+    "requested_original": "ChatGPT-HARMONIA-20261106-1715",
+    "status": "NO_CAPTURADO_NO_LOCALIZADO_EN_RUTAS_CONSULTADAS",
+    "not_in_current_originals_inventory": true,
+    "not_in_manifest_entries": true,
+    "search_scopes": [
+      {
+        "device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
+        "path": "C:\\Users\\MantenimientoRCI",
+        "status": "COMPLETED_ZERO_MATCHES_INCOMPLETE_PERMISSIONS_WARNING"
+      },
+      {
+        "device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
+        "path": "C:\\Users\\MantenimientoRCI\\Downloads",
+        "status": "COMPLETED_ZERO_MATCHES"
+      },
+      {
+        "device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
+        "path": "C:\\Users\\MantenimientoRCI\\Desktop",
+        "status": "COMPLETED_ZERO_MATCHES_INCOMPLETE_PERMISSIONS_WARNING"
+      }
+    ],
+    "do_not_create_substitute": true,
+    "required_input": "Original export bytes or accessible exact source path"
   }
 }
