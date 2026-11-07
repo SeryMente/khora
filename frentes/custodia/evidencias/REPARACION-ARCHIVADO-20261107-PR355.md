@@ -71,26 +71,31 @@ La coincidencia de blobs demuestra que el contenido de los cuatro archivos coinc
 - Los tres workflows declaran `runs-on: ubuntu-latest` (`.github/workflows/ci.yml`, `.github/workflows/ui-quality.yml` y `.github/workflows/khora-ok.yml`); el bloqueo no depende del runner local RDC. La causa exacta del no-arranque (configuración/permisos/entitlement/servicio de Actions u otra condición de GitHub) permanece NO DETERMINADA.
 - Los checks externos Netlify/Vercel fallaron por la restricción vigente para desplegar repositorios privados de organización con el plan Hobby; no son pruebas funcionales del parche.
 
-## 5. Dictamen actual
+## 5. Dictamen actual · actualización posterior a merge y deployment
 
-- **Implementado:** sí, en rama aislada y PR #355 en borrador.
-- **Lectura de vuelta de los cuatro archivos:** sí; los SHA coinciden con la evidencia de contenido ya validada.
-- **Pruebas locales previas sobre contenido idéntico:** sí, resultados arriba.
-- **Ejecución CI de la punta PR #355:** NO VALIDADA. GitHub generó workflows y jobs en dos tentativas, pero ninguno ejecutó pasos; no hay evidencia de pruebas nuevas aprobadas ni de aserciones fallidas.
-- **Build nuevo de esta rama:** NO EJECUTADO.
-- **Prueba física con proveedor real no productivo:** NO EJECUTADA.
-- **Causa runtime de la sesión concreta del operador:** NO DETERMINADA.
-- **Merge/deploy/producción:** NO EJECUTADOS.
-- **Aceptación funcional del operador:** PENDIENTE.
-- **Garantías E2E/recuperabilidad del producto:** NO CERTIFICADAS.
+- **Implementado e integrado:** sí. PR #355 cerrada y fusionada el 2026-11-07; merge commit `8489a09c03a330b85f3e31297415ada7a19fe10e`.
+- **Publicación:** sí. Vercel `khora-web`, target production, deployment `dpl_HRPV5F7FteWVZquUjfZcumA52atg`, READY, alias `https://khora-web.vercel.app`, commit exacto del merge.
+- **Respuesta live:** HTTP 200 y pantalla de acceso OIDC; SSO está activo. La comprobación no fue autenticada y no ejecutó el flujo de archivar desde navegador.
+- **Pruebas locales en el worktree del PR:** `npm ci`, TypeScript, UI Review, UI Contract, preflight/extensión, 572/572 unitarias, `next build --webpack`, audio E2E 3/3, smoke E2E 4/4 y diff-check: PASS.
+- **Cobertura pendiente/fallida sin atribución al parche:** Playwright focal UI 20/23 (tres fallos en renderizado de Grafo y navegación por teclado); suite E2E general de 141 casos iniciada y detenida tras timeouts/fallos; pytest/kernel/API no ejecutado por ausencia de dependencias/Docker/Neo4j.
+- **GitHub Actions:** los seis jobs de dos intentos previos terminaron sin runner y `steps=[]`; CI no queda declarada verde.
+- **Build hook productivo:** el log del deployment registra ejecución de `migrate-runtime` y anuncia la aplicación de migraciones 023–029. Fue un efecto automático de la configuración existente del proyecto durante el build; no se ejecutó SQL manual ni se inspeccionaron datos. Debe revisarse el efecto del esquema/configuración antes de cambios productivos adicionales.
+- **No demostrado:** proveedor físico real no productivo, lectura de vuelta de bytes del audio, flujo autenticado live de «Archivar registro», telemetría de la sesión original y causa runtime exacta.
+- **Estado:** código fusionado y publicado; aceptación E2E/garantías de producto PENDIENTES. CUSTODIA-04 permanece ABIERTA hasta cerrar los puntos anteriores.
+
 
 ## 6. Siguiente acción necesaria
 
-Resolver primero la disponibilidad/configuración de GitHub Actions para sus jobs `ubuntu-latest` o disponer de un entorno local expresamente autorizado. Después ejecutar los gates sobre la punta de PR #355, realizar build y una prueba con proveedor físico real no productivo y lectura de vuelta. El perfil RDC `CENTRAL\\MantenimientoRCI` continúa excluido; no usarlo. Mantener PR #355 en borrador y sin merge/despliegue hasta obtener esas evidencias.
+1. Revisar de forma acotada el efecto del hook automático de migraciones 023–029 registrado en el build de producción y confirmar el estado esperado del esquema; no aplicar SQL adicional ni revertir migraciones sin evidencia y autorización específica.
+2. Completar el test funcional autenticado del flujo «Reintentar y archivar» en una sesión controlada, con evidencia minimizada.
+3. Ejecutar prueba con proveedor físico real no productivo y GET/read-back de bytes con recálculo de integridad.
+4. Resolver GitHub Actions (runner sin pasos) y los tres fallos UI de Grafo por separado. No etiquetar CI completa como verde hasta ejecutar todos los gates requeridos.
+5. Capturar diagnóstico runtime autorizado de la sesión original, si aún es posible, sin recopilar texto/audio privado fuera del soporte autorizado.
 
-## 7. Seguridad y no alteración
+## 7. Seguridad y alcance de acciones
 
-- No se consultaron, copiaron ni modificaron registros productivos, audio personal, credenciales o datos Neon.
-- No se realizaron cambios en Vercel Blob, Backblaze B2, Neon Production, selector de proveedor, CORS, llaves ni despliegues.
-- No se hizo merge ni se cerró PR #354; continúa abierta como antecedente divergido.
-- Esta evidencia describe la reparación candidata del bloqueo de archivado; no certifica la recuperación del dictado ausente del 28-10.
+- No se consultaron ni trasladaron registros de audio personales, credenciales o datos de sesiones de producción.
+- No hubo ejecución manual de SQL, cambio de proveedor, selector, CORS, llaves ni credenciales.
+- El deployment de producción ejecutó automáticamente el hook preexistente `migrate-runtime`; los eventos de build registran migraciones 023–029 aplicadas. Se deja explícito como efecto colateral del despliegue para revisión.
+- PR #354 permanece como antecedente abierto/divergido; no se cerró ni modificó en este ciclo.
+- El original `ChatGPT-CUSTODIA-20261107-1157.txt` quedó preservado en `frentes/custodia/originales/` con SHA-256 `7E256B9888F2A0227632D39D22B98E9BD1316548E057E83514ADE61376A93CC5`, 42,629 bytes y lectura de vuelta exacta.
