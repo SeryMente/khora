@@ -1324,6 +1324,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
     }
   }, [archivado, texto, titulo, pulidosOk, observarDictado, guardarCheckpoint, reintentarCustodia]);
 
+
   const reintentarYArchivar=useCallback(async()=>{
     if(finalizandoRef.current||activoRef.current)return;
     // Reutiliza el mismo camino de archivo; no abre una segunda operación de retry.
