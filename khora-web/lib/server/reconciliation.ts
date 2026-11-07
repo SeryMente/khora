@@ -1,3 +1,4 @@
+import { listB2Objects } from "./object-storage";
 // @l0 L0-002-R · @req TRACE-SESSION/010 · @req FORENSIC-REC/01
 import { list } from "@vercel/blob";
 import { getDb } from "./neon";
@@ -76,6 +77,8 @@ export async function ejecutarReconciliacionForense(modo: "DRY_RUN" | "APPLY" = 
   } catch (err) {
     console.warn("No se pudo listar Vercel Blob directamente (se utilizará la metadata registrada):", String(err));
   }
+
+  blobsFisicos.push(...await listB2Objects());
 
   // Indexar blobs por sessionId extraído del pathname (e.g., dictado/<sessionId>/<parte>.webm...)
   const blobsPorSesion = new Map<string, { url: string; pathname: string; size: number }[]>();

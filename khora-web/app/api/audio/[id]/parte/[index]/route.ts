@@ -1,3 +1,4 @@
+import { fetchStoredObject } from "@/lib/server/object-storage";
 import { poseeVolcado } from "@/lib/server/custodia-acceso";
 import { auth } from "@/auth";
 // @l0 L0-002-R · @req REVISION-COCKPIT/REQ-1
@@ -120,7 +121,7 @@ export async function GET(
     // Descargar blob
     let remoto: Response;
     try {
-      remoto = await fetch(blobUrl, { cache: "no-store" });
+      remoto = await fetchStoredObject(blobUrl, { cache: "no-store" });
     } catch (err: any) {
       await reportarIncidente({
         volcadoId,

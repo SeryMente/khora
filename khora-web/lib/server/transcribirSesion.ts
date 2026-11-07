@@ -1,3 +1,4 @@
+import { fetchStoredObject } from "./object-storage";
 // @l0 L0-002-R · @req FIX-DICTADO/D13
 import { getDb } from "./neon";
 import { descifrarBytes } from "./cripto";
@@ -114,7 +115,7 @@ export async function transcribirSesion(
 
   for (const parte of partes) {
     try {
-      const respBlob = await fetch(parte.blob_url);
+      const respBlob = await fetchStoredObject(parte.blob_url);
       if (!respBlob.ok) {
         partesFallidas.push(parte.part_index);
         continue;
