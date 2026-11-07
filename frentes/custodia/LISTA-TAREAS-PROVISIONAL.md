@@ -1,11 +1,11 @@
-<!-- LIST_VERSION=0.18; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.19; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.18.
-- **Última actualización:** 2026-11-07 (PR #355 fusionada y publicada en Vercel production; certificación E2E pendiente; titularidad gen. 8).
+- **Versión de esta lista provisional:** 0.19.
+- **Última actualización:** 2026-11-07 (PR #355 publicada; nueva instrucción: B2 exclusivo, migración integral/cutover P0 en curso; titularidad gen. 8).
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
 - **Última lectura de metodología del ciclo 2 (referencia histórica):** Samantha v352 · NX-352m; Metacanon 1.21; GOW v2.3; blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
@@ -14,7 +14,7 @@
 - **Revalidación metodológica C009–C011 (histórica):** Samantha v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`, leído de `SeryMente/metodologia/main` el 2026-10-29.
 - **Gobierno vigente revalidado en esta retoma (2026-11-07):** Samantha v377 · NX-377m; Metacanon 1.28; GOW 2.17; DUG blob `54064c8fe00f872023a455f06596061ed69062ae`; commit main `8ee2482866b3dd085e58e05006727256d0274376`. Se revisó la cascada, P001/P004/P005/P037/P038/P039/P041/P042/P043, Metacanon §§4, 16, 28, 29, 38, 41, 42, 44 y 46–47, y los términos GOW de OCP/SPDF/persistencia. MCP-NORMATIVO: DESACTIVADO.
 La lista sigue provisional; ni el relevo ni esta revalidación certifican su diseño.
-- **Alcance y orden operativo vigente:** (1) CUSTODIA-03, prioridad inmediata: localizar, cotejar y rescatar primero los dictados considerados ausentes/perdidos y las fuentes históricas con potencial de recuperación; (2) CUSTODIA-01: recuperar y verificar después todas las unidades visibles en Ingresos → Dictado → Recuperación; (3) CUSTODIA-04: completar la corrección sistémica y certificar el flujo E2E. El defecto «Archivar registro» ya tiene corrección integrada por PR #355 y publicada en Vercel production; permanece abierta la validación autenticada del flujo, la prueba física no productiva y el diagnóstico runtime. Este avance no desplaza ni cierra CUSTODIA-03/01. CUSTODIA-02 permanece retirada y su identificador no se reutiliza. No se afirma que estas tres tareas sean el inventario exhaustivo de todas las obligaciones futuras del frente.
+- **Alcance y orden operativo vigente:** (1) CUSTODIA-03, prioridad inmediata: localizar, cotejar y rescatar primero los dictados considerados ausentes/perdidos y las fuentes históricas con potencial de recuperación; (2) CUSTODIA-01: recuperar y verificar después todas las unidades visibles en Ingresos → Dictado → Recuperación; (3) CUSTODIA-04: completar la corrección sistémica y certificar el flujo E2E. El defecto «Archivar registro» continúa afectado por la indisponibilidad de Vercel Blob; PR #355 no resolvió la persistencia subyacente. Se prioriza migración integral a B2 exclusivo y certificación E2E. Este avance no desplaza ni cierra CUSTODIA-03/01. CUSTODIA-02 permanece retirada y su identificador no se reutiliza. No se afirma que estas tres tareas sean el inventario exhaustivo de todas las obligaciones futuras del frente.
 - **Regla provisional de custodia de información:** no copiar a este repositorio el texto o audio de dictados reales, secretos, credenciales ni identificadores personales innecesarios. Registrar resultados mediante evidencia minimizada y sanitizada, en el soporte autorizado que corresponda.
 
 ### Secuencia de ejecución · antecedente histórico y secuencia vigente
@@ -251,6 +251,10 @@ La propuesta continúa sin comprobar los bytes actuales de los objetos remotos n
 
 - **2026-11-06 · REORDENAMIENTO-PRIORIDAD-RESCATE · versión 0.13:** se preserva la instrucción literal en [originales/INSTRUCCION-REORDENAMIENTO-PRIORIDAD-RECUPERACION-20261106.md](originales/INSTRUCCION-REORDENAMIENTO-PRIORIDAD-RECUPERACION-20261106.md). La secuencia vigente pasa a CUSTODIA-03 (#1: rescate de ausentes y fuentes candidatas), CUSTODIA-01 (#2: unidades visibles) y CUSTODIA-04 (#3: corrección sistémica); el diagnóstico de «Archivar registro» queda como paréntesis limitado. CUSTODIA-03 se amplía y se coloca primero en el documento, preservando sus identificadores y la historia de tareas. Se prioriza el candidato textual 28-10 20:29/264 checkpoints, seguido de las siete sesiones/1,038 checkpoints, B2, Vercel Blob, IndexedDB del perfil original y otras fuentes autorizadas. Ninguna ruta se declara recuperada por metadatos históricos; no se realizó recuperación productiva en esta actualización.
 ## Registro de cambios
+
+- **2026-11-07 · CUSTODIA-B2-EXCLUSIVO · versión 0.19:** por instrucción literal del operador, se descarta persistencia dual, fallback y lectura dual Blob/B2. B2 será el único backend de objetos de Khora. CUSTODIA-B2-004 pasa a EN CURSO/P0; abarca adaptación de todos los flujos, captura por partes, inventario/backfill histórico, observabilidad correlacionada, cutover y pruebas E2E/restauración. La PR #348 es solo base técnica en draft; aún no demuestra autenticación ni lectura/escritura física B2 ni migración histórica. Se observó que variables KHORA_B2_* y KHORA_OBJECT_STORAGE existen en Vercel Production sin revelar valores; falta verificar la cuenta/bucket con preflight real. No borrar Blob fuente ni declarar aceptación antes de read-back SHA/KHC1 y reconciliación completa.
+
+
 
 - **2026-11-07 · CUSTODIA-04-REPARACION-ARCHIVADO-PR355 · versión 0.17:** se registra reparación candidata en rama limpia/PR #355, con reintento secuencial *single-flight*, bloqueo de archivados duplicados, nueva evaluación del manifiesto y conservación de texto ante fallo persistente. Los cuatro archivos de código/pruebas coinciden con SHA de archivos ya validados localmente en commit 55449a0; CI nuevo disparó seis jobs sin runner ni pasos. PR #354 queda como antecedente divergido sin integración. Producto no certificado; no merge/deploy.
 
