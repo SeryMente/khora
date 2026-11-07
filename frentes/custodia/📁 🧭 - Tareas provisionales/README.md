@@ -3,7 +3,7 @@
 
 **Estado:** PROVISIONAL · materialización de trabajo para continuidad del sprint; no es canon normativo ni un segundo OCP.  
 **Fuente de estado:** [OCP Custodia](../OBJETO-CANONICO.md) y [control único de responsabilidad](../CONTROL-RESPONSABILIDAD.json).  
-**Responsabilidad observada:** generación 6 · alias `chatgpt-custodia-retoma-01a19495-f227-7f5d-8985-4648e1a9ffcb`; alias operativo local, no ID nativo.  
+**Responsabilidad observada:** control único de Custodia, generación 8 (última transferencia verificada); esta colección no crea titularidad independiente.  
 **Autorización del sprint:** [instrucción literal del operador](../originales/INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md).  
 **Coordinación de continuidad:** [COORDINACION-SPRINT-CUSTODIA-v0.2.md](../entregas/COORDINACION-SPRINT-CUSTODIA-v0.2.md).
 
@@ -20,14 +20,14 @@ Estas tareas ya existían en la lista provisional anterior y no se duplican ni r
 | CUSTODIA-04 | `EN CURSO` | [Lista provisional existente](../LISTA-TAREAS-PROVISIONAL.md) |
 | CUSTODIA-02 | `RETIRADA` · no reutilizar | [Lista provisional existente](../LISTA-TAREAS-PROVISIONAL.md) |
 
-## 2. Tareas provisionales del sprint de migración Blob → B2
+## 2. Tareas provisionales del sprint de migración exclusiva a Backblaze B2
 
 | Identificador local | Estado | Objeto de tarea |
 |---|---|---|
-| CUSTODIA-B2-001 | `en_curso` | [Adaptador dual y flujos](./📁%20🧩%20-%20CUSTODIA-B2-001%20-%20Adaptador%20dual%20y%20flujos/README.md) |
+| CUSTODIA-B2-001 | `en_curso` | [Adaptador B2 exclusivo y flujos](./📁%20🧩%20-%20CUSTODIA-B2-001%20-%20Adaptador%20dual%20y%20flujos/README.md) |
 | CUSTODIA-B2-002 | `en_curso` | [Inventario y backfill no destructivo](./📁%20🧩%20-%20CUSTODIA-B2-002%20-%20Inventario%20y%20backfill%20no%20destructivo/README.md) |
 | CUSTODIA-B2-003 | `en_curso` | [Preflight y seguridad del proveedor](./📁%20🧩%20-%20CUSTODIA-B2-003%20-%20Preflight%20y%20seguridad%20del%20proveedor/README.md) |
-| CUSTODIA-B2-004 | `pendiente` | [Aceptación E2E y cutover controlado](./📁%20🧩%20-%20CUSTODIA-B2-004%20-%20Aceptación%20E2E%20y%20cutover%20controlado/README.md) |
+| CUSTODIA-B2-004 | `en_curso` · P0 | [Migración integral a B2 exclusivo y cutover sin persistencia dual](./📁%20🧩%20-%20CUSTODIA-B2-004%20-%20Aceptación%20E2E%20y%20cutover%20controlado/README.md) |
 
 ## 3. Convenciones de registro
 
@@ -41,3 +41,8 @@ Estas tareas ya existían en la lista provisional anterior y no se duplican ni r
 ## 4. Relación con el sprint vigente
 
 La fotografía y el estado de la rama se mantienen en [COORDINACION-SPRINT-CUSTODIA-v0.2.md](../entregas/COORDINACION-SPRINT-CUSTODIA-v0.2.md). La instrucción de origen queda preservada en [INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md](../originales/INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md). El estado técnico de cada tarea está desarrollado en su propio `README.md`, sin replicar el control ni la fuente de estado del frente.
+
+
+## Actualización operativa · 2026-11-07
+
+El operador establece B2 como **único proveedor de persistencia**. Se descarta persistencia dual, fallback y lectura dual Blob/B2 como estado final. CUSTODIA-B2-004 pasa a `en_curso`/P0 y concentra la aceptación E2E y cutover exclusivo. Los objetos Blob históricos solo se conservan temporalmente como fuentes de migración hasta verificar sus copias B2; esa retención no autoriza que la aplicación continúe leyéndolos. No borrar fuentes hasta autorización y reconciliación verificadas.
