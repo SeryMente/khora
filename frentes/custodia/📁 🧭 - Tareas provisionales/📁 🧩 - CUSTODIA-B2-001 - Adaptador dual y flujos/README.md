@@ -1,4 +1,4 @@
-# CUSTODIA-B2-001 · Adaptador dual y flujos de almacenamiento
+# CUSTODIA-B2-001 · Adaptador B2 exclusivo y flujos de almacenamiento
 
 **Estado:** `en_curso`  
 **Tipo:** tarea provisional subordinada al OCP Custodia.  
@@ -12,13 +12,13 @@
 
 **Fuente literal:** [INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md](../../../originales/INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md).
 
-**Desglose operativo (derivado, no cita literal):** completar y comprobar la capa de transporte dual para que Khora pueda escribir en Backblaze B2 cuando el selector de proveedor lo determine, seguir leyendo referencias históricas de Vercel Blob y mantener las verificaciones de cifrado e integridad en los flujos de audio afectados.
+**Desglose operativo (derivado, no cita literal):** completar la capa de transporte para que todas las rutas de producto escriban y lean exclusivamente Backblaze B2. No mantener selector dual, fallback ni lectura Blob en el estado final; las referencias históricas deben migrarse y verificarse antes de retirar sus rutas.
 
 ## Alcance de trabajo
 
 - Revisar el adaptador `lib/server/object-storage.ts` y el validador de localizadores `lib/storage/object-reference.ts`.
-- Cubrir escritura cifrada KHC1, lectura B2 mediante URL firmada del lado servidor y lectura de Blob legacy con host allowlisted.
-- Integrar captura, importación temporal, reproducción, exportación, transcripción y derivado MP3 sin romper compatibilidad con las referencias Blob.
+- Cubrir escritura cifrada KHC1 y lectura B2 mediante URL firmada del lado servidor. Eliminar la lectura Blob de las rutas de producto tras la migración histórica verificada.
+- Integrar captura, importación temporal, reproducción, exportación, transcripción y derivado MP3 usando B2 como único backend.
 - Mantener los localizadores persistidos sin incluir credenciales ni capacidades firmadas de corta duración.
 - Mantener separados staging temporal y objetos originales; la eliminación permitida del adaptador se limita al staging validado para la sesión.
 
@@ -39,7 +39,7 @@
 
 ## Límites
 
-No cambiar el selector de almacenamiento en producción, no desplegar, no cambiar credenciales ni borrar objetos fuente. El trabajo de esta tarea queda en la rama de desarrollo y entornos no productivos. La responsabilidad, autorización y sesión se heredan del [control único de Custodia](../../CONTROL-RESPONSABILIDAD.json), generación 6; no se crea un control por tarea.
+No borrar objetos fuente históricos hasta completar inventario, migración y restauración verificadas. La decisión del operador descarta modo dual y prioriza B2 exclusivo; el cutover se ejecuta tras demostrar integridad y aceptación E2E. No exponer ni imprimir credenciales. La responsabilidad, autorización y sesión se heredan del [control único de Custodia](../../CONTROL-RESPONSABILIDAD.json), generación 6; no se crea un control por tarea.
 
 
 ## Runbook de persistencia B2
