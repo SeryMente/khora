@@ -1,3 +1,4 @@
+import { fetchStoredObject } from "@/lib/server/object-storage";
 import { poseeSesion } from "@/lib/server/custodia-acceso";
 // @l0 L0-002-R · @req L0-003/CUSTODIA · @req ING-EXPORT-ORIGINAL
 import { createHash } from "crypto";
@@ -96,7 +97,7 @@ export async function GET(
 
     const buffers: Buffer[] = [];
     for (const part of parts) {
-      const response = await fetch(String(part.blob_url), { cache: "no-store" });
+      const response = await fetchStoredObject(String(part.blob_url), { cache: "no-store" });
       if (!response.ok) {
         return NextResponse.json({ error: "blob_inaccesible", detail: `No se pudo recuperar el original (HTTP ${response.status}).` }, { status: 502 });
       }

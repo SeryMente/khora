@@ -1,5 +1,6 @@
+import { fetchStoredObject } from "@/lib/server/object-storage";
 import { NextResponse } from "next/server";
-import { del, put } from "@vercel/blob";
+import { putEncryptedObject as put, deleteStagedObject, isStagingObject } from "@/lib/server/object-storage";
 import { createHash } from "crypto";
 import { reclamarSesion } from "@/lib/server/custodia-schema";
 import { auth } from "@/auth";
@@ -10,7 +11,6 @@ import {
   MAX_STAGED_AUDIO_BYTES,
   decryptStagedAudio,
   detectAudioFormat,
-  isKhoraStagingBlobUrl,
 } from "@/lib/server/importedAudio";
 
 export const runtime = "nodejs";
@@ -20,6 +20,7 @@ export const maxDuration = 60;
 export async function POST(request: Request) {
   let stagingUrl = "";
   let stagingCanBeDeleted = false;
+  let cleanupSessionId = "";
   try {
     const session = await auth();
     if (!session?.user?.email) {
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
 
     if (
       !/^[0-9a-f-]{36}$/i.test(sessionId) ||
-      !isKhoraStagingBlobUrl(stagingUrl, sessionId)
+      !isStagingObject(stagingUrl, sessionId)
     ) {
       return NextResponse.json(
         { detail: "Referencia temporal de audio inválida" },
@@ -46,7 +47,8 @@ export async function POST(request: Request) {
     }
 
     await reclamarSesion(sessionId, session.user.email);
-    const response = await fetch(stagingUrl, { cache: "no-store" });
+    cleanupSessionId = sessionId;
+    const response = await fetchStoredObject(stagingUrl, { cache: "no-store" });
     if (!response.ok) {
       return NextResponse.json(
         { detail: `Carga temporal inaccesible: HTTP ${response.status}` },
@@ -94,7 +96,7 @@ export async function POST(request: Request) {
     // Si la lectura de control falla, conservar el objeto cifrado y la carga temporal.
     // La recuperación nunca se confunde con custodia verificada.
     try {
-      const verifyResponse = await fetch(stored.url, { cache: "no-store" });
+      const verifyResponse = await fetchStoredObject(stored.url, { cache: "no-store" });
       if (!verifyResponse.ok) {
         return NextResponse.json({
           error: "audio_no_verificable",
@@ -193,6 +195,6 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   } finally {
-    if (stagingUrl && stagingCanBeDeleted) await del(stagingUrl).catch(() => undefined);
+    if (stagingUrl && stagingCanBeDeleted) await deleteStagedObject(stagingUrl, cleanupSessionId).catch(() => undefined);
   }
 }

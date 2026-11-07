@@ -1,4 +1,3 @@
-import { upload } from "@vercel/blob/client";
 import { transcribeStoredSession } from "./authoritative-transcription";
 
 export const MAX_IMPORT_AUDIO_BYTES = 24 * 1024 * 1024;
@@ -66,14 +65,20 @@ export async function importAndTranscribeAudio(args: {
   const stagingFile = new File([encrypted], "audio-importado.khstaging", {
     type: "application/octet-stream",
   });
-  const stagingPath = `staging/audio/${args.sessionId}/${crypto.randomUUID()}.khstaging`;
 
-  const stagingBlob = await upload(stagingPath, stagingFile, {
-    access: "public",
-    handleUploadUrl: "/api/audio/importar/token",
-    multipart: true,
-    clientPayload: JSON.stringify({ sessionId: args.sessionId }),
+  const policyResponse = await fetch("/api/audio/importar/token", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ kind: "storage-policy", sessionId: args.sessionId, bytes: stagingFile.size }),
   });
+  const policy = await readJson(policyResponse);
+  if (!policyResponse.ok) throw new Error(policy.detail || "No se pudo preparar el almacenamiento cifrado");
+  if (policy.provider !== "b2" || typeof policy.uploadUrl !== "string" || typeof policy.url !== "string") {
+    throw new Error("Backblaze B2 no está habilitado; no se guardará el nuevo registro en otro proveedor");
+  }
+  const response = await fetch(policy.uploadUrl, { method: "PUT", body: stagingFile,
+    headers: { "Content-Type": "application/octet-stream", "x-amz-server-side-encryption": "AES256" }, redirect: "error" });
+  if (!response.ok) throw new Error("No se pudo subir el audio cifrado a Backblaze B2; el archivo local permanece intacto");
+  const stagingBlob = { url: policy.url };
 
   const storedResponse = await fetch("/api/audio/importar/procesar", {
     method: "POST",

@@ -1,3 +1,4 @@
+import { fetchStoredObject } from "@/lib/server/object-storage";
 import { poseeVolcado } from "@/lib/server/custodia-acceso";
 import { auth } from "@/auth";
 // @l0 L0-002-R · @req TRACE-SESSION/010 · @req AUD-04
@@ -85,7 +86,7 @@ export async function GET(pedido: NextRequest, contexto: { params: Promise<{ id:
         const url = p.blob_url;
         let remoto: Response;
         try {
-          remoto = await fetch(url, { cache: "no-store" });
+          remoto = await fetchStoredObject(url, { cache: "no-store" });
         } catch (fetchErr) {
           return NextResponse.json({ error: "blob_inexistente", detail: `Blob inaccesible: ${url}` }, { status: 502 });
         }
@@ -147,7 +148,7 @@ export async function GET(pedido: NextRequest, contexto: { params: Promise<{ id:
         if (!url) continue;
         let remoto: Response;
         try {
-          remoto = await fetch(url, { cache: "no-store" });
+          remoto = await fetchStoredObject(url, { cache: "no-store" });
         } catch (e) {
           return NextResponse.json({ error: "blob_inexistente", detail: `Blob inaccesible: ${url}` }, { status: 502 });
         }
@@ -177,7 +178,7 @@ export async function GET(pedido: NextRequest, contexto: { params: Promise<{ id:
     if (url) {
       let remoto: Response;
       try {
-        remoto = await fetch(url, { cache: "no-store" });
+        remoto = await fetchStoredObject(url, { cache: "no-store" });
       } catch (e) {
         return NextResponse.json({ error: "blob_inexistente", detail: `Blob inaccesible: ${url}` }, { status: 502 });
       }
