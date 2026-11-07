@@ -130,7 +130,8 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
    <footer className={s.sheetfooter}>
     <p role="status" aria-live="polite" data-ui-id="ingreso.custodia-status" className={s.storage}><I.ShieldCheck size={16}/><span>{v.audioPendiente?`Audio: ${v.audioPendiente} parte(s) con confirmación remota pendiente. Conserva esta pestaña o exporta antes de cerrarla.`:v.recuperando?"Recuperando sin sustituir el original…":v.custodiaEstado||"Salvaguarda de captura"}</span></p>
     {v.custodiaReady===false&&!v.custodiaPreparando&&a.onReintentarPreparacion&&<button className={s.secondary} onClick={a.onReintentarPreparacion}>Reintentar preparación</button>}
-    {!!v.custodiaDetalle&&<details className={s.diagnostics}><summary>Detalle de sincronización de audio</summary><p>{v.custodiaDetalle}</p>{a.onReintentarCustodia&&<button className={s.secondary} disabled={busy} onClick={a.onReintentarCustodia}>Reintentar sincronización</button>}</details>}
+    {!!v.custodiaDetalle&&<details className={s.diagnostics}><summary>Detalle de sincronización de audio</summary><p>{v.custodiaDetalle}</p></details>}
+    {(v.audioPendiente??0)>0&&a.onReintentarCustodia&&<button className={s.secondary} disabled={busy} onClick={a.onReintentarCustodia}>Reintentar y archivar</button>}
     <span className={s.characters}>{v.texto.length.toLocaleString('es')} caracteres</span>
    </footer>
   </section>
