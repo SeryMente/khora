@@ -1,18 +1,18 @@
-<!-- LIST_VERSION=0.13; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.14; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.13.
-- **Última actualización:** 2026-11-06 (reordenamiento por prioridad de recuperación; control gen. 7).
+- **Versión de esta lista provisional:** 0.14.
+- **Última actualización:** 2026-11-07 (transferencia de responsabilidad a gen. 8; actualización de estado PR #354; prioridades de recuperación preservadas).
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
 - **Última lectura de metodología del ciclo 2 (referencia histórica):** Samantha v352 · NX-352m; Metacanon 1.21; GOW v2.3; blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
 - **Última lectura metodológica histórica (ciclo 4):** Samantha v356 · NX-356m; Metacanon 1.22; GOW v2.6; blob `c364e179e8e9b6a3d566a8e690dfa1a7cce91798`.
 - **Última lectura metodológica histórica (C008):** Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; blob `89a28e4d05f5baab9c4b86abdb9fbfc532690c75`.
 - **Revalidación metodológica C009–C011 (histórica):** Samantha v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`, leído de `SeryMente/metodologia/main` el 2026-10-29.
-- **Gobierno vigente consultado en esta retoma (2026-11-06):** Samantha v377 · NX-377m; Metacanon 1.28; GOW 2.17; DUG blob `54064c8fe00f872023a455f06596061ed69062ae`; commit main `8ee2482866b3dd085e58e05006727256d0274376`. Se revisó la cascada, P001/P004/P005/P037/P038/P039/P041/P042/P043, Metacanon §§4, 16, 28, 29, 38, 41, 42, 44 y 46–47, y los términos GOW de OCP/SPDF/persistencia. MCP-NORMATIVO: DESACTIVADO.
+- **Gobierno vigente revalidado en esta retoma (2026-11-07):** Samantha v377 · NX-377m; Metacanon 1.28; GOW 2.17; DUG blob `54064c8fe00f872023a455f06596061ed69062ae`; commit main `8ee2482866b3dd085e58e05006727256d0274376`. Se revisó la cascada, P001/P004/P005/P037/P038/P039/P041/P042/P043, Metacanon §§4, 16, 28, 29, 38, 41, 42, 44 y 46–47, y los términos GOW de OCP/SPDF/persistencia. MCP-NORMATIVO: DESACTIVADO.
 La lista sigue provisional; ni el relevo ni esta revalidación certifican su diseño.
 - **Alcance y orden operativo vigente:** (1) CUSTODIA-03, prioridad inmediata: localizar, cotejar y rescatar primero los dictados considerados ausentes/perdidos y las fuentes históricas con potencial de recuperación; (2) CUSTODIA-01: recuperar y verificar después todas las unidades visibles en Ingresos → Dictado → Recuperación; (3) CUSTODIA-04: corregir las brechas sistémicas y certificar el flujo E2E. En CUSTODIA-04 se permite un paréntesis breve, de solo lectura, para revisar el error «Archivar registro», pero no desplaza ni demora el rescate ni autoriza por sí mismo cambios de producto/producción. CUSTODIA-02 permanece retirada y su identificador no se reutiliza. No se afirma que estas tres tareas sean el inventario exhaustivo de todas las obligaciones futuras del frente.
 - **Regla provisional de custodia de información:** no copiar a este repositorio el texto o audio de dictados reales, secretos, credenciales ni identificadores personales innecesarios. Registrar resultados mediante evidencia minimizada y sanitizada, en el soporte autorizado que corresponda.
@@ -143,7 +143,7 @@ Secuencia histórica (C006; antecedente conservado y supersedido por la secuenci
 
 **Prioridad:** P0 · CRÍTICA · PRIORIDAD OPERATIVA #3. La corrección sistémica va después de preservar los candidatos de CUSTODIA-03 y avanzar el catálogo CUSTODIA-01; solo se permite en paralelo el paréntesis de diagnóstico del archivo.
 
-**Estado:** EN CURSO · TERCERA LÍNEA OPERATIVA — el contrato Dictado→Custodia y el error de archivado ya tuvieron una primera revisión estática. No hay corrección de producto ni validación funcional nueva. El paréntesis pendiente se limita a cotejar el texto exacto/runtime del error y su estado de partes si el acceso autorizado está disponible; no debe interrumpir la recuperación prioritaria. PR #339 se cerró sin merge el 2026-10-30 (`merged=false`); su rama `fix/custodia-recovery-reconcile-20261028` estaba divergida en C013 (18 commits ahead / 82 behind frente a `main`, merge-base `b8926d4ad2643805e119f55d0b9b3b58779fd8df`). No reutilizarla sin reconciliación y repetición completa de controles. No hay catálogo productivo cotejado ni recuperaciones de producción.
+**Estado:** EN CURSO · TERCERA LÍNEA OPERATIVA. Diagnóstico estático documentado y corrección del recorrido de reintento/archivado implementada en rama aislada mediante PR [#354](https://github.com/SeryMente/khora/pull/354), todavía abierta y sin merge. La descripción vigente de la PR documenta validaciones locales aprobadas (typecheck; unitarias 572/572; contrato UI; UI review; Playwright E2E 3/3; diff-check). GitHub Actions no ejecutó pasos en los seis jobs observados (`steps=[]`); no equivale a CI aprobado. En ese corte no se ejecutó `npm run build` ni ensayo con proveedor físico real no productivo. El siguiente paréntesis diagnóstico/runtime continúa subordinado al rescate y no debe interrumpir CUSTODIA-03 ni CUSTODIA-01. La causa runtime exacta de la captura reportada sigue NO DETERMINADA; garantías de producto NO CERTIFICADAS.
 
 **Objetivo:** concluir la investigación de las brechas de recuperabilidad identificadas y actualizar KHORA para que las unidades admisibles puedan catalogarse, recuperarse y verificarse de manera consistente. No se considera lograda la recuperabilidad por el mero hecho de modificar o compilar código.
 
@@ -198,10 +198,23 @@ La propuesta continúa sin comprobar los bytes actuales de los objetos remotos n
 **Decisión de estructura:** no crear CUSTODIA-05. Estos criterios amplían CUSTODIA-04, cuyo objetivo existente ya abarca correcciones y pruebas E2E; crear un ID superior duplicaría el mismo resultado. CUSTODIA-02 permanece retirada y no se reutiliza.
 
 
+### Actualización 2026-11-07 · PR #354, transferencia y validación de archivado
+
+- La PR [#354](https://github.com/SeryMente/khora/pull/354), titulada «fix(dictado): reintentar custodia de audio antes de archivar», permanece OPEN; su descripción declara expresamente que no se ha fusionado ni desplegado.
+- El cambio candidato implementa drenaje secuencial/single-flight de subidas pendientes, espera/reintentos antes de validar el manifiesto, protección contra doble activación y bloqueo conservador cuando persiste un fallo. No se relaja la compuerta de integridad ni se elimina la copia local.
+- La descripción de PR registra typecheck aprobado; unitarias 572/572; UI Contract y UI Review aprobados; Playwright focal 3/3 y `git diff --check` aprobado. Son resultados locales documentados para el commit `55449a08719f04982dbfceb15ec28f43c7b68118`; no se presentan como validación de una punta diferente no cotejada.
+- En el mismo expediente, CI remoto registra seis jobs fallidos sin pasos (`steps=[]`), por lo que Actions no ejecutó las pruebas. `npm run build` no se ejecutó en ese corte.
+- No se ha realizado ensayo de escritura + lectura física de vuelta con Blob/Neon no productivo; las rutas de proveedor de Playwright son simuladas. Tampoco se ha reproducido la sesión concreta del operador ni determinado su causa runtime.
+- **Siguiente aceptación de CUSTODIA-04:** runner CI funcional, ensayo autorizado con proveedor no productivo y lectura física/descifrado/cotejo de bytes y SHA, restauración tras recarga/reapertura y evidencia de la sesión causante, sin alterar producción. CUSTODIA-04 continúa abierta.
+- La transferencia documental del frente se ejecutó de generación 7 → 8 tras el «Si» explícito del operador; control leído de vuelta. El folio de sesión continúa PENDIENTE/NO ASIGNADO porque FOL1 no está ACTIVO. No se crea CUSTODIA-05 ni se reactiva CUSTODIA-02.
+
+
 ---
 
 - **2026-11-06 · REORDENAMIENTO-PRIORIDAD-RESCATE · versión 0.13:** se preserva la instrucción literal en [originales/INSTRUCCION-REORDENAMIENTO-PRIORIDAD-RECUPERACION-20261106.md](originales/INSTRUCCION-REORDENAMIENTO-PRIORIDAD-RECUPERACION-20261106.md). La secuencia vigente pasa a CUSTODIA-03 (#1: rescate de ausentes y fuentes candidatas), CUSTODIA-01 (#2: unidades visibles) y CUSTODIA-04 (#3: corrección sistémica); el diagnóstico de «Archivar registro» queda como paréntesis limitado. CUSTODIA-03 se amplía y se coloca primero en el documento, preservando sus identificadores y la historia de tareas. Se prioriza el candidato textual 28-10 20:29/264 checkpoints, seguido de las siete sesiones/1,038 checkpoints, B2, Vercel Blob, IndexedDB del perfil original y otras fuentes autorizadas. Ninguna ruta se declara recuperada por metadatos históricos; no se realizó recuperación productiva en esta actualización.
 ## Registro de cambios
+
+- **2026-11-07 · CUSTODIA-TRANSFER-20261107 · versión 0.14:** transferencia de titularidad documental/operativa a generación 8 por autorización expresa «Si» y actualización condicionada por SHA del control; lectura de vuelta verificada. Se actualiza el estado de CUSTODIA-04 con la evidencia actualmente documentada en PR #354: corrección en rama y validaciones locales, CI sin pasos, sin build en ese corte y sin prueba física con proveedor real no productivo. Se mantienen las prioridades CUSTODIA-03 → CUSTODIA-01 → CUSTODIA-04; el frente y sus garantías continúan abiertos/no certificados.
 
 - **2026-11-06 · CUSTODIA-RETOMA-DIAGNOSTICO-DICTADO · versión 0.12:** instrucción literal conservada en `originales/ChatGPT-CUSTODIA-20261106-1424.txt` (blob `c1cb21131cc4576a4787bdb5fc76bcb978295610`). Se retoma responsabilidad documental mediante `TRANSFER_RESPONSIBILITY`, generación 6→7; control leído de vuelta. Se incorpora en CUSTODIA-04 el contrato E2E Dictado→Custodia, compuerta de archivado, reintentos, conservación de checkpoints, lectura física y criterios específicos de prueba/usabilidad. No se crea CUSTODIA-05. Se corrige el estado actual de PR #339: cerrada sin merge; su rama sigue divergida. La investigación fue estática en main: no se reprodujo la sesión, no se ejecutaron pruebas y no se modificó producto, datos o despliegue. CUSTODIA-01 y CUSTODIA-03 permanecen abiertas; garantías no certificadas.
 
