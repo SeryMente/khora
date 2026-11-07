@@ -7,7 +7,7 @@
 **Autorización del sprint:** [instrucción literal del operador](../originales/INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md).  
 **Coordinación de continuidad:** [COORDINACION-SPRINT-CUSTODIA-v0.2.md](../entregas/COORDINACION-SPRINT-CUSTODIA-v0.2.md).
 
-> Esta colección imita el patrón de Gobernanza: un índice y un objeto `README.md` por cada tarea nueva, anclados en una fuente literal. Los objetos heredan el titular, autorización, generación y sesión del OCP padre. No crean controles, responsables, sesiones, folios globales ni nuevos frentes. El identificador de tarea es local y estable dentro de este registro. No se canoniza el concepto «Tareas» como ámbito funcional.
+> Esta colección imita el patrón de Gobernanza: un índice y un objeto README.md por cada tarea nueva, anclados en una fuente literal. Los objetos heredan el titular, autorización, generación y sesión del OCP padre. No crean controles, responsables, sesiones, folios globales ni nuevos frentes. El identificador de tarea es local y estable dentro de este registro. No se canoniza el concepto «Tareas» como ámbito funcional.
 
 ## 1. Tareas existentes del frente
 
@@ -29,6 +29,8 @@ Estas tareas ya existían en la lista provisional anterior y no se duplican ni r
 | CUSTODIA-B2-003 | `en_curso` | [Preflight y seguridad del proveedor](./📁%20🧩%20-%20CUSTODIA-B2-003%20-%20Preflight%20y%20seguridad%20del%20proveedor/README.md) |
 | CUSTODIA-B2-004 | `pendiente` | [Aceptación E2E y cutover controlado](./📁%20🧩%20-%20CUSTODIA-B2-004%20-%20Aceptación%20E2E%20y%20cutover%20controlado/README.md) |
 
+**Nota transversal B2:** [camino operativo con Master Application Key, cuenta KHORA separada y lecciones de EP](../NOTA-OPERATIVA-B2-MASTER-APPLICATION-KEY.md). Es guía subordinada; no cambia estados ni autoriza migración productiva.
+
 ## 3. Convenciones de registro
 
 - Estados de tarea: `pendiente`, `en_curso`, `completada` y `cancelada`.
@@ -40,4 +42,4 @@ Estas tareas ya existían en la lista provisional anterior y no se duplican ni r
 
 ## 4. Relación con el sprint vigente
 
-La fotografía y el estado de la rama se mantienen en [COORDINACION-SPRINT-CUSTODIA-v0.2.md](../entregas/COORDINACION-SPRINT-CUSTODIA-v0.2.md). La instrucción de origen queda preservada en [INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md](../originales/INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md). El estado técnico de cada tarea está desarrollado en su propio `README.md`, sin replicar el control ni la fuente de estado del frente.
+La fotografía y el estado de la rama se mantienen en [COORDINACION-SPRINT-CUSTODIA-v0.2.md](../entregas/COORDINACION-SPRINT-CUSTODIA-v0.2.md). La instrucción de origen queda preservada en [INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md](../originales/INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md). El estado técnico de cada tarea está desarrollado en su propio README.md, sin replicar el control ni la fuente de estado del frente.
