@@ -75,6 +75,8 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
   const [finalizando,setFinalizando]=useState(false);
   const finalizandoRef=useRef(false);
   const pendingUploadsRef=useRef(new Map<number,()=>Promise<void>>());
+  const retryCustodyInFlightRef=useRef<Promise<void>|null>(null);
+  const archiveInFlightRef=useRef(false);
   const [audioPendiente,setAudioPendiente]=useState(0);
   const [custodiaDetalle,setCustodiaDetalle]=useState("");
   const [generandoTitulo, setGenerandoTitulo] = useState(false);
@@ -1026,11 +1028,31 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
     setEstabaDictando(false);
   }, [arrancarReconocedor, arrancarGrabacion, observarDictado, soportado, guardando, archivado]);
 
-  const reintentarCustodia=async()=>{
-    if(finalizandoRef.current)return;
-    const task=(subidaEnCursoRef.current||Promise.resolve()).catch(()=>undefined).then(async()=>{for(const retry of [...pendingUploadsRef.current.values()])await retry();});
-    subidaEnCursoRef.current=task;await task;await guardarCheckpoint(true);
-  };
+  const reintentarCustodia=useCallback(async()=>{
+    if(finalizandoRef.current||activoRef.current)return false;
+    const existing=retryCustodyInFlightRef.current;
+    if(existing){await existing;return pendingUploadsRef.current.size===0;}
+    const previousUpload=subidaEnCursoRef.current;
+    const task=(async()=>{
+      if(previousUpload)await previousUpload.catch(()=>undefined);
+      const pendientes=[...pendingUploadsRef.current.entries()].sort(([a],[b])=>a-b);
+      for(const [parte,retry] of pendientes){
+        if(pendingUploadsRef.current.get(parte)!==retry)continue;
+        await retry();
+      }
+      await guardarCheckpoint(true);
+    })();
+    retryCustodyInFlightRef.current=task;
+    subidaEnCursoRef.current=task;
+    try{await task;}
+    finally{
+      if(retryCustodyInFlightRef.current===task)retryCustodyInFlightRef.current=null;
+      if(subidaEnCursoRef.current===task)subidaEnCursoRef.current=null;
+    }
+    const confirmada=pendingUploadsRef.current.size===0;
+    if(confirmada){setCustodiaDetalle("");setCustodiaEstado("Todas las partes de audio tienen confirmación remota.");}
+    return confirmada;
+  },[guardarCheckpoint]);
   const detener = useCallback(async () => {
     if(finalizandoRef.current)return;
     finalizandoRef.current=true;setFinalizando(true);
@@ -1166,10 +1188,15 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
   }, [estado, detenerGrabacion, estabilizarEmision, guardarCheckpoint]);
 
   const guardar = useCallback(async () => {
+    if(archiveInFlightRef.current)return;
     setError("");
     setResultado("");
     if (archivado) {
       setError("Esta captura ya está archivada y sellada. Pulsa Limpiar para iniciar una captura nueva.");
+      return;
+    }
+    if(activoRef.current||finalizandoRef.current){
+      setError("Detén la captura y espera a que termine el cierre antes de archivar.");
       return;
     }
     const archivoOriginalVerificado =
@@ -1177,19 +1204,31 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       partesSubidasRef.current[0].verificado === true &&
       Number(partesSubidasRef.current[0].bytes) > 0 &&
       /^[0-9a-f]{64}$/i.test(String(partesSubidasRef.current[0].sha256 ?? ""));
-    if (texto.trim().length === 0 && !archivoOriginalVerificado) {
-      setError("No hay transcripción para archivar. Puedes custodiar el audio original si su almacenamiento y SHA-256 ya están verificados.");
+    const hayAudioConservado=archivoOriginalVerificado||pendingUploadsRef.current.size>0||partesRawRef.current.length>0;
+    if (texto.trim().length === 0 && !hayAudioConservado) {
+      setError("No hay transcripción ni una parte de audio conservada para archivar.");
       return;
     }
     if (!sesionIdRef.current) sesionIdRef.current = generarSesionId();
-    await guardarCheckpoint(true);
+    archiveInFlightRef.current=true;
     setGuardando(true);
     const saveStartedAt = Date.now();
     observarDictado("GUARDADO_DICTADO_INICIADO", { outcome: "PENDING", metrics: { chars_current: texto.length, part_count: partesSubidasRef.current.length } });
     void enviarEventosObservabilidadDictado();
     try {
-      if (subidaEnCursoRef.current) {
-        await subidaEnCursoRef.current;
+      await guardarCheckpoint(true);
+      if (subidaEnCursoRef.current) await subidaEnCursoRef.current;
+      const custodiaConfirmada=await reintentarCustodia();
+      if(!custodiaConfirmada){
+        const pendientes=[...pendingUploadsRef.current.keys()].sort((a,b)=>a-b);
+        const detallePendientes=pendientes.length
+          ? `Partes de audio pendientes de confirmación remota: ${pendientes.map(n=>"#"+n).join(", ")}.`
+          : "La cola de subida no pudo cerrarse; la captura permanece sin sellar.";
+        setCustodiaDetalle(actual=>[detallePendientes,actual].filter(Boolean).join(" "));
+        setCustodiaEstado("Archivo detenido: quedan partes de audio sin confirmar.");
+        setError("No se puede archivar el registro: Khora no ha verificado la custodia íntegra de todas las partes de audio. "+detallePendientes+" No se omitirá ninguna parte; el texto y las copias locales se conservan.");
+        observarDictado("ARCHIVO_BLOQUEADO_POR_AUDIO_PENDIENTE",{severity:"WARN",outcome:"PARTIAL",reasonCode:"audio_parts_pending",metrics:{part_count:partesSubidasRef.current.length,pending_chunks:pendientes.length}});
+        return;
       }
 
       let audioUrl: string | null = null;
@@ -1200,24 +1239,26 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       const audioEsperado = fuenteEntrada === "microfono" || fuenteEntrada === "chrome_live_caption" || fuenteEntrada === "audio_archivo";
       const audioImportado = fuenteEntrada === "audio_archivo";
       const partesGeneradas = Math.max(parteConsecutivaRef.current-1,maximoIndiceConocido(partes,partesRawRef.current));
-      const indicesSubidos = new Set(partes.map((p) => p.parte));
-      const todasLasPartesVerificadas = partes.length > 0 &&
-        partes.every((p) => p.verificado === true &&
-          Number(p.bytes) > 0 &&
-          /^[0-9a-f]{64}$/i.test(String(p.sha256 ?? "")));
-      const indicesContiguos = [...partes]
-        .sort((a, b) => a.parte - b.parte)
-        .every((p, i) => p.parte === i + 1);
-      const audioIntegro = audioImportado
-        ? partes.length === 1 && partes[0].parte === 1 && todasLasPartesVerificadas
-        : fuenteEntrada === "microfono" && partesGeneradas > 0
-          ? evaluarAudioRecuperado(partes,partesGeneradas).ok
-          : fuenteEntrada === "chrome_live_caption"
-            ? todasLasPartesVerificadas && indicesContiguos
-            : !audioEsperado;
+      const evaluacionAudio=partesGeneradas>0?evaluarAudioRecuperado(partes,partesGeneradas):null;
+      let audioIntegro=!audioEsperado;
+      let motivoIntegridad="";
+      if(audioEsperado){
+        if(audioImportado&&partes.length!==1){
+          audioIntegro=false;
+          motivoIntegridad="El audio importado no tiene exactamente una parte registrada.";
+        }else if(!evaluacionAudio?.ok){
+          audioIntegro=false;
+          motivoIntegridad=evaluacionAudio?.motivo||"La captura no generó ninguna parte de audio verificable.";
+        }else{
+          audioIntegro=true;
+        }
+      }
 
       if (audioEsperado && !audioIntegro) {
-        setError("No se puede archivar el registro: Khora no ha verificado la custodia íntegra de todas las partes de audio.");
+        const detalle=motivoIntegridad||"El manifiesto de audio no acredita todas las partes esperadas.";
+        setCustodiaDetalle("Validación de custodia pendiente: "+detalle);
+        setCustodiaEstado("Archivo detenido por integridad de audio.");
+        setError("No se puede archivar el registro: Khora no ha verificado la custodia íntegra de todas las partes de audio. "+detalle);
         return;
       }
 
@@ -1278,9 +1319,16 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       setError(String(e));
     } finally {
       setGuardando(false);
-      await enviarEventosObservabilidadDictado();
+      try { await enviarEventosObservabilidadDictado(); }
+      finally { archiveInFlightRef.current=false; }
     }
-  }, [archivado, texto, titulo, pulidosOk, observarDictado, guardarCheckpoint]);
+  }, [archivado, texto, titulo, pulidosOk, observarDictado, guardarCheckpoint, reintentarCustodia]);
+
+  const reintentarYArchivar=useCallback(async()=>{
+    if(finalizandoRef.current||activoRef.current)return;
+    // Reutiliza el mismo camino de archivo; no abre una segunda operación de retry.
+    await guardar();
+  },[guardar]);
 
 
   const exportarMp3Conservado = useCallback(async()=>{
@@ -1637,7 +1685,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
         onPrepararChrome: prepararChrome,
         onDialogoChange:(enabled)=>{if(enabled&&!texto.trim()&&!conAudio&&!titulo.trim()&&estado!=="dictando"&&!guardando)onDialogo();},
         onDetener: detener,
-        onReintentarCustodia:()=>void reintentarCustodia(),
+        onReintentarCustodia:()=>void reintentarYArchivar(),
         onGuardar: guardar,
         onRetranscribir: ejecutarTranscripcionAutoritativa,
         onAdjuntarClick: () => fileInputRef.current?.click(),
