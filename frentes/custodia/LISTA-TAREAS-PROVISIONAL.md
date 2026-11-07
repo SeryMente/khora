@@ -1,11 +1,11 @@
-<!-- LIST_VERSION=0.15; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.16; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.15.
-- **Última actualización:** 2026-11-07 (seguimiento remoto PR #354; rama divergida y solapamiento documental identificados; titularidad gen. 8).
+- **Versión de esta lista provisional:** 0.16.
+- **Última actualización:** 2026-11-07 (nuevo cotejo agregado de candidato textual en snapshot Neon no productivo; PR #354 divergida; titularidad gen. 8).
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
 - **Última lectura de metodología del ciclo 2 (referencia histórica):** Samantha v352 · NX-352m; Metacanon 1.21; GOW v2.3; blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
@@ -54,6 +54,19 @@ Secuencia histórica (C006; antecedente conservado y supersedido por la secuenci
 **Motivo:** el incidente reportado el 28-10-2026 dejó de permitir asumir que todas las capturas relevantes están presentes en el inventario visible. El operador informa que falta un dictado realizado hacia el final de una sesión de terminal y que la última entrada visible en Recuperación fecha del 28-10-2026 a las 17:08. También reporta un contador que cambia de 40 a 20. La explicación de duplicados local/remoto es plausible por el código inspeccionado, pero no se ha comparado el catálogo real y no cuantifica las capturas ausentes.
 
 **Objetivo rector:** localizar y recuperar primero el dictado específico que se considera perdido y cualquier otra unidad ausente con fuente candidata; preservar todas las fuentes y restaurar en un destino separado con lectura de vuelta. Después, cuantificar el universo de dictados ausentes, duplicados, archivados, locales solamente, incompletos, inaccesibles o irrecuperables. No se tomará «no visible» como sinónimo de «perdido» ni «metadatos presentes» como sinónimo de «recuperable ahora».
+
+
+### Evidencia adicional 2026-11-07 · candidato de texto en snapshot Neon
+
+- En la rama no predeterminada `custodia-b2-migration-test-20261031`, creada el 2026-10-31 a partir de un snapshot de main con parent timestamp 2026-10-31T20:42:02Z, se inspeccionó el esquema y solo se consultaron agregados en la copia `neondb`.
+- Aparece una sesión creada entre 20:29 y 20:30 del 28-10 (hora America/Mexico_City) con **264 revisiones únicas**; las 264 filas tienen texto y snapshot no vacíos. Suma agregada de longitudes: 769,749 caracteres. No se leyó ni exportó el contenido.
+- Metadatos de la misma sesión: estado `checkpoint`, `total_partes=0`; 0 filas de `dictado_audio_parte`, 0 de `dictado_mp3`, 0 de historial MP3, 0 `volcado_id` y 0 relaciones `volcado` con audio. Esto respalda un candidato de texto, no audio recuperable.
+- La consulta por `dictado_checkpoint.client_at` desde 17:08 hasta medianoche devolvió **2 sesiones/268 checkpoints** en este snapshot: una de 264 y otra de 4. No coincide con C014 (7 sesiones/1,038 checkpoints); ambos cortes quedan preservados y la diferencia no está reconciliada. No sustituir el dato C014 con esta muestra.
+- La base separada `custodia_b2_e2e` no tenía datos en las tablas de audio/migración inspeccionadas (tamaño de tabla 0 bytes); no es fuente para este rescate.
+- Evidencia sanitizada: [CUSTODIA-03-CANDIDATO-TEXTO-NEON-SNAPSHOT-20261107.md](evidencias/CUSTODIA-03-CANDIDATO-TEXTO-NEON-SNAPSHOT-20261107.md), blob `9bfaac04eb2aff22cb212de1ca5c90fc4494d867`.
+- **Estado:** candidato localizado en snapshot, identidad con el dictado buscado NO CONFIRMADA, contenido no leído, recuperación NO EJECUTADA, audio NO ENCONTRADO en las tablas de esta sesión. La rama es copia de datos de main y puede contener información real; no se interpreta como entorno sintético.
+- **Siguiente paso:** cotejar el contenido de ese único candidato con lo que busca el operador, bajo acceso/autoridad del propietario y sin reproducirlo ni persistirlo en GitHub; después, si coincide, restaurar solo a destino separado y verificar lectura de vuelta. En paralelo, mantener la investigación física de B2/Vercel Blob e IndexedDB original.
+
 
 **Orden de rescate por valor y evidencia disponible**
 
@@ -222,6 +235,8 @@ La propuesta continúa sin comprobar los bytes actuales de los objetos remotos n
 
 - **2026-11-06 · REORDENAMIENTO-PRIORIDAD-RESCATE · versión 0.13:** se preserva la instrucción literal en [originales/INSTRUCCION-REORDENAMIENTO-PRIORIDAD-RECUPERACION-20261106.md](originales/INSTRUCCION-REORDENAMIENTO-PRIORIDAD-RECUPERACION-20261106.md). La secuencia vigente pasa a CUSTODIA-03 (#1: rescate de ausentes y fuentes candidatas), CUSTODIA-01 (#2: unidades visibles) y CUSTODIA-04 (#3: corrección sistémica); el diagnóstico de «Archivar registro» queda como paréntesis limitado. CUSTODIA-03 se amplía y se coloca primero en el documento, preservando sus identificadores y la historia de tareas. Se prioriza el candidato textual 28-10 20:29/264 checkpoints, seguido de las siete sesiones/1,038 checkpoints, B2, Vercel Blob, IndexedDB del perfil original y otras fuentes autorizadas. Ninguna ruta se declara recuperada por metadatos históricos; no se realizó recuperación productiva en esta actualización.
 ## Registro de cambios
+
+- **2026-11-07 · CUSTODIA-03-NEON-SNAPSHOT · versión 0.16:** se registra en evidencia un candidato textual del 28-10 a las 20:29 con 264 revisiones/checkpoints no vacíos en un snapshot Neon de no producción. Los metadatos indican 0 partes de audio, 0 MP3, 0 historial y sin vínculo a volcado. El contenido no fue leído ni recuperado. La ventana completa en el snapshot devuelve 2/268 por `client_at`, discrepante con el corte C014 7/1,038; se conservan ambos y queda pendiente reconciliación.
 
 - **2026-11-07 · SEGUIMIENTO-PR354-RECONCILIACION · versión 0.15:** se añade fotografía de rama PR #354 divergida (32 ahead/7 behind), solapamiento de los dos documentos de Custodia con main gen. 8 y seis jobs remotos sin pasos. Se preservan resultados locales reportados para SHA 55449a0, se aclara que no equivalen a CI ni proveedor físico, y se prohíbe inferir aceptación/merge. CUSTODIA-03 → CUSTODIA-01 → CUSTODIA-04 sigue vigente.
 
