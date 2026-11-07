@@ -19,9 +19,9 @@
 ## 3. Cambio implementado en rama limpia
 
 - Rama: `fix/custodia-04-archive-retry-20261107-g8`.
-- Base: `main` en `3c35c0f41a943b54b971fa3bcf5bcd6112019cbb).
+- Base al crear la rama: `main` en `3c35c0f41a943b54b971fa3bcf5bcd6112019cbb`.
 - Head de PR #355: `2841425d6ea4aa2a43998a717c7d585be3f5084f`.
-- La comparación muestra 6 commits ahead y 0 behind; merge-base igual a la base actual de `main`.
+- Comparación actual antes de esta actualización documental: `main` `650e4b285ce57d172ac0fe8c9c668f263e4fbc6f`; estado `diverged`, 6 commits ahead / 3 behind, merge-base `3c35c0f41a943b54b971fa3bcf5bcd6112019cbb`. Los tres commits exclusivos de `main` afectan documentación de Custodia; el diff de la PR sigue limitado a cuatro archivos de código/pruebas y no comparte esas rutas.
 - Archivos modificados: cuatro rutas de código/pruebas, sin cambios del OCP en la rama:
   - `khora-web/app/components/ingreso/IngresoWorkspace.tsx`
   - `khora-web/app/components/shared/IngresoView.tsx`
@@ -55,7 +55,7 @@ Los cuatro archivos de código/pruebas de la rama son **idénticos byte por byte
 - Playwright `audio-por-partes.spec.ts`: 3/3.
 - `git diff --check`: aprobado.
 
-La coincidencia de blobs demuestra que el contenido de los cuatro archivos coincide con el corte local validado. No se afirma que los workflows hayan ejecutado de nuevo en la punta de PR #355.
+La coincidencia de blobs demuestra que el contenido de los cuatro archivos coincide con el corte local validado. Esto acredita identidad de contenido, no ejecución nueva de pruebas en la punta de PR #355; el estado de Actions se detalla a continuación.
 
 ### GitHub Actions en PR #355
 
@@ -65,8 +65,10 @@ La coincidencia de blobs demuestra que el contenido de los cuatro archivos coinc
   - UI Quality: `42394103598`
   - CI: `42394103601`
   - khora-ok / gate: `42394103652`
-- Seis jobs consultados individualmente: UI Contract, UI E2E, calidad, khora-web-gate, api-tests y khora-ok.
-- Los seis terminaron `completed/failure`, pero todos reportaron `runner_id=0`, `runner_name=""` y `steps=[]`. **Ningún paso de workflow se ejecutó.** Es un bloqueo de asignación de runner, no evidencia de una aserción fallida ni CI aprobado.
+- Seis jobs consultados individualmente en la primera tentativa: UI Contract `128467683626`, UI E2E `128467683788`, calidad `128467683229`, khora-web-gate `128467683435`, api-tests `128467683566` y khora-ok `128467684110`.
+- Se reintentaron los tres runs mediante la acción de repetir jobs fallidos. Los nuevos jobs fueron UI Contract `128469824848`, UI E2E `128469824833`, calidad `128469834073`, khora-web-gate `128469834007`, api-tests `128469834155` y khora-ok `128469840670`; los seis se consultaron por separado y cada consulta de pasos devolvió `steps=[]`.
+- En la primera tentativa, los seis terminaron `completed/failure` con `runner_id=0`, `runner_name=""` y `steps=[]`. Tras repetir los tres runs, los seis jobs volvieron a terminar `completed/failure`; cada consulta de pasos devolvió `[]` y `logs_url=null`. **Ningún paso de workflow se ejecutó en ninguna de las dos tentativas.** No es una falla de aserciones del parche ni CI aprobado.
+- Los tres workflows declaran `runs-on: ubuntu-latest` (`.github/workflows/ci.yml`, `.github/workflows/ui-quality.yml` y `.github/workflows/khora-ok.yml`); el bloqueo no depende del runner local RDC. La causa exacta del no-arranque (configuración/permisos/entitlement/servicio de Actions u otra condición de GitHub) permanece NO DETERMINADA.
 - Los checks externos Netlify/Vercel fallaron por la restricción vigente para desplegar repositorios privados de organización con el plan Hobby; no son pruebas funcionales del parche.
 
 ## 5. Dictamen actual
@@ -74,7 +76,7 @@ La coincidencia de blobs demuestra que el contenido de los cuatro archivos coinc
 - **Implementado:** sí, en rama aislada y PR #355 en borrador.
 - **Lectura de vuelta de los cuatro archivos:** sí; los SHA coinciden con la evidencia de contenido ya validada.
 - **Pruebas locales previas sobre contenido idéntico:** sí, resultados arriba.
-- **Ejecución CI de la punta PR #355:** NO EJECUTADA; falta runner.
+- **Ejecución CI de la punta PR #355:** NO VALIDADA. GitHub generó workflows y jobs en dos tentativas, pero ninguno ejecutó pasos; no hay evidencia de pruebas nuevas aprobadas ni de aserciones fallidas.
 - **Build nuevo de esta rama:** NO EJECUTADO.
 - **Prueba física con proveedor real no productivo:** NO EJECUTADA.
 - **Causa runtime de la sesión concreta del operador:** NO DETERMINADA.
@@ -84,7 +86,7 @@ La coincidencia de blobs demuestra que el contenido de los cuatro archivos coinc
 
 ## 6. Siguiente acción necesaria
 
-Conseguir un runner GitHub autorizado o un entorno local permitido para ejecutar los controles sobre la punta de PR #355. No usar el perfil RDC `CENTRAL\\MantenimientoRCI` excluido; el equipo `015RENTA01` no estaba disponible en el corte previo. Después ejecutar una prueba con proveedor físico real no productivo y lectura de vuelta. Mantener PR #355 sin merge ni despliegue hasta que esas evidencias existan.
+Resolver primero la disponibilidad/configuración de GitHub Actions para sus jobs `ubuntu-latest` o disponer de un entorno local expresamente autorizado. Después ejecutar los gates sobre la punta de PR #355, realizar build y una prueba con proveedor físico real no productivo y lectura de vuelta. El perfil RDC `CENTRAL\\MantenimientoRCI` continúa excluido; no usarlo. Mantener PR #355 en borrador y sin merge/despliegue hasta obtener esas evidencias.
 
 ## 7. Seguridad y no alteración
 
