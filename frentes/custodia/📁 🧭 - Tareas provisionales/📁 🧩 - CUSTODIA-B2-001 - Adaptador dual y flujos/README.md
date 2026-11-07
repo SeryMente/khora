@@ -40,3 +40,8 @@
 ## Límites
 
 No cambiar el selector de almacenamiento en producción, no desplegar, no cambiar credenciales ni borrar objetos fuente. El trabajo de esta tarea queda en la rama de desarrollo y entornos no productivos. La responsabilidad, autorización y sesión se heredan del [control único de Custodia](../../CONTROL-RESPONSABILIDAD.json), generación 6; no se crea un control por tarea.
+
+
+## Runbook de persistencia B2
+
+Seguir [GUIA-PERSISTENCIA-B2-MASTER.md](../../../GUIA-PERSISTENCIA-B2-MASTER.md) para el preflight y smoke test de Backblaze. La ruta recomendada usa la Master Application Key de una cuenta B2 exclusiva de Khora, no Application Keys individuales. Es una guía documental: la cuenta/credenciales y la migración siguen pendientes; no habilita cambios de producción ni eliminación de fuentes.
