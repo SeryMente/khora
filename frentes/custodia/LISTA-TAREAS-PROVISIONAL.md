@@ -1,11 +1,11 @@
-<!-- LIST_VERSION=0.16; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.17; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.16.
-- **Última actualización:** 2026-11-07 (nuevo cotejo agregado de candidato textual en snapshot Neon no productivo; PR #354 divergida; titularidad gen. 8).
+- **Versión de esta lista provisional:** 0.17.
+- **Última actualización:** 2026-11-07 (reparación candidata del bloqueo de archivado en PR #355; CI sin runners; titularidad gen. 8).
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
 - **Última lectura de metodología del ciclo 2 (referencia histórica):** Samantha v352 · NX-352m; Metacanon 1.21; GOW v2.3; blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
@@ -156,7 +156,7 @@ Secuencia histórica (C006; antecedente conservado y supersedido por la secuenci
 
 **Prioridad:** P0 · CRÍTICA · PRIORIDAD OPERATIVA #3. La corrección sistémica va después de preservar los candidatos de CUSTODIA-03 y avanzar el catálogo CUSTODIA-01; solo se permite en paralelo el paréntesis de diagnóstico del archivo.
 
-**Estado:** EN CURSO · TERCERA LÍNEA OPERATIVA. Diagnóstico estático documentado y corrección del recorrido de reintento/archivado implementada en rama aislada mediante PR [#354](https://github.com/SeryMente/khora/pull/354), todavía OPEN · DRAFT · NOT MERGED. Su expediente documenta validaciones locales (typecheck; unitarias 572/572; UI Contract; UI Review; Playwright E2E 3/3; diff-check) para el commit `55449a0`; no se atribuyen a una punta posterior no validada. Seis jobs remotos asociados terminaron failure con pasos vacíos; no es CI aprobado. En ese corte no se ejecutó `npm run build` ni ensayo con proveedor físico real no productivo. La comparación actual contra main reporta rama divergida: 32 commits ahead / 7 behind, merge-base `0aa7497a6316772ccf846620685a87b0711e346c`. La PR modifica también `OBJETO-CANONICO.md` y `LISTA-TAREAS-PROVISIONAL.md`, cuyos contenidos en main fueron actualizados después; requiere reconciliación documental antes de integración. No hacer merge/rebase automático. La causa runtime exacta de la captura sigue NO DETERMINADA; garantías de producto NO CERTIFICADAS.
+**Estado:** EN CURSO · TERCERA LÍNEA OPERATIVA. La corrección candidata del bloqueo de archivado está implementada en una rama limpia basada en el `main` actual y en PR [#355](https://github.com/SeryMente/khora/pull/355), OPEN · DRAFT · NOT MERGED. La rama contiene solo cuatro archivos de código/pruebas y está 6 commits ahead / 0 behind de `main` al corte de creación. Los cuatro blobs de código/pruebas son idénticos a los del commit localmente validado `55449a0`; el expediente anterior documenta typecheck, 572/572 unitarias, UI Contract, UI Review, Playwright 3/3 y diff-check aprobados. La PR #355 disparó tres workflows (CI, UI Quality y khora-ok/gate), pero sus seis jobs terminaron failure con `runner_id=0`, `runner_name=""` y `steps=[]`; ningún paso se ejecutó. Esto no es CI aprobado ni fallo de aserciones. Los checks Netlify/Vercel fallaron por restricciones del plan para repositorio privado. No se ejecutó build nuevo ni prueba física con proveedor real no productivo. La PR #354 anterior permanece abierta y divergida, como antecedente; no se integra ni se rebasea automáticamente. La causa runtime exacta de la sesión del operador sigue NO DETERMINADA; garantías de producto NO CERTIFICADAS.
 
 **Objetivo:** concluir la investigación de las brechas de recuperabilidad identificadas y actualizar KHORA para que las unidades admisibles puedan catalogarse, recuperarse y verificarse de manera consistente. No se considera lograda la recuperabilidad por el mero hecho de modificar o compilar código.
 
@@ -231,10 +231,28 @@ La propuesta continúa sin comprobar los bytes actuales de los objetos remotos n
 - **Evidencia:** [SEGUIMIENTO-PR354-RECONCILIACION-20261107.md](evidencias/SEGUIMIENTO-PR354-RECONCILIACION-20261107.md), blob `9f986a773dcd55bb922d13a9ad8aa6517133d010`. La corrección candidata permanece sin integrar y el producto NO CERTIFICADO.
 
 
+### Reparación del bloqueo de archivado · PR #355 · 2026-11-07
+
+- **Solicitud operativa:** corregir el incidente reportado el 2026-11-06 que impide archivar registros nuevos con el mensaje de falta de custodia íntegra de todas las partes.
+- **Diagnóstico estático:** `IngresoWorkspace.tsx::guardar()` presenta el mensaje antes de POST `/api/dictado`. Si una parte queda en `pendingUploadsRef`, la implementación previa esperaba la subida activa, pero no drenaba toda la cola de reintentos antes de validar el manifiesto. Defecto de coordinación compatible con el síntoma; causa runtime de la sesión concreta NO DETERMINADA.
+- **Rama limpia:** `fix/custodia-04-archive-retry-20261107-g8`, base `main` `3c35c0f41a943b54b971fa3bcf5bcd6112019cbb`, HEAD `2841425d6ea4aa2a43998a717c7d585be3f5084f`; comparación: 6 commits ahead / 0 behind, merge-base en la base actual de main.
+- **PR:** [#355](https://github.com/SeryMente/khora/pull/355), OPEN · DRAFT · NOT MERGED. Cuatro rutas modificadas, solo código y pruebas; no arrastra documentos del OCP.
+- **Comportamiento:** drena subidas pendientes en orden; serializa reintentos y archivado; bloquea doble activación; vuelve a validar el manifiesto; no omite partes ni relaja integridad; si persiste el fallo, no llama a `/api/dictado` y conserva texto/copias locales; expone «Reintentar y archivar».
+- **Pruebas de regresión:** 503 transitorio → reintento satisfactorio y una sola llamada de archivo incluso con doble clic; 502 persistente → archivo bloqueado y texto preservado.
+- **Identidad de contenido validado:** los blobs de los cuatro archivos de código/pruebas coinciden byte por byte con el commit `55449a08719f04982dbfceb15ec28f43c7b68118`, cuya validación local documentada fue typecheck, 572/572 unitarias, UI Contract, UI Review, Playwright 3/3 y diff-check aprobados.
+- **CI de la nueva punta:** runs `42394103598` (UI Quality), `42394103601` (CI), `42394103652` (khora-ok/gate). Seis jobs: `128467683626`, `128467683788`, `128467683229`, `128467683435`, `128467683566`, `128467684110`; todos completed/failure con `runner_id=0`, `runner_name=""` y `steps=[]`. Ningún workflow ejecutó pasos; no clasificar como regresión de código ni como CI verde. Netlify/Vercel Preview fallaron por restricción de repo privado en plan Hobby.
+- **Evidencia:** [REPARACION-ARCHIVADO-20261107-PR355.md](evidencias/REPARACION-ARCHIVADO-20261107-PR355.md), blob `155b969ac17b3cd1387e3ff32876336f1d343a90`.
+- **Límites:** no se ha ejecutado build nuevo, ensayo con proveedor físico no productivo, diagnóstico runtime de la sesión original, merge, despliegue ni operación productiva. La PR #354 previa permanece abierta/divergida y sin cerrar. CUSTODIA-04 permanece ABIERTA; producto NO CERTIFICADO.
+- **Siguiente aceptación:** runner GitHub con pasos efectivos y gates aprobados; build; prueba con proveedor real no productivo y lectura física de vuelta; captura de evidencia runtime autorizada; aceptación E2E. No merge/deploy ni cambios productivos sin autorización específica.
+
+
+
 ---
 
 - **2026-11-06 · REORDENAMIENTO-PRIORIDAD-RESCATE · versión 0.13:** se preserva la instrucción literal en [originales/INSTRUCCION-REORDENAMIENTO-PRIORIDAD-RECUPERACION-20261106.md](originales/INSTRUCCION-REORDENAMIENTO-PRIORIDAD-RECUPERACION-20261106.md). La secuencia vigente pasa a CUSTODIA-03 (#1: rescate de ausentes y fuentes candidatas), CUSTODIA-01 (#2: unidades visibles) y CUSTODIA-04 (#3: corrección sistémica); el diagnóstico de «Archivar registro» queda como paréntesis limitado. CUSTODIA-03 se amplía y se coloca primero en el documento, preservando sus identificadores y la historia de tareas. Se prioriza el candidato textual 28-10 20:29/264 checkpoints, seguido de las siete sesiones/1,038 checkpoints, B2, Vercel Blob, IndexedDB del perfil original y otras fuentes autorizadas. Ninguna ruta se declara recuperada por metadatos históricos; no se realizó recuperación productiva en esta actualización.
 ## Registro de cambios
+
+- **2026-11-07 · CUSTODIA-04-REPARACION-ARCHIVADO-PR355 · versión 0.17:** se registra reparación candidata en rama limpia/PR #355, con reintento secuencial *single-flight*, bloqueo de archivados duplicados, nueva evaluación del manifiesto y conservación de texto ante fallo persistente. Los cuatro archivos de código/pruebas coinciden con SHA de archivos ya validados localmente en commit 55449a0; CI nuevo disparó seis jobs sin runner ni pasos. PR #354 queda como antecedente divergido sin integración. Producto no certificado; no merge/deploy.
 
 - **2026-11-07 · CUSTODIA-03-NEON-SNAPSHOT · versión 0.16:** se registra en evidencia un candidato textual del 28-10 a las 20:29 con 264 revisiones/checkpoints no vacíos en un snapshot Neon de no producción. Los metadatos indican 0 partes de audio, 0 MP3, 0 historial y sin vínculo a volcado. El contenido no fue leído ni recuperado. La ventana completa en el snapshot devuelve 2/268 por `client_at`, discrepante con el corte C014 7/1,038; se conservan ambos y queda pendiente reconciliación.
 
