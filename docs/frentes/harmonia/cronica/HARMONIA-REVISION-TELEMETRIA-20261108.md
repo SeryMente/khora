@@ -93,6 +93,18 @@ No se modificó código, PR, Chrome, permisos, infraestructura, OCP de otro fren
 
 Fuentes: [observador](https://github.com/SeryMente/khora/blob/main/apps/harmonia-observability/extension/cycle-observer.js), [service worker](https://github.com/SeryMente/khora/blob/main/apps/harmonia-observability/extension/service-worker.js), [validador del colector](https://github.com/SeryMente/khora/blob/main/apps/harmonia-observability/collector/cycle-telemetry.js), [consulta](https://github.com/SeryMente/khora/blob/main/apps/harmonia-observability/collector/query.ps1), [contrato y límites](https://github.com/SeryMente/khora/blob/main/apps/harmonia-observability/CYCLE-TELEMETRY.md).
 
+---
+
+IPZ: v0.7 · d.h.m NO VERIFICADO
+DUG: v383 · NX-383m · d.h.m NO VERIFICADO
+CONV: PENDIENTE / NO ASIGNADO | OCP: PENDIENTE / NO ASIGNADO
+CICLO 1: PENDIENTE / NO ASIGNADO | OCP: PENDIENTE / NO ASIGNADO
+A: PENDIENTE / NO ASIGNADO | OCP: PENDIENTE / NO ASIGNADO
+B: PENDIENTE / NO ASIGNADO | OCP: PENDIENTE / NO ASIGNADO
+UUIDv7 local del ciclo: `01a1bc2b-a790-7b73-63d0-cbddd2678b0d`
+FOL1: PREPARADA · NO ACTIVA
+MCP normativo: DESACTIVADO
+
 ## Siguiente checkpoint
 
 1. Obtener un resultado verificable de GitHub Actions y ejecutar la suite de Node y PowerShell.
