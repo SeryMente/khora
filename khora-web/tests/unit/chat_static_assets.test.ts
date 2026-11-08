@@ -16,16 +16,18 @@ test("Open WebUI interface, API and static assets remain on the authenticated up
   }
   const middleware = fs.readFileSync("middleware.ts", "utf8");
   assert.ok(middleware.indexOf("!req.auth") < middleware.indexOf("if (process.env.KHORA_CHAT_ENABLED"));
-  assert.match(middleware, /pathname === "\\/chat\\/frame"/);
-  assert.match(middleware, /pathname === "\\/api\\/version"/);
+  assert.match(middleware, /pathname === "\/chat\/frame"/);
+  assert.match(middleware, /pathname === "\/api\/version"/);
+  assert.match(middleware, /referer.pathname !== "\/"/);
   assert.match(middleware, /isOpenWebUIRootNavigation/);
-  assert.match(middleware, /NextResponse\\.rewrite\\(destino\\)/);
+  assert.match(middleware, /NextResponse\.rewrite\(destino\)/);
+  assert.doesNotMatch(middleware, /bundledOpenWebUIAsset/);
 });
 
 test("Cora keeps its own shell around the Open WebUI iframe", () => {
   const page = fs.readFileSync("app/chat/page.tsx", "utf8");
   assert.match(page, /<iframe/);
-  assert.match(page, /src="\\/chat\\/frame"/);
+  assert.match(page, /src="\/chat\/frame"/);
   assert.match(page, /title="Open WebUI"/);
   const fallback = fs.readFileSync("app/chat/frame/page.tsx", "utf8");
   assert.match(fallback, /no está habilitado/);
