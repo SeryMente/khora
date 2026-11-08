@@ -1,0 +1,19 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict');
+const {START,COMPLETE,sanitizeCycleEvent,validateCyclePair}=require('./cycle-telemetry');
+const sessionId='123e4567-e89b-42d3-a456-426614174000',conversationId='018bcfe5-6800-7000-8000-000000000001',cycleId='018bcfe5-6800-7000-8000-000000000002';
+const t0='2023-11-14T22:13:20.100Z',t1='2023-11-14T22:13:21.600Z';
+function event(type,payload,id,capturedAt=payload.timestamp_utc){return {schema:'harmonia.event.v1',eventId:id||sessionId,sessionId,type,source:'cycle-observer',capturedAt,payload};}
+function startPayload(overrides={}){return {conversation_id:conversationId,cycle_id:cycleId,phase:'started',timestamp_utc:t0,monotonic_ms:100,clock_source:'performance.now',clock_precision_ms:0.001,coverage:'new-dom-node-v1',settle_window_ms:1500,...overrides};}
+function completePayload(overrides={}){return {conversation_id:conversationId,cycle_id:cycleId,phase:'completed',timestamp_utc:t1,monotonic_ms:1600,duration_ms:1500,clock_source:'performance.now',clock_precision_ms:0.001,coverage:'new-dom-node-v1',settle_window_ms:1500,...overrides};}
+test('synthetic: accepts exact event schemas',()=>{assert.equal(sanitizeCycleEvent(event(START,startPayload())).type,START);assert.equal(sanitizeCycleEvent(event(COMPLETE,completePayload(),'123e4567-e89b-42d3-a456-426614174001')).type,COMPLETE);});
+test('synthetic: rejects non-v7 local IDs',()=>{assert.throws(()=>sanitizeCycleEvent(event(START,startPayload({cycle_id:sessionId}))),/uuidv7/);assert.throws(()=>sanitizeCycleEvent(event(START,startPayload({conversation_id:sessionId}))),/uuidv7/);});
+test('synthetic: rejects unapproved event/payload fields',()=>{assert.throws(()=>sanitizeCycleEvent({...event(START,startPayload()),conversation:'native-id'}),/unapproved_fields/);assert.throws(()=>sanitizeCycleEvent(event(START,{...startPayload(),message:'private'})),/unapproved_fields/);assert.throws(()=>sanitizeCycleEvent(event(START,{...startPayload(),url:'https://chatgpt.com/c/secret'})),/unapproved_fields/);});
+test('synthetic: start does not accept duration_ms',()=>{assert.throws(()=>sanitizeCycleEvent(event(START,{...startPayload(),duration_ms:0})),/unapproved_fields/);});
+test('synthetic: rejects invalid UTC, clock and negative duration',()=>{
+ assert.throws(()=>sanitizeCycleEvent(event(START,startPayload({timestamp_utc:'not-a-date'}),undefined,t0)),/timestamp_mismatch/);
+ assert.throws(()=>sanitizeCycleEvent(event(START,startPayload({clock_source:'Date.now'}))),/clock_source/);
+ assert.throws(()=>sanitizeCycleEvent(event(COMPLETE,completePayload({duration_ms:-1}),'123e4567-e89b-42d3-a456-426614174001')),/duration_invalid/);
+});
+test('synthetic: pair requires same session, conversation, cycle',()=>{const a=sanitizeCycleEvent(event(START,startPayload())),b=sanitizeCycleEvent(event(COMPLETE,completePayload(),'123e4567-e89b-42d3-a456-426614174001'));assert.equal(validateCyclePair(a,b),true);assert.throws(()=>validateCyclePair(a,{...b,sessionId:'123e4567-e89b-42d3-a456-426614174099'}),/identity_mismatch/);assert.throws(()=>validateCyclePair(a,{...b,payload:{...b.payload,cycle_id:conversationId}}),/identity_mismatch/);});
+test('synthetic: duration is monotonic-only',()=>{const a=sanitizeCycleEvent(event(START,startPayload())),wrong=sanitizeCycleEvent(event(COMPLETE,completePayload({duration_ms:1499}),'123e4567-e89b-42d3-a456-426614174001'));assert.throws(()=>validateCyclePair(a,wrong),/does_not_match/);const wall=sanitizeCycleEvent(event(COMPLETE,completePayload({timestamp_utc:'2023-11-14T22:19:00.000Z'}),'123e4567-e89b-42d3-a456-426614174001'));assert.equal(validateCyclePair(a,wall),true);});

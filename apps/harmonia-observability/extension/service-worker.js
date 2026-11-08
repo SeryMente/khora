@@ -12,6 +12,7 @@ let lastError=null;
 let collector=false;
 let knownFingerprints=new Set();
 let surfaceQueue=Promise.resolve();
+let cycleQueue=Promise.resolve();
 const ready=(async()=>{
   const saved=await chrome.storage.local.get([STORE.sessions,STORE.enabled,STORE.events,STORE.fingerprints]);
   sessions=saved[STORE.sessions]||{};
@@ -104,7 +105,8 @@ async function rememberFingerprint(fingerprint){
  await chrome.storage.local.set({[STORE.fingerprints]:[...knownFingerprints]});
 }
 async function postEvent(tabId,session,type,payload={},source='extension'){
- const event={schema:'harmonia.event.v1',eventId:crypto.randomUUID(),sessionId:session.id,conversation:`tab-${tabId}`,type,source,capturedAt:new Date().toISOString(),payload};
+ const cycleType=type==='client.cycle.started'||type==='client.cycle.completed';
+ const event={schema:'harmonia.event.v1',eventId:crypto.randomUUID(),sessionId:session.id,...(cycleType?{}:{conversation:`tab-${tabId}`}),type,source,capturedAt:cycleType?payload.timestamp_utc:new Date().toISOString(),payload};
  if(!TOKEN){collector=false;lastError='No existe credencial local; evento no enviado.';return {ok:false};}
  try{
   const response=await fetch(`${COLLECTOR}/events`,{method:'POST',headers:headers({'content-type':'application/json'}),body:JSON.stringify(event)});
@@ -124,7 +126,7 @@ async function ensureSession(tab){
  sessionInitializers[key]=(async()=>{
   const session={id:crypto.randomUUID(),startedAt:new Date().toISOString(),lastAt:null,events:0,url:safePageUrl(tab.url)};
   sessions[key]=session;await saveSessions();
-  await postEvent(tab.id,session,'capture.started',{url:session.url,version:'0.3.0',mode:'automatic-interface-architecture',privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true}});
+  await postEvent(tab.id,session,'capture.started',{url:session.url,version:'0.3.1',mode:'automatic-interface-architecture',privacy:{conversationTextCaptured:false,composerTextCaptured:false,fieldValuesCaptured:false,hrefsCaptured:false,imageUrlsCaptured:false,menusExcluded:true}});
   return session;
  })();
  try{return await sessionInitializers[key];}finally{delete sessionInitializers[key];}
@@ -178,18 +180,35 @@ async function processSurfaceScan(tab,session,payload){
  await rememberFingerprint(sanitized.fingerprint);
  return true;
 }
+function sanitizeCyclePayload(type,payload){
+ const common=['conversation_id','cycle_id','phase','timestamp_utc','monotonic_ms','clock_source','clock_precision_ms','coverage','settle_window_ms'];
+ const keys=type==='client.cycle.started'?common:[...common,'duration_ms'];
+ if(!payload||typeof payload!=='object'||Array.isArray(payload))throw new Error('cycle-payload-invalid');
+ const actual=Object.keys(payload).sort(),expected=[...keys].sort();
+ if(actual.length!==expected.length||actual.some((key,index)=>key!==expected[index]))throw new Error('cycle-payload-unapproved-fields');
+ const uuidv7=/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+ if(!uuidv7.test(payload.conversation_id)||!uuidv7.test(payload.cycle_id))throw new Error('cycle-identity-not-uuidv7');
+ if(payload.phase!==(type==='client.cycle.started'?'started':'completed'))throw new Error('cycle-phase-mismatch');
+ const utc=Date.parse(payload.timestamp_utc);if(!Number.isFinite(utc)||new Date(utc).toISOString()!==payload.timestamp_utc)throw new Error('cycle-utc-invalid');
+ if(!Number.isFinite(payload.monotonic_ms)||payload.monotonic_ms<0)throw new Error('cycle-monotonic-invalid');
+ if(payload.clock_source!=='performance.now')throw new Error('cycle-clock-invalid');
+ if(!Number.isFinite(payload.clock_precision_ms)||payload.clock_precision_ms<=0||payload.clock_precision_ms>1000)throw new Error('cycle-clock-precision-invalid');
+ if(payload.coverage!=='new-dom-node-v1'||payload.settle_window_ms!==1500)throw new Error('cycle-coverage-invalid');
+ if(type==='client.cycle.completed'&&(!Number.isFinite(payload.duration_ms)||payload.duration_ms<0))throw new Error('cycle-duration-invalid');
+ return Object.fromEntries(keys.map(key=>[key,payload[key]]));
+}
 async function onObservedEvent(message,sender){
- const tab=sender.tab;
- if(!autoEnabled||!tab?.id||!valid(tab.url))return false;
- const type=String(message?.event?.type||'');
- if(type!=='ui.surface.scan')return false;
- const session=await ensureSession(tab);
- if(!session)return false;
- const payload=message.event.payload||{};
- const run=()=>processSurfaceScan(tab,session,payload);
- const next=surfaceQueue.then(run,run);
- surfaceQueue=next.catch(error=>{lastError=String(error.message||error);});
- return next;
+ const tab=sender.tab;if(!autoEnabled||!tab?.id||!valid(tab.url))return false;
+ const type=String(message?.event?.type||''),cycleType=type==='client.cycle.started'||type==='client.cycle.completed';
+ if(type!=='ui.surface.scan'&&!cycleType)return false;
+ const session=await ensureSession(tab);if(!session)return false;
+ if(cycleType){
+  let payload;try{payload=sanitizeCyclePayload(type,message.event.payload);}catch(error){lastError=String(error.message||error);return false;}
+  const run=()=>postEvent(tab.id,session,type,payload,'cycle-observer');
+  const next=cycleQueue.then(run,run);cycleQueue=next.then(()=>undefined,error=>{lastError=String(error.message||error);});return next;
+ }
+ const payload=message.event.payload||{},run=()=>processSurfaceScan(tab,session,payload);
+ const next=surfaceQueue.then(run,run);surfaceQueue=next.catch(error=>{lastError=String(error.message||error);});return next;
 }
 async function stopSession(tabId,reason){
  const key=String(tabId),session=sessions[key];if(!session)return;
@@ -199,7 +218,7 @@ async function stopSession(tabId,reason){
 async function injectTab(tab){
  if(!autoEnabled||!tab?.id||!valid(tab.url))return;
  try{
-  await chrome.scripting.executeScript({target:{tabId:tab.id},files:['content.js']});
+  await chrome.scripting.executeScript({target:{tabId:tab.id},files:['cycle-observer.js','content.js']});
   await chrome.tabs.sendMessage(tab.id,{kind:'harmonia:start',automatic:true});
  }catch(error){lastError='No se pudo activar observación en una pestaña: '+String(error.message||error);}
 }
@@ -224,7 +243,7 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
    const syncData=await chrome.storage.local.get([STORE.repositorySync]);
    let coverage=null;
    if(collector){try{const response=await fetch(`${COLLECTOR}/coverage`,{headers:headers(),cache:'no-store'});if(response.ok)coverage=await response.json();else throw new Error(`Colector HTTP ${response.status}`);}catch(error){lastError=String(error.message||error);}}
-   return {version:'0.3.0',autoEnabled,active:autoEnabled&&Object.keys(sessions).length>0,activeTabs:Object.keys(sessions).length,
+   return {version:'0.3.1',autoEnabled,active:autoEnabled&&Object.keys(sessions).length>0,activeTabs:Object.keys(sessions).length,
     sessions:Object.entries(sessions).map(([tabId,session])=>({tabId,startedAt:session.startedAt,lastAt:session.lastAt,events:session.events})),
     collector,lastError,events:eventCount,coverage,repositorySync:syncData[STORE.repositorySync]||null};
   }

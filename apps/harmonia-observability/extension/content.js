@@ -1,7 +1,30 @@
 (()=> {
-  if (globalThis.__harmoniaObserver?.version==='0.3.0') return;
-  const H = globalThis.__harmoniaObserver = { version:'0.3.0', active:false, lastFingerprint:null, lastSentAt:0, droppedScans:0 };
+  if (globalThis.__harmoniaObserver?.version==='0.3.1') return;
+  const H = globalThis.__harmoniaObserver = { version:'0.3.1', active:false, lastFingerprint:null, lastSentAt:0, droppedScans:0 };
   let observer=null, timer=null, sessionId=null;
+  let cycleObserver=null;
+  let cycleEventQueue=Promise.resolve();
+  const cycleAPI=globalThis.HarmoniaCycleTelemetry||null;
+  const cycleActivitySelector='[aria-busy="true"],[data-is-streaming="true"],[data-testid*="stop"],[data-testid*="agent-progress"],[data-testid*="agent-run"],[data-testid*="task-progress"],[data-testid*="subagent"]';
+  function cycleSnapshot(){
+    const root=mainRegion();
+    if(!root)return {messages:[],activity:false};
+    const messages=$('[data-message-author-role="user"],[data-message-author-role="assistant"]',root)
+      .filter(el=>visible(el)&&!excluded(el))
+      .map(el=>({node:el,role:el.getAttribute('data-message-author-role')}));
+    const activity=[root,...$(cycleActivitySelector,root)].some(el=>el.matches?.(cycleActivitySelector)&&visible(el)&&!excluded(el));
+    return {messages,activity};
+  }
+  function startCycleObservation(){
+    if(cycleObserver||!cycleAPI)return;
+    const root=mainRegion();if(!root)return;
+    cycleObserver=cycleAPI.createCycleObserver({target:root,getSnapshot:cycleSnapshot,onEvent(type,payload){
+      const send=()=>chrome.runtime.sendMessage({kind:'harmonia:event',event:{type,payload}});
+      const next=cycleEventQueue.then(send,send);cycleEventQueue=next.then(()=>undefined,()=>undefined);return next;
+    }});
+  }
+  function stopCycleObservation(){if(!cycleObserver)return;cycleObserver.stop();cycleObserver=null;}
+  function restartCycleObservation(){if(!H.active)return;stopCycleObservation();startCycleObservation();}
 
   const $ = (sel, root=document) => root.querySelector(sel);
   const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
@@ -148,9 +171,12 @@
   function start(message){
     if(H.active)return;
     H.active=true;sessionId=message?.sessionId||null;
+    startCycleObservation();
     window.addEventListener('resize',scheduleScan,{passive:true});
     window.addEventListener('popstate',scheduleScan,true);
     window.addEventListener('hashchange',scheduleScan,true);
+    window.addEventListener('popstate',restartCycleObservation,true);
+    window.addEventListener('hashchange',restartCycleObservation,true);
     void scan(true);
     observer=new MutationObserver(records=>{
       const relevant=records.some(record=>{
@@ -174,6 +200,9 @@
     if(observer)observer.disconnect();observer=null;
     if(timer)clearTimeout(timer);timer=null;
     H.periodic=null;
+    stopCycleObservation();
+    window.removeEventListener('popstate',restartCycleObservation,true);
+    window.removeEventListener('hashchange',restartCycleObservation,true);
     window.removeEventListener('resize',scheduleScan);
     window.removeEventListener('popstate',scheduleScan,true);
     window.removeEventListener('hashchange',scheduleScan,true);
