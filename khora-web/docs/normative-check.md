@@ -17,6 +17,9 @@ Antes de ejecutar ese recorrido desde otra plataforma, resolver la identidad nor
 
 ## Catálogo
 
+**Organización modular del servidor:** el endpoint único `/api/mcp` registra capacidades mediante `lib/server/mcp-module-registry.ts`. El módulo funcional Jules se implementa en `lib/server/mcp-jules.ts` y se documenta en [OCP KHORA-MCP · módulo Jules](../../docs/frentes/observabilidad-mcp/modulos/jules/README.md). `MCP_MODULE_REGISTRY` registra módulos funcionales; `MCP_TOOL_SCOPES` continúa siendo el catálogo canónico de herramientas y scopes. La modularización no crea endpoints, servidores OAuth ni controles independientes.
+
+
 `?` indica opcional; los demás campos son obligatorios. Toda herramienta sustantiva añade **`_norm_turn_token`** (mínimo 16 caracteres), **`_thinking_mode`** y **`_output_format_version`**. Modos: `THINKING`, `INSTANT`, `UNKNOWN`, `UNAVAILABLE`; no inventar una señal observada. La versión deriva de `REQUIRED_OUTPUT_FORMAT_VERSION`: **v1.7.7** en esta base. La gobernanza usa NORM-CHECK **v0.5.0**, verificador `norm-check/0.5.0`; servidor anunciado `khora-mcp` **1.3.0**. Son versiones distintas.
 
 | Herramienta / propósito | Entradas de negocio | Salida principal / límite |
@@ -35,15 +38,15 @@ Antes de ejecutar ese recorrido desde otra plataforma, resolver la identidad nor
 | `khora_eventos_recientes` / diagnóstico retrospectivo | `segundos?`, `limite?`, `session_id?`, `component?`, `severity?`, `outcome?`, `fase?`, `scope?`, `category?` | `ventana_segundos`, `limite`, `retornados`, `eventos`; ventana 1–86400 s (300 predeterminado), 1–200 eventos (50 predeterminado) |
 
 
-| `jules_list_sources` / fuentes conectadas a Jules | `page_size?` (1–100), `page_token?` | `jules:read` + `norm:turn`; devuelve fuentes y `nextPageToken` |
-| `jules_list_sessions` / sesiones Jules | `page_size?` (1–100), `page_token?` | `jules:read` + `norm:turn`; devuelve sesiones y token de paginación |
-| `jules_get_session` / estado de sesión | `session_id` | `jules:read` + `norm:turn`; devuelve estado, URL, outputs y tiempos reportados por Jules |
-| `jules_list_activities` / mensajes y retroalimentación | `session_id`, `page_size?` (1–100), `page_token?` | `jules:read` + `norm:turn`; mensajes del agente/usuario, plan, progreso, terminación y fallos |
-| `jules_create_session` / delegar desarrollo | `source`, `starting_branch`, `prompt`, `title?` | `jules:write` + `norm:turn`; fuerza `requirePlanApproval=true` y `AUTO_CREATE_PR` |
-| `jules_send_message` / responder a Jules | `session_id`, `prompt` | `jules:write` + `norm:turn`; el POST aceptado no prueba que Jules ya haya respondido |
-| `jules_approve_plan` / aprobar plan | `session_id`, `plan_id`, `plan_sha256` | `jules:write` + `norm:turn`; relee sesión/plan dos veces y exige ID/huella actuales + estado `AWAITING_PLAN_APPROVAL`; el API upstream no ofrece precondición atómica, por lo que T22 conserva un residual TOCTOU |
+| `jules_list_sources` / fuentes conectadas a Jules | `page_size?` (1–100), `page_token?` | `jules:read` (sin `norm:turn`); devuelve fuentes y `nextPageToken` |
+| `jules_list_sessions` / sesiones Jules | `page_size?` (1–100), `page_token?` | `jules:read` (sin `norm:turn`); devuelve sesiones y token de paginación |
+| `jules_get_session` / estado de sesión | `session_id` | `jules:read` (sin `norm:turn`); devuelve estado, URL, outputs y tiempos reportados por Jules |
+| `jules_list_activities` / mensajes y retroalimentación | `session_id`, `page_size?` (1–100), `page_token?` | `jules:read` (sin `norm:turn`); mensajes del agente/usuario, plan, progreso, terminación y fallos |
+| `jules_create_session` / delegar desarrollo | `source`, `starting_branch`, `prompt`, `title?` | `jules:write` (sin `norm:turn`); fuerza `requirePlanApproval=true` para todos, incluido el propietario; `AUTO_CREATE_PR` solo ejecuta después de `jules_approve_plan` |
+| `jules_send_message` / responder a Jules | `session_id`, `prompt` | `jules:write` (sin `norm:turn`); el POST aceptado no prueba que Jules ya haya respondido |
+| `jules_approve_plan` / aprobar plan | `session_id`, `plan_id`, `plan_sha256` | `jules:write` (sin `norm:turn`); relee sesión/plan dos veces y exige ID/huella actuales + estado `AWAITING_PLAN_APPROVAL`; el API upstream no ofrece precondición atómica, por lo que T22 conserva un residual TOCTOU |
 
-**Permisos efectivos:** las ocho herramientas de contenido requieren `volcados:read` **y** `norm:turn`; las cuatro de observabilidad, `runtime:read` **y** `norm:turn`; las siete herramientas Jules requieren el scope `jules:read` o `jules:write` que corresponda **y** `norm:turn`. El permiso de negocio anunciado en `securitySchemes` se conserva; `norm:turn` es necesario para abrir/completar el ciclo, no una concesión implícita. La respuesta `tools/list` también oculta herramientas cuyos scopes o dependencia `norm:turn` no estén concedidos en el Bearer.
+**Permisos efectivos:** las ocho herramientas de contenido requieren `volcados:read` **y** `norm:turn`; las cuatro de observabilidad, `runtime:read` **y** `norm:turn`. Las siete herramientas Jules requieren únicamente su scope `jules:read` o `jules:write`, respectivamente, y mantienen su verificación ACL propia sin `norm:turn`. El permiso de negocio anunciado en `securitySchemes` se conserva; `norm:turn` es necesario para las herramientas sustantivas que lo declaran, no una concesión implícita a todas las capacidades. La respuesta `tools/list` también oculta herramientas cuyos scopes no estén concedidos en el Bearer.
 
 | Herramienta / propósito | Entradas (sin los tres controles sustantivos) | Permiso / salida y efecto |
 |---|---|---|
@@ -237,7 +240,9 @@ La misma sección permite introducir credenciales por uso, sin crear un gestor p
 Contrato y mantenimiento: [Custodia continua de dictados](./CUSTODIA-DICTADOS.md). Las dos herramientas de audio usan la conexión autenticada existente y `volcados:read`; no publican direcciones Blob, no incluyen credenciales y no omiten el ciclo normativo. No conceder automáticamente permisos nuevos. El contenido Base64 es privado: consumirlo como archivo, nunca copiarlo al registro de eventos. Un MP3 pendiente o fallido no es un audio disponible. Las capturas históricas sin propietario comprobable no se adjudican por inferencia.
 
 
-## Candidato · MCP Jules · 2026-10-25
+## Registro histórico · candidato MCP Jules · 2026-10-25
+
+> Registro histórico de diseño y validación inicial. El estado actual del módulo, la extracción de servicio, el registro central y sus criterios de aceptación se mantienen en [modulos/jules](../../docs/frentes/observabilidad-mcp/modulos/jules/README.md). Este apéndice no es el catálogo activo ni sustituye la evidencia actual de pruebas.
 
 **Estado de esta rama:** `feat/mcp-jules-mvp-20261025-a71c9e2`. Las siete herramientas nuevas y sus cambios de autorización están en una rama candidata; no se afirma merge, despliegue, credencial real validada ni conexión desde ChatGPT.
 

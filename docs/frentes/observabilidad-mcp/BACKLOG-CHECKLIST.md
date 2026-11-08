@@ -1,8 +1,8 @@
 # Checklist maestro de backlog — KHORA-MCP
 
 **Tipo:** documento vivo de seguimiento del backlog; no crea tareas, frentes, módulos, controles, responsables ni folios nuevos.  
-**Corte:** 2026-11-01 · America/Mexico_City.  
-**OCP padre:** [OBJETO-CANONICO.md](./OBJETO-CANONICO.md), versión v0.3.12.  
+**Corte:** 2026-11-06 · America/Mexico_City.
+**OCP padre:** [OBJETO-CANONICO.md](./OBJETO-CANONICO.md), versión v0.3.13.
 **Control vigente:** [CONTROL-RESPONSABILIDAD.json](./CONTROL-RESPONSABILIDAD.json), generación 9.  
 **Índice de tareas formales:** [Tareas provisionales](./📁%20🧭%20-%20Tareas%20provisionales/README.md).  
 **Titular global:** `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229`.  
@@ -138,29 +138,27 @@ Los estados se aplican a cada punto, no al conjunto de una tarea. No se cierran 
 
 **Clasificación pendiente:** decidir si este bloque se integra en TASK-002 o continúa como subbloque sin ID hasta que su alcance quede confirmado. No asignar un ID local nuevo sin instrucción.
 
-## 4. TASK-003 — Jules: puente local OAuth y RDC
+## 4. TASK-003 — Jules: integración ChatGPT Desktop/Codex y desarrollo E2E
 
-**Estado:** `en_curso`  
+**Estado:** en_curso — prioridad única activa del resultado solicitado.
 **Núcleo:** [TASK-003 — Jules](./📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20KHORA-MCP-TASK-003%20-%20Jules%20-%20puente%20local%20OAuth%20y%20RDC/README.md)  
-**Autoridad arquitectónica:** corresponsable modular Jules; coordinar con ella cambios internos, de contrato, scopes, ACL, pruebas y aceptación.
+**Autoridad arquitectónica:** corresponsable modular Jules; coordinar cambios internos de arquitectura, contrato, scopes, ACL, pruebas y aceptación.
 
-- [x] Verificar que existe una rama remota de modularización Jules y que su clon local corresponde exactamente a su HEAD.
-- [x] Identificar los artefactos añadidos en la rama: `mcp-jules.ts`, contexto/registro modular y documento del módulo.
-- [x] Detectar la divergencia respecto de `main` actual: 27 ahead / 32 behind; preservar rama y no integrarla a ciegas.
-- [ ] Comparar la rama Jules con el OCP/control actuales y preparar un plan de reconciliación coordinado.
-- [ ] Completar pruebas locales del puente con dependencias instaladas y sin sustituir resultados históricos por resultados actuales.
-- [ ] Verificar cliente `stdio`, callback loopback, OAuth 2.1 Authorization Code + PKCE y registro dinámico.
-- [ ] Obtener consentimiento OAuth explícito del propietario en la interfaz oficial.
-- [ ] Aprovisionar DPAPI CurrentUser en el SID vigente y comprobar escritura, descifrado, ACL y lectura de vuelta.
-- [ ] Confirmar que el access token vive solo en memoria y que `JULES_API_KEY` permanece exclusivamente en Production.
-- [ ] Descubrir las siete herramientas con `tools/list` y sus scopes efectivos.
-- [ ] Ejecutar lecturas autenticadas reales de fuentes, sesiones y actividades.
-- [ ] Verificar denegaciones y comportamiento fail-closed.
-- [ ] Verificar elegibilidad del espacio ChatGPT para escritura y documentar el cliente realmente utilizado.
-- [ ] Diseñar una prueba de escritura limitada solo tras autorización específica del operador.
-- [ ] Conservar explícitamente el riesgo residual T22: el doble preflight no elimina la carrera entre comprobación y aprobación remota del plan.
+- [x] Reconciliar localmente la rama Jules con origin/main mediante merge no forzado, sin conflictos; merge local 190ed77cf0faadeae1ae7b9e5909177a0aad23d3, base d4f29f7044b80b30e01e00bf2ae2fc5f0207f0c2. Aún no publicado.
+- [x] Ejecutar pruebas focalizadas OAuth/Jules: **53/53 PASS**.
+- [x] Ejecutar suite unitaria completa: **572/572 PASS**, cero fallos/omitidos.
+- [x] Ejecutar typecheck, ui:contract y ui-review:check: PASS.
+- [x] Ejecutar npx next build --webpack: PASS, Next.js 16.4.0, 78/78 páginas.
+- [x] Validar en Production metadata OAuth/Protected Resource HTTP 200, cliente CIMD oficial de ChatGPT, callback y scopes; preflight Authorization Code/PKCE redirige a login Khora sin error de cliente.
+- [x] Preparar y leer de vuelta khora_jules en C:\Users\fila4\.codex\config.toml, Streamable HTTP/OAuth, scopes jules:read offline_access, cuatro herramientas de lectura, aprobación writes; SHA-256 4E43B3E96B2344B78E4EF025AD60638255F4CC37C6760B3D5C7DCC9456CD8637.
+- [!] Completar recarga de ChatGPT Desktop y consentimiento OAuth visible del propietario; todavía no hay sesión autenticada.
+- [!] Verificar tools/list real y lecturas autenticadas de fuentes/sesiones/actividades.
+- [!] Corregir y publicar requirePlanApproval=true para todos los sujetos. Production aún contiene requirePlanApproval: !developerOwner; las escrituras se mantienen deshabilitadas en el host local hasta que la corrección esté desplegada y validada.
+- [ ] Ampliar a jules:write y tres herramientas de escritura solo después de comprobar el gate de plan y obtener consentimiento OAuth específico.
+- [ ] Ejecutar un encargo real acotado con aprobación expresa del plan, seguimiento de actividades, revisión de PR/commit/tests y entrega de evidencia.
+- [x] Conservar el residual T22: el doble preflight no elimina la carrera entre comprobación y aprobación remota del plan.
 
-**Cierre:** consentimiento real, DPAPI verificado en el perfil vigente, siete herramientas descubiertas, lecturas auténticas y límites de escritura aceptados. Crear sesiones, enviar mensajes o aprobar planes no forma parte del smoke test de lectura.
+**Cierre:** ChatGPT Desktop/Codex conectado por OAuth CIMD; siete herramientas disponibles con scopes correctos; lecturas reales autenticadas; creación sujeta a aprobación de plan para todo sujeto; ejecución de un encargo real autorizado con revisión humana, seguimiento y verificación final por SHA/pruebas. No requiere terminar todo TASK-002.
 
 ## 5. Cierre transversal y aceptación del frente
 
@@ -241,3 +239,24 @@ Los estados se aplican a cada punto, no al conjunto de una tarea. No se cierran 
 - No aplicar migraciones, conceder ACL, desplegar, fusionar ramas o alterar Production por inferencia.
 - No reescribir ni fusionar la rama Jules divergente sin coordinar con su responsable arquitectónico.
 - Toda actualización de este documento debe conservar la procedencia, registrar estado observado y realizar lectura de vuelta del archivo actualizado.
+
+### Ciclo de trabajo 2 — reconciliación y E2E · 2026-11-01
+
+**RDC:** `015RENTA01`, Device ID `aacf2eb5-17f4-428e-9242-c24a1fe4a2ec`; entorno de sesión renovado, sin asumir persistencia volátil. Se verificó el checkout Jules en `c5f56d070e0a5f4cb0956f5f2ee6094e18a05f73`.
+
+**UI Quality:** 15/20 PASS y 5 FAIL en tres specs Playwright/Chromium. Los cinco fallos quedan abiertos: checkpoint de reanudación de dictado; expectativa obsoleta de error shell en `/grafo`; fixture de grafo no interceptado en desktop y mobile; splash desktop no desaparece dentro del umbral del test de tema. No se atribuyen al módulo Jules sin evidencia adicional.
+
+**Reconciliación Git:** `main` avanzó a `0c8fa8ae96fe0b022262770ed67d1bdb1a209aca`; control generación 9 y OCP actualizado. Se inició merge local de `FETCH_HEAD` sobre la rama Jules; conflicto único del índice provisional resuelto restaurando primero el blob exacto de `main` (`80453d7f4f0edeb3d1369926193d55fcd989a36b`). Merge aún no comprometido ni publicado al registrar este ciclo. No se modificaron control ni OCP canónicos manualmente.
+
+**Pendiente:** completar constancia de reconciliación, validar JSON/manifiestos, `git diff --check`, confirmar ausencia de conflictos y commit de merge; después push con lectura de vuelta. Mantener PR #349 abierta y draft hasta aceptación de CI y compuertas humanas. No desplegar Production.
+### Ciclo de trabajo 3 — segunda reconciliación · 2026-11-01
+
+**Sincronización:** `main` avanzó a `c85c39fbf7ed177e2bc90b682825addeb8b6a238`; se integró mediante merge de dos padres en la rama Jules, commit `56d4cb9184e6107badaf90ca004a9ff55774c628` (padres `5dab16ddc3494aea98218fdfd4ff8917789881ec` y `c85c39fbf7ed177e2bc90b682825addeb8b6a238`). Push fast-forward y `ls-remote` read-back exactos.
+
+**Estado de PR:** #349 abierta, draft, `mergeable=true`, `mergeable_state=unstable`; base `c85c39fbf7ed177e2bc90b682825addeb8b6a238`, head `56d4cb9184e6107badaf90ca004a9ff55774c628`.
+
+**CI:** en este SHA los workflows `CI`, `UI Quality` y `khora-ok / gate` terminaron fallidos antes de ejecutar steps. Los jobs de los cuatro runs consultados presentan `runner_id=0`, `runner_name` vacío y `steps=[]`; no existe evidencia de ejecución ni de fallo de tests. La infraestructura de GitHub Actions/runner sigue siendo el bloqueo activo.
+
+**Aviso de seguridad:** el push reportó 39 vulnerabilidades en la rama default (4 críticas, 20 altas, 13 moderadas, 2 bajas). No se modificaron dependencias ni se ejecutó una actualización automática; requiere triage independiente.
+
+**Límites:** no se fusionó PR ni se desplegó Production. No se ejecutó OAuth/DPAPI ni lecturas reales autenticadas de Jules. Los cinco fallos UI E2E del ciclo 2 siguen abiertos.

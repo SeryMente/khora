@@ -313,7 +313,7 @@ test("configured developer owner gets full Jules-account access without ACL or n
     const createCall = fixture.calls.find(x => x.name === "JulesCreateSession");
     assert.ok(createCall);
     assert.equal((createCall!.args as any).sourceContext.githubRepoContext.startingBranch, "restricted");
-    assert.equal((createCall!.args as any).requirePlanApproval, false, "single configured owner has no unnecessary plan-approval gate");
+    assert.equal((createCall!.args as any).requirePlanApproval, true, "configured owner bypasses per-source ACL only; explicit plan approval remains required");
     assert.deepEqual(fixture.aclSubjects, [], "configured owner does not need per-repository ACL rows");
   } finally { await client.close(); await fixture.close(); }
 });
