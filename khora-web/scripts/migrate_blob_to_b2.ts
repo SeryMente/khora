@@ -253,6 +253,7 @@ async function copyAndVerify(
   }
   return {
     url: copy.url,
+    pathname: copy.pathname,
     encryptedHash: copy.encryptedSha256,
     encryptedBytes: copy.encryptedBytes,
     reused: copy.reused,
