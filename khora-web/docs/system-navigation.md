@@ -41,7 +41,7 @@ El flujo canónico es **captura → transcripción/procesamiento → revisión �
 
 `/chat` mantiene la barra principal de Cora y presenta la interfaz oficial de Open WebUI dentro de un marco integrado. La aplicación original no se modifica ni se publica en un host adicional.
 
-El marco utiliza el proxy autenticado de Cora en el mismo origen. El backend y los recursos upstream no reciben credenciales del navegador: la identidad se deriva de la sesión autenticada, el proxy firma la petición servidor a servidor y solo reenvía las rutas permitidas. Los recursos estáticos se extraen durante el build desde la rueda oficial Open WebUI 0.12.3 tras comprobar su SHA-256.
+El marco utiliza el proxy autenticado de Cora en el mismo origen. El backend y los recursos upstream no reciben credenciales del navegador: la identidad se deriva de la sesión autenticada, el proxy firma la petición servidor a servidor y solo reenvía las rutas permitidas. Las rutas de interfaz, API y recursos estáticos oficiales se sirven desde el runtime existente de Open WebUI a través del proxy autenticado de Cora, sin copiar ni modificar la aplicación upstream.
 
 La integración requiere `KHORA_CHAT_ENABLED=1` en el entorno de producción. La ruta histórica `/sistema/consulta` se conserva como alias y redirige a `/chat`; la antigua pantalla de consulta ya no se sirve como superficie de producto.
 
