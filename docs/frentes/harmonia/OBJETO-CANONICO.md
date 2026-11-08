@@ -1942,6 +1942,6 @@ La transferencia de responsabilidad y el dispositivo PC-14 descritos en §46.1 s
 - Dictamen: **IMPLEMENTACIÓN INTEGRADA EN MAIN; VERIFICACIÓN PARCIAL; CI Y ACEPTACIÓN NATURAL NO VERIFICADAS**. Las necesidades principales del contrato existen en el código, pero no procede declarar telemetría aceptada.
 - PR #358 integrada; #353 y #346 cerradas. La búsqueda de PR abiertas de `SeryMente/khora` devuelve cuatro PR de otros temas y ninguna PR abierta de Harmonia.
 - Siguiente secuencia: obtener resultado verificable del workflow y ejecutar tests Node/PowerShell; cubrir/reparar navegación SPA (`pushState` y sustitución de main); después ejecutar prueba natural autorizada en Chrome. No se modificó código, permisos, infraestructura, Chrome ni el control durante esta revisión.
-- Crónica del ciclo: `docs/frentes/harmonia/cronica/HARMONIA-REVISION-TELEMETRIA-20261108.md`; commit `a8e9f96b7ddb3bf6d66f330d4f4fa06f53e3b4d7`; blob `3c86e6b331e866e52c17605f29a9afda59969420`, lectura de vuelta exacta.
+- Crónica del ciclo: `docs/frentes/harmonia/cronica/HARMONIA-REVISION-TELEMETRIA-20261108.md`; commit `fdad80f9dc5e3c03167b2c1666c65786220af120`; blob `a54fe1fc3126bfe533177750c700e57d2dac420d`, lectura de vuelta exacta.
 
 ---
