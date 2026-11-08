@@ -1,0 +1,33 @@
+name: Harmonia cycle telemetry
+on:
+  push:
+    paths:
+      - 'apps/harmonia-observability/**'
+      - '.github/workflows/harmonia-cycles.yml'
+  pull_request:
+    paths:
+      - 'apps/harmonia-observability/**'
+      - '.github/workflows/harmonia-cycles.yml'
+jobs:
+  cycle-telemetry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax validation
+        run: |
+          node --check apps/harmonia-observability/extension/cycle-observer.js
+          node --check apps/harmonia-observability/extension/content.js
+          node --check apps/harmonia-observability/extension/service-worker.js
+          node --check apps/harmonia-observability/collector/cycle-telemetry.js
+          node --check apps/harmonia-observability/collector/server.js
+      - name: Observer and collector contract tests
+        run: |
+          node --test apps/harmonia-observability/extension/cycle-observer.test.js
+          node --test apps/harmonia-observability/collector/cycle-telemetry.test.js
+          node --test apps/harmonia-observability/collector/tests/cycle-server.integration.test.js
+      - name: PowerShell cycle query fixture tests
+        shell: pwsh
+        run: ./apps/harmonia-observability/collector/tests/query-cycles.test.ps1

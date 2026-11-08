@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Harmonia · Observabilidad del trabajo con IA",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Mapeo automático y local de estructura y controles de las pestañas de chatgpt.com, sin capturar texto de conversación.",
   "permissions": [
     "scripting",
@@ -30,6 +30,7 @@
         "https://chatgpt.com/*"
       ],
       "js": [
+        "cycle-observer.js",
         "content.js"
       ],
       "run_at": "document_idle"

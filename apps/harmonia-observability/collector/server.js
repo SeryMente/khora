@@ -2,6 +2,7 @@ const http=require('http');
 const fs=require('fs');
 const path=require('path');
 const crypto=require('crypto');
+const {START:CYCLE_START,COMPLETE:CYCLE_COMPLETE,sanitizeCycleEvent,validateCyclePair}=require('./cycle-telemetry');
 const HOST='127.0.0.1',PORT=Number(process.env.HARMONIA_PORT||47321),MAX=1024**3,MAX_REQUEST=1_000_000,MAX_SEEN_EVENTS=20000,MAX_INDEXED_SURFACES=5000;
 const TOKEN=String(process.env.HARMONIA_TOKEN||'');
 if(!TOKEN)throw new Error('HARMONIA_TOKEN is required; load the local auth config first.');
@@ -12,11 +13,12 @@ const idxPath=path.join(root,'index.json'),surfacesDir=path.join(root,'surfaces'
 fs.mkdirSync(surfacesDir,{recursive:true});fs.mkdirSync(originalsDir,{recursive:true});
 const catalogPath=path.join(__dirname,'..','coverage-catalog.json');
 const catalog=JSON.parse(fs.readFileSync(catalogPath,'utf8'));
-let index={schema:'harmonia.index.v1',updatedAt:null,sessions:{},surfaceFingerprints:{},seenEventIds:{},coverage:null,uniqueSurfaceCount:0,totalBytes:0,stopped:false};
+let index={schema:'harmonia.index.v1',updatedAt:null,sessions:{},surfaceFingerprints:{},seenEventIds:{},cycles:{},coverage:null,uniqueSurfaceCount:0,totalBytes:0,stopped:false};
 try{const saved=JSON.parse(fs.readFileSync(idxPath,'utf8'));if(saved.schema==='harmonia.index.v1')index={...index,...saved};}catch{}
 if(!index.sessions||typeof index.sessions!=='object')index.sessions={};
 if(!index.surfaceFingerprints||typeof index.surfaceFingerprints!=='object')index.surfaceFingerprints={};
 if(!index.seenEventIds||typeof index.seenEventIds!=='object')index.seenEventIds={};
+if(!index.cycles||typeof index.cycles!=='object')index.cycles={};
 if(!Number.isFinite(index.uniqueSurfaceCount))index.uniqueSurfaceCount=fs.readdirSync(surfacesDir).filter(name=>/^[0-9a-f]{64}\.json$/.test(name)).length;
 function featureWeight(feature){return feature.priority==='core'?2:1;}
 function text(value,max){return typeof value==='string'?value.replace(/[\r\n\t]+/g,' ').replace(/\s+/g,' ').slice(0,max):'';}
@@ -101,8 +103,49 @@ function reply(req,res,code,obj){
  res.writeHead(code,headers);res.end(JSON.stringify(obj));
 }
 function validUUID(value){return typeof value==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);}
+
+function cycleConflict(code){const error=new Error(code);error.code=code;error.statusCode=409;return error;}
+function recordCycleEvent(event){
+ const clean=sanitizeCycleEvent(event),key=clean.payload.cycle_id;
+ const requestSha256=crypto.createHash('sha256').update(JSON.stringify(clean)).digest('hex');
+ const replay=index.seenEventIds[clean.eventId],existing=index.cycles[key];
+ if(replay){
+  if(replay.requestSha256!==requestSha256)throw cycleConflict('cycle-event-id-integrity-conflict');
+  return {duplicate:true,storedType:replay.storedType||clean.type,ordinal:replay.ordinal||0};
+ }
+ if(clean.type===CYCLE_START&&existing){
+  if(existing.start&&existing.start.eventId===clean.eventId&&existing.start.requestSha256===requestSha256)return {duplicate:true,storedType:CYCLE_START,ordinal:0};
+  throw cycleConflict('cycle-id-already-registered');
+ }
+ if(clean.type===CYCLE_COMPLETE){
+  if(existing&&existing.state==='COMPLETED'&&existing.complete&&existing.complete.eventId===clean.eventId&&existing.complete.requestSha256===requestSha256)
+   return {duplicate:true,storedType:CYCLE_COMPLETE,ordinal:0};
+  if(!existing||existing.state!=='STARTED'||!existing.start)throw cycleConflict('cycle-start-not-found');
+  try{validateCyclePair(existing.start,clean);}catch(_){throw cycleConflict('cycle-pair-or-duration-mismatch');}
+ }
+ const when=Date.parse(clean.capturedAt);
+ if(!Number.isFinite(when))throw new Error('cycle-event-date-invalid');
+ const day=new Date(when).toISOString().slice(0,10),file=path.join(originalsDir,day,clean.sessionId+'.jsonl');
+ fs.mkdirSync(path.dirname(file),{recursive:true});
+ const line=JSON.stringify(clean)+'\n',bytes=Buffer.byteLength(line);
+ if(index.totalBytes+bytes>MAX){index.stopped=true;persist();return {tooLarge:true};}
+ fs.appendFileSync(file,line,'utf8');index.totalBytes+=bytes;
+ const session=index.sessions[clean.sessionId]||{firstAt:clean.capturedAt,lastAt:clean.capturedAt,events:0,types:{},file:path.relative(root,file).split(path.sep).join('/'),lastEventSha256:null};
+ session.lastAt=clean.capturedAt;session.events++;session.types[clean.type]=(session.types[clean.type]||0)+1;
+ session.lastEventSha256=crypto.createHash('sha256').update(line).digest('hex');index.sessions[clean.sessionId]=session;
+ index.seenEventIds[clean.eventId]={capturedAt:clean.capturedAt,sessionId:clean.sessionId,storedType:clean.type,ordinal:session.events,requestSha256};
+ const startMeta={type:CYCLE_START,eventId:clean.eventId,requestSha256,sessionId:clean.sessionId,
+  payload:{conversation_id:clean.payload.conversation_id,cycle_id:clean.payload.cycle_id,monotonic_ms:clean.payload.monotonic_ms,
+   clock_source:clean.payload.clock_source,clock_precision_ms:clean.payload.clock_precision_ms,settle_window_ms:clean.payload.settle_window_ms}};
+ if(clean.type===CYCLE_START)index.cycles[key]={state:'STARTED',start:startMeta};
+ else index.cycles[key]={state:'COMPLETED',start:existing.start,complete:{eventId:clean.eventId,requestSha256}};
+ pruneSeenEventIds();persist();
+ return {duplicate:false,storedType:clean.type,ordinal:session.events,deduplicated:false,cycleId:key};
+}
+
 function recordEvent(event,res){
  if(!validUUID(event.eventId)||!validUUID(event.sessionId)||typeof event.type!=='string'||!event.type||!event.capturedAt)throw Error('invalid-event-identity');
+ if(event.type===CYCLE_START||event.type===CYCLE_COMPLETE)return recordCycleEvent(event);
  const replay=index.seenEventIds[event.eventId];
  if(replay)return {duplicate:true,storedType:replay.storedType||event.type,ordinal:replay.ordinal||0};
  if(!/^ui\.surface\.(scan|reused)$|^capture\./.test(event.type))throw Error('event-type-out-of-scope');
@@ -170,7 +213,7 @@ const server=http.createServer((req,res)=>{
    if(result.tooLarge)return reply(req,res,507,{error:'storage-limit-stop-no-deletion'});
    if(result.duplicate)return reply(req,res,200,{ok:true,eventId:event.eventId,duplicate:true,storedType:result.storedType,ordinal:result.ordinal});
    return reply(req,res,201,{ok:true,eventId:event.eventId,ordinal:result.ordinal,storedType:result.storedType,deduplicated:result.deduplicated,surfaceRef:result.surfaceRef||null});
-  }catch(error){return reply(req,res,400,{error:String(error.message||error)});}
+  }catch(error){return reply(req,res,Number(error.statusCode)||400,{error:String(error.code||error.message||error)});}
  });
 });
 server.listen(PORT,HOST,()=>console.log('HARMONIA_COLLECTOR_ONLINE http://'+HOST+':'+PORT+' data='+root));
