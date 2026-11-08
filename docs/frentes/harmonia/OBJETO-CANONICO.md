@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: harmonia. Versión del objeto **0.45**; sello **HARMONIA-v0.45**; corte de estado **2026-11-08**. §51 documenta la revisión de la telemetría de ciclos ya integrada en main y separa implementación, tests sintéticos, CI no verificada y aceptación natural pendiente. §§37–45 conservan antecedentes históricos, incluida la transferencia gen12 y el cierre NCL-OCP. §46 conserva la fotografía técnica de la candidata local-first v0.40 en rama separada y la titularidad gen13, ambas supersedidas en responsabilidad por §47. §47 registra la transferencia gen13→gen14 a PC-8 y la captura documental del original ChatGPT-HARMONIA-20261101-1709.md. §48 registra la renovación del dispositivo RDC tras pérdida total del entorno local y la validación local 10/10 de la candidata local-first en rama de revisión; no supone aceptación Chrome, integración del código en main ni transporte EP. La regla permanente §36.1-36.2 conserva la aceptación natural exclusivamente en manos del operador.
+- Identificador del frente: harmonia. Versión del objeto **0.46**; sello **HARMONIA-v0.46**; corte de estado **2026-11-08**. §51 documenta la revisión de telemetría y §52 la materialización local verificada de Harmonia v0.3.1 en PC-13; ambos separan las pruebas sintéticas de la aceptación natural pendiente. §§37–45 conservan antecedentes históricos, incluida la transferencia gen12 y el cierre NCL-OCP. §46 conserva la fotografía técnica de la candidata local-first v0.40 en rama separada y la titularidad gen13, ambas supersedidas en responsabilidad por §47. §47 registra la transferencia gen13→gen14 a PC-8 y la captura documental del original ChatGPT-HARMONIA-20261101-1709.md. §48 registra la renovación del dispositivo RDC tras pérdida total del entorno local y la validación local 10/10 de la candidata local-first en rama de revisión; no supone aceptación Chrome, integración del código en main ni transporte EP. La regla permanente §36.1-36.2 conserva la aceptación natural exclusivamente en manos del operador.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -1945,3 +1945,46 @@ La transferencia de responsabilidad y el dispositivo PC-14 descritos en §46.1 s
 - Crónica del ciclo: `docs/frentes/harmonia/cronica/HARMONIA-REVISION-TELEMETRIA-20261108.md`; commit `fb7ffa2bab56e773096d8b89ca8611347325afc8`; blob `08a5b58ae7abe24ecb19e02ae8dfff12fbbacf19`, lectura de vuelta exacta.
 
 ---
+---
+
+## 52. Preparación local de Harmonia v0.3.1 para carga descomprimida en PC-13 · 2026-11-08
+
+### 52.1. Solicitud, gobierno y autorización de terminal
+
+- Entradas literales del operador:
+  - «Usa rdc local, y deja en carpeta EP de escritorio a Harmonia la carpeta de trabajko lista con extension dentro para cargar en cvhrome,»
+  - «Observabilidad se descarga primnero a local verdaD?»
+  - Corrección de terminal: «No esa no pC 13».
+- La respuesta operativa es afirmativa: los archivos de observabilidad se materializan primero en un árbol local; Chrome utiliza la carpeta descomprimida local, no GitHub ni un ZIP remoto.
+- Titularidad de Harmonia preservada: generación 15, alias chatgpt-harmonia-01a1b6ca-4543-7578-85d9-7624877c2e80. No se transfirió titularidad, no se incrementó generación y no se asignó folio FOL1.
+- Se autorizó PC-13 de manera task-scoped para esta materialización local. Dispositivo RDC exacto 1227e578-55c8-4231-82bb-4dbf9234855a; usuario observado PC-13\\PC 12; perfil C:\\Users\\PC 12; SID cotejado en preflight. La autorización se registró en CONTROL-RESPONSABILIDAD.json mediante commit d98e9029deec79426a52352cff00925799d50c4e, blob releído 6199386845aaeed02abcd81baa26712226376977. El dispositivo previo PC10 y su UUID se conservaron en previous_authorized_device; la autorización PC-13 no se extiende a otros frentes, EP/B2 general, credenciales, despliegues ni rutas ajenas a esta carpeta.
+
+### 52.2. Materialización y contenido
+
+- Carpeta de trabajo: Desktop\\EP\\Armonía.
+- Carpeta exacta para Chrome → Cargar descomprimida: Desktop\\EP\\Armonía\\extension.
+- Fuente de código: SeryMente/khora, rama main, commit de referencia d98e9029deec79426a52352cff00925799d50c4e; manifiesto MV3 versión 0.3.1.
+- Se materializaron 17 archivos de origen: manifiesto y runtime de extensión, service worker, observador temporal, catálogo de cobertura, colector, validador, consulta, pruebas sintéticas y contrato CYCLE-TELEMETRY.md. Se conservaron los blobs del origen sin modificación.
+- Se añadieron seis auxiliares locales específicos para el perfil observado: README-LOCAL.txt, INICIAR-HARMONIA-LOCAL.ps1, INICIAR-HARMONIA.cmd, CONSULTAR-CICLOS.ps1, CONSULTAR-CICLOS.cmd y .gitignore. No se copiaron scripts históricos que tenían rutas fijas bajo C:\\Users\\fila4, porque no correspondían a este perfil.
+- MANIFEST-PROCEDENCIA-LOCAL.json fue generado en el host y leído de vuelta. SHA-256 8d58126ff0ff98f8305dd0fbdc9faf1abcd95a93daf85a014a087188c7c296c, tamaño 13.144 bytes. El manifiesto local contiene hashes; no contiene valores de credenciales.
+
+### 52.3. Integridad y pruebas ejecutadas
+
+- Cotejo de Git blob SHA entre origen main y archivos locales: 17/17 MATCH. El catálogo raíz y el catálogo dentro de extension comparten el mismo blob fuente.
+- Node.js v24.22.2: comprobación sintáctica 5/5 PASS.
+- Pruebas Node sintéticas: observador 11/11 PASS, validador/colector 7/7 PASS, integración servidor/JSONL 1/1 PASS; total 19/19 PASS.
+- Parser de Windows PowerShell para el inicializador local y wrapper de consulta: 2/2 PASS.
+- Fixture upstream collector/tests/query-cycles.test.ps1: NOT_VERIFIED. PC-13 tiene Windows PowerShell 5.1.26100.9168 y no tiene pwsh; el fixture del workflow CI utiliza semántica de deserialización de matrices JSON de PowerShell 7 y no completa bajo el host 5.1. La salida diagnóstica de la consulta expuso las cuatro filas sintéticas esperadas (COMPLETED, new_user_turn_replaced_previous, tab_closed y causa indeterminada), pero no se acredita PASS de ese fixture.
+- Evidencia estructurada: evidencias/EV-HARMONIA-LOCAL-WORKSPACE-PC13-20261108.json; crónica: cronica/HARMONIA-PAQUETE-LOCAL-PC13-20261108.md.
+
+### 52.4. Estado de activación y límites EP
+
+- El preflight observó Node disponible, puerto local 127.0.0.1:47321 libre y ausencia previa del almacén de datos bajo el perfil PC-13.
+- El inicializador INICIAR-HARMONIA.cmd quedó preparado. Al ejecutarlo crea extension/local-auth.js con un secreto aleatorio local y arranca el colector con almacén %LOCALAPPDATA%\\Harmonia\\surface-index-v0.3.0\\data; el secreto no se generó, mostró ni persistió durante esta materialización.
+- No se inició el colector, no se creó el almacén, no se cargó la extensión y no se modificó Chrome en este ciclo. El paso del operador para cargar queda: ejecutar el inicializador, abrir chrome://extensions, activar Modo desarrollador y seleccionar la carpeta extension.
+- La carpeta Desktop\\EP se clasifica EP_VOLATIL / UBICACIÓN FÍSICA Y CIFRADO NO CERTIFICADOS. La presencia en esa ruta no es respaldo duradero ni evidencia de EP híbrido/cifrado.
+- No hubo modificación de código fuente en main, cambio de permisos de la extensión, despliegue ni aceptación natural de Chrome.
+
+### 52.5. Dictamen y salida
+
+PREPARADO Y VERIFICADO COMO PAQUETE LOCAL CARGABLE; NO ACTIVADO NI ACEPTADO EN CHROME. La integridad de los archivos de origen y las pruebas Node sintéticas están acreditadas. El fixture PowerShell upstream y la aceptación natural siguen sin verificar. La siguiente acción operativa es ejecutar INICIAR-HARMONIA.cmd y cargar la carpeta Desktop\\EP\\Armonía\\extension desde chrome://extensions; esa acción aún no se declara ejecutada.
