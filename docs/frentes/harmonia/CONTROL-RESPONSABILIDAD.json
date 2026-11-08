@@ -361,16 +361,16 @@
   "authorized_device": {
     "name": "PC10RCIF4EI4",
     "device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
-    "status": "authorized_for_harmonia_task_scoped_subproject_bootstrap",
-    "scope": "RDC access limited to establishing and verifying the HARMONIA subproject scaffold at C:\\Users\\fila4\\Desktop\\Ser y Mente\\EP\\Harmonia\\subproyectos\\bucle-mejora-supervisada. Scope permits inspection and creation of project documentation/configuration templates only. It does not authorize modifying the active extension runtime, reading or entering credentials, API calls, starting autonomous loops, controlling ChatGPT Web, loading/reloading Chrome, merging, deploying, or operations outside this exact subproject folder. Separate gates and explicit authorization are required for those actions.",
+    "status": "authorized_for_harmonia_scoped_subproject_implementation_and_validation",
+    "scope": "Local HARMONIA subproject implementation and validation only at C:\\Users\\fila4\\Desktop\\Ser y Mente\\EP\\Harmonia\\subproyectos\\bucle-mejora-supervisada. This includes creating/editing source code, local data schemas, UI/configuration, documentation, and automated tests inside that exact subproject folder; creating an isolated candidate copy/worktree inside it; running local tests and a local loopback-only prototype with synthetic/sanitized fixtures. It excludes modification/replacement of the existing parent extension package, reading or entering real credentials, paid/external API calls before the operator supplies the key and expressly enables them, browser automation against ChatGPT Web, merge/push/deployment, Chrome installation/activation, or unrelated paths. No ChatGPT Web UI automation or programmatic extraction of ChatGPT Web outputs. Any expansion requires a separate explicit gate.",
     "observed_platform": "Windows",
     "observed_user": "CENTRAL\\fila4 (interactive console session ID 4; active)",
     "observed_profile": "C:\\Users\\fila4",
     "sid": "S-1-5-21-1529298404-1161420656-882029410-5167",
     "observed_rdc_process_user": "CENTRAL\\mantenimientorci",
     "observed_rdc_process_profile": "C:\\Users\\MantenimientoRCI",
-    "authorized_by": "Explicit instructions in current conversation: “Utiliza la conexión RDC a fila 4” and clarification “PC10RCIF4EI4 es fila 4”. Live inventory identified exact device UUID; quser and Win32_UserAccount/Win32_UserProfile verified the fila4 interactive session, SID and profile. RDC process identity separately observed as CENTRAL\\mantenimientorci.",
-    "authorized_at": "2026-11-08T22:10:51.260Z",
+    "authorized_by": "Explicit instructions in current conversation: “Utiliza la conexión RDC a fila 4” and clarification “PC10RCIF4EI4 es fila 4”. Live inventory identified exact device UUID; quser and Win32_UserAccount/Win32_UserProfile verified the fila4 interactive session, SID and profile. RDC process identity separately observed as CENTRAL\\mantenimientorci. Additional explicit current instruction: “considera autorizado el empezar a trabajar en lo que te acabo de decir, considerando que sí sea viable. Si es así resuelve de extremo a extremo”.",
+    "authorized_at": "2026-11-08T22:12:08.389Z",
     "authorized_timezone": "America/Mexico_City"
   },
   "uuidv7_local_event": "01a1b6ca-4543-7578-85d9-7624877c2e80",
@@ -388,17 +388,17 @@
     "authorized_at": "2026-11-08 (exact local time not captured)"
   },
   "device_authorization_event": {
-    "type": "REAUTHORIZE_RDC_DEVICE_TASK_SCOPED",
-    "event_uuidv7": "01a1bd36-dafc-7316-9566-6a7a7a0cf1ff",
-    "authorization_ref": "Current conversation, 2026-11-08: explicit operator instruction to use RDC to fila4 and clarification that PC10RCIF4EI4 is fila4; scope is local HARMONIA subproject scaffold only.",
-    "previous_device_id": "1227e578-55c8-4231-82bb-4dbf9234855a",
+    "type": "EXPAND_RDC_DEVICE_TASK_SCOPE",
+    "event_uuidv7": "01a1bd38-0845-7ced-b2e7-a8d608efd701",
+    "authorization_ref": "Current conversation 2026-11-08: user explicitly authorized starting and completing the viable parts of the supervised improvement-loop subproject.",
+    "previous_device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
     "new_device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
-    "scope": "Documentation/configuration scaffold only under C:\\Users\\fila4\\Desktop\\Ser y Mente\\EP\\Harmonia\\subproyectos\\bucle-mejora-supervisada. No extension runtime, credentials, API, browser, merge or deployment.",
+    "scope": "Local HARMONIA subproject implementation and validation only at C:\\Users\\fila4\\Desktop\\Ser y Mente\\EP\\Harmonia\\subproyectos\\bucle-mejora-supervisada. This includes creating/editing source code, local data schemas, UI/configuration, documentation, and automated tests inside that exact subproject folder; creating an isolated candidate copy/worktree inside it; running local tests and a local loopback-only prototype with synthetic/sanitized fixtures. It excludes modification/replacement of the existing parent extension package, reading or entering real credentials, paid/external API calls before the operator supplies the key and expressly enables them, browser automation against ChatGPT Web, merge/push/deployment, Chrome installation/activation, or unrelated paths. No ChatGPT Web UI automation or programmatic extraction of ChatGPT Web outputs. Any expansion requires a separate explicit gate.",
     "owner_alias_unchanged": true,
     "responsibility_generation_unchanged": true,
     "session_folio": null,
     "readback_required": true,
-    "acquired_at": "2026-11-08T22:10:51.260Z"
+    "acquired_at": "2026-11-08T22:12:08.389Z"
   },
   "environment_reset": {
     "state": "TOTAL_LOCAL_ENVIRONMENT_LOSS_DECLARED_BY_OPERATOR",
@@ -436,6 +436,22 @@
       "sid": "S-1-5-21-874664506-151841403-77259543-1001",
       "authorized_by": "Explicit user instruction in current conversation: requested local RDC preparation in EP and corrected device selection with “No esa no pC 13”; live RDC inventory showed the only online PC-13 identity as this exact UUID; read-only preflight verified Windows account, SID and profile.",
       "authorized_at": "2026-11-08 (exact local time not captured)"
+    },
+    {
+      "name": "PC10RCIF4EI4",
+      "device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
+      "status": "superseded_prior_narrow_scope",
+      "scope": "Local HARMONIA subproject implementation and validation only at C:\\Users\\fila4\\Desktop\\Ser y Mente\\EP\\Harmonia\\subproyectos\\bucle-mejora-supervisada. This includes creating/editing source code, local data schemas, UI/configuration, documentation, and automated tests inside that exact subproject folder; creating an isolated candidate copy/worktree inside it; running local tests and a local loopback-only prototype with synthetic/sanitized fixtures. It excludes modification/replacement of the existing parent extension package, reading or entering real credentials, paid/external API calls before the operator supplies the key and expressly enables them, browser automation against ChatGPT Web, merge/push/deployment, Chrome installation/activation, or unrelated paths. No ChatGPT Web UI automation or programmatic extraction of ChatGPT Web outputs. Any expansion requires a separate explicit gate.",
+      "observed_platform": "Windows",
+      "observed_user": "CENTRAL\\fila4 (interactive console session ID 4; active)",
+      "observed_profile": "C:\\Users\\fila4",
+      "sid": "S-1-5-21-1529298404-1161420656-882029410-5167",
+      "observed_rdc_process_user": "CENTRAL\\mantenimientorci",
+      "observed_rdc_process_profile": "C:\\Users\\MantenimientoRCI",
+      "authorized_by": "Explicit instructions in current conversation: “Utiliza la conexión RDC a fila 4” and clarification “PC10RCIF4EI4 es fila 4”. Live inventory identified exact device UUID; quser and Win32_UserAccount/Win32_UserProfile verified the fila4 interactive session, SID and profile. RDC process identity separately observed as CENTRAL\\mantenimientorci. Additional explicit current instruction: “considera autorizado el empezar a trabajar en lo que te acabo de decir, considerando que sí sea viable. Si es así resuelve de extremo a extremo”.",
+      "authorized_at": "2026-11-08T22:12:08.389Z",
+      "authorized_timezone": "America/Mexico_City",
+      "authorization_event": "01a1bd38-0845-7ced-b2e7-a8d608efd701"
     }
   ]
 }
