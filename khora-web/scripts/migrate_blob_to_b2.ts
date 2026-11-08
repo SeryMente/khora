@@ -240,7 +240,7 @@ async function fetchEncryptedBlob(url: string): Promise<Buffer> {
 async function copyAndVerify(
   item: Candidate,
   sourceEncrypted: Buffer,
-): Promise<{ url: string; encryptedHash: string; encryptedBytes: number; reused: boolean }> {
+): Promise<{ url: string; pathname: string; encryptedHash: string; encryptedBytes: number; reused: boolean }> {
   const sourceUrlHash = hash(item.url);
   const copy = await putMigratedEncryptedObject(sourceUrlHash, sourceEncrypted);
   const expectedEncryptedHash = hash(sourceEncrypted);
