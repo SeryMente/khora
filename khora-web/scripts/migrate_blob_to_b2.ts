@@ -560,6 +560,10 @@ async function main() {
 
       try {
         const encrypted = await fetchEncryptedBlob(item.url);
+        const sourcePhysicalSize = physical.get(item.url)?.size;
+        if (!Number.isSafeInteger(sourcePhysicalSize) || sourcePhysicalSize !== encrypted.length) {
+          throw new Error("source_encrypted_size_mismatch");
+        }
         const clear = descifrarBytes(encrypted);
         if (clear.length !== item.bytes || hash(clear) !== item.sha256) {
           throw new Error("source_cleartext_integrity_mismatch");
