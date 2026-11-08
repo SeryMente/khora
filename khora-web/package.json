@@ -23,7 +23,7 @@
   "dependencies": {
     "@aflsolutions/graphology-communities-leiden": "1.1.1",
     "@aws-sdk/client-s3": "3.1153.0",
-    "@aws-sdk/s3-request-presigner": "^3.1153.0",
+    "@aws-sdk/s3-request-presigner": "3.1153.0",
     "@breezystack/lamejs": "^1.2.7",
     "@google/genai": "^2.10.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
