@@ -8,14 +8,12 @@ import {
   buildPipelineState,
   buildRegistroState,
   buildGrafoState,
-  buildConsultaState,
   buildKpiState,
 } from "@/lib/ui-review/states";
 import { IngresoView } from "@/app/components/shared/IngresoView";
 import { PipelineView } from "@/app/components/shared/PipelineView";
 import { RegistroView } from "@/app/components/shared/RegistroView";
 import { GrafoView } from "@/app/components/shared/GrafoView";
-import { ConsultaView } from "@/app/components/shared/ConsultaView";
 import { KpiPanelView } from "@/app/components/shared/KpiPanelView";
 
 export const dynamic = "force-static";
@@ -39,8 +37,6 @@ function renderScenario(screen: ScreenId, scenario: string) {
       return <RegistroView isReviewMode state={buildRegistroState(scenario)} />;
     case "grafo":
       return <GrafoView isReviewMode state={buildGrafoState(scenario)} />;
-    case "consulta":
-      return <ConsultaView isReviewMode state={buildConsultaState(scenario)} />;
     case "kpi":
       return <KpiPanelView state={buildKpiState(scenario)} />;
     default:
