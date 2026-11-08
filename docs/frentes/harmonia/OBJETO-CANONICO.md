@@ -4,7 +4,7 @@
 ## 1. Control e identidad
 
 - Nombre normalizado: **Harmonia**, extensión compañera de **Khora**; «Armonía» y «Cora» de los dictados se conservan literalmente en originales. No renombrar producto o repositorio por transcripción.
-- Identificador del frente: harmonia. Versión del objeto **0.44**; sello **HARMONIA-v0.44**; corte de estado **2026-11-07**. §§37–45 conservan antecedentes históricos, incluida la transferencia gen12 y el cierre NCL-OCP. §46 conserva la fotografía técnica de la candidata local-first v0.40 en rama separada y la titularidad gen13, ambas supersedidas en responsabilidad por §47. §47 registra la transferencia gen13→gen14 a PC-8 y la captura documental del original ChatGPT-HARMONIA-20261101-1709.md. §48 registra la renovación del dispositivo RDC tras pérdida total del entorno local y la validación local 10/10 de la candidata local-first en rama de revisión; no supone aceptación Chrome, integración del código en main ni transporte EP. La regla permanente §36.1-36.2 conserva la aceptación natural exclusivamente en manos del operador.
+- Identificador del frente: harmonia. Versión del objeto **0.45**; sello **HARMONIA-v0.45**; corte de estado **2026-11-08**. §51 documenta la revisión de la telemetría de ciclos ya integrada en main y separa implementación, tests sintéticos, CI no verificada y aceptación natural pendiente. §§37–45 conservan antecedentes históricos, incluida la transferencia gen12 y el cierre NCL-OCP. §46 conserva la fotografía técnica de la candidata local-first v0.40 en rama separada y la titularidad gen13, ambas supersedidas en responsabilidad por §47. §47 registra la transferencia gen13→gen14 a PC-8 y la captura documental del original ChatGPT-HARMONIA-20261101-1709.md. §48 registra la renovación del dispositivo RDC tras pérdida total del entorno local y la validación local 10/10 de la candidata local-first en rama de revisión; no supone aceptación Chrome, integración del código en main ni transporte EP. La regla permanente §36.1-36.2 conserva la aceptación natural exclusivamente en manos del operador.
 - Repositorio propietario: `SeryMente/khora`, rama `main`; objeto canónico en `docs/frentes/harmonia/OBJETO-CANONICO.md`. El blob de la versión anterior v0.4 fue `9a186ea789ea5aacab8dd06cf9f6edf364b89531`. Primera publicación del estado completo: commit `892adad897d6bd36c797ec2343ff7f4893b853bf`; lectura de vuelta en `main` confirmada y blob verificado `03ec5d127e0913dfe1f61e8588ba53b8abaa8e5f`. El recibo se refiere al contenido integral v0.5. Corte v0.6: commit inicial `3cb7901c2223cd41773185b93f17133e459e7a69`, blob `d1f524c383cc71c13f89e8d3aa3886ac3533fcdb`. Corte v0.7: commit inicial `55c2e8ba053265c219b2d941665c5cb3730107de`, blob `bbd08e2da15be17486e7515fd11eda7df57fca2b`; lectura de vuelta y corrección del catálogo documentadas. Nunca anticipar un SHA.
 - Fuente de código vigente: `apps/harmonia-observability/` en `main`, con la extensión de observabilidad y captura automática en evolución (rama `main`, versión de código en revisión E2E), `coverage-catalog.json` y scripts/validador. No inferir que el código fuente, el paquete local y el runtime ejecutado están sincronizados sin prueba de huellas. El paquete materializado en el Escritorio se reconstruyó desde esos archivos y contiene solo el runtime portable y una credencial local excluidos del repositorio; su manifiesto local de huellas se regeneró tras las validaciones.
 - Frente permanente por creación expresa del operador. El paquete local usado anteriormente está en `C:\\Users\\fila4\\Desktop\\Harmonia-Observabilidad-v0.2.0`; su sincronización con las últimas versiones de `main` **NO VERIFICADA**. El runtime debe considerarse desincronizado hasta comparar huellas y reiniciar con el colector actualizado. La versión 0.3.0 del código fuente no está aceptada funcionalmente en Chrome; no hereda pruebas de v0.1.0 ni de validaciones anteriores.
@@ -1902,5 +1902,46 @@ La transferencia de responsabilidad y el dispositivo PC-14 descritos en §46.1 s
 - Crónica: docs/frentes/harmonia/cronica/HARMONIA-TRANSFER-G15-20261107.md.
 - Evidencia estructurada: docs/frentes/harmonia/evidencias/EV-HARMONIA-TRANSFER-G15-20261107.json.
 - Manifiesto y procedencia: documentos/MANIFIESTO-DOCUMENTAL.json y originales/PROCEDENCIA.md.
+
+---
+
+
+## 51. Revisión de telemetría de ciclos y aceptación pendiente · 2026-11-08
+
+### 51.1. Gobierno y procedencia
+
+- Entrada literal del operador: «Si se llevaron a cabo las nbecesidades de telemetria, revisa las ultiams conveaciones.»
+- Se leyó el export completo `originales/ChatGPT-Harmonia-20261108-1105.md` (1.776 líneas). La procedencia y los bytes están registrados en `originales/PROCEDENCIA.md` y `documentos/MANIFIESTO-DOCUMENTAL.json`; el export es distinto del nombre histórico pendiente `ChatGPT-HARMONIA-20261106-1715`.
+- Gobierno adquirido desde `SeryMente/metodologia/main`: DUG v383 / NX-383m, blob `cad464717c43733aa84b49f8c9c3af0875597fbd`; Metacanon 1.29; GOW 2.18. Se revisaron manualmente cascada, P041/P042, Metacanon §§4/28/47 y términos GOW pertinentes. `MCP-NORMATIVO: DESACTIVADO`.
+- Titularidad leída sin cambios: generación 15, alias `chatgpt-harmonia-01a1b6ca-4543-7578-85d9-7624877c2e80`, control blob `0e090e1f3537b75891344af812e576e39a5f5e02`; `session_folio=null`. FOL1 permanece PREPARADA, no activa. No se asignan folios CV/CY/A/B ni por OCP.
+- UUIDv7 local del ciclo de revisión: `01a1bc2b-a790-7b73-a360-79415f0e5f91`. Es una identidad local de evento, no un folio ni un ID nativo.
+
+### 51.2. Implementación contrastada en main
+
+- Commit de integración: `dcba260981837f75a8a05db85edd310c2a7a9736`, squash de PR #358; 14 archivos. La extensión declara v0.3.1 en `apps/harmonia-observability/extension/manifest.json`.
+- El código leído de main implementa `client.cycle.started` y `client.cycle.completed`, IDs locales UUIDv7, medición con `performance.now()`, UTC para auditoría y asentamiento de 1.500 ms sin sumarlo a `duration_ms`.
+- El observador temporal está separado del escáner estructural y usa cobertura `new-dom-node-v1`. El service worker y el colector validan payloads exactos; el colector correlaciona parejas, aplica idempotencia y escribe JSONL. `query.ps1 -Cycles` consulta completos e incompletos.
+- La frontera de privacidad está implementada en el observador: observa `characterData` sin leer valores ni procesar MutationRecords; no usa APIs de lectura de texto de mensajes/compositor. La validación rechaza propiedades no permitidas.
+- La outbox durable y persistencia remota no se incorporaron; el límite está documentado en `CYCLE-TELEMETRY.md`: un evento puede perderse cuando el colector local no está disponible.
+
+### 51.3. Pruebas y CI
+
+- Están definidos 11 casos sintéticos en `extension/cycle-observer.test.js`, 7 en `collector/cycle-telemetry.test.js`, una integración sintética del servidor/JSONL y fixtures PowerShell en `collector/tests/query-cycles.test.ps1`.
+- `.github/workflows/harmonia-cycles.yml` configura sintaxis, tests Node y fixture PowerShell para push/PR. No se recuperó evidencia de una ejecución de Actions con PASS. La herramienta consultada devuelve runs asociadas a PR y no devolvió runs; el status combinado visible para `dcba2609` mostró cinco contextos Vercel en failure, que no prueban el resultado de tests de telemetría. CI: **NO VERIFICADA**; tests: definidos, ejecución no acreditada.
+- Las pruebas son fixtures sintéticas. No se presentan como observación natural de ChatGPT ni aceptación funcional.
+
+### 51.4. Brechas y límites
+
+- En `content.js`, el observador se reinicia explícitamente con `popstate` y `hashchange`; no se encontró tratamiento/prueba explícita de navegación SPA con `history.pushState` ni reemplazo de la región principal. La continuidad de `conversation_id` entre conversaciones no queda demostrada para esos casos.
+- Los indicadores de actividad dependen de selectores conocidos de `aria-busy`, `data-is-streaming`, controles stop y progreso de agentes/tareas. No se han validado contra una sesión real actual de Chrome.
+- No existe prueba natural E2E de navegación, reinicio de observador, herramientas/agentes o comportamiento bajo indisponibilidad del colector. Regeneraciones, ediciones/reenvíos, reintentos sin nodo nuevo y voz siguen fuera de cobertura v1, según contrato.
+- La limitación sin outbox es deliberada y está documentada; no equivale a durabilidad garantizada ante fallo del colector.
+
+### 51.5. Dictamen, backlog y continuación
+
+- Dictamen: **IMPLEMENTACIÓN INTEGRADA EN MAIN; VERIFICACIÓN PARCIAL; CI Y ACEPTACIÓN NATURAL NO VERIFICADAS**. Las necesidades principales del contrato existen en el código, pero no procede declarar telemetría aceptada.
+- PR #358 integrada; #353 y #346 cerradas. La búsqueda de PR abiertas de `SeryMente/khora` devuelve cuatro PR de otros temas y ninguna PR abierta de Harmonia.
+- Siguiente secuencia: obtener resultado verificable del workflow y ejecutar tests Node/PowerShell; cubrir/reparar navegación SPA (`pushState` y sustitución de main); después ejecutar prueba natural autorizada en Chrome. No se modificó código, permisos, infraestructura, Chrome ni el control durante esta revisión.
+- Crónica del ciclo: `docs/frentes/harmonia/cronica/HARMONIA-REVISION-TELEMETRIA-20261108.md`; commit `a8e9f96b7ddb3bf6d66f330d4f4fa06f53e3b4d7`; blob `3c86e6b331e866e52c17605f29a9afda59969420`, lectura de vuelta exacta.
 
 ---
