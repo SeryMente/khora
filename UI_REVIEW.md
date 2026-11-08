@@ -41,7 +41,6 @@ Las rutas de UI Review permanecen **fail-closed** y requieren
 | `ingesta` | Envío al kernel | `PipelineView` |
 | `registro` | Registro de eventos | `RegistroView` |
 | `grafo` | Nodos y relaciones | `GrafoView` |
-| `consulta` | Consulta multi-turno y RAG | `ConsultaView` |
 | `kpi` | Métricas y benchmarks | `KpiPanelView` |
 
 Cada pantalla tiene escenarios explícitos de operación, carga, vacío, error y
