@@ -6,7 +6,7 @@
   "ocp_path": "docs/frentes/harmonia/",
   "manifest_path": "docs/frentes/harmonia/documentos/MANIFIESTO-DOCUMENTAL.json",
   "ocp_version": "0.45",
-  "ocp_blob_sha1": "29e1707dcc9b166eca97453edf480691adf8ecfc",
+  "ocp_blob_sha1": "6585d4e79a75ee9192cd6551803161ba3d4ad6a4",
   "responsibility": {
     "generation": 15,
     "owner_alias": "chatgpt-harmonia-01a1b6ca-4543-7578-85d9-7624877c2e80",
@@ -454,7 +454,7 @@
   ],
   "chronicle": {
     "path": "docs/frentes/harmonia/cronica/HARMONIA-REVISION-TELEMETRIA-20261108.md",
-    "git_blob_sha1": "a54fe1fc3126bfe533177750c700e57d2dac420d",
+    "git_blob_sha1": "08a5b58ae7abe24ecb19e02ae8dfff12fbbacf19",
     "state": "PERSISTIDO_Y_VERIFICADO",
     "readback_exact": true,
     "cycle_uuidv7_local": "01a1bc2b-a790-7b73-a360-79415f0e5f91"
