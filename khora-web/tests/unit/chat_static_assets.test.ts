@@ -18,7 +18,7 @@ test("Open WebUI interface, API and static assets remain on the authenticated up
   assert.ok(middleware.indexOf("!req.auth") < middleware.indexOf("if (process.env.KHORA_CHAT_ENABLED"));
   assert.match(middleware, /pathname === "\/chat\/frame"/);
   assert.match(middleware, /pathname === "\/api\/version"/);
-  assert.match(middleware, /pathname === "\/manifest\\.json"/);
+  assert.match(middleware, /pathname === "\/manifest\.json"/);
   assert.match(middleware, /contextSensitiveUpstreamRoute && isOpenWebUIRootNavigation/);
   assert.match(middleware, /referer.pathname !== "\/"/);
   assert.match(middleware, /isOpenWebUIRootNavigation/);
