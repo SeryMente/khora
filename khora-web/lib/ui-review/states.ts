@@ -14,7 +14,6 @@ import type { IngresoViewState } from "@/app/components/shared/IngresoView";
 import type { PipelineViewState } from "@/app/components/shared/PipelineView";
 import type { RegistroViewState } from "@/app/components/shared/RegistroView";
 import type { GrafoViewState } from "@/app/components/shared/GrafoView";
-import type { ConsultaViewState } from "@/app/components/shared/ConsultaView";
 import type { KpiPanelViewState } from "@/app/components/shared/KpiPanelView";
 import {
   FIXTURE_VOLCADOS,
@@ -237,61 +236,6 @@ export function buildGrafoState(
     viewMode: scenario === "dense" ? "graph" : "list",
     layer2Active: scenario === "dense",
     selectedElement: null,
-  };
-}
-
-export function buildConsultaState(
-  scenario: string,
-  fetchError: string | null = null
-): ConsultaViewState {
-  const msgUser = {
-    id: "msg-001",
-    rol: "user" as const,
-    contenido: "¿Cómo opera la veracidad semántica en Khora?",
-  };
-
-  const msgAssistantStream = {
-    id: "msg-002",
-    rol: "assistant" as const,
-    contenido:
-      "La veracidad semántica se garantiza mediante auditorías léxicas y verbatims inmutables.",
-    origen: "llm:groq:openai/gpt-oss-120b",
-  };
-
-  const msgAssistantGrafo = {
-    id: "msg-003",
-    rol: "assistant" as const,
-    contenido:
-      "El subgrafo recuperado confirma que el motor RAG conserva las tripletas originales.",
-    origen: "grafo",
-    fuentes: [
-      {
-        tripleta: "(Khora)-[:PRESERVA]->(VeracidadSemantica)",
-        provenance: "volcado-sintetico-001",
-        derived_from: "v1:sha256-sintetico",
-      },
-    ],
-    suficiencia: true,
-    no_anclada: false,
-    degradacion_declarada: null,
-  };
-
-  return {
-    mensajes:
-      scenario === "empty"
-        ? []
-        : scenario === "grafo"
-        ? [msgUser, msgAssistantGrafo]
-        : [msgUser, msgAssistantStream],
-    inputPregunta: scenario === "recording" ? "Pregunta sintética..." : "",
-    perfil: "groq",
-    modeloOverride: scenario === "override" ? "openai/gpt-oss-120b" : "",
-    modoGrafo: scenario === "grafo",
-    generando: scenario === "generating",
-    error:
-      scenario === "error"
-        ? "Error sintético de conexión con el proveedor LLM"
-        : fetchError || null,
   };
 }
 
