@@ -39,7 +39,6 @@ async function main() {
     "PipelineView.tsx",
     "RegistroView.tsx",
     "GrafoView.tsx",
-    "ConsultaView.tsx",
     "KpiPanelView.tsx",
   ];
 
