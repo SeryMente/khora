@@ -29,7 +29,6 @@ const UI_REVIEW_SCREENS = [
   "ingesta",
   "registro",
   "grafo",
-  "chat",
   "kpi",
 ];
 
