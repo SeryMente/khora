@@ -93,6 +93,8 @@ No se modificó código, PR, Chrome, permisos, infraestructura, OCP de otro fren
 
 Fuentes: [observador](https://github.com/SeryMente/khora/blob/main/apps/harmonia-observability/extension/cycle-observer.js), [service worker](https://github.com/SeryMente/khora/blob/main/apps/harmonia-observability/extension/service-worker.js), [validador del colector](https://github.com/SeryMente/khora/blob/main/apps/harmonia-observability/collector/cycle-telemetry.js), [consulta](https://github.com/SeryMente/khora/blob/main/apps/harmonia-observability/collector/query.ps1), [contrato y límites](https://github.com/SeryMente/khora/blob/main/apps/harmonia-observability/CYCLE-TELEMETRY.md).
 
+
+**Persistencia de esta revisión:** OCP actualizado a v0.45 / HARMONIA-v0.45; crónica, README y manifiesto documental escritos y leídos de vuelta desde `main`. Control de responsabilidad sin cambios.
 ---
 
 IPZ: v0.7 · d.h.m NO VERIFICADO
