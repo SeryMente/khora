@@ -20,6 +20,8 @@ function isOpenWebUIRootNavigation(req: NextRequest): boolean {
   try {
     const referer = new URL(rawReferer);
     return referer.origin === req.nextUrl.origin &&
+      referer.pathname !== "/" &&
+      referer.pathname !== "/api/version" &&
       (referer.pathname === "/chat/frame" || openWebUIPath(referer.pathname));
   } catch {
     return false;
@@ -72,10 +74,10 @@ const authMiddleware = auth((req) => {
   const chatFrame = pathname === "/chat/frame";
   const chatRoute =
     chatFrame ||
-    (pathname !== "/" && openWebUIPath(pathname)) ||
-    (pathname === "/" && isOpenWebUIRootNavigation(req));
+    ((pathname === "/" || pathname === "/api/version") && isOpenWebUIRootNavigation(req)) ||
+    (pathname !== "/" && pathname !== "/api/version" && openWebUIPath(pathname));
 
-  if (process.env.KHORA_CHAT_ENABLED === "1" && chatRoute && !bundledOpenWebUIAsset(pathname)) {
+  if (process.env.KHORA_CHAT_ENABLED === "1" && chatRoute) {
     const destino = req.nextUrl.clone();
     destino.pathname = "/api/khora-chat/proxy";
     destino.searchParams.set("path", chatFrame ? "/" : pathname);
