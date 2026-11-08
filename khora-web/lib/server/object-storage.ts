@@ -190,17 +190,81 @@ export async function deleteStagedObject(value:string,sessionId:string) {
     await b2Json(auth,'b2_delete_file_version',{fileName:key,fileId:file.fileId});
   }
 }
-export async function listB2Objects() {
+export type B2ListedObject = { url:string; pathname:string; size:number; uploadedAt:Date };
+
+function safeKhoraPrefix(prefix:string) {
+  if(!prefix.startsWith('khora/')||!prefix.endsWith('/')||prefix.length>900
+    ||!/^[A-Za-z0-9._/-]+$/.test(prefix)||prefix.split('/').some(part=>part==='.'||part==='..')) {
+    throw new Error('storage_listing_prefix_invalid');
+  }
+  return prefix;
+}
+
+/** Complete paginated inventory, scoped strictly to KHORA's namespace. */
+export async function listB2Objects(prefix='khora/dictado/'):Promise<B2ListedObject[]> {
   if(!b2Enabled())return [];
-  const c=storageLocation(),auth=await authorize(),objects:{url:string;pathname:string;size:number;uploadedAt:Date}[]=[];
+  const safePrefix=safeKhoraPrefix(prefix),c=storageLocation();
+  if(!c.bucketId)throw new Error('storage_b2_bucket_config_missing');
+  const auth=await authorize(),objects=new Map<string,B2ListedObject>();
   let startFileName:string|undefined;
-  for(let pageNo=0;pageNo<100;pageNo++) {
-    const page=await b2Json<{files:Array<{fileName:string;contentLength:number;uploadTimestamp:number;action:string}>;nextFileName?:string|null}>(auth,'b2_list_file_names',
-      {bucketId:c.bucketId,prefix:'khora/dictado/',maxFileCount:1000,...(startFileName?{startFileName}:{})});
-    for(const f of page.files||[]) if(f.action==='upload'&&f.fileName?.startsWith('khora/dictado/')) objects.push({url:b2ObjectUrl(f.fileName,c),pathname:f.fileName.slice('khora/'.length),size:f.contentLength||0,uploadedAt:new Date(f.uploadTimestamp||0)});
-    if(!page.nextFileName) return objects;
-    if(page.nextFileName===startFileName) throw new Error('storage_listing_incomplete');
-    startFileName=page.nextFileName;
+  for(let pageNo=0;pageNo<1000;pageNo++) {
+    const page=await b2Json<{files:Array<{fileName:string;contentLength:number;uploadTimestamp:number|string;action:string}>;nextFileName?:string|null}>(
+      auth,'b2_list_file_names',
+      {bucketId:c.bucketId,prefix:safePrefix,maxFileCount:1000,...(startFileName?{startFileName}:{})});
+    for(const f of page.files||[]) {
+      if(f.action==='upload'&&typeof f.fileName==='string'&&f.fileName.startsWith(safePrefix)) {
+        objects.set(f.fileName,{url:b2ObjectUrl(f.fileName,c),pathname:f.fileName.slice('khora/'.length),
+          size:Number(f.contentLength||0),uploadedAt:new Date(Number(f.uploadTimestamp||0))});
+      }
+    }
+    const next=page.nextFileName||undefined;
+    if(!next)return [...objects.values()].sort((a,b)=>a.pathname.localeCompare(b.pathname));
+    if(next===startFileName||(startFileName&&next<startFileName))throw new Error('storage_listing_incomplete');
+    startFileName=next;
   }
   throw new Error('storage_listing_limit');
+}
+
+/**
+ * Idempotent historical copy. Destination identity is derived from the SHA-256 of the
+ * immutable source URL. Existing destination versions are read back and compared;
+ * conflicts fail closed and are never overwritten or deleted.
+ */
+export async function putMigratedEncryptedObject(sourceUrlSha256:string,data:Buffer) {
+  if(!b2Enabled())throw new Error('storage_b2_not_enabled');
+  if(!/^[a-f0-9]{64}$/i.test(sourceUrlSha256))throw new Error('migration_source_identity_invalid');
+  if(data.length<32||data.subarray(0,4).toString('ascii')!=='KHC1')throw new Error('storage_requires_encrypted_envelope');
+  const c=storageLocation();
+  if(!c.bucketId)throw new Error('storage_b2_bucket_config_missing');
+  const key=safeObjectKey('khora/dictado/migrated/vercel-blob/'+sourceUrlSha256.toLowerCase()+'.khc');
+  const url=b2ObjectUrl(key,c),expectedSha256=createHash('sha256').update(data).digest('hex');
+  const auth=await authorize();
+  const versions=await b2Json<{files:Array<{fileName:string;fileId:string;action:string;contentLength:number;uploadTimestamp:number}>;nextFileName?:string|null;nextFileId?:string|null}>(
+    auth,'b2_list_file_versions',{bucketId:c.bucketId,prefix:key,startFileName:key,maxFileCount:100});
+  if(versions.nextFileName||versions.nextFileId)throw new Error('migration_destination_versions_exceeded');
+  const prior=(versions.files||[]).filter(f=>f.fileName===key)
+    .sort((a,b)=>Number(b.uploadTimestamp||0)-Number(a.uploadTimestamp||0))[0];
+  if(prior) {
+    if(prior.action!=='upload'||!prior.fileId)throw new Error('migration_destination_hidden_or_incomplete');
+    if(Number(prior.contentLength)!==data.length)throw new Error('migration_destination_conflict');
+    const response=await fetch(fileDownloadUrl(auth,c.bucket,key),{
+      headers:{Authorization:auth.authorizationToken},cache:'no-store',redirect:'error',
+      signal:AbortSignal.timeout(REQUEST_TIMEOUT_MS)});
+    if(!response.ok)throw new Error('migration_destination_readback_failed');
+    const readback=Buffer.from(await response.arrayBuffer());
+    const readbackSha=createHash('sha256').update(readback).digest('hex');
+    if(readback.length!==data.length||readbackSha!==expectedSha256)throw new Error('migration_destination_conflict');
+    return {url,pathname:key.slice('khora/'.length),encryptedBytes:readback.length,encryptedSha256:readbackSha,reused:true};
+  }
+  const target=await uploadUrl(auth);
+  const uploaded=await uploadFile(target.uploadUrl,target.authorizationToken,key,data);
+  if(uploaded.fileName!==key||uploaded.contentLength!==data.length)throw new Error('migration_destination_upload_mismatch');
+  const response=await fetch(fileDownloadUrl(auth,c.bucket,key),{
+    headers:{Authorization:auth.authorizationToken},cache:'no-store',redirect:'error',
+    signal:AbortSignal.timeout(REQUEST_TIMEOUT_MS)});
+  if(!response.ok)throw new Error('migration_destination_readback_failed');
+  const readback=Buffer.from(await response.arrayBuffer());
+  const readbackSha=createHash('sha256').update(readback).digest('hex');
+  if(readback.length!==data.length||readbackSha!==expectedSha256)throw new Error('migration_destination_integrity_failed');
+  return {url,pathname:key.slice('khora/'.length),encryptedBytes:readback.length,encryptedSha256:readbackSha,reused:false};
 }
