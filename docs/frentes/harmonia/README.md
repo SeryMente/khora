@@ -7,15 +7,18 @@ Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). El OCP conse
 - [Control exclusivo](CONTROL-RESPONSABILIDAD.json): actualmente asignado a la instancia y generación que constan en el JSON; no es un bootstrap sin propietario. Preparar el traspaso no transfiere la titularidad.
 - [Originales](originales/PROCEDENCIA.md), [crónica](cronica/HARMONIA-INSTANCIACION-01.md) y [revisión](evidencias/HARMONIA-INSTANCIACION-01-revision.json).
 
-## Estado vigente · 2026-11-07 · generación 15
+## Estado vigente · 2026-11-08 · generación 15
 
-- OCP canónico main: v0.44 / HARMONIA-v0.44, secciones 46–50.
+- OCP canónico main: v0.45 / HARMONIA-v0.45, secciones 46–51.
 - Control: generación 15; alias operativo chatgpt-harmonia-01a1b6ca-4543-7578-85d9-7624877c2e80; owner_thread=null (ID nativo no expuesto); session_folio=null (FOL1 no activa).
 - RDC autorizado para esta continuidad: PC10RCIF4EI4, UUID d0bbb2a3-d7b4-45e1-8870-652c2c3844fc; Windows 11 Pro; usuario CENTRAL\MantenimientoRCI; perfil C:\Users\MantenimientoRCI; SID S-1-5-21-1529298404-1161420656-882029410-2126.
 - Transferencia gen14 a gen15 por CAS y push fast-forward no forzado: commit 6f330f2301f2f2b55988ecbb5285c2b3a45621b7; control blob releído 0e090e1f3537b75891344af812e576e39a5f5e02. El titular anterior y el historial de generaciones permanecen preservados.
 - Export ChatGPT-HARMONIA-20261106-1715: NO CAPTURADO / NO LOCALIZADO EN RUTAS CONSULTADAS. Búsquedas por nombre exacto: cero coincidencias en Downloads y Desktop; cero en el perfil con aviso de directorios inaccesibles. No se creó sustituto. El original ChatGPT-HARMONIA-20261101-1709.md permanece como antecedente verificado y no lo reemplaza.
+- Export adicional `ChatGPT-Harmonia-20261108-1105.md`: PERSISTIDO_Y_VERIFICADO en `originales/`; SHA-256 `E1B0FE08A22C1A54AE88C464BEF68FFEF8614E8DE5C63D95E81C49C26F8AF608`. No sustituye el export nominal 2026-11-06 que sigue NO LOCALIZADO.
+- Revisión de telemetría: [crónica HARMONIA-REVISION-TELEMETRIA-20261108](cronica/HARMONIA-REVISION-TELEMETRIA-20261108.md). Dictamen: implementación integrada; CI y aceptación natural pendientes.
+- Gobierno adquirido en este corte: DUG v383 / NX-383m; Metacanon 1.29; GOW 2.18. `MCP-NORMATIVO: DESACTIVADO`.
 - Crónica y evidencia de transferencia: cronica/HARMONIA-TRANSFER-G15-20261107.md y evidencias/EV-HARMONIA-TRANSFER-G15-20261107.json; revisar su estado en el manifiesto documental.
-- Estado técnico conservado: PR #353 sigue como draft sin merge según el último corte técnico. CI, Chrome y EP remoto permanecen no aceptados/no verificados; sin B2, Neon, backfill o despliegue acreditados.
+- Estado técnico vigente: extensión v0.3.1 y telemetría de ciclos integradas en main mediante PR #358 (commit `dcba260981837f75a8a05db85edd310c2a7a9736`). PR #353 y #346 cerradas; cero PR abiertas de Harmonia. CI y aceptación natural en Chrome NO VERIFICADAS; no hay persistencia remota, B2, Neon, backfill ni despliegue acreditados.
 
 ## Antecedentes históricos de código y aceptación (no vigentes)
 
