@@ -1,0 +1,57 @@
+{
+  "schema": "harmonia.local-workspace-evidence.v1",
+  "front": "harmonia",
+  "date": "2026-11-08",
+  "cycle_uuidv7_local": "01a1bd12-f56f-7b57-9d81-2de45da860b1",
+  "responsibility": {
+    "generation": 15,
+    "owner_alias": "chatgpt-harmonia-01a1b6ca-4543-7578-85d9-7624877c2e80",
+    "control_blob": "6199386845aaeed02abcd81baa26712226376977",
+    "control_commit": "d98e9029deec79426a52352cff00925799d50c4e",
+    "rdc_device": "PC-13",
+    "rdc_device_id": "1227e578-55c8-4231-82bb-4dbf9234855a",
+    "authorization_scope": "task-scoped local workspace materialization only"
+  },
+  "source": {
+    "repository": "SeryMente/khora",
+    "branch": "main",
+    "commit": "d98e9029deec79426a52352cff00925799d50c4e",
+    "path": "apps/harmonia-observability",
+    "extension_version": "0.3.1"
+  },
+  "workspace": {
+    "relative_path": "Desktop/EP/Armonía",
+    "extension_relative_path": "Desktop/EP/Armonía/extension",
+    "ep_classification": "EP_VOLATIL",
+    "physical_certification": "NOT_VERIFIED",
+    "local_manifest_sha256": "8d58126ff0ff98f8305dd0f0bdc9faf1abcd95a93daf85a014a087188c7c296c",
+    "local_manifest_bytes": 13144
+  },
+  "verification": {
+    "git_blob_readback": "17/17_MATCH",
+    "node": "v24.22.2",
+    "node_syntax": "5/5_PASS",
+    "node_tests": {
+      "observer": "11/11_PASS",
+      "collector": "7/7_PASS",
+      "server_integration": "1/1_PASS",
+      "total": "19/19_PASS"
+    },
+    "powershell_script_parse": "2/2_PASS",
+    "powershell_query_fixture": "NOT_VERIFIED_PWSh_NOT_INSTALLED_PS5_1_ARRAY_DESERIALIZATION_DIFFERENCE"
+  },
+  "operations": {
+    "chrome_modified": false,
+    "extension_loaded": false,
+    "collector_started": false,
+    "collector_port_preflight": "47321_FREE",
+    "local_auth_generated": false,
+    "local_data_created": false
+  },
+  "acceptance": {
+    "folder_prepared": true,
+    "load_unpacked_ready": true,
+    "natural_chrome_acceptance": "PENDING",
+    "accepted": false
+  }
+}
