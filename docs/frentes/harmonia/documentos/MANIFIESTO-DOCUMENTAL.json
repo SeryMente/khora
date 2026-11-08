@@ -19,7 +19,7 @@
   },
   "provenance_index": {
     "path": "docs/frentes/harmonia/originales/PROCEDENCIA.md",
-    "git_blob_sha1": "b056fce1588f618a55244c3bb4dcf5a57882f10e",
+    "git_blob_sha1": "835ed2b7e620a8fe3a1c5e699fa2104e2b1d6b08",
     "state": "PERSISTIDO_Y_VERIFICADO",
     "readback_exact": true
   },
@@ -425,6 +425,30 @@
       "classification": "responsibility_transfer_evidence",
       "persistence_state": "PERSISTIDO_Y_VERIFICADO",
       "readback_exact": true
+    },
+    {
+      "document_id": "HAR-ORIG-20261108-1105",
+      "original_name": "ChatGPT-Harmonia-20261108-1105.md",
+      "canonical_path": "docs/frentes/harmonia/originales/ChatGPT-Harmonia-20261108-1105.md",
+      "source_path": "C:\\Users\\PC 8\\Downloads\\ChatGPT-Harmonia-20261108-1105.md",
+      "source_device_id": "c3c9becd-4f87-4692-ad7d-9e6bc77945c3",
+      "source_export_url": "https://chatgpt.com/c/6aee5f33-5e54-83e8-898f-e7a26788c973",
+      "source_created_at_exporter": "2026-11-06T17:13:55",
+      "source_updated_at_exporter": "2026-11-08T11:04:46",
+      "source_exported_at_exporter": "2026-11-08T11:05:33",
+      "media_type": "text/markdown",
+      "encoding": "UTF-8",
+      "line_endings": "LF",
+      "byte_size": 75321,
+      "line_count": 1776,
+      "sha256": "E1B0FE08A22C1A54AE88C464BEF68FFEF8614E8DE5C63D95E81C49C26F8AF608",
+      "git_blob_sha1": "77c4c22c5bc023c94f4f1f62fa10110766a46295",
+      "classification": "original_conversation_export",
+      "persistence_state": "PERSISTIDO_Y_VERIFICADO",
+      "write_commit": "b8839969b4578974296c7afb73ecfe2fc33a1301",
+      "readback_method": "GitHub fetch_file from main in Base64; exact source/read-back comparison after removing only Base64 presentation line breaks",
+      "readback_exact": true,
+      "revalidated_this_cycle": true
     }
   ],
   "chronicle": {
