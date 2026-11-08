@@ -27,7 +27,7 @@ import {
   diagnosticarConexionOllama,
   DiagnosticoOllamaResult,
 } from "@/lib/client/ollamaLocal";
-import { PerfilProveedor } from "./ConsultaView";
+import type { PerfilProveedor } from "@/lib/config/llm-profile";
 import {
   FRONTIER_BENCHMARKS_CONFIG,
   FrontierBenchmarkConfig,
