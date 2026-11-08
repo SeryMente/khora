@@ -72,10 +72,11 @@ const authMiddleware = auth((req) => {
   // routes are proxied individually. Root is proxied only for navigations that
   // originate inside that same authenticated Open WebUI frame.
   const chatFrame = pathname === "/chat/frame";
+  const contextSensitiveUpstreamRoute = pathname === "/" || pathname === "/api/version" || pathname === "/manifest.json";
   const chatRoute =
     chatFrame ||
-    ((pathname === "/" || pathname === "/api/version") && isOpenWebUIRootNavigation(req)) ||
-    (pathname !== "/" && pathname !== "/api/version" && openWebUIPath(pathname));
+    (contextSensitiveUpstreamRoute && isOpenWebUIRootNavigation(req)) ||
+    (!contextSensitiveUpstreamRoute && openWebUIPath(pathname));
 
   if (process.env.KHORA_CHAT_ENABLED === "1" && chatRoute) {
     const destino = req.nextUrl.clone();
