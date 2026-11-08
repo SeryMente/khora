@@ -1,6 +1,6 @@
 // @l0 L0-002 §4 · @req AUTH-F1-01/REQ-1 · @acr ACR-1.2 · @req UI-REVIEW/SECURITY
 import { auth } from "@/auth";
-import { bundledOpenWebUIAsset, openWebUIPath } from "./lib/chat-routes";
+import { openWebUIPath } from "./lib/chat-routes";
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { resolverGeneracion } from "./lib/server/generacion";
 
