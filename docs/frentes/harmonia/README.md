@@ -9,16 +9,17 @@ Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). El OCP conse
 
 ## Estado vigente · 2026-11-08 · generación 15
 
-- OCP canónico main: v0.45 / HARMONIA-v0.45, secciones 46–51.
+- OCP canónico main: v0.46 / HARMONIA-v0.46, secciones 46–52.
 - Control: generación 15; alias operativo chatgpt-harmonia-01a1b6ca-4543-7578-85d9-7624877c2e80; owner_thread=null (ID nativo no expuesto); session_folio=null (FOL1 no activa).
-- RDC autorizado para esta continuidad: PC10RCIF4EI4, UUID d0bbb2a3-d7b4-45e1-8870-652c2c3844fc; Windows 11 Pro; usuario CENTRAL\MantenimientoRCI; perfil C:\Users\MantenimientoRCI; SID S-1-5-21-1529298404-1161420656-882029410-2126.
+- RDC autorizado para la tarea local de este ciclo: PC-13, UUID 1227e578-55c8-4231-82bb-4dbf9234855a; usuario PC-13\PC 12; perfil C:\Users\PC 12; SID S-1-5-21-874664506-151841403-77259543-1001. Alcance limitado a materializar y verificar Desktop\EP\Armonía. PC10 permanece como dispositivo anterior en el historial; no cambió la titularidad ni la generación 15.
 - Transferencia gen14 a gen15 por CAS y push fast-forward no forzado: commit 6f330f2301f2f2b55988ecbb5285c2b3a45621b7; control blob releído 0e090e1f3537b75891344af812e576e39a5f5e02. El titular anterior y el historial de generaciones permanecen preservados.
 - Export ChatGPT-HARMONIA-20261106-1715: NO CAPTURADO / NO LOCALIZADO EN RUTAS CONSULTADAS. Búsquedas por nombre exacto: cero coincidencias en Downloads y Desktop; cero en el perfil con aviso de directorios inaccesibles. No se creó sustituto. El original ChatGPT-HARMONIA-20261101-1709.md permanece como antecedente verificado y no lo reemplaza.
 - Export adicional `ChatGPT-Harmonia-20261108-1105.md`: PERSISTIDO_Y_VERIFICADO en `originales/`; SHA-256 `E1B0FE08A22C1A54AE88C464BEF68FFEF8614E8DE5C63D95E81C49C26F8AF608`. No sustituye el export nominal 2026-11-06 que sigue NO LOCALIZADO.
 - Revisión de telemetría: [crónica HARMONIA-REVISION-TELEMETRIA-20261108](cronica/HARMONIA-REVISION-TELEMETRIA-20261108.md). Dictamen: implementación integrada; CI y aceptación natural pendientes.
+- Paquete local Harmonia v0.3.1 preparado en PC-13: Desktop\EP\Armonía; carpeta descomprimida para Chrome: Desktop\EP\Armonía\extension. Integridad 17/17 Git blob SHA; sintaxis Node 5/5 y suites Node sintéticas 19/19 PASS. Fixture PowerShell upstream NO VERIFICADO en PS5.1 (pwsh no instalado). El inicializador está preparado; no se inició el colector ni se cargó/modificó Chrome en ese ciclo. EP_VOLATIL; cifrado/recuperación física no certificados. Ver §52, crónica y evidencia EV-HARMONIA-LOCAL-WORKSPACE-PC13-20261108.
 - Gobierno adquirido en este corte: DUG v383 / NX-383m; Metacanon 1.29; GOW 2.18. `MCP-NORMATIVO: DESACTIVADO`.
 - Crónica y evidencia de transferencia: cronica/HARMONIA-TRANSFER-G15-20261107.md y evidencias/EV-HARMONIA-TRANSFER-G15-20261107.json; revisar su estado en el manifiesto documental.
-- Estado técnico vigente: extensión v0.3.1 y telemetría de ciclos integradas en main mediante PR #358 (commit `dcba260981837f75a8a05db85edd310c2a7a9736`). PR #353 y #346 cerradas; cero PR abiertas de Harmonia. CI y aceptación natural en Chrome NO VERIFICADAS; no hay persistencia remota, B2, Neon, backfill ni despliegue acreditados.
+- Estado técnico vigente: extensión v0.3.1 y telemetría de ciclos integradas en main mediante PR #358 (commit `dcba260981837f75a8a05db85edd310c2a7a9736`). PR #353 y #346 cerradas; cero PR abiertas de Harmonia. CI y aceptación natural en Chrome NO VERIFICADAS; la preparación local en PC-13 está verificada, pero Chrome no se cargó ni aceptó en este ciclo. No hay persistencia remota, B2, Neon, backfill ni despliegue acreditados.
 
 ## Antecedentes históricos de código y aceptación (no vigentes)
 
