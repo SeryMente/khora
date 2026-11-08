@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.28; OBJECT_VERSION=0.23; OBJECT_SEAL=CUSTODIA-v0.23; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.24; OBJECT_SEAL=CUSTODIA-v0.24; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · RESPONSABILIDAD DOCUMENTAL EN GENERACIÓN 8 · ORDEN OPERATIVO: CUSTODIA-03 (#1, RESCATE DE DICTADOS AUSENTES/PRESUNTAMENTE PERDIDOS) → CUSTODIA-01 (#2, UNIDADES VISIBLES) → CUSTODIA-04 (#3, CORRECCIÓN SISTÉMICA; PARÉNTESIS BREVE SOBRE ARCHIVAR REGISTRO) · DICTAMEN C014 SIN CAMBIO: RECUPERACIÓN TOTAL NO DEMOSTRADA · GARANTÍAS DE PRODUCTO NO CERTIFICADAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.23. Metacanon: 1.28. Gobierno general consultado: Samantha v377 · NX-377m; GOW 2.17. Fuente central SeryMente/metodologia/main: blob 54064c8fe00f872023a455f06596061ed69062ae. Este ciclo reordena prioridades y documenta rutas candidatas; no equivale a recuperación productiva ni certificación de bytes.
+> **ESTADO · VIVO · RESPONSABILIDAD DOCUMENTAL EN GENERACIÓN 10 · ORDEN OPERATIVO: CUSTODIA-03 (#1, RESCATE DE DICTADOS AUSENTES/PRESUNTAMENTE PERDIDOS) → CUSTODIA-01 (#2, UNIDADES VISIBLES) → CUSTODIA-04 (#3, CORRECCIÓN SISTÉMICA; PARÉNTESIS BREVE SOBRE ARCHIVAR REGISTRO) · DICTAMEN C014 SIN CAMBIO: RECUPERACIÓN TOTAL NO DEMOSTRADA · GARANTÍAS DE PRODUCTO NO CERTIFICADAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.24. Metacanon: 1.29. Gobierno general consultado: Samantha v383 · NX-383m; GOW 2.18. Fuente central SeryMente/metodologia/main: blob cad464717c43733aa84b49f8c9c3af0875597fbd. Esta retoma transfiere titularidad, preserva el original y registra el estado real del transporte B2; no equivale a recuperación productiva ni certificación de bytes.
 
 ## 1. Control e identidad
 
@@ -10,13 +10,14 @@
 - **Propietario documental:** SeryMente/khora, rama main.
 - **Directorio OCP:** frentes/custodia/.
 - **Único núcleo operativo:** este OBJETO-CANONICO.md.
-- **Control único de responsabilidad:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json). Titularidad documental/operativa transferida y leída de vuelta en generación 8 a `chatgpt-custodia-INSTANCE-20261107-01A1B6E4`; alias operativo `chatgpt-custodia-01a1b6e4-2f04-777f-b243-077f98894243`, no ID nativo. UUIDv7 local de conversación `01a1b6e4-2f04-777f-b243-077f98894243`; UUIDv7 local del evento `01a1b6e4-2f04-72c7-9f8d-f2c7e9ff9f8d`. Titular previo gen. 7 y snapshot íntegro quedan preservados. Folio `PENDIENTE/NO ASIGNADO`; FOL1 no está ACTIVO/verificado.
+- **Control único de responsabilidad:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json). Titularidad documental/operativa transferida de generación 9 a 10 y leída de vuelta. Titular actual: `chatgpt-custodia-INSTANCE-20261108-01A1BC33`; alias operativo `chatgpt-custodia-01a1bc33-32d5-7d64-b132-a52bdeb1e800`; UUIDv7 local de conversación `01a1bc33-32d5-7d64-b132-a52bdeb1e800`; UUIDv7 local del evento `01a1bc33-32d5-7581-94c8-7b0fa892d800`. ID nativo de plataforma no expuesto. Titular previo gen. 9 y generaciones anteriores preservados. Folio `PENDIENTE/NO ASIGNADO`; FOL1 no está ACTIVO/verificado.
 - **Propósito literal aprobado:** [originales/PROPOSITO-OPERADOR-2026-10-28.md](originales/PROPOSITO-OPERADOR-2026-10-28.md). La sección 4 también conserva el texto aprobado íntegro para que el propósito sea visible en el núcleo.
-- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional de los pendientes; versión 0.18, reordenada para priorizar CUSTODIA-03. CUSTODIA-02 continúa retirada y su identificador no se reutiliza; la lista sigue provisional.
+- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional de los pendientes; versión 0.20, reordenada para priorizar CUSTODIA-03. CUSTODIA-02 continúa retirada y su identificador no se reutiliza; la lista sigue provisional.
 - **Inventario provisional de hallazgos:** [evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md](evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md), materialización de evidencia para CUSTODIA-01; no es un segundo estado vivo.
-- **Versión y sello vigentes:** CUSTODIA-v0.23. Es la vigésima primera versión documental del objeto; no es una versión del producto.
+- **Versión y sello vigentes:** CUSTODIA-v0.24. Es la vigésima segunda versión documental del objeto; no es una versión del producto.
 - **Registro de la retoma anterior:** [originales/ChatGPT-CUSTODIA-20261106-1424.txt](originales/ChatGPT-CUSTODIA-20261106-1424.txt), instrucción textual parcial original y diagnóstico estático del límite de archivado.
 - **Original de esta retoma:** [originales/ChatGPT-CUSTODIA-20261107-1157.txt](originales/ChatGPT-CUSTODIA-20261107-1157.txt), exportación preservada en main; SHA-256 `7E256B9888F2A0227632D39D22B98E9BD1316548E057E83514ADE61376A93CC5`, 42,629 bytes; lectura de vuelta exacta.
+- **Original de esta retoma (2026-11-08 11:21):** [originales/ChatGPT-CUSTODIA-20261108-1121.md](originales/ChatGPT-CUSTODIA-20261108-1121.md), 39,896 bytes; SHA-256 `CB264E5979AA545F082B5CC9C59DEDA30CE9547100DB29B138A520C3592A866A`; Git blob `b7e13e3fe9fed70873535640e1124577f5b037e4`; commit `5d6cf7055f2ab5f0020bde220d078ffe077512a6`; lectura de vuelta idéntica.
 - **Instrucción de prioridad vigente:** [originales/INSTRUCCION-REORDENAMIENTO-PRIORIDAD-RECUPERACION-20261106.md](originales/INSTRUCCION-REORDENAMIENTO-PRIORIDAD-RECUPERACION-20261106.md), solicita priorizar la recuperación de lo considerado perdido y mantener el error de archivado como paréntesis.
 - **Relación con frentes existentes:** este frente es transversal. No sustituye ni duplica el objeto de Dictado de voz ([docs/frentes/dictado-voz/OBJETO-CANONICO.md](../../docs/frentes/dictado-voz/OBJETO-CANONICO.md)) ni su contrato de implementación ([khora-web/docs/CUSTODIA-DICTADOS.md](../../khora-web/docs/CUSTODIA-DICTADOS.md)).
 - **Visibilidad del repositorio:** la consulta inicial de GitHub devolvió public; dos consultas posteriores devolvieron private y coinciden con el README. El estado más reciente observado es private. El momento y la causa de la diferencia, así como una posible exposición pública anterior, no están verificados.
@@ -43,6 +44,7 @@
 - **Fuente normativa revalidada en C009 (histórica):** Samantha v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`. Revisión manual; MCP-NORMATIVO permanece desactivado.
 - **Fuente normativa revalidada en C013 (histórica):** Samantha v373 · NX-373m; Metacanon 1.26; GOW 2.14; blob `cac4525de77d4f47a8a59c25201968ecf2056b90`.
 - **Gobierno vigente leído en la retoma 2026-11-06:** Samantha v377 · NX-377m; Metacanon 1.28; GOW 2.17; blob DUG `54064c8fe00f872023a455f06596061ed69062ae`; commit main `8ee2482866b3dd085e58e05006727256d0274376`. Se leyó §ARR como secuencia de adquisición, la cascada y P001/P004/P005/P037/P038/P039/P041/P042/P043, Metacanon §§4, 28, 29, 38, 41, 42, 44, 46–47 y entradas GOW de Persistencia documental, OCP, SPDF y ciclo. MCP-NORMATIVO: DESACTIVADO. No se modificó el DUG.
+- **Gobierno vigente de esta retoma (2026-11-08):** Samantha v383 · NX-383m; Metacanon 1.29; GOW 2.18; DUG blob `cad464717c43733aa84b49f8c9c3af0875597fbd`; commit main `5f703622f11182a048db97419d8d6ef96b40a1c9`. Se leyó §ARR y se consideraron P001/P004/P005/P037/P038/P043. MCP-NORMATIVO: DESACTIVADO.
 - Esta adquisición identifica la versión del canon central al momento de la lectura; no equivale a una auditoría integral de todos sus principios o anexos ni a una declaración de conformidad definitiva del diseño de lista.
 
 ## 4. Propósito y alcance
@@ -106,9 +108,18 @@ Custodia es el frente transversal que define, verifica y gobierna las garantías
 
 ## 8. Estado vivo
 
-**Estado del frente: CUSTODIA-03 ABIERTA (P0 · PRIORIDAD #1: RESCATE DE AUSENTES) — CUSTODIA-01 EN CURSO (P0 · PRIORIDAD #2: UNIDADES VISIBLES) — CUSTODIA-04 EN CURSO (P0 · PRIORIDAD #3: CORRECCIÓN SISTÉMICA Y CERTIFICACIÓN E2E) — GARANTÍAS DE PRODUCTO NO CERTIFICADAS. CUSTODIA-02 RETIRADA DEL PLAN ACTIVO. RESPONSABILIDAD DOCUMENTAL/OPERATIVA TRANSFERIDA A GENERACIÓN 8.**
+**Estado del frente: CUSTODIA-03 ABIERTA (P0 · PRIORIDAD #1: RESCATE DE AUSENTES) — CUSTODIA-01 EN CURSO (P0 · PRIORIDAD #2: UNIDADES VISIBLES) — CUSTODIA-04 EN CURSO (P0 · PRIORIDAD #3: CORRECCIÓN SISTÉMICA Y CERTIFICACIÓN E2E) — GARANTÍAS DE PRODUCTO NO CERTIFICADAS. CUSTODIA-02 RETIRADA DEL PLAN ACTIVO. RESPONSABILIDAD DOCUMENTAL/OPERATIVA TRANSFERIDA A GENERACIÓN 10.**
 
-**Secuencia operativa vigente · 2026-11-07**
+### Retoma 2026-11-08 · transporte B2 y límites de aceptación
+
+- **Transporte nativo presente en `main`:** commit `7be5712a19aa98837e6d34449585ecb40e634af3`; archivo `khora-web/lib/server/object-storage.ts`, blob `148d7afe4f48f28f4ecda9f9d5fdeb6938a0c7fa`. Usa `b2_authorize_account`, valida que el Key ID corresponda al account ID y exige capacidades de Master Application Key; las nuevas escrituras cifradas se dirigen a B2 sin fallback de escritura a Blob.
+- **Compatibilidad histórica:** `fetchStoredObject` aún admite referencias `legacyBlobUrl` de Vercel Blob. No es persistencia dual de escritura, pero sí una ruta de lectura legacy pendiente de migración; no representa el estado final solicitado de B2 exclusivo.
+- **No aceptado aún:** no se ejecutó autenticación real, preflight de bucket, PUT/GET físico con lectura de vuelta, cotejo de tamaño/SHA ni backfill/restauración histórica. El código y las pruebas locales/mocks no prueban persistencia física.
+- **Credenciales:** el original registra que el intento anterior falló con `VAULT_PASSPHRASE_INVALID` y no guardó entradas nuevas. La [guía B2 Master](GUIA-PERSISTENCIA-B2-MASTER.md) prohíbe reutilizar la bóveda/cache de EP; exige la bóveda aprobada de Khora. El control vigente mantiene excluidos los cambios de credenciales/llaves; no se modificaron credenciales, selector, producción, SQL/backfill ni seguridad del bucket en esta retoma.
+- **Prioridades sin alteración:** CUSTODIA-03 → CUSTODIA-01 → CUSTODIA-04. CUSTODIA-B2-004 sigue en curso/P0; garantía de producto NO CERTIFICADA.
+
+
+**Secuencia operativa vigente · 2026-11-08**
 
 1. **CUSTODIA-03 — rescate prioritario de lo presuntamente perdido.** Primero cotejar bajo la cuenta propietaria el candidato textual del 28-10 a las 20:29: en un snapshot Neon no productivo se localizó una sesión con 264 revisiones únicas y texto/snapshot no vacíos, pero el contenido no se ha leído ni cotejado con lo que busca el operador. En la misma copia la sesión está en estado `checkpoint`, declara cero partes, no tiene filas de audio/MP3/historial ni vínculo a `volcado`; por ahora es candidato de texto, no de audio. El corte C014 había informado siete sesiones/1,038 checkpoints desde las 17:08; la consulta equivalente por `client_at` en este snapshot devolvió 2/268. Ambos resultados se conservan como cortes distintos y la diferencia queda pendiente de reconciliación. No se ha recuperado ni exportado el contenido. Cotejar el candidato con el dictado esperado bajo el acceso propietario y la bóveda aplicable; si coincide, restaurar a destino separado y comprobar lectura de vuelta. Después ampliar el inventario de sesiones y comprobar físicamente B2/Vercel Blob e IndexedDB solo en el perfil original autorizado.
 2. **CUSTODIA-01 — catálogo visible.** Después de la primera pasada del candidato ausente, recorrer todas las páginas de Ingresos → Dictado → Recuperación y restaurar/verificar cada unidad visible, sin desplazar un rescate positivo de CUSTODIA-03.
@@ -244,6 +255,18 @@ Cada ciclo futuro dejará en este núcleo, dentro de la crónica, al menos. El e
 No se rellenan huecos con inferencias ni se da por ejecutada una prueba porque aparezca escrita en un plan.
 
 ## 11. Crónica y fuentes
+
+### Retoma documental · 2026-11-08 · CUSTODIA-TRANSFER-20261108
+
+- **Instrucción A:** el operador ordenó retomar contexto, responsabilidad y trabajo del frente, y preservar el original `ChatGPT-CUSTODIA-20261108-1121.md`.
+- **Transferencia:** `TRANSFER_RESPONSIBILITY` de generación 9→10. Autorización literal en el turno actual: «Retoma contexto, responsabilidad y trabajo siendo hecho del frente». Evento UUIDv7 local `01a1bc33-32d5-7581-94c8-7b0fa892d800`; conversación UUIDv7 local `01a1bc33-32d5-7d64-b132-a52bdeb1e800`. Control base blob `a198f888a730219e2cb59e9dac67240e8bc1f83f`; control nuevo blob `0fb1375028922407afdf34420b52fe094384081d`; commit `a3a75f337c1ff42804f1deeddacf3b68abf12e17`; lectura de vuelta cotejada, exclusiones preservadas.
+- **Original B:** persistido en `originales/ChatGPT-CUSTODIA-20261108-1121.md`; 39,896 bytes; SHA-256 `CB264E5979AA545F082B5CC9C59DEDA30CE9547100DB29B138A520C3592A866A`; Git blob `b7e13e3fe9fed70873535640e1124577f5b037e4`; commit `5d6cf7055f2ab5f0020bde220d078ffe077512a6`; read-back exacto. El origen local permanece en Downloads.
+- **Lista provisional:** versionada a 0.20; blob `c1863918694c799285f38dc3fd3c2fd80a3e88b4`; commit `466150b7320db0ed00fb273e28506dabccf8b067`; read-back exacto.
+- **Gobierno:** DUG Samantha v383 · NX-383m; Metacanon 1.29; GOW 2.18; blob `cad464717c43733aa84b49f8c9c3af0875597fbd`; main commit `5f703622f11182a048db97419d8d6ef96b40a1c9`. MCP-NORMATIVO permanece DESACTIVADO.
+- **B2:** el transporte nativo Master Key está integrado en main (commit `7be5712a19aa98837e6d34449585ecb40e634af3`). La prueba física y la migración histórica no están ejecutadas; lectura de Blob legacy todavía existe; no declarar cutover/aceptación. No se guardaron secretos ni se tocó producción.
+- **Cierre:** CUSTODIA-03, CUSTODIA-01, CUSTODIA-04 y CUSTODIA-B2-004 siguen abiertas según sus criterios; no se declaró recuperado ningún dictado.
+
+
 
 ### Ciclo inicial · CUSTODIA-CREATE-SES-20261028-C8M4R7Q1 · 2026-10-28
 
