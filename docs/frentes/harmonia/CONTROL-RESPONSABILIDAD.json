@@ -359,9 +359,26 @@
     }
   ],
   "authorized_device": {
+    "name": "PC10RCIF4EI4",
+    "device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
+    "status": "authorized_for_harmonia_task_scoped_subproject_bootstrap",
+    "scope": "RDC access limited to establishing and verifying the HARMONIA subproject scaffold at C:\\Users\\fila4\\Desktop\\Ser y Mente\\EP\\Harmonia\\subproyectos\\bucle-mejora-supervisada. Scope permits inspection and creation of project documentation/configuration templates only. It does not authorize modifying the active extension runtime, reading or entering credentials, API calls, starting autonomous loops, controlling ChatGPT Web, loading/reloading Chrome, merging, deploying, or operations outside this exact subproject folder. Separate gates and explicit authorization are required for those actions.",
+    "observed_platform": "Windows",
+    "observed_user": "CENTRAL\\fila4 (interactive console session ID 4; active)",
+    "observed_profile": "C:\\Users\\fila4",
+    "sid": "S-1-5-21-1529298404-1161420656-882029410-5167",
+    "observed_rdc_process_user": "CENTRAL\\mantenimientorci",
+    "observed_rdc_process_profile": "C:\\Users\\MantenimientoRCI",
+    "authorized_by": "Explicit instructions in current conversation: “Utiliza la conexión RDC a fila 4” and clarification “PC10RCIF4EI4 es fila 4”. Live inventory identified exact device UUID; quser and Win32_UserAccount/Win32_UserProfile verified the fila4 interactive session, SID and profile. RDC process identity separately observed as CENTRAL\\mantenimientorci.",
+    "authorized_at": "2026-11-08T22:10:51.260Z",
+    "authorized_timezone": "America/Mexico_City"
+  },
+  "uuidv7_local_event": "01a1b6ca-4543-7578-85d9-7624877c2e80",
+  "authorized_device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
+  "previous_authorized_device": {
     "name": "PC-13",
     "device_id": "1227e578-55c8-4231-82bb-4dbf9234855a",
-    "status": "authorized_for_harmonia_task_scoped_workspace_materialization",
+    "status": "historical_superseded_by_operator_selection_of_PC10_2026-11-08",
     "scope": "RDC access limited to this user-directed HARMONIA task: prepare and verify the local work folder under this terminal's Desktop\\EP\\Armonía, including the unpacked Chrome extension package. No authorization for other fronts, EP/B2 operations beyond this folder task, credentials, deployment, or unrelated paths. Exact device UUID plus observed Windows identity; not transferable by display name. Least privilege.",
     "observed_platform": "Windows (platform version not re-collected)",
     "observed_user": "PC-13\\PC 12",
@@ -370,32 +387,18 @@
     "authorized_by": "Explicit user instruction in current conversation: requested local RDC preparation in EP and corrected device selection with “No esa no pC 13”; live RDC inventory showed the only online PC-13 identity as this exact UUID; read-only preflight verified Windows account, SID and profile.",
     "authorized_at": "2026-11-08 (exact local time not captured)"
   },
-  "uuidv7_local_event": "01a1b6ca-4543-7578-85d9-7624877c2e80",
-  "authorized_device_id": "1227e578-55c8-4231-82bb-4dbf9234855a",
-  "previous_authorized_device": {
-    "name": "PC10RCIF4EI4",
-    "device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
-    "status": "historical_superseded_by_explicit_device_selection_2026-11-08",
-    "scope": "RDC access for this HARMONIA responsibility transfer and documentary-persistence continuity on this exact UUID only; identity is anchored to exact UUID plus observed Windows account; not transferable to devices sharing a display name. No authorization for other fronts, EP/B2 operations, credential disclosure, or changes outside this HARMONIA OCP. Least privilege.",
-    "observed_platform": "Windows 11 Pro",
-    "observed_user": "CENTRAL\\MantenimientoRCI",
-    "observed_profile": "C:\\Users\\MantenimientoRCI",
-    "sid": "S-1-5-21-1529298404-1161420656-882029410-2126",
-    "authorized_by": "Explicit user instruction selecting PC10RCIF4EI4 (exact UUID) and explicit \"Si\" authorizing TRANSFER_RESPONSIBILITY in current conversation",
-    "authorized_at": "2026-11-07T16:14:31.747Z",
-    "superseded_at": "2026-11-08 (current conversation)",
-    "superseded_by_device_id": "1227e578-55c8-4231-82bb-4dbf9234855a"
-  },
   "device_authorization_event": {
-    "type": "AUTHORIZE_RDC_DEVICE_TASK_SCOPED",
-    "authorization_ref": "Current conversation, 2026-11-08: user ordered Harmonia work-folder preparation in Desktop\\EP and explicitly corrected the RDC device to PC-13. Live inventory and PowerShell read-only preflight identified exact device UUID, Windows identity, SID and profile.",
-    "previous_device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
-    "new_device_id": "1227e578-55c8-4231-82bb-4dbf9234855a",
-    "scope": "HARMONIA generation 15; single task-scoped local work-folder preparation and verification only",
+    "type": "REAUTHORIZE_RDC_DEVICE_TASK_SCOPED",
+    "event_uuidv7": "01a1bd36-dafc-7316-9566-6a7a7a0cf1ff",
+    "authorization_ref": "Current conversation, 2026-11-08: explicit operator instruction to use RDC to fila4 and clarification that PC10RCIF4EI4 is fila4; scope is local HARMONIA subproject scaffold only.",
+    "previous_device_id": "1227e578-55c8-4231-82bb-4dbf9234855a",
+    "new_device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
+    "scope": "Documentation/configuration scaffold only under C:\\Users\\fila4\\Desktop\\Ser y Mente\\EP\\Harmonia\\subproyectos\\bucle-mejora-supervisada. No extension runtime, credentials, API, browser, merge or deployment.",
     "owner_alias_unchanged": true,
     "responsibility_generation_unchanged": true,
     "session_folio": null,
-    "readback_required": true
+    "readback_required": true,
+    "acquired_at": "2026-11-08T22:10:51.260Z"
   },
   "environment_reset": {
     "state": "TOTAL_LOCAL_ENVIRONMENT_LOSS_DECLARED_BY_OPERATOR",
@@ -406,5 +409,33 @@
     "observed_profile": "C:\\Users\\PC",
     "observed_sid": "S-1-5-21-4061665785-3686036472-903815331-1003",
     "recorded_at": "2026-11-01T19:03:39.457-06:00"
-  }
+  },
+  "device_authorization_history": [
+    {
+      "name": "PC10RCIF4EI4",
+      "device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
+      "status": "historical_superseded_by_explicit_device_selection_2026-11-08",
+      "scope": "RDC access for this HARMONIA responsibility transfer and documentary-persistence continuity on this exact UUID only; identity is anchored to exact UUID plus observed Windows account; not transferable to devices sharing a display name. No authorization for other fronts, EP/B2 operations, credential disclosure, or changes outside this HARMONIA OCP. Least privilege.",
+      "observed_platform": "Windows 11 Pro",
+      "observed_user": "CENTRAL\\MantenimientoRCI",
+      "observed_profile": "C:\\Users\\MantenimientoRCI",
+      "sid": "S-1-5-21-1529298404-1161420656-882029410-2126",
+      "authorized_by": "Explicit user instruction selecting PC10RCIF4EI4 (exact UUID) and explicit \"Si\" authorizing TRANSFER_RESPONSIBILITY in current conversation",
+      "authorized_at": "2026-11-07T16:14:31.747Z",
+      "superseded_at": "2026-11-08 (current conversation)",
+      "superseded_by_device_id": "1227e578-55c8-4231-82bb-4dbf9234855a"
+    },
+    {
+      "name": "PC-13",
+      "device_id": "1227e578-55c8-4231-82bb-4dbf9234855a",
+      "status": "historical_superseded_by_operator_selection_of_PC10_2026-11-08",
+      "scope": "RDC access limited to this user-directed HARMONIA task: prepare and verify the local work folder under this terminal's Desktop\\EP\\Armonía, including the unpacked Chrome extension package. No authorization for other fronts, EP/B2 operations beyond this folder task, credentials, deployment, or unrelated paths. Exact device UUID plus observed Windows identity; not transferable by display name. Least privilege.",
+      "observed_platform": "Windows (platform version not re-collected)",
+      "observed_user": "PC-13\\PC 12",
+      "observed_profile": "C:\\Users\\PC 12",
+      "sid": "S-1-5-21-874664506-151841403-77259543-1001",
+      "authorized_by": "Explicit user instruction in current conversation: requested local RDC preparation in EP and corrected device selection with “No esa no pC 13”; live RDC inventory showed the only online PC-13 identity as this exact UUID; read-only preflight verified Windows account, SID and profile.",
+      "authorized_at": "2026-11-08 (exact local time not captured)"
+    }
+  ]
 }
