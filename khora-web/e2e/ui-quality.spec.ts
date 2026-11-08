@@ -4,7 +4,7 @@ const PRODUCT_ROUTES = [
   "/",
   "/sistema/custodia",
   "/sistema/ingreso",
-  "/sistema/consulta",
+  "/chat",
   "/sistema/kpis",
   "/grafo",
   "/mapa",
@@ -29,7 +29,7 @@ const UI_REVIEW_SCREENS = [
   "ingesta",
   "registro",
   "grafo",
-  "consulta",
+  "chat",
   "kpi",
 ];
 
@@ -104,7 +104,7 @@ for (const viewport of [
 
       await expect(page.locator("[data-navigation-entry]")).toHaveCount(6);
       const primaryIds = await page.locator("[data-navigation-entry]").evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-navigation-entry")));
-      expect(primaryIds).toEqual(["ingreso", "custodia", "grafo", "consulta", "seguridad", "sistema"]);
+      expect(primaryIds).toEqual(["ingreso", "custodia", "grafo", "chat", "seguridad", "sistema"]);
       await expect(page.getByRole("link", { name: "Ingreso", exact: true })).toBeVisible();
       await expect(page.getByRole("link", { name: "Custodia", exact: true })).toBeVisible();
       await expect(page.getByRole("link", { name: "Capturar", exact: true })).toHaveCount(0);
