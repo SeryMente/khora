@@ -10,8 +10,3 @@ export function openWebUIPath(path: string): boolean {
     (path === '/api/v1/models' || path.startsWith('/api/v1/models/')) || path.startsWith('/api/v1/users/user/') ||
     (path === '/api/v1/folders' || path.startsWith('/api/v1/folders/')) || path.startsWith('/api/v1/configs/banners');
 }
-
-/** Pinned, unchanged upstream assets on the same Vercel host, after real auth(). */
-export function bundledOpenWebUIAsset(path: string): boolean {
-  return openWebUIPath(path) && ['/_app/', '/assets/', '/licenses/'].some(prefix => path.startsWith(prefix));
-}
