@@ -9,8 +9,8 @@ import path from "path";
 
 test("UI Review Harness Test Suite", async (t) => {
   await t.test("1. Registro de pantallas y escenarios completo y no vacío", () => {
-    assert.strictEqual(SCREENS.length, 9);
-    assert.deepStrictEqual(SCREENS, ["ingreso", "archivo", "revision", "aprobacion", "ingesta", "registro", "grafo", "consulta", "kpi"]);
+    assert.strictEqual(SCREENS.length, 8);
+    assert.deepStrictEqual(SCREENS, ["ingreso", "archivo", "revision", "aprobacion", "ingesta", "registro", "grafo", "kpi"]);
 
     for (const screen of SCREENS) {
       const scenarios = getAllScenariosForScreen(screen);
@@ -77,7 +77,7 @@ test("UI Review Harness Test Suite", async (t) => {
     const sharedDir = path.join(process.cwd(), "app", "components", "shared");
     assert.ok(fs.existsSync(sharedDir), "Debe existir app/components/shared");
 
-    const requiredComponents = ["IngresoView.tsx", "PipelineView.tsx", "RegistroView.tsx", "GrafoView.tsx", "ConsultaView.tsx", "KpiPanelView.tsx"];
+    const requiredComponents = ["IngresoView.tsx", "PipelineView.tsx", "RegistroView.tsx", "GrafoView.tsx", "KpiPanelView.tsx"];
     for (const comp of requiredComponents) {
       const filePath = path.join(sharedDir, comp);
       assert.ok(fs.existsSync(filePath), "Falta " + comp);
@@ -89,7 +89,6 @@ test("UI Review Harness Test Suite", async (t) => {
       ["Volcados", "app/sistema/custodia/page.tsx", "PipelineView"],
       ["Registro", "app/sistema/registro/page.tsx", "RegistroView"],
       ["Grafo", "app/grafo/page.tsx", "GrafoView"],
-      ["Consulta", "app/sistema/consulta/page.tsx", "ConsultaView"],
       ["KPIs", "app/sistema/kpis/page.tsx", "KpiPanelView"],
     ] as const) {
       const content = fs.readFileSync(path.join(process.cwd(), file), "utf8");
