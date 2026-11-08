@@ -69,3 +69,13 @@ SHA-256 del archivo JSONL: 8a5f2ea2ed6c2ddf76d5d4bbe3758dd6dde638df68fef026df346
 
 - El original no fue localizado en el inventario canónico ni por búsqueda exacta en Downloads y Desktop del perfil verificado. La búsqueda del perfil completo informó cero coincidencias, pero hubo directorios inaccesibles y no puede declararse exhaustiva.
 - Estado: NO CAPTURADO / NO LOCALIZADO EN RUTAS CONSULTADAS. No se creó un derivado sustituto. Se requiere que los bytes originales o una ruta accesible se pongan a disposición para cumplir P041.
+
+## Exportación de conversación · ChatGPT-Harmonia-20261108-1105.md
+
+- Original recuperado por RDC desde `C:\\Users\\PC 8\\Downloads\\ChatGPT-Harmonia-20261108-1105.md`, dispositivo PC-8, UUID `c3c9becd-4f87-4692-ad7d-9e6bc77945c3`. El archivo se recibió y conservó con el nombre exacto, sin conversión ni normalización.
+- Encabezado del exportador: conversación `Harmonia`; creada `2026-11-06 17:13:55`, actualizada `2026-11-08 11:04:46`, exportada `2026-11-08 11:05:33`; URL de origen `https://chatgpt.com/c/6aee5f33-5e54-83e8-898f-e7a26788c973`. Estos metadatos proceden del encabezado del exportador.
+- Fuente: 75,321 bytes; 1,776 líneas; UTF-8 válido sin BOM; finales LF (1,775 LF, sin salto final). SHA-256 de origen `E1B0FE08A22C1A54AE88C464BEF68FFEF8614E8DE5C63D95E81C49C26F8AF608`.
+- Destino canónico: `docs/frentes/harmonia/originales/ChatGPT-Harmonia-20261108-1105.md`. Commit de escritura en `main`: `b8839969b4578974296c7afb73ecfe2fc33a1301`; blob Git `77c4c22c5bc023c94f4f1f62fa10110766a46295`.
+- Lectura de vuelta desde `main` mediante `fetch_file` en Base64; una vez retirados únicamente los saltos de línea de presentación insertados por la respuesta, los 100,428 caracteres Base64 coinciden exactamente con los bytes obtenidos por RDC del original. Estado: **PERSISTIDO_Y_VERIFICADO**.
+- Relación con el pendiente §50.3: el export identifica la conversación creada en la fecha/hora correspondiente y conserva su contenido actualizado. Se preserva bajo el nombre real recibido; no se renombra como `ChatGPT-HARMONIA-20261106-1715` ni se afirma haber recuperado ese archivo con su nombre nominal.
+- Alcance del contenido: se leyó el export completo (1,776 líneas). Sus últimas salidas visibles documentan la limpieza de PR de Harmonia, la integración de telemetría en `main` y la descarga local de `v0.3.1`; la aceptación natural en Chrome y la suite CI completa siguen pendientes según el propio registro.
