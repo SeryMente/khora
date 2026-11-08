@@ -5,8 +5,8 @@
   "branch": "main",
   "ocp_path": "docs/frentes/harmonia/",
   "manifest_path": "docs/frentes/harmonia/documentos/MANIFIESTO-DOCUMENTAL.json",
-  "ocp_version": "0.44",
-  "ocp_blob_sha1": "69d460839af8bf805e587c5c639e24c0c795437e",
+  "ocp_version": "0.45",
+  "ocp_blob_sha1": "ae3f11f480874c1ee31ce261fe875a90400b9b36",
   "responsibility": {
     "generation": 15,
     "owner_alias": "chatgpt-harmonia-01a1b6ca-4543-7578-85d9-7624877c2e80",
@@ -25,7 +25,7 @@
   },
   "README": {
     "path": "docs/frentes/harmonia/README.md",
-    "git_blob_sha1": "adc978fb40f853c41f58aacbefc433757807e3ed",
+    "git_blob_sha1": "23b574d019f16a6f2ec4327c809b404b3a35a7e5",
     "state": "PERSISTIDO_Y_VERIFICADO",
     "readback_exact": true
   },
@@ -79,9 +79,10 @@
       "root_cause": "NOT_DETERMINED"
     },
     "chrome_accepted": false,
-    "remote_ep_enabled": false
+    "remote_ep_enabled": false,
+    "record_status": "HISTORICAL_SNAPSHOT_SUPERSEDED_BY_MAINLINE_TELEMETRY_INTEGRATION"
   },
-  "inventory_note": "Prior original/session entries remain historical inventory and were not rehashed in this cycle. Current main OCP v0.43 records the RDC reset, local validation pass and final clean PR #353. PR #351 and #352 are closed without merge. FOL1 remains inactive; no global folio is assigned.",
+  "inventory_note": "Prior original/session entries remain historical inventory and were not rehashed in this cycle. Current main OCP v0.43 records the RDC reset, local validation pass and final clean PR #353. PR #351 and #352 are closed without merge. FOL1 remains inactive; no global folio is assigned. The candidate_technical_branch fields above are a historical snapshot; current technical state is recorded in current_technical_state and OCP §51.",
   "entries": [
     {
       "document_id": "HAR-EXISTING-70663c69e843",
@@ -452,10 +453,11 @@
     }
   ],
   "chronicle": {
-    "path": "docs/frentes/harmonia/cronica/HARMONIA-TRANSFER-G15-20261107.md",
-    "git_blob_sha1": "8a4e3b0f991dc6bd0fc920cc5b99a583a30573df",
+    "path": "docs/frentes/harmonia/cronica/HARMONIA-REVISION-TELEMETRIA-20261108.md",
+    "git_blob_sha1": "3c86e6b331e866e52c17605f29a9afda59969420",
     "state": "PERSISTIDO_Y_VERIFICADO",
-    "readback_exact": true
+    "readback_exact": true,
+    "cycle_uuidv7_local": "01a1bc2b-a790-7b73-a360-79415f0e5f91"
   },
   "evidence": {
     "path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-TRANSFER-G15-20261107.json",
@@ -588,5 +590,44 @@
     ],
     "do_not_create_substitute": true,
     "required_input": "Original export bytes or accessible exact source path"
+  },
+  "current_technical_state": {
+    "source": "SeryMente/khora:main",
+    "integration_commit": "dcba260981837f75a8a05db85edd310c2a7a9736",
+    "integration_pull_request": 358,
+    "integration_state": "MERGED",
+    "extension_version": "0.3.1",
+    "telemetry": {
+      "implementation": "INTEGRATED",
+      "coverage": "new-dom-node-v1",
+      "tests_defined": {
+        "observer_synthetic": 11,
+        "collector_validation_synthetic": 7,
+        "collector_server_integration_synthetic": 1,
+        "powershell_query_fixture": true
+      },
+      "tests_execution": "NOT_VERIFIED",
+      "github_actions": "NOT_VERIFIED",
+      "chrome_natural_acceptance": "PENDING",
+      "spa_push_state_navigation": "NOT_COVERED_OR_VERIFIED",
+      "durable_outbox": false,
+      "collector_unavailable_event_loss": "DOCUMENTED_LIMIT"
+    },
+    "related_pull_requests": [
+      {
+        "number": 353,
+        "state": "closed",
+        "reason": "superseded; IndexedDB outbox/EP ledger not merged"
+      },
+      {
+        "number": 346,
+        "state": "closed",
+        "reason": "remote persistence/OCP changes out of scope"
+      }
+    ],
+    "open_harmonia_pull_requests": 0,
+    "search_scope": "Open PR listing for SeryMente/khora returned four unrelated PRs and no Harmonia PR",
+    "responsibility_control_changed": false,
+    "accepted": false
   }
 }
