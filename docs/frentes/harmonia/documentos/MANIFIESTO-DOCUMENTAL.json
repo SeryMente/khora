@@ -5,17 +5,22 @@
   "branch": "main",
   "ocp_path": "docs/frentes/harmonia/",
   "manifest_path": "docs/frentes/harmonia/documentos/MANIFIESTO-DOCUMENTAL.json",
-  "ocp_version": "0.45",
-  "ocp_blob_sha1": "6585d4e79a75ee9192cd6551803161ba3d4ad6a4",
+  "ocp_version": "0.46",
+  "ocp_blob_sha1": "7e30f6609d2a4617ff12a41bbca6310458e12852",
   "responsibility": {
     "generation": 15,
     "owner_alias": "chatgpt-harmonia-01a1b6ca-4543-7578-85d9-7624877c2e80",
     "uuidv7_local_event": "01a1b6ca-4543-7578-85d9-7624877c2e80",
-    "control_blob_sha1": "0e090e1f3537b75891344af812e576e39a5f5e02",
-    "authorized_device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
+    "control_blob_sha1": "6199386845aaeed02abcd81baa26712226376977",
+    "authorized_device_id": "1227e578-55c8-4231-82bb-4dbf9234855a",
     "device_authorization_event": "01a1b6ca-4543-7578-85d9-7624877c2e80",
     "authorization_event": "HARMONIA-TRANSFER-01a1b6ca-4543-7578-85d9-7624877c2e80",
-    "session_folio": null
+    "session_folio": null,
+    "authorized_device_name": "PC-13",
+    "authorized_device_scope": "Task-scoped local workspace materialization and verification under Desktop/EP/Armonía only; generation and owner unchanged.",
+    "previous_authorized_device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
+    "device_authorization_commit": "d98e9029deec79426a52352cff00925799d50c4e",
+    "device_authorization_event_type": "AUTHORIZE_RDC_DEVICE_TASK_SCOPED"
   },
   "provenance_index": {
     "path": "docs/frentes/harmonia/originales/PROCEDENCIA.md",
@@ -25,7 +30,7 @@
   },
   "README": {
     "path": "docs/frentes/harmonia/README.md",
-    "git_blob_sha1": "23b574d019f16a6f2ec4327c809b404b3a35a7e5",
+    "git_blob_sha1": "d72fb71a00d4f0ec4b32f0dc8b800377fa9cfe12",
     "state": "PERSISTIDO_Y_VERIFICADO",
     "readback_exact": true
   },
@@ -450,22 +455,41 @@
       "readback_method": "GitHub fetch_file from main in Base64; exact source/read-back comparison after removing only Base64 presentation line breaks",
       "readback_exact": true,
       "revalidated_this_cycle": true
+    },
+    {
+      "document_id": "HAR-CHRONICLE-PC13-20261108",
+      "original_name": "HARMONIA-PAQUETE-LOCAL-PC13-20261108.md",
+      "canonical_path": "docs/frentes/harmonia/cronica/HARMONIA-PAQUETE-LOCAL-PC13-20261108.md",
+      "git_blob_sha1": "6e0c8102543302c67e48ba1b8194b53982cc0574",
+      "classification": "cycle_chronicle",
+      "persistence_state": "PERSISTIDO_Y_VERIFICADO",
+      "readback_exact": true,
+      "cycle_uuidv7_local": "01a1bd12-f56f-7b57-9d81-2de45da860b1"
+    },
+    {
+      "document_id": "HAR-EVIDENCE-LOCAL-PC13-20261108",
+      "original_name": "EV-HARMONIA-LOCAL-WORKSPACE-PC13-20261108.json",
+      "canonical_path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-LOCAL-WORKSPACE-PC13-20261108.json",
+      "git_blob_sha1": "67cc4117c9c0d8ce37fb0307340ddd512b770545",
+      "classification": "validation_evidence",
+      "persistence_state": "PERSISTIDO_Y_VERIFICADO",
+      "readback_exact": true
     }
   ],
   "chronicle": {
-    "path": "docs/frentes/harmonia/cronica/HARMONIA-REVISION-TELEMETRIA-20261108.md",
-    "git_blob_sha1": "08a5b58ae7abe24ecb19e02ae8dfff12fbbacf19",
+    "path": "docs/frentes/harmonia/cronica/HARMONIA-PAQUETE-LOCAL-PC13-20261108.md",
+    "git_blob_sha1": "6e0c8102543302c67e48ba1b8194b53982cc0574",
     "state": "PERSISTIDO_Y_VERIFICADO",
     "readback_exact": true,
-    "cycle_uuidv7_local": "01a1bc2b-a790-7b73-a360-79415f0e5f91"
+    "cycle_uuidv7_local": "01a1bd12-f56f-7b57-9d81-2de45da860b1"
   },
   "evidence": {
-    "path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-TRANSFER-G15-20261107.json",
-    "git_blob_sha1": "a1a7793408ff92e89ff5bb8bf5d55069086e4912",
+    "path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-LOCAL-WORKSPACE-PC13-20261108.json",
+    "git_blob_sha1": "67cc4117c9c0d8ce37fb0307340ddd512b770545",
     "state": "PERSISTIDO_Y_VERIFICADO",
     "readback_exact": true
   },
-  "main_canonical_ocp_version": "0.44",
+  "main_canonical_ocp_version": "0.46",
   "environment_reset": {
     "declared_by_operator": true,
     "state": "TOTAL_LOCAL_ENVIRONMENT_LOSS",
@@ -479,50 +503,85 @@
     "prior_device_status": "historical_superseded"
   },
   "latest_cycle": {
-    "generation": 14,
-    "date": "2026-11-02",
-    "status": "PR353_DRAFT_LOCAL_TESTS_PASS_GITHUB_ACTIONS_BLOCKED",
-    "main_canonical_ocp_version": "0.43",
-    "authorized_rdc_device": "015RENTA01",
-    "authorized_rdc_uuid": "aacf2eb5-17f4-428e-9242-c24a1fe4a2ec",
-    "branch": "feat/harmonia-local-first-mainline-final-20261101",
-    "pr": 353,
-    "pr_draft": true,
+    "generation": 15,
+    "date": "2026-11-08",
+    "status": "LOCAL_WORKSPACE_PREPARED_GIT_BLOBS_VERIFIED_CHROME_NOT_LOADED",
+    "ocp_version": "0.46",
+    "owner_alias": "chatgpt-harmonia-01a1b6ca-4543-7578-85d9-7624877c2e80",
+    "device": "PC-13",
+    "authorized_rdc_uuid": "1227e578-55c8-4231-82bb-4dbf9234855a",
+    "windows_user": "PC-13\\PC 12",
+    "windows_profile": "C:\\Users\\PC 12",
+    "sid": "S-1-5-21-874664506-151841403-77259543-1001",
+    "workspace_path": "C:\\Users\\PC 12\\Desktop\\EP\\Armonía",
+    "chrome_unpacked_path": "C:\\Users\\PC 12\\Desktop\\EP\\Armonía\\extension",
+    "source_repository": "SeryMente/khora",
+    "source_branch": "main",
+    "source_commit": "d98e9029deec79426a52352cff00925799d50c4e",
+    "extension_version": "0.3.1",
+    "local_integrity": {
+      "source_files": 17,
+      "git_blob_matches": 17,
+      "mismatch": 0,
+      "local_manifest_sha256": "8d58126ff0ff98f8305dd0fbdc9faf1abcd95a93daf85a014a087188c7c296c"
+    },
     "local_tests": {
-      "tests": 10,
-      "pass": 10,
-      "fail": 0,
-      "exit_code": 0,
-      "node": "v24.22.2"
+      "node_version": "v24.22.2",
+      "syntax_pass": 5,
+      "syntax_fail": 0,
+      "observer_tests": {
+        "tests": 11,
+        "pass": 11,
+        "fail": 0
+      },
+      "collector_validation_tests": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0
+      },
+      "collector_server_integration": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0
+      },
+      "node_total": {
+        "tests": 19,
+        "pass": 19,
+        "fail": 0
+      },
+      "powershell_script_parse": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0
+      },
+      "upstream_query_fixture": "NOT_VERIFIED",
+      "upstream_query_fixture_reason": "pwsh is not installed; Windows PowerShell 5.1 array JSON deserialization differs from the PowerShell 7 CI fixture. Diagnostic output showed four expected sample rows but fixture PASS is not claimed."
     },
-    "local_syntax": {
-      "pass": 8,
-      "fail": 0
-    },
-    "github_actions": {
-      "harmonia_run": 41372264801,
-      "ci_run": 41372264680,
-      "steps": 0,
-      "logs": "BlobNotFound",
-      "root_cause": "NOT_DETERMINED"
-    },
-    "chrome_acceptance": false,
-    "ep_contract_verified": false,
-    "ep_transport_enabled": false,
-    "merge": false,
-    "deployment": false
+    "collector_started": false,
+    "collector_port_47321_preflight": "FREE",
+    "local_data_root_created": false,
+    "local_auth_generated": false,
+    "chrome_loaded": false,
+    "chrome_modified": false,
+    "natural_chrome_acceptance": false,
+    "ep_classification": "EP_VOLATIL",
+    "ep_physical_encryption_and_recovery": "NOT_CERTIFIED",
+    "accepted": false
   },
   "latest_cycle_chronicle": {
-    "path": "docs/frentes/harmonia/cronica/HARMONIA-RDC-RESET-G14-20261101.md",
-    "git_blob_sha1": "8d6cd3538af8710052751527611cf13626d38d85",
+    "path": "docs/frentes/harmonia/cronica/HARMONIA-PAQUETE-LOCAL-PC13-20261108.md",
+    "git_blob_sha1": "6e0c8102543302c67e48ba1b8194b53982cc0574",
     "state": "PERSISTIDO_Y_VERIFICADO",
-    "readback_exact": true
+    "readback_exact": true,
+    "cycle_uuidv7_local": "01a1bd12-f56f-7b57-9d81-2de45da860b1",
+    "write_commit": "04c8d5a9fafe7cee0b156810e09c8c2582d73ef9"
   },
   "latest_cycle_evidence": {
-    "path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-RDC-RESET-TEST-20261101.json",
-    "git_blob_sha1": "8611c3353a86cc1b05c2f6ddefebe5d0fe209fd4",
+    "path": "docs/frentes/harmonia/evidencias/EV-HARMONIA-LOCAL-WORKSPACE-PC13-20261108.json",
+    "git_blob_sha1": "67cc4117c9c0d8ce37fb0307340ddd512b770545",
     "state": "PERSISTIDO_Y_VERIFICADO",
-    "readback_exact": true
+    "readback_exact": true,
+    "write_commit": "52484305f971de713819bc9d958eb20f9543eaf4"
   },
   "previous_responsibility": {
     "generation": 14,
@@ -627,7 +686,29 @@
     ],
     "open_harmonia_pull_requests": 0,
     "search_scope": "Open PR listing for SeryMente/khora returned four unrelated PRs and no Harmonia PR",
-    "responsibility_control_changed": false,
-    "accepted": false
+    "responsibility_control_changed": true,
+    "accepted": false,
+    "responsibility_owner_changed": false,
+    "authorized_rdc_device": {
+      "name": "PC-13",
+      "uuid": "1227e578-55c8-4231-82bb-4dbf9234855a",
+      "scope": "Task-scoped HARMONIA local workspace materialization only"
+    },
+    "local_workspace": {
+      "path": "C:\\Users\\PC 12\\Desktop\\EP\\Armonía",
+      "extension_path": "C:\\Users\\PC 12\\Desktop\\EP\\Armonía\\extension",
+      "state": "PREPARED_AND_HASH_VERIFIED",
+      "source_commit": "d98e9029deec79426a52352cff00925799d50c4e",
+      "extension_version": "0.3.1",
+      "git_blob_matches": "17/17",
+      "node_syntax": "5/5_PASS",
+      "node_synthetic_tests": "19/19_PASS",
+      "powershell_query_fixture": "NOT_VERIFIED",
+      "collector_started": false,
+      "chrome_loaded": false,
+      "ep_classification": "EP_VOLATIL_NOT_CERTIFIED",
+      "evidence": "docs/frentes/harmonia/evidencias/EV-HARMONIA-LOCAL-WORKSPACE-PC13-20261108.json",
+      "chronicle": "docs/frentes/harmonia/cronica/HARMONIA-PAQUETE-LOCAL-PC13-20261108.md"
+    }
   }
 }
