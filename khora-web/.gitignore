@@ -54,3 +54,10 @@ node_modules/
 
 .vercel
 .env*
+
+# Generated verbatim Open WebUI 0.12.3 static assets (integrity-checked during prebuild)
+/public/_app/
+/public/assets/
+/public/licenses/
+/public/OPENWEBUI-LICENSE*.txt
+/public/openwebui-static-manifest.json

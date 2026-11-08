@@ -1,5 +1,6 @@
 // @l0 L0-002 §4 · @req AUTH-F1-01/REQ-1 · @acr ACR-1.2 · @req UI-REVIEW/SECURITY
 import { auth } from "@/auth";
+import { bundledOpenWebUIAsset, openWebUIPath } from "./lib/chat-routes";
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { resolverGeneracion } from "./lib/server/generacion";
 
@@ -12,6 +13,18 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico|ep-main-live\\.json$|auth/signin|api/auth|api/version|api/eventos|\\.well-known).*)",
   ],
 };
+
+function isOpenWebUIRootNavigation(req: NextRequest): boolean {
+  const rawReferer = req.headers.get("referer");
+  if (!rawReferer) return false;
+  try {
+    const referer = new URL(rawReferer);
+    return referer.origin === req.nextUrl.origin &&
+      (referer.pathname === "/chat/frame" || openWebUIPath(referer.pathname));
+  } catch {
+    return false;
+  }
+}
 
 const authMiddleware = auth((req) => {
   const pathname = req.nextUrl.pathname;
@@ -50,6 +63,23 @@ const authMiddleware = auth((req) => {
     const url = new URL("/api/auth/signin", req.nextUrl.origin);
     url.searchParams.set("callbackUrl", req.nextUrl.pathname + req.nextUrl.search);
     return NextResponse.redirect(url);
+  }
+
+  // Open WebUI stays inside the Cora shell through a same-origin iframe.
+  // Only the iframe entrypoint maps to upstream '/', while the remaining native
+  // routes are proxied individually. Root is proxied only for navigations that
+  // originate inside that same authenticated Open WebUI frame.
+  const chatFrame = pathname === "/chat/frame";
+  const chatRoute =
+    chatFrame ||
+    (pathname !== "/" && openWebUIPath(pathname)) ||
+    (pathname === "/" && isOpenWebUIRootNavigation(req));
+
+  if (process.env.KHORA_CHAT_ENABLED === "1" && chatRoute && !bundledOpenWebUIAsset(pathname)) {
+    const destino = req.nextUrl.clone();
+    destino.pathname = "/api/khora-chat/proxy";
+    destino.searchParams.set("path", chatFrame ? "/" : pathname);
+    return NextResponse.rewrite(destino);
   }
 
   const generacion = resolverGeneracion(pathname, process.env.KHORA_SHELL, RUTAS_OS);

@@ -11,8 +11,20 @@ test("primary navigation stays bounded and registry-driven", () => {
   assert.equal(NAVIGATION_REGISTRY.length, 6);
   assert.ok(NAVIGATION_REGISTRY.length <= MAX_PRIMARY_NAVIGATION_ITEMS);
   assert.deepEqual(NAVIGATION_REGISTRY.map((entry) => entry.id), [
-    "ingreso", "custodia", "grafo", "consulta", "seguridad", "sistema",
+    "ingreso", "custodia", "grafo", "chat", "seguridad", "sistema",
   ]);
+});
+
+test("Chat is the only primary entry for the native Open WebUI surface", () => {
+  const entry = NAVIGATION_REGISTRY.find((item) => item.id === "chat");
+  assert.ok(entry);
+  assert.equal(entry.kind, "direct");
+  assert.equal(entry.href, "/chat");
+  assert.deepEqual(entry.coverage, ["/chat", "/chat/frame"]);
+  assert.equal(NAVIGATION_REGISTRY.some((item) => item.id === "consulta"), false);
+  assert.equal(NAVIGATION_LEGACY_ALIASES.get("/sistema/consulta"), "/chat");
+  assert.ok(readFileSync(join(root, "app/sistema/consulta/page.tsx"), "utf8").includes('redirect("/chat")'));
+  assert.ok(readFileSync(join(root, "app/chat/page.tsx"), "utf8").includes('src="/chat/frame"'));
 });
 
 test("system menu only exposes secondary surfaces", () => {
