@@ -1,0 +1,48 @@
+{
+  "schema": "responsabilidad-frente/1",
+  "front": "chat",
+  "canonical_identity": "CHAT",
+  "repository": "SeryMente/khora",
+  "state_object": "frentes/chat/OBJETO-CANONICO.md",
+  "status": "assigned",
+  "owner_thread": null,
+  "owner_alias": "chatgpt-chat-01a1bc36-0935-7292-b7b3-1d524466d8ed",
+  "owner_alias_type": "operational_alias_not_native_thread_id",
+  "instance": "chatgpt-chat-01a1bc36-0935-7292-b7b3-1d524466d8ed",
+  "session_folio": "PENDIENTE/NO ASIGNADO",
+  "generation": 1,
+  "expiry": null,
+  "authorization_ref": "Respuesta afirmativa del operador en la conversación actual para asumir Chat y crear el control y tareas documentales, inmediatamente después de la solicitud explícita de TRANSFER_RESPONSIBILITY.",
+  "authorization_event": "CHAT-TRANSFER-20261108-01a1bc36-0935-7292-b7b3-1d524466d8ee",
+  "authorization_original": {
+    "source": "Conversación actual 2026-11-08",
+    "literal": "Bien, ahora asegúrate de revisar los antecedentes de manera exhaustiva para crear tareas provisionales ... distinguiendo entre lo que ya está hecho, lo que está en progreso y lo que está todavía por construirse para este frente de trabajo."
+  },
+  "previous_owner": {
+    "status": "unassigned",
+    "owner_thread": null,
+    "owner_alias": null,
+    "instance": null,
+    "session_folio": "PENDIENTE/NO ASIGNADO",
+    "generation": 0,
+    "record_kind": "initial_assignment"
+  },
+  "prior_generation": 0,
+  "base_blob_sha": null,
+  "assignment_method": "Asignación inicial del OCP nuevo sobre main 6bdda633478eb9693f99b18fe4c6bf1f4883ae08. No existía control Chat en main. No se sustituye el OCP histórico Chat/EpisTwin ni control de otros frentes.",
+  "acquired_at": "2026-11-08T17:35:22.770Z",
+  "working_branch": "docs/chat-front-inauguration-20261108",
+  "base_main_sha": "6bdda633478eb9693f99b18fe4c6bf1f4883ae08",
+  "uuidv7_local": "01a1bc36-0935-7292-b7b3-1d524466d8ed",
+  "uuidv7_local_type": "local_registry_identity_not_native_thread_id",
+  "native_thread_id": "NOT_EXPOSED",
+  "folio_collision_check": {
+    "scope": "árbol main Khora y controles de Dictado, Harmonia, Observabilidad MCP y Custodia",
+    "matches_found": 0,
+    "global_uniqueness": "not_verified"
+  },
+  "global_folio_status": "FOL1 PREPARADO/PENDIENTE DE ACTIVACIÓN; CV/CY/A/B y SES PENDIENTES/NO ASIGNADOS",
+  "bootstrap_scope": "Responsabilidad documental y de continuidad del frente Chat: mantener OCP/antecedentes/tareas y auditar Khora/EpisTwin. No autoriza cambios de código producto, merge/deploy, SQL/backfill/borrado productivo, egress personal, gasto, hosting adicional ni cambios de seguridad. E53/E54/E76 solo en su alcance documentado.",
+  "enforcement": "cooperative registry; no server fencing of arbitrary writes",
+  "readback_required": true
+}
