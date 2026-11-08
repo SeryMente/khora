@@ -9,7 +9,7 @@ type B2Auth = {
   apiInfo: { storageApi: { apiUrl: string; downloadUrl: string; allowed: { capabilities?: string[]; buckets?: Array<{id:string;name:string|null}> | null; namePrefix?: string | null } } };
 };
 type B2Bucket = { accountId:string; bucketId:string; bucketName:string; bucketType:string; corsRules?:Array<Record<string,unknown>>; defaultServerSideEncryption?:{isClientAuthorizedToRead:boolean;value?:{algorithm:string;mode:string}|null} };
-let authCache: { auth:B2Auth; expiresAt:number } | null = null;
+let authCache: { auth:B2Auth; expiresAt:number; fingerprint:string } | null = null;
 const API_VERSION = 'v4';
 const REQUEST_TIMEOUT_MS = 30000;
 
@@ -60,8 +60,9 @@ async function uploadFile(url:string,token:string,key:string,data:Buffer) {
   });
   return jsonResponse<{fileId:string;fileName:string;contentLength:number;serverSideEncryption?:{mode:string;algorithm:string}}>(response,'storage_b2_upload_failed');
 }async function authorize():Promise<B2Auth> {
-  if (authCache && authCache.expiresAt > Date.now() + 60000) return authCache.auth;
   const { keyId, applicationKey } = credentials();
+  const fingerprint=createHash('sha256').update(keyId).update('\0').update(applicationKey).digest('hex');
+  if (authCache && authCache.fingerprint===fingerprint && authCache.expiresAt > Date.now() + 60000) return authCache.auth;
   const response = await fetch(`https://api.backblazeb2.com/b2api/${API_VERSION}/b2_authorize_account`, {
     method:'GET', headers:{ Authorization:`Basic ${Buffer.from(`${keyId}:${applicationKey}`).toString('base64')}` },
     cache:'no-store', redirect:'error', signal:AbortSignal.timeout(REQUEST_TIMEOUT_MS),
@@ -74,7 +75,7 @@ async function uploadFile(url:string,token:string,key:string,data:Buffer) {
     throw new Error('storage_b2_master_key_required');
   }
   if (!auth.authorizationToken || !auth.apiInfo.storageApi.apiUrl || !auth.apiInfo.storageApi.downloadUrl) throw new Error('storage_b2_authorization_invalid');
-  authCache = { auth, expiresAt:Date.now() + 50*60*1000 };
+  authCache = { auth, fingerprint, expiresAt:Date.now() + 50*60*1000 };
   return auth;
 }
 async function bucketMetadata(auth:B2Auth):Promise<B2Bucket> {
@@ -240,7 +241,7 @@ export async function putMigratedEncryptedObject(sourceUrlSha256:string,data:Buf
   const url=b2ObjectUrl(key,c),expectedSha256=createHash('sha256').update(data).digest('hex');
   const auth=await authorize();
   const versions=await b2Json<{files:Array<{fileName:string;fileId:string;action:string;contentLength:number;uploadTimestamp:number}>;nextFileName?:string|null;nextFileId?:string|null}>(
-    auth,'b2_list_file_versions',{bucketId:c.bucketId,prefix:key,startFileName:key,maxFileCount:100});
+    auth,'b2_list_file_versions',{bucketId:c.bucketId,prefix:key,maxFileCount:1000});
   if(versions.nextFileName||versions.nextFileId)throw new Error('migration_destination_versions_exceeded');
   const prior=(versions.files||[]).filter(f=>f.fileName===key)
     .sort((a,b)=>Number(b.uploadTimestamp||0)-Number(a.uploadTimestamp||0))[0];
