@@ -5,7 +5,7 @@
 
 - **Frente:** Custodia.
 - **Versión de esta lista provisional:** 0.24.
-- **Última actualización:** 2026-11-09 (retoma y evidencia de deployments B2, actualización de OCP y corrección del bloqueo local; las pruebas físicas siguen pendientes).
+- **Última actualización:** 2026-11-09 (retoma, matriz de trazabilidad, salida B y evidencias de deployments B2 actualizadas; las pruebas físicas siguen pendientes).
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
 - **Última lectura de metodología del ciclo 2 (referencia histórica):** Samantha v352 · NX-352m; Metacanon 1.21; GOW v2.3; blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
@@ -19,6 +19,11 @@ La lista sigue provisional; ni el relevo ni esta revalidación certifican su dis
 - **Autorización recibida 2026-11-09:** el operador respondió «Correcto , actualiza tareas provisionales rapidamente, y resuelve.» a la pregunta explícita de autorización para actuar sobre credenciales B2 de Production y desplegar a producción condicionado a pruebas satisfactorias. Se registra como asentimiento contextual limitado a verificar/corregir solo variables B2 de Production mediante la bóveda canónica y a desplegar solo cuando todos los gates técnicos pasen. Original: [INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md](originales/INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md), A UUIDv7 local `01a1c17d-189a-7fea-a644-6be002e2c07a`.
 - **Compuerta de despliegue:** la autorización no equivale a ejecución ni aceptación. Antes de producción deben pasar pruebas de autenticación, bucket privado/identidad, PUT/GET físico sintético, SHA-256/bytes, vínculo y manifiesto de partes, archivado E2E y recuperación tras recarga. Debe inspeccionarse primero el hook de build existente; no ejecutar SQL/backfill ni migraciones productivas fuera de autorización.
 - **Regla provisional de custodia de información:** no copiar a este repositorio el texto o audio de dictados reales, secretos, credenciales ni identificadores personales innecesarios. Registrar resultados mediante evidencia minimizada y sanitizada, en el soporte autorizado que corresponda.
+
+
+- **Retoma actual A:** [INSTRUCCION-RETOMA-CUSTODIA-20261109.md](originales/INSTRUCCION-RETOMA-CUSTODIA-20261109.md) · UUIDv7 local `01a1c193-eccc-78ad-bcb1-a7f102ff4733`.
+- **Salida B de la retoma:** [SALIDA-MODELO-RETOMA-CUSTODIA-20261109.md](originales/SALIDA-MODELO-RETOMA-CUSTODIA-20261109.md) · UUIDv7 local `01a1c193-eccc-7302-a7bd-99135476b8e4`.
+- **Matriz de trazabilidad actualizada:** [TRAZABILIDAD-INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](evidencias/TRAZABILIDAD-INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md).
 
 ### Secuencia de ejecución · antecedente histórico y secuencia vigente
 
