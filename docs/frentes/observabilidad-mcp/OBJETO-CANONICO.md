@@ -4,8 +4,8 @@
 - Frente único vigente: **Khora MCP**; identidad canónica `KHORA-MCP`.
 - Nombre e identidad histórica: **Observabilidad MCP** / `OBSERVABILIDAD-MCP`. La ruta heredada `docs/frentes/observabilidad-mcp/` se conserva; no se migra ni duplica el OCP o su control.
 - Repositorio: `SeryMente/khora`; OCP único: `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`; control único: `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`.
-- OCP: **v0.3.12**. Control de responsabilidad: **generación 9**, titular global operativo `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229`.
-- La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local del titular global registrado: `01a199dd-30ba-7843-92ae-278ff01d4229`; no es un ID nativo.
+- OCP: **v0.3.13**. Control de responsabilidad: **generación 10**, titular global operativo `chatgpt-khora-mcp-01a1c17f-ca60-73bb-8045-48eeff29141d`.
+- La plataforma no expuso un identificador nativo de conversación: `owner_thread` permanece `null`. UUIDv7 local del titular global registrado: `01a1c17f-ca60-73bb-8045-48eeff29141d`; no es un ID nativo.
 - Corresponsable arquitectónico del módulo Jules: `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; su autoridad es modular y no equivale a titularidad global.
 - Folio global y folio de sesión: **PENDIENTE / NO ASIGNADO**; FOL1 está PREPARADO, NO ACTIVO. El control vigente tiene `session_folio: null`; el candidato anterior se conserva solo como antecedente no emitido en el registro de corrección.
 - Las tareas provisionales «Continuidad», «General» y «Jules» pertenecen a este mismo frente y se registran en [Tareas provisionales](./📁%20🧭%20-%20Tareas%20provisionales/README.md); no crean frentes ni controles paralelos.
@@ -523,4 +523,15 @@ Se completó la tarea provisional `KHORA-MCP-TASK-001` en el perfil RDC vigente:
 
 `KHORA-MCP-TASK-001` queda **completada** conforme a su criterio de cierre: workspace restaurado, remoto/HEAD cotejados, dependencias utilizables, pruebas y build satisfactorios, higiene local comprobada y evidencias persistidas en [BACKLOG-CHECKLIST.md](./BACKLOG-CHECKLIST.md) y el núcleo de TASK-001.
 
-TASK-002 General continúa `en_curso`, con la compuerta de privacidad de observabilidad descrita en el checklist. TASK-003 Jules continúa `en_curso` y conserva su autoridad arquitectónica modular. El cierre de TASK-001 no altera el control generación 9 ni amplía permisos productivos.
+TASK-002 General continúa `en_curso`, con la compuerta de privacidad de observabilidad descrita en el checklist. TASK-003 Jules continúa `en_curso` y conserva su autoridad arquitectónica modular. El cierre de TASK-001 es histórico; la titularidad global se transfirió después de generación 9 a 10 el 2026-11-09, sin ampliar permisos productivos.
+
+
+## 29. Retoma de titularidad global — 2026-11-09
+
+- **Instrucción literal:** «MCP OCP, retoma responsabilidad d efrente». Confirmación posterior: «Si hazlo».
+- **Operación:** `TRANSFER_RESPONSIBILITY`, generación 9 → 10, sobre el único `CONTROL-RESPONSABILIDAD.json`.
+- **Titular global vigente:** `chatgpt-khora-mcp-01a1c17f-ca60-73bb-8045-48eeff29141d`; UUIDv7 local de operación, no ID nativo. `owner_thread=null`.
+- **Corresponsable modular:** Jules conserva autoridad final dentro de su módulo. El control confirma exactamente dos responsables activos.
+- **Evidencia:** blob previo `4fba2187947730abca0cc338429dfacf4810594c`; commit de transferencia `dcc5b7b21426a7776812a4b3c1bbe0b226703246`; commit de verificación `36745d01d0012b3a2b472b00c864f0f8af5f0714`; blob final leído de vuelta `fc6432f884a8adeea59326adeabd38bc67242797`.
+- **Límites:** folio de sesión PENDIENTE/NO ASIGNADO; FOL1 PREPARADO, NO ACTIVO. No se cambiaron Production, secretos, bases de datos ni despliegues.
+- **Metodología:** `INICIO.md` identifica Samantha v377 · NX-377m, Metacanon 1.28 y GOW 2.17 (commit `8ee2482866b3dd085e58e05006727256d0274376`). La lectura de `INICIO.md` sí fue posible; el conector devolvió contenido vacío al solicitar el HTML DUG, por lo que la lectura íntegra de §ARR/DUG queda NO VERIFICADA en este ciclo.
