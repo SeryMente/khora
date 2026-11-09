@@ -1,18 +1,22 @@
 <!-- TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
 # 📁 Tareas provisionales · Frente Custodia
 
-**Estado:** PROVISIONAL · materialización de ejecución y continuidad; no es canon normativo ni segundo OCP. La secuencia operativa fue aprobada el 2026-11-09 y se recibió asentimiento contextual para verificar/corregir solo credenciales B2 de Production mediante bóveda canónica y desplegar a producción únicamente tras pasar todos los gates. Ejecución pendiente.  
+**Estado:** PROVISIONAL · materialización de ejecución y continuidad; no es canon normativo ni segundo OCP. La secuencia operativa está aprobada; CUSTODIA-B2-006 continúa EN CURSO y bloqueada en la validación local de credenciales, con evidencia de fallo de autorización B2 y sin archivado restaurado.  
 **OCP único:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md).  
 **Control único:** [CONTROL-RESPONSABILIDAD.json](../CONTROL-RESPONSABILIDAD.json).  
-**Titularidad observada:** generación 11 · alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59 · control blob 21fe3e0ebae32d6e3988a5511fecaa5d63f8c3af. ID nativo no expuesto.  
+**Titularidad observada:** generación 11 · alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59 · control blob `01b1aac95e7d4f666cd67905ab54430f70a5de97`. ID nativo no expuesto.  
 **Folio:** PENDIENTE/NO ASIGNADO · FOL1 no está ACTIVO.  
 **Instrucción literal vigente:** [INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](../originales/INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md).  
+**Retoma actual:** [INSTRUCCION-RETOMA-CUSTODIA-20261109.md](../originales/INSTRUCCION-RETOMA-CUSTODIA-20261109.md) · A local `01a1c193-eccc-78ad-bcb1-a7f102ff4733`.  
+**Evidencia de despliegues/B2:** [DIAGNOSTICO-B2-PRODUCTION-20261109.md](../evidencias/DIAGNOSTICO-B2-PRODUCTION-20261109.md).   
 **Instrucción operativa posterior (prioridad 1):** [INSTRUCCION-RESTABLECER-ARCHIVADO-PRIMERO-20261109.md](../originales/INSTRUCCION-RESTABLECER-ARCHIVADO-PRIMERO-20261109.md) · A UUIDv7 local `01a1c170-3d40-7edb-b707-9a14020a76b8`.
 **Autorización B2 Production:** [INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md](../originales/INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md) · A UUIDv7 local `01a1c17d-189a-7fea-a644-6be002e2c07a`.  
 **Matriz de trazabilidad:** [TRAZABILIDAD-INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](../evidencias/TRAZABILIDAD-INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md).  
 **Salida visible B:** [SALIDA-MODELO-CUSTODIA-ARQUITECTURA-MULTIALMACEN-20261109.md](../originales/SALIDA-MODELO-CUSTODIA-ARQUITECTURA-MULTIALMACEN-20261109.md) · A UUIDv7 local 01a1c138-ead3-7678-a44e-a49bb72f11de · A2 correctiva 01a1c134-2125-7263-b011-14bc36a10d03 · B UUIDv7 local 01a1c134-2125-75e8-9c39-16a74610d034.
 
 > Cada tarea nueva tiene un README de detalle y un ID local estable. Todas heredan del OCP padre titularidad, autorización y exclusiones. No crean controles, responsables, sesiones ni folios independientes. Una aprobación ordinaria no amplía permisos de producción, credenciales, datos ni proveedores; una autorización literal posterior, explícita y de alcance delimitado sí puede habilitar exclusivamente las operaciones expresamente enumeradas, como el original A B2 Production enlazado arriba.
+
+- **Gobierno vigente leído en esta retoma:** Samantha v384 · NX-384m; Metacanon 1.29; GOW 2.18; DUG blob `2f320e5e6e4768e9a77bc34d24b0639b47f2128d`. §ARR leído; MCP-NORMATIVO DESACTIVADO.  
 
 ## 1. Criterio operativo vigente
 
@@ -83,6 +87,17 @@ La plantilla no exige fechas objetivo ni responsables por tarea: se añaden solo
 - Sin eliminación ni sobrescritura de objetos originales.
 - Las pruebas de escritura/lectura deben usar contenido sintético en entornos aislados hasta obtener la compuerta aplicable.
 - No se crea CUSTODIA-05 ni se reactiva CUSTODIA-02.
+
+
+
+### Retoma diagnóstica · 2026-11-09
+
+- **Tarea 1:** CUSTODIA-B2-006 continúa en primer lugar P0. La corrección del cliente de PR #355 ya está integrada, pero no demuestra que el almacenamiento remoto funcione.
+- **B2:** último preflight nativo disponible falló en `b2_authorize_account` con `storage_b2_authorization_failed`. PUT/GET físico, SHA/bytes, vínculo de partes y archivado E2E siguen pendientes.
+- **Variables:** el inventario Vercel Production muestra el par heredado `KHORA_B2_KEY_ID` / `KHORA_B2_APPLICATION_KEY`; las entradas `KHORA_B2_MASTER_APPLICATION_KEY_ID` / `KHORA_B2_MASTER_APPLICATION_KEY` no aparecen. Ningún valor fue descifrado.
+- **EP Vault:** el operador informa que las notas efímeras actuales contienen ambas claves; su lectura/promoción sigue pendiente de acceso validado al equipo/perfil efectivo. Se descarta expresamente la sesión efímera antigua de PC10; «PSK14» es el literal de conexión todavía no vinculado a un host/perfil verificado.
+- **Build:** un despliegue previo aplicó migraciones 023–029 antes de fallar en `encrypted_roundtrip`; el intento nativo posterior ejecutó preflight antes de migrar y se detuvo en autorización. No repetir despliegue con hook de migración sin verificar estado del esquema y ruta permitida.
+- **No ejecutado en esta retoma:** no leer secretos, no editar variables, no escribir B2, no SQL, no merge, no deploy y no cutover.
 
 ## 7. Registro de cambios
 
