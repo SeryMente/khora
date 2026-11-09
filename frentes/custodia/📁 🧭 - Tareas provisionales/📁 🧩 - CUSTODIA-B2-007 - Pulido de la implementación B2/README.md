@@ -1,7 +1,7 @@
 # CUSTODIA-B2-007 · Pulido de la implementación B2
 
 > **Estado:** propuesta_pendiente_aprobacion · **Prioridad:** P1 · **Hito:** 3 de 5.
-> **Depende de:** CUSTODIA-B2-006 aceptada. **Desbloquea:** CUSTODIA-RES-001.
+> **Depende de:** CUSTODIA-B2-006 y CUSTODIA-B2-005 aceptadas (archivado E2E operativo y diagnóstico residual cerrado). **Desbloquea:** CUSTODIA-RES-001.
 > **OCP padre:** frentes/custodia/OBJETO-CANONICO.md. **Control heredado:** CONTROL-RESPONSABILIDAD.json.
 
 ## 1. Objetivo
