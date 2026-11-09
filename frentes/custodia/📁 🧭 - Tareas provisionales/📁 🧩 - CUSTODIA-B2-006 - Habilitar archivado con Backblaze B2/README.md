@@ -96,6 +96,6 @@ Cora vuelve a aceptar y archivar registros de prueba de extremo a extremo en el 
 ### Preview de validación del código · 2026-11-09
 
 - Se creó el deployment preview `dpl_9gWxfH72UD2b2S115QpEUwa2M9Bt`, URL `https://khora-ghmy4m41f-victorhugotorresmendez-8991s-projects.vercel.app`, desde la rama `fix/custodia-b2-auth-diagnostics-20261109`, commit `3b684a870a21ccf2f200ee684687beea42e3b235`.
-- Último estado observado: BUILDING, en `next build --webpack`. No se declara aún aprobado.
+- Estado final: READY. Build: `Compiled successfully in 37.2s`; TypeScript: PASS (16.8s); páginas estáticas: 78/78; `Build Completed in /vercel/output`. No se ejecutaron unitarias ni preflight B2; no se declara persistencia física ni archivado E2E.
 - Las credenciales B2 consultadas se encuentran asociadas únicamente a Production; el preview no dispone de ellas. El preflight de B2 está condicionado a Production, por lo que este preview solo puede validar compilación, nunca autenticación B2 ni archivado físico.
 - Es un preview aislado: no tiene alias productivo y no modifica el servicio activo.
