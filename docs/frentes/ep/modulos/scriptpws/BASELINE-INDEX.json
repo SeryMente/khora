@@ -1,0 +1,35 @@
+{
+  "schema": "scriptpws-baseline-index/v1",
+  "module": "ScriptPWS",
+  "currentBaseline": "BASELINE-002",
+  "currentPath": "Baselines/BASELINE-CURRENT.ps1",
+  "retention": {
+    "maxSuccessfulVersions": 3,
+    "policy": "Retain the latest three operator-accepted, read-back-verified baselines; retire the oldest only after the new baseline has passed verification.",
+    "qualifiedVersions": 2,
+    "nextBaseline": "BASELINE-003"
+  },
+  "baselines": [
+    {
+      "id": "BASELINE-001",
+      "version": "1.0",
+      "status": "PREVIOUS_FALLBACK",
+      "path": "Baselines/BASELINE-001.ps1",
+      "sha256": "2E7393FE26774FD469F1D846E394D733CFD64B1D20ED70D18750B3E65A1C9742",
+      "bytes": 1601,
+      "source": "Operator-provided original command",
+      "acceptance": "Operator reported this command worked."
+    },
+    {
+      "id": "BASELINE-002",
+      "version": "2.0",
+      "status": "CURRENT",
+      "path": "Baselines/BASELINE-002.ps1",
+      "sha256": "702E54E8B0E8DB72A7DC57D19CC69AEDE742BE0D7D97953EA1AE273AB7980629",
+      "bytes": 11587,
+      "source": "Official Windows RDC launcher with npm.cmd/npx.cmd checks and version output",
+      "acceptance": "Operator reported successful execution without errors."
+    }
+  ],
+  "updatedUtc": "2026-11-09T20:12:45Z"
+}
