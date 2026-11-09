@@ -135,7 +135,19 @@ La explicación «credencial KHORA incorrecta» deja de ser el diagnóstico prin
 - Bucket khora-userdata-ecea4187, ID 35b8cbd6623b54a5a9130c18, allPrivate, con pertenencia de cuenta confirmada.
 - Vercel Production todavía tiene solo los nombres heredados KHORA_B2_KEY_ID / KHORA_B2_APPLICATION_KEY; faltan los nombres canónicos KHORA_B2_MASTER_APPLICATION_KEY_ID / KHORA_B2_MASTER_APPLICATION_KEY. No se descifraron valores.
 - El selector Production KHORA_OBJECT_STORAGE está en B2 y KHORA_B2_PREFLIGHT=1.
-- No se acreditó PUT/GET físico ni archivado E2E. La causa local de autenticación está resuelta; la conexión de Production y su despliegue siguen pendientes.
+- La prueba física B2 local ya pasó: objeto sintético 150 bytes subido/descargado, SHA-256 coincidente y SSE-B2/AES256. La evidencia está en PRUEBA-FISICA-B2-KHORA-20261109.md (blob c5043bc3ca6f6c492c4a5ca4cb55235d055488e1). El archivado E2E de Production sigue pendiente porque faltan las dos variables maestras canónicas y un deployment nuevo.
 - Los errores OIDC/PostgreSQL siguen sin correlación demostrada con archivado. El estado actual de Vercel Blob no se volvió a consultar en este ciclo.
 
 **Dictamen actualizado:** el bloqueo no es inexistencia de la cuenta ni rechazo de la Master Key KHORA. El siguiente punto causal es alinear los secretos canónicos de Vercel Production y completar el roundtrip físico.
+
+
+### Prueba física posterior · 2026-11-09 · PASS
+
+- Objeto sintético: khora/custodia/preflight/20261109/342ed1ad-d8aa-4e9a-bf0b-fce84f31c3ab.json.
+- File ID: 4_z35b8cbd6623b54a5a9130c18_f1191dbb4dc31bbce_d20261109_m230230_c005_v0501036_t0032_u01794265350120.
+- Tamaño: 150 bytes.
+- SHA-256 origen y read-back: 9f0fccddda2ec3a56f808236d54701961a3f70269640a35a5771e7ecf399541e; coincidencia exacta.
+- SSE-B2/AES256 confirmado; objeto de prueba retenido.
+- Evidencia detallada: [PRUEBA-FISICA-B2-KHORA-20261109.md](../../../evidencias/PRUEBA-FISICA-B2-KHORA-20261109.md), blob c5043bc3ca6f6c492c4a5ca4cb55235d055488e1.
+
+**Conclusión:** Backblaze KHORA autentica y persiste físicamente desde PC-7. La causa residual está en conectar la Master Key al runtime Vercel Production y probar el archivado E2E, no en acceso al proveedor B2.
