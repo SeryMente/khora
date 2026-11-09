@@ -68,3 +68,15 @@ Si se requiere cambiar/rotar una credencial o modificar producción, se detiene 
 ## 7. Salida
 
 Cora vuelve a aceptar y archivar registros de prueba de extremo a extremo en el entorno autorizado. La publicación de producción y la aceptación con una cuenta propietaria real son una compuerta independiente; no se infieren del éxito no productivo.
+
+
+### Avance técnico · PR #362 · 2026-11-09
+
+- Rama: `fix/custodia-b2-auth-diagnostics-20261109`.
+- PR: [#362](https://github.com/SeryMente/khora/pull/362), OPEN · DRAFT · NOT MERGED.
+- Punta: `3b684a870a21ccf2f200ee684687beea42e3b235`; 3 archivos de código/prueba cambiados: `object-storage.ts`, `preflight-object-storage.ts` y `object-storage.test.ts`.
+- La corrección conserva el HTTP status y el código JSON de B2 bajo validación estricta y los expone en el preflight sin imprimir claves, tokens, cabeceras Authorization, cuerpos ni mensajes libres.
+- La prueba unitaria sintética cubre HTTP 401/`unauthorized`; se añadió pero no se ejecutó en esta sesión. GitHub Actions no devolvió workflow runs para la punta; los checks Vercel fallan por la limitación del plan/repo privado de organización.
+- La PR no se integró ni desplegó. No cambia credenciales ni variables. Su finalidad es poder diagnosticar la autorización con evidencia segura; no demuestra todavía archivado operativo.
+
+**Siguiente bloqueo:** ejecutar esta versión con acceso B2 autorizado para captar `http_status` y `provider_code`, resolver el par de credenciales desde la bóveda autorizada si procede y repetir el PUT/GET físico y el archivado E2E. La mutación productiva continúa separada y no está autorizada por este alcance.
