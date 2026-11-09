@@ -106,3 +106,21 @@ El operador aprobó iniciar la recuperación del archivado sin esperar a complet
 El operador respondió «Correcto , actualiza tareas provisionales rapidamente, y resuelve.» a la pregunta explícita de autorización sobre credenciales B2 de Production y despliegue condicionado. El original A es [INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md](../../originales/INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md), UUIDv7 local `01a1c17d-189a-7fea-a644-6be002e2c07a`. La verificación/corrección de B2 Production se asigna a B2-006; esta tarea conserva el diagnóstico residual y E2E sin modificar por sí sola credenciales.
 
 PR #362 sigue OPEN · DRAFT · NOT MERGED, head `3b684a870a21ccf2f200ee684687beea42e3b235`, 3 archivos. La Preview asociada está READY con compilación y TypeScript correctos (78/78 páginas), pero no ejecutó preflight B2 por ausencia de variables B2 en Preview. La prueba unitaria añadida no fue ejecutada. Por tanto, no hay todavía status HTTP/código B2 actual ni evidencia de PUT/GET físico; todos los criterios de aceptación de esta tarea permanecen PENDIENTES.
+
+
+### Reconciliación diagnóstica vigente · 2026-11-09
+
+La lectura actual de Vercel y de `main` deja los siguientes hechos, con sus límites:
+
+- **Cliente/flujo de archivado:** PR #355 está MERGED en `main` (merge `8489a09c03a330b85f3e31297415ada7a19fe10e`). Su corrección de drenaje/reintento de partes es real, pero no prueba que la persistencia B2 esté habilitada.
+- **Transporte S3-compatible:** `dpl_36DeUEnuz2zoWtMJqp1BsZjWASUJ` ejecutó `migrate-runtime.mjs` antes del preflight; el log confirma migraciones 023–029 aplicadas. Después falló el roundtrip cifrado con `storage_provider_request_failed`.
+- **Transporte nativo B2:** `dpl_DwfJkUPZ4NJnjTXgKCPFRNY5FR2f` ejecutó primero preflight y después migración, pero falló en `b2_authorize_account` con `storage_b2_authorization_failed`; no alcanzó el hook de migración. La evidencia no contiene HTTP status ni código JSON nativo.
+- **Variables Production:** metadatos no descifrados confirman nombres heredados `KHORA_B2_KEY_ID` y `KHORA_B2_APPLICATION_KEY` más selector, preflight y bucket. No aparecen los nombres canónicos Master Key. No se leyó ningún valor.
+- **PR #362:** continúa OPEN · DRAFT · NOT MERGED. Añade status/código saneados y una prueba sintética de 401, pero la prueba no se ejecutó. Su Preview READY compiló (78/78 páginas estáticas y TypeScript PASS), pero no ejecutó preflight con credenciales, PUT/GET o E2E.
+- **Build/migraciones:** el primer intento del commit b52003ee aplicó migraciones 023–029 antes de fallar en roundtrip. El script enumera también 032, pero el log no confirma si esa última quedó aplicada. El intento nativo falló antes de migrar. No repetir hook Production hasta reconciliar el estado del esquema y contar con vía autorizada sin mutaciones adicionales.
+- **Vercel Blob:** `khora-audio` tiene antecedente histórico `limits-exceeded-suspended`; no se consultó el estado actual del store en esta retoma, por lo que su condición presente sigue NO VERIFICADA.
+- **Archivos del usuario:** no se recuperó evidencia runtime actual de /api/audio que permita asociar otros errores de OIDC o PostgreSQL al botón Archivar. No inferir ausencia de fallos fuera de la ventana probada.
+
+**Dictamen:** hay fallos demostrados adicionales al antecedente de cuota de Blob. El último error B2 específico permanece en autenticación; su causa exacta está pendiente de capturar status/código. No existe evidencia de PUT/GET físico ni de archivado E2E exitoso; por tanto, Cora/Khora continúa NO RESTABLECIDA/NO DEMOSTRADA.
+
+**Fuentes:** [evidencia consolidada de B2 Production](../../evidencias/DIAGNOSTICO-B2-PRODUCTION-20261109.md), [retoma A](../../originales/INSTRUCCION-RETOMA-CUSTODIA-20261109.md), eventos de los tres deployments arriba identificados y metadatos Vercel Production sin valores secretos.
