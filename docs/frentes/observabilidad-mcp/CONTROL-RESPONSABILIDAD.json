@@ -1091,14 +1091,24 @@
     "source_control_blob_sha": "4fba2187947730abca0cc338429dfacf4810594c",
     "base_main_sha": null,
     "attachment_commit_sha": null,
-    "result": "EXECUTED; exact read-back verification pending.",
+    "result": "VERIFIED: generation 10, titular nuevo, titular anterior generación 9, Jules como corresponsable modular, autorización, ausencia de ID nativo/folio y preservación de historial confirmados mediante lectura exacta desde main.",
     "authorization_scope": "Titularidad global KHORA-MCP: arquitectura e integración del servidor MCP completo, host común, registro, contratos transversales, coordinación entre módulos, estado/documentación global y validación integrada. Respetar la autoridad arquitectónica independiente de cada responsable modular; en particular, Jules conserva decisión final sobre su arquitectura, contratos, interfaces, seguridad, scopes, ACL, comportamiento de herramientas, pruebas y aceptación. No alterar decisiones de Jules unilateralmente. Cambios multi-módulo se coordinan; decisiones productivas/irreversibles requieren autorización específica del operador.",
     "verification": {
-      "status": "PENDING_READBACK",
-      "verified_at_local": null,
-      "update_commit_sha": null,
-      "readback_blob_sha": null,
-      "confirmed": []
+      "status": "VERIFIED",
+      "verified_at_local": "2026-11-09T12:09:00-06:00",
+      "update_commit_sha": "dcc5b7b21426a7776812a4b3c1bbe0b226703246",
+      "readback_blob_sha": "ee473e523e12bb58097291e5675f3810950b9126",
+      "confirmed": [
+        "generation=10",
+        "new titular alias matches local UUIDv7 operational alias",
+        "owner_thread=null; native conversation ID not exposed",
+        "generation-9 titular archived under previous_owner",
+        "Jules module architectural co-responsibility retained",
+        "exactly two active_responsibles",
+        "authorization event recorded",
+        "session_folio=null; FOL1 remains PREPARADO NO ACTIVO",
+        "prior ownership and transfer history preserved"
+      ]
     }
   },
   "strategic_redirection": {
@@ -1159,14 +1169,24 @@
     "source_control_blob_sha": "4fba2187947730abca0cc338429dfacf4810594c",
     "base_main_sha": null,
     "attachment_commit_sha": null,
-    "result": "EXECUTED; exact read-back verification pending.",
+    "result": "VERIFIED: generation 10, titular nuevo, titular anterior generación 9, Jules como corresponsable modular, autorización, ausencia de ID nativo/folio y preservación de historial confirmados mediante lectura exacta desde main.",
     "authorization_scope": "Titularidad global KHORA-MCP: arquitectura e integración del servidor MCP completo, host común, registro, contratos transversales, coordinación entre módulos, estado/documentación global y validación integrada. Respetar la autoridad arquitectónica independiente de cada responsable modular; en particular, Jules conserva decisión final sobre su arquitectura, contratos, interfaces, seguridad, scopes, ACL, comportamiento de herramientas, pruebas y aceptación. No alterar decisiones de Jules unilateralmente. Cambios multi-módulo se coordinan; decisiones productivas/irreversibles requieren autorización específica del operador.",
     "verification": {
-      "status": "PENDING_READBACK",
-      "verified_at_local": null,
-      "update_commit_sha": null,
-      "readback_blob_sha": null,
-      "confirmed": []
+      "status": "VERIFIED",
+      "verified_at_local": "2026-11-09T12:09:00-06:00",
+      "update_commit_sha": "dcc5b7b21426a7776812a4b3c1bbe0b226703246",
+      "readback_blob_sha": "ee473e523e12bb58097291e5675f3810950b9126",
+      "confirmed": [
+        "generation=10",
+        "new titular alias matches local UUIDv7 operational alias",
+        "owner_thread=null; native conversation ID not exposed",
+        "generation-9 titular archived under previous_owner",
+        "Jules module architectural co-responsibility retained",
+        "exactly two active_responsibles",
+        "authorization event recorded",
+        "session_folio=null; FOL1 remains PREPARADO NO ACTIVO",
+        "prior ownership and transfer history preserved"
+      ]
     }
   },
   "previous_responsibility_change": {
