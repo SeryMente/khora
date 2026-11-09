@@ -29,6 +29,8 @@
 
 **Fragmento incompleto conservado:** el dictado de conexiones termina con «o tareas que...». No se reconstruye qué tipo de tareas iba a mencionar el operador. La matriz registra solo el uso explícito para integración continua y el criterio de usar la conexión adicional únicamente cuando acelere el sprint.
 
+| «antes de dar tu respuesta, asegúrate de que la última entrada fue tomada en cuenta en su totalidad y que no dejaste ningún elemento verbatim sin trazar a tu resultado» | Se hizo un cotejo frase-por-frase; cada decisión está enlazada con tarea, estado o límite. Se preservó literalmente esta corrección y se registra la identidad A UUIDv7 local 01a1c134-2125-7263-b011-14bc36a10d03. | Original, matriz y OCP; salida final B UUIDv7 local 01a1c134-2125-75e8-9c39-16a74610d034; ciclo local UUIDv7 01a1c134-2125-70ac-847f-18058ba4b884. |
+
 ## Dictamen de cobertura
 
 - Se preservó el original fuente completo visible en la conversación; no se presenta como exportación nativa de mensajes previos ausentes.
