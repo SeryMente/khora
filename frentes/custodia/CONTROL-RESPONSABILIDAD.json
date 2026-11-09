@@ -6,32 +6,32 @@
   "state_object": "frentes/custodia/OBJETO-CANONICO.md",
   "status": "assigned",
   "owner_thread": null,
-  "owner_alias": "chatgpt-custodia-01a1bc33-32d5-7d64-b132-a52bdeb1e800",
+  "owner_alias": "chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59",
   "owner_alias_type": "operational_alias_not_native_thread_id",
-  "instance": "chatgpt-custodia-INSTANCE-20261108-01A1BC33",
+  "instance": "chatgpt-custodia-INSTANCE-20261109-01A1C125",
   "session_folio": "PENDIENTE/NO ASIGNADO",
-  "generation": 10,
+  "generation": 11,
   "expiry": null,
-  "authorization_ref": "Instrucción directa del operador en la conversación actual (2026-11-08): «Retoma contexto, responsabilidad y trabajo siendo hecho del frente.». Se interpreta expresamente como TRANSFER_RESPONSIBILITY para sustituir la titularidad de generación 9 por esta conversación, sin ampliar alcance ni exclusiones. ID nativo de conversación no expuesto.",
-  "authorization_event": "CUSTODIA-TRANSFER-20261108-01a1bc33-32d5-7581-94c8-7b0fa892d800",
+  "authorization_ref": "Instrucción directa del operador en esta conversación (2026-11-09): «A ver, aquí vamos a retomar el frente de trabajo custodia. Este, empápate con el contexto y retoma la responsabilidad del frente en lo que te sigo dictando las instrucciones». Se interpreta como TRANSFER_RESPONSIBILITY de generación 10→11, sin ampliar las exclusiones preexistentes. El ID nativo de conversación no está expuesto.",
+  "authorization_event": "CUSTODIA-TRANSFER-20261109-01a1c125-af13-7825-8af1-0ff35ad87b0e",
   "previous_owner": {
     "status": "assigned",
     "owner_thread": null,
-    "owner_alias": "chatgpt-custodia-01a1b78f-d8c2-7d5b-8dcf-45abf7a31988",
+    "owner_alias": "chatgpt-custodia-01a1bc33-32d5-7d64-b132-a52bdeb1e800",
     "owner_alias_type": "operational_alias_not_native_thread_id",
-    "instance": "chatgpt-custodia-INSTANCE-20261107-01A1B78F",
+    "instance": "chatgpt-custodia-INSTANCE-20261108-01A1BC33",
     "session_folio": "PENDIENTE/NO ASIGNADO",
-    "generation": 9,
-    "authorization_ref": "Respuesta literal del operador en la conversación actual (2026-11-07): «Autorizo TRANSFER_RESPONSIBILITY para el frente Custodia, generación 8, con el alcance y exclusiones ya registrados.». Autoriza TRANSFER_RESPONSIBILITY para sustituir al titular de generación 8 por esta conversación, conservando sin ampliación el alcance y todas las exclusiones registrados. ID nativo de conversación no expuesto.",
-    "record_kind": "owner_previous_to_generation_10",
-    "blob_sha": "a198f888a730219e2cb59e9dac67240e8bc1f83f"
+    "generation": 10,
+    "authorization_ref": "Instrucción directa del operador en la conversación actual (2026-11-08): «Retoma contexto, responsabilidad y trabajo siendo hecho del frente.». Se interpreta expresamente como TRANSFER_RESPONSIBILITY para sustituir la titularidad de generación 9 por esta conversación, sin ampliar alcance ni exclusiones. ID nativo de conversación no expuesto.",
+    "record_kind": "owner_previous_to_generation_11",
+    "blob_sha": "0fb1375028922407afdf34420b52fe094384081d"
   },
   "previous_authorization_ref": "Instrucción directa del operador, 2026-10-28, preservada en originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob 357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5). Autoriza inventariar provisionalmente los hallazgos sobre recuperabilidad dentro del OCP; no autoriza cambios de código, alteraciones de producción ni recuperaciones que puedan sobrescribir/eliminar originales. Asignación inicial desde control sin titular previo asignado. ID nativo de conversación no expuesto.",
   "previous_acquired_at": "2026-10-31",
-  "prior_generation": 9,
-  "previous_blob": "a198f888a730219e2cb59e9dac67240e8bc1f83f",
-  "base_blob_sha": "a198f888a730219e2cb59e9dac67240e8bc1f83f",
-  "assignment_method": "TRANSFER_RESPONSIBILITY condicionado al blob SHA observado a198f888a730219e2cb59e9dac67240e8bc1f83f de generación 9; coincidencia verificada antes de escritura GitHub Contents API y read-back posterior. UUIDv7 local; ID nativo de conversación no expuesto.",
+  "prior_generation": 10,
+  "previous_blob": "0fb1375028922407afdf34420b52fe094384081d",
+  "base_blob_sha": "0fb1375028922407afdf34420b52fe094384081d",
+  "assignment_method": "TRANSFER_RESPONSIBILITY condicionado al blob SHA observado 0fb1375028922407afdf34420b52fe094384081d de generación 10; comparación exacta antes de escritura y lectura de vuelta posterior. UUIDv7 local; ID nativo de conversación no expuesto.",
   "folio_collision_check": {
     "searched_scope": "Búsqueda exacta en SeryMente/khora de UUIDv7 local, alias operativo e identificador de evento antes de la escritura; 0 coincidencias. No acredita unicidad global fuera del repositorio.",
     "repositories_searched": [
@@ -43,7 +43,7 @@
     "matches_found": 0,
     "global_uniqueness": "not_verified"
   },
-  "acquired_at": "2026-11-08",
+  "acquired_at": "2026-11-09",
   "bootstrap_scope": "Responsabilidad documental y operativa del frente transversal Custodia: mantener el OCP y los objetos provisionales; conducir la migración Vercel Blob → Backblaze B2 mediante trabajo en rama, revisión y pruebas/entornos aislados no productivos. No autoriza merge/deploy/cutover de producción, aplicación SQL/backfill en Neon Production, cambio de selector de producción, modificación de credenciales, cambios efectivos de seguridad/configuración del bucket o eliminación de objetos fuente.",
   "enforcement": "cooperative registry; no server fencing of arbitrary writes",
   "readback_required": true,
@@ -82,12 +82,12 @@
     },
     "previous_authorization_ref": "Instrucción directa del operador, 2026-10-28, preservada en originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob 357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5). Autoriza inventariar provisionalmente los hallazgos sobre recuperabilidad dentro del OCP; no autoriza cambios de código, alteraciones de producción ni recuperaciones que puedan sobrescribir/eliminar originales. Asignación inicial desde control sin titular previo asignado. ID nativo de conversación no expuesto."
   },
-  "transfer_generation": 10,
-  "transfer_authority": "Samantha v383 · NX-383m; Metacanon 1.29; GOW 2.18; DUG blob cad464717c43733aa84b49f8c9c3af0875597fbd; instrucción literal del operador 2026-11-08 para retomar la responsabilidad de CUSTODIA.",
-  "previous_owner_observed_on": "2026-11-08",
-  "local_conversation_uuidv7": "01a1bc33-32d5-7d64-b132-a52bdeb1e800",
+  "transfer_generation": 11,
+  "transfer_authority": "Samantha v383 · NX-383m; Metacanon 1.29; GOW 2.18; DUG blob cad464717c43733aa84b49f8c9c3af0875597fbd; instrucción directa del operador 2026-11-09.",
+  "previous_owner_observed_on": "2026-11-09",
+  "local_conversation_uuidv7": "01a1c125-af13-79b1-87cc-f1e5fe4b0b59",
   "local_conversation_uuidv7_type": "local_registry_identity_not_native_platform_id",
-  "authorization_event_uuidv7": "01a1bc33-32d5-7581-94c8-7b0fa892d800",
+  "authorization_event_uuidv7": "01a1c125-af13-7825-8af1-0ff35ad87b0e",
   "instance_collision_check": {
     "searched_scope": "Búsqueda exacta de la nueva etiqueta de instancia en SeryMente/khora antes de la escritura; 0 coincidencias. No acredita unicidad global fuera del repositorio.",
     "repositories_searched": [
@@ -98,8 +98,8 @@
     "global_uniqueness": "not_verified"
   },
   "session_folio_status": "PENDIENTE/NO ASIGNADO",
-  "folio_status_note": "FOL1 no está ACTIVO/verificado en el registro maestro. No se asigna folio SES/CV/CY/A/B hasta comprobar su activación.",
-  "transfer_scope": "Sustituir al titular documental y operativo de Custodia para mantener el OCP y sus persistencias provisionales; investigar y documentar el contrato Dictado→Custodia; actualizar la lista provisional; continuar el alcance preexistente de migración Vercel Blob → Backblaze B2 en ramas y entornos aislados/no productivos. No amplía las exclusiones existentes.",
+  "folio_status_note": "FOL1 no está ACTIVO/verificado en el registro maestro. No se asigna folio SES/CV/CY/A/B.",
+  "transfer_scope": "TRANSFER_RESPONSIBILITY: asumir la responsabilidad documental/operativa del frente para diagnosticar el bloqueo del archivado de Cora/Khora, mantener y mejorar las tareas provisionales, preparar la recuperación de servicio con B2, y diseñar la futura arquitectura multialmacén. La escritura de producto queda limitada a ramas y entornos no productivos hasta aprobación del plan y de sus compuertas. No amplía las exclusiones registradas.",
   "previous_owner_generation_4": {
     "status": "assigned",
     "owner_thread": null,
@@ -208,6 +208,25 @@
       "native_thread_id": "NOT_EXPOSED",
       "instance_alias": "chatgpt-custodia-INSTANCE-20261108-01A1BC33",
       "conversation_alias": "chatgpt-custodia-01a1bc33-32d5-7d64-b132-a52bdeb1e800"
+    },
+    {
+      "event": "CUSTODIA-TRANSFER-20261109-01a1c125-af13-7825-8af1-0ff35ad87b0e",
+      "local_event_uuidv7": "01a1c125-af13-7825-8af1-0ff35ad87b0e",
+      "acquired_at": "2026-11-09",
+      "authorization_source": "Instrucción literal del operador en la conversación actual: «retoma la responsabilidad del frente» (2026-11-09).",
+      "scope": "TRANSFER_RESPONSIBILITY: sustituir el titular documental/operativo generación 10 por esta conversación; mantener el OCP y sus tareas provisionales; diagnosticar y proponer el desbloqueo de archivado con B2; diseñar la posterior estrategia multialmacén. La implementación queda pendiente de aprobación del plan; el desarrollo permitido se mantiene en ramas y entornos no productivos.",
+      "exclusions": [
+        "No concede ADD_CO_RESPONSIBLE",
+        "No autoriza merge, deploy o cutover de producción",
+        "No autoriza SQL/backfill en Neon Production",
+        "No autoriza modificar credenciales o llaves",
+        "No autoriza cambios efectivos de seguridad/CORS/configuración del bucket",
+        "No autoriza eliminar ni sobrescribir objetos originales",
+        "No autoriza operar sobre un perfil Windows excluido por Metacanon §41.2/P036 ni utilizar el perfil MantenimientoRCI como raíz operativa"
+      ],
+      "native_thread_id": "NOT_EXPOSED",
+      "instance_alias": "chatgpt-custodia-INSTANCE-20261109-01A1C125",
+      "conversation_alias": "chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59"
     }
   ],
   "previous_control_snapshot": {
