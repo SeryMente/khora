@@ -11,7 +11,7 @@ Módulo operativo de Entorno Persistente para automatización PowerShell de Wind
 ## Punto de entrada en el host materializado
 
 ```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; & "$env:LOCALAPPDATA\\ScriptPWS\\START-RDC.ps1"
+Set-ExecutionPolicy Bypass -Scope Process -Force; & "$env:LOCALAPPDATA\ScriptPWS\START-RDC.ps1"
 ```
 
-El baseline se ejecuta mediante el wrapper local para conservar transcript en `Desktop\\log.txt` y copia de diagnóstico al portapapeles al finalizar.
+El baseline se ejecuta mediante el wrapper local para conservar transcript en `Desktop\log.txt` y copia de diagnóstico al portapapeles al finalizar.
