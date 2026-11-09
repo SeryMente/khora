@@ -1,11 +1,11 @@
-<!-- LIST_VERSION=0.27; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.28; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.27.
-- **Última actualización:** 2026-11-09 (PUT/GET físico B2 aprobado; evidencia preservada; OCP v0.36, control gen. 11 y README de tareas v0.23 alineados; Vercel Production y archivado E2E pendientes).
+- **Versión de esta lista provisional:** 0.28.
+- **Última actualización:** 2026-11-09 (Master Key KHORA incorporada a Vercel Production; preflight B2 PASS; deployment Production READY; aceptación de archivado E2E y backfill histórico Blob→B2 pendientes).
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
 - **Última lectura de metodología del ciclo 2 (referencia histórica):** Samantha v352 · NX-352m; Metacanon 1.21; GOW v2.3; blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
@@ -344,3 +344,12 @@ La propuesta continúa sin comprobar los bytes actuales de los objetos remotos n
 - **Build de Production:** un intento anterior ejecutó migraciones 023–029 antes de fallar en `encrypted_roundtrip`; el log no confirma de forma separada `032_graph_twins.sql`. El intento nativo posterior ejecutó primero preflight y falló en autorización, por lo que no alcanzó el hook de migración. No reintentar build Production que pueda mutar Neon sin verificar el esquema y resolver una ruta autorizada.
 - **Estado del hito 1:** EN CURSO, con bloqueo concreto de acceso a la bóveda/identidad del endpoint y credenciales no validadas. No afirmar que Cora ya archiva.
 - **2026-11-09 · RETOMA-CUSTODIA-v0.24:** persistida la instrucción de retoma, leída fuente metodológica v384, creada evidencia de diagnóstico, corregida la nota histórica PC10 y reconciliado el orden real de los hooks de build. Sin código, variables, SQL, bucket, merge ni deploy modificados.
+
+## Retoma operativa verificada · 2026-11-09 · PC-7 / Vercel Production
+
+- Backblaze B2: autenticación Master Key KHORA, identidad del bucket privado y lectura de configuración SSE-B2 verificadas desde Production por el preflight.
+- Transferidas desde EP Vault las dos variables canónicas `KHORA_B2_MASTER_APPLICATION_KEY_ID` y `KHORA_B2_MASTER_APPLICATION_KEY`; read-back de metadatos Vercel confirma una entrada de tipo `sensitive` en Production para cada nombre. Los valores no se revelaron.
+- Deployment Production `dpl_6hUVD7LBXqtmnaMw2nfH2wwyrHUp`, commit `dd9527a223f65e7af834b042d51f716296151bf2`, estado `READY`; preflight `native_auth`, `master_key`, `bucket_identity`, `bucket_private` y `sse_b2_default`: PASS. URL: `https://khora-r25tmr78o-victorhugotorresmendez-8991s-projects.vercel.app`.
+- Para este build se aisló temporalmente el comando y se omitió `migrate-runtime.mjs`; el Build Command original se restauró en la configuración del proyecto después de iniciarse el build. No se ejecutó SQL ni backfill de Neon en este ciclo.
+- La ruta de código de nuevas escrituras usa `putEncryptedObject` (B2-only y fail-closed), y quedó desplegada; el archivado E2E real con sesión propietaria, vínculo/manifiesto y recuperación tras recarga permanece pendiente. Por tanto, la capacidad productiva está preflight-validada y desplegada, pero la aceptación funcional de archivo no está certificada.
+- No se ha iniciado el backfill histórico Blob→B2 ni se ha cambiado ninguna referencia Neon. Los originales Blob siguen sin borrarse.
