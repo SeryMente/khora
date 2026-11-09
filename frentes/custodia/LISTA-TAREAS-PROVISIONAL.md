@@ -1,11 +1,11 @@
-<!-- LIST_VERSION=0.20; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.21; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.20.
-- **Última actualización:** 2026-11-08 (original de conversación preservado; titularidad transferida gen. 9→10; API nativa B2 ya presente en main; autenticación/PUT-GET físico y migración histórica pendientes).
+- **Versión de esta lista provisional:** 0.21.
+- **Última actualización:** 2026-11-09 (transferencia gen. 10→11; se preservó la nueva instrucción multialmacén; cinco tareas nuevas registradas como propuesta pendiente de aprobación; no se ejecutaron cambios de producto).
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
 - **Última lectura de metodología del ciclo 2 (referencia histórica):** Samantha v352 · NX-352m; Metacanon 1.21; GOW v2.3; blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
@@ -32,6 +32,28 @@ Secuencia histórica (C006; antecedente conservado y supersedido por la secuenci
   4. **Regla transversal de rescate:** en cualquier fuente candidata, primero identificar y preservar; después recuperar en destino separado, verificar identidad/contenido/partes/huellas mediante lectura de vuelta, y solo entonces marcar como recuperada. No confundir localizada, histórica/verificada al subir, recuperable ahora, restaurada ni aceptada. No declarar irrecuperable antes de agotar fuentes autorizadas.
 
 ---
+
+
+## Propuesta de secuencia de trabajo · 2026-11-09 · PENDIENTE DE VISTO BUENO
+
+**Instrucción fuente:** [INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](originales/INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md).  
+**Decisión nueva:** el objetivo final deja de ser migrar de forma exclusiva de Vercel Blob a B2. Se construirá una arquitectura con varios medios, salud/capacidad, enrutamiento, réplicas y recuperación. B2 sigue siendo el medio inmediato para recuperar el archivado mientras se diagnostica y se habilita.  
+**Estado de esta secuencia:** propuesta documentada, NO APROBADA AÚN PARA EJECUCIÓN. Los cinco objetos individuales están en la carpeta de tareas provisionales.
+
+| Orden | ID | Prioridad | Resultado que cierra |
+|---:|---|---|---|
+| 1 | CUSTODIA-B2-005 | P0 | Diagnóstico: estado Blob, causa B2, cadena completa de archivado y fallos adicionales dentro del alcance probado |
+| 2 | CUSTODIA-B2-006 | P0 | Archivo E2E operativo con B2: PUT/GET físico, SHA/bytes, vínculo de parte y registro archivado |
+| 3 | CUSTODIA-B2-007 | P1 | Implementación actual reducida a lo necesario, sin perder integridad ni lectura histórica necesaria |
+| 4 | CUSTODIA-RES-001 | P1 | Diseño validado de persistencia local-first, réplica y failover multi-proveedor |
+| 5 | CUSTODIA-RES-002 | P2 | Implementación aislada y certificación de fallos/restauración; producción queda como compuerta independiente |
+
+**Recuperación histórica conservada:** CUSTODIA-03 y CUSTODIA-01 siguen abiertas y con su evidencia original; no se consideran completadas por restablecer el archivado. Se reanudan tras recuperar el servicio, sin borrar ni renumerar tareas existentes.
+
+**Decisión supersedida:** la instrucción del 2026-11-07 que declaraba B2 como único backend final queda preservada en el historial, pero no rige la arquitectura objetivo tras la nueva instrucción del 2026-11-09. El uso inmediato de B2 no implica que sea el único proveedor final.
+
+**Límites de esta actualización:** solo documentación provisional. No se modificaron código, variables, credenciales, buckets, seguridad/CORS, base productiva, objetos originales ni despliegues. La aprobación de esta secuencia será la compuerta previa al trabajo de implementación.
+
 
 ## Orden de prioridad y criterio de coordinación · vigente 2026-11-06
 
@@ -259,6 +281,8 @@ La propuesta continúa sin comprobar los bytes actuales de los objetos remotos n
 - **Estado:** CUSTODIA-03 → CUSTODIA-01 → CUSTODIA-04 permanece abierto; CUSTODIA-B2-004 sigue en curso/P0. La API nativa en código no equivale a persistencia B2 aceptada ni a garantía de producto.
 
 ## Registro de cambios
+
+- **2026-11-09 · ARQUITECTURA-MULTIALMACEN-PROPUESTA · versión 0.21:** se preserva la instrucción literal y se presentan cinco tareas nuevas en orden diagnóstico → restablecimiento → pulido → diseño → implementación. La secuencia queda pendiente de visto bueno; el objetivo B2 exclusivo se marca supersedido, preservando su historia y pruebas reutilizables. CUSTODIA-03/01 continúan abiertas.
 
 - **2026-11-07 · CUSTODIA-B2-EXCLUSIVO · versión 0.19:** por instrucción literal del operador, se descarta persistencia dual, fallback y lectura dual Blob/B2. B2 será el único backend de objetos de Khora. CUSTODIA-B2-004 pasa a EN CURSO/P0; abarca adaptación de todos los flujos, captura por partes, inventario/backfill histórico, observabilidad correlacionada, cutover y pruebas E2E/restauración. La PR #348 es solo base técnica en draft; aún no demuestra autenticación ni lectura/escritura física B2 ni migración histórica. Se observó que variables KHORA_B2_* y KHORA_OBJECT_STORAGE existen en Vercel Production sin revelar valores; falta verificar la cuenta/bucket con preflight real. No borrar Blob fuente ni declarar aceptación antes de read-back SHA/KHC1 y reconciliación completa.
 
