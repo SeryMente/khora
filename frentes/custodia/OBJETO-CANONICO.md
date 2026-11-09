@@ -118,6 +118,7 @@ Custodia es el frente transversal que define, verifica y gobierna las garantías
 - **Estado al corte documental:** autorización contextual RECIBIDA; validación de la bóveda y credenciales NO EJECUTADA; preflight/PUT/GET/E2E PENDIENTES; despliegue productivo NO EJECUTADO; archivado restaurado NO DEMOSTRADO.
 - **Evidencia de configuración:** los nombres de las variables B2 y su target Production fueron observados mediante metadatos Vercel sin descifrar valores. No se ha demostrado que el par de credenciales de la bóveda coincida con el valor configurado en Vercel.
 - **Acceso local en esta retoma:** PC10RCIF4EI4 fue inspeccionado de forma no destructiva; la ruta estándar del clon Khora, la bóveda cifrada y el archivo temporal DPAPI no estaban presentes en ese equipo. Esto no demuestra su ausencia en el equipo activo del operador. La importación de bóveda y el preflight no se ejecutaron; no se leyó ni cambió ningún secreto.
+- **Gate de build Production:** el comando observado ejecuta `node scripts/migrate-runtime.mjs; next build --webpack`; el script `khora-web/scripts/migrate-runtime.mjs` aplica en `DATABASE_URL` las migraciones 023, 024, 025, 026, 027, 028, 029 y 032. Es una mutación de esquema de Neon Production no cubierta por la autorización B2 recibida y expresamente excluida. No se ejecutó. El despliegue productivo permanece bloqueado mientras ese hook siga incluido, salvo autorización específica o una ruta alternativa de build validada sin mutar Neon.
 
 ### Corrección de referencia metodológica · 2026-11-09
 
