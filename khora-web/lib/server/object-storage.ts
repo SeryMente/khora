@@ -24,8 +24,22 @@ function credentials() {
   return { keyId, applicationKey };
 }
 function apiUrl(auth:B2Auth, operation:string) { return `${auth.apiInfo.storageApi.apiUrl}/b2api/${API_VERSION}/${operation}`; }
+type StorageProviderError = Error & { status?: number; providerCode?: string };
+
 async function jsonResponse<T>(response:Response, code:string):Promise<T> {
-  if (!response.ok) { const error = new Error(code) as Error & { status: number }; error.status = response.status; throw error; }
+  if (!response.ok) {
+    // Backblaze's JSON error body contains a short machine code and a free-form message.
+    // Preserve only the status and a strictly sanitized code; never log the provider message.
+    let providerCode: string | undefined;
+    try {
+      const body = await response.clone().json() as { code?: unknown };
+      if (typeof body.code === 'string' && /^[a-z0-9_]{1,80}$/i.test(body.code)) providerCode = body.code;
+    } catch { /* Non-JSON errors still retain the HTTP status. */ }
+    const error = new Error(code) as StorageProviderError;
+    error.status = response.status;
+    if (providerCode) error.providerCode = providerCode;
+    throw error;
+  }
   try { return await response.json() as T; } catch { throw new Error(`${code}_invalid_response`); }
 }
 async function b2Json<T>(auth:B2Auth, operation:string, payload:Record<string,unknown>):Promise<T> {
