@@ -2,7 +2,8 @@
 
 **B UUIDv7 local:** 01a1c134-2125-75e8-9c39-16a74610d034 · no es folio global ni ID nativo.
 **Ciclo UUIDv7 local:** 01a1c134-2125-70ac-847f-18058ba4b884.
-**Entrada A correctiva UUIDv7 local:** 01a1c134-2125-7263-b011-14bc36a10d03 · literal conservado en [INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md).
+**Entrada principal A UUIDv7 local:** 01a1c138-ead3-7678-a44e-a49bb72f11de · literal conservado en la sección «Dictado de diagnóstico, secuencia y formato».  
+**Entrada correctiva A2 UUIDv7 local:** 01a1c134-2125-7263-b011-14bc36a10d03 · literal conservado en [INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md).
 **OCP:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md) · CUSTODIA-v0.26.
 
 ## Dictamen ejecutivo
