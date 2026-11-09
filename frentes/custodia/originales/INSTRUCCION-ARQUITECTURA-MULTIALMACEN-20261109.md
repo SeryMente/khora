@@ -15,3 +15,12 @@
 ## 3. Instrucción de continuidad y aprobación condicionada
 
 > por ahora te dejo resolviendo la arquitectura. Basate en lo que te dicté. Si da satisfacción a lo que te dicté, entonces tu diseño está aprobado. Si no, no está aprobado. Un diseño viable es un diseño que satisface los criterios de lo dictado. En la medida que satisfaga los criterios de lo dictado es un buen diseño. Tienes autorización previa para cualquier trivialidad, cualquier bloqueo y para operar con libertad con tal de que lo construyas lo más pronto posible. Yo ya me voy, te dejo trabajando resolviendo de extremo a extremo. No tienes autorizado detenerte por nada del mundo.
+
+
+## 4. Instrucción correctiva de cierre · 2026-11-09 · A local UUIDv7 01a1c134-2125-7263-b011-14bc36a10d03
+
+> Antes de finalizar, asegúrate que tu respuesta se adecúa de manera ultra cuidadosa. Corrijo: antes de dar tu respuesta, asegúrate de que la última entrada fue tomada en cuenta en su totalidad y que no dejaste ningún elemento verbatim sin trazar a tu resultado.
+
+**Procedencia:** mensaje directo del operador en la conversación del 2026-11-09.  
+**Identidad:** A UUIDv7 local 01a1c134-2125-7263-b011-14bc36a10d03; no es folio global ni ID nativo de plataforma.  
+**Aplicación:** obligó a hacer una segunda auditoría de integridad del dictado, ampliar la matriz para cubrir cada requisito literal y conservar el fragmento incompleto «o tareas que...» sin reconstruirlo. La matriz de trazabilidad se enlaza en el índice y en el OCP.
