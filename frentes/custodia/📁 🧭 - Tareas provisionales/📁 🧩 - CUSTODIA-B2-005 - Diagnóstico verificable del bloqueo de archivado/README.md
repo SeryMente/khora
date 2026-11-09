@@ -151,3 +151,9 @@ La explicación «credencial KHORA incorrecta» deja de ser el diagnóstico prin
 - Evidencia detallada: [PRUEBA-FISICA-B2-KHORA-20261109.md](../../../evidencias/PRUEBA-FISICA-B2-KHORA-20261109.md), blob c5043bc3ca6f6c492c4a5ca4cb55235d055488e1.
 
 **Conclusión:** Backblaze KHORA autentica y persiste físicamente desde PC-7. La causa residual está en conectar la Master Key al runtime Vercel Production y probar el archivado E2E, no en acceso al proveedor B2.
+
+### Hallazgo causal adicional · 2026-11-09 · Vercel legacy key ID no es Master Key
+
+La lectura controlada de KHORA_B2_KEY_ID desde Vercel Production, sin imprimir el valor, mostró que **no coincide con el Account ID** de la cuenta KHORA (58b62b4593c8). El Master Application Key ID validado desde PC-7 sí coincide con ese Account ID. Por ello, las variables heredadas actuales no representan la Master Key esperada por el adaptador de KHORA y no deben simplemente renombrarse.
+
+**Corrección necesaria:** reemplazar, no renombrar, las dos entradas heredadas de Production con la pareja real KHORA_B2_MASTER_APPLICATION_KEY_ID / KHORA_B2_MASTER_APPLICATION_KEY leída desde la bóveda local y transferida por Vercel CLI autenticado. No descifrar ni copiar los valores a chat, consola o archivos de documentación.
