@@ -113,3 +113,9 @@ El asentimiento contextual del operador queda enlazado al original A [INSTRUCCIO
 - Esta observación **no prueba** que el repositorio o la bóveda no existan en el equipo activo del operador; solo identifica que no están disponibles en el PC10 consultado.
 - Consecuencia: no se pudo importar la bóveda canónica, comparar el par B2 local con el proveedor ni ejecutar el preflight real. No se leyeron ni modificaron credenciales, y no se realizó PUT/GET de objetos reales ni despliegue.
 - Próximo paso local: desde el clon propietario con la bóveda presente y desbloqueada, importar únicamente las entradas B2 necesarias y ejecutar el preflight de solo lectura. El resultado debe mostrar únicamente etapa/código/HTTP/provider-code; nunca valores.
+
+### Compuerta adicional del build de Production · 2026-11-09
+
+- Se inspeccionó `khora-web/scripts/migrate-runtime.mjs` (blob `52e98b1ce1db3d18881bef66443a0af0b1b74095`). El build productivo observado ejecuta `node scripts/migrate-runtime.mjs; next build --webpack`; el script abre `DATABASE_URL` y aplica mediante PostgreSQL los archivos `023_runtime_state.sql`, `024_oauth_scopes.sql`, `025_normative_receipts.sql`, `026_normative_turns.sql`, `027_manual_mcp_tokens.sql`, `028_normative_order_ledger.sql`, `029_github_credentials.sql` y `032_graph_twins.sql`.
+- Aunque varias instrucciones SQL usan `IF NOT EXISTS`, el script es una vía de mutación de esquema de Neon Production. La autorización recibida cubre credenciales B2 y despliegue condicionado, pero excluye migraciones/SQL productivo; no se ejecutó este script ni se intentó deploy.
+- **Gate de release:** Production permanece bloqueado mientras el build hook incluya esas migraciones. Solo se puede proceder si se aprueba específicamente esa mutación o si se prepara y valida una ruta de build/deploy que no ejecute mutaciones de base de datos ni cambie comportamiento fuera del alcance autorizado.
