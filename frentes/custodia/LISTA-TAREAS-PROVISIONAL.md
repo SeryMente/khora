@@ -1,11 +1,11 @@
-<!-- LIST_VERSION=0.25; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.26; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.25.
-- **Última actualización:** 2026-11-09 (PC-7 único RDC; Master Key KHORA autenticada contra B2; bucket privado verificado; Production ya selecciona B2 pero faltan variables canónicas y roundtrip físico; secuencia Blob→B2 actualizada).
+- **Versión de esta lista provisional:** 0.26.
+- **Última actualización:** 2026-11-09 (Master Key KHORA autenticada; PUT/GET físico, SHA-256, bytes y SSE-B2 verificados; pendiente enlazar variables canónicas a Vercel Production y probar archivado E2E).
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
 - **Última lectura de metodología del ciclo 2 (referencia histórica):** Samantha v352 · NX-352m; Metacanon 1.21; GOW v2.3; blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
@@ -55,7 +55,7 @@ Secuencia histórica (C006; antecedente conservado y supersedido por la secuenci
 | 5 | CUSTODIA-RES-001 | P2 | DIFERIDA | Evaluar más proveedores solo después de completar la prioridad B2/Blob |
 | 6 | CUSTODIA-RES-002 | P2 | DIFERIDA | Implementar proveedor adicional únicamente si se vuelve a priorizar |
 
-**Estado técnico observado en esta retoma:** autenticación de la Master Application Key KHORA y bucket privado confirmados desde PC-7. Vercel Production ya selecciona B2 y tiene el bucket configurado, pero carece de los nombres canónicos de las dos variables maestras. El PUT/GET físico, el despliegue con esas variables y el archivado E2E aún no están acreditados.
+**Estado técnico observado en esta retoma:** autenticación Master Key, bucket privado y prueba física B2 PUT/GET/SHA-256/bytes/SSE-B2 aprobados desde PC-7. Vercel Production ya selecciona B2 y tiene el bucket configurado, pero carece de los nombres canónicos de las dos variables maestras. El despliegue con esas variables y el archivado E2E siguen pendientes.
 
 **Identidad operativa:** PC-7 es la única terminal RDC disponible; identidad comprobada PC-7\\PC 7. No exigir ni asumir otra terminal o cuenta; referencias históricas a PC-14, PSK14 y CENTRAL\\fila4 quedan supersedidas.
 
@@ -285,6 +285,9 @@ La propuesta continúa sin comprobar los bytes actuales de los objetos remotos n
 - **Estado:** CUSTODIA-03 → CUSTODIA-01 → CUSTODIA-04 permanece abierto; CUSTODIA-B2-004 sigue en curso/P0. La API nativa en código no equivale a persistencia B2 aceptada ni a garantía de producto.
 
 ## Registro de cambios
+
+- **2026-11-09 · prueba física B2 confirmada · v0.26:** objeto sintético de 150 bytes subido y descargado desde el bucket privado KHORA; SHA-256 de origen y read-back coinciden; SSE-B2/AES256 confirmado. Evidencia: [evidencias/PRUEBA-FISICA-B2-KHORA-20261109.md](evidencias/PRUEBA-FISICA-B2-KHORA-20261109.md), blob `c5043bc3ca6f6c492c4a5ca4cb55235d055488e1`. B2 local está operativo; Vercel Production aún no tiene las dos variables maestras canónicas ni despliegue nuevo. Archivado E2E y backfill histórico siguen pendientes.
+
 
 - **2026-11-09 · retoma operativa PC-7 y B2-first · v0.25:** se registra autenticación read-only correcta de la Master Application Key KHORA y verificación del bucket privado; se corrige la identidad operativa a PC-7 como única terminal RDC; se cambia el objetivo actual a B2 para todas las escrituras nuevas y backfill completo/no destructivo de Blob→B2. PUT/GET físico y archivado E2E aún no están demostrados.
 
