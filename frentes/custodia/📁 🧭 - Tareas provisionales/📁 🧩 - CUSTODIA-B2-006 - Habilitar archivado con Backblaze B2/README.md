@@ -138,3 +138,15 @@ La inspección cruzada de eventos Vercel corrige la nota previa: no todos los in
 
 **Siguiente acción causal:** resolver la conexión RDS referida como `PSK14`, validar que el proceso opere bajo un perfil autorizado y comprobar la sesión abierta de EP Vault. Después promover cada valor individualmente a la bóveda canónica mediante portapapeles, leer de vuelta sin imprimir secretos e importar solo las dos variables canónicas para ejecutar el preflight de solo lectura. No usar PC10, no exponer secretos, no rotar por sospecha y no reintentar despliegue productivo con migraciones.
 
+
+
+### Intento urgente de transferencia EP Vault → bóveda fila4 · 2026-11-09
+
+- **Instrucción A:** [INSTRUCCION-TRANSFERENCIA-EPVAULT-FILA4-20261109.md](../../originales/INSTRUCCION-TRANSFERENCIA-EPVAULT-FILA4-20261109.md), UUIDv7 local `01a1c19d-259d-7348-ab19-4ba87044a8d8`.
+- **Resultado B:** [SALIDA-MODELO-TRANSFERENCIA-EPVAULT-FILA4-20261109.md](../../originales/SALIDA-MODELO-TRANSFERENCIA-EPVAULT-FILA4-20261109.md), UUIDv7 local `01a1c19d-259d-7afb-b310-e259a5d77f9d`.
+- PC-14 (device ID `4fc35a07-2192-4b88-81ec-96cb450d565e`) respondió a una consulta read-only, pero la identidad efectiva fue `PC-14\PC 13`, perfil `C:\Users\PC 13`; no es la identidad destino fila4.
+- Una llamada posterior del conector Desktop Commander devolvió cuota mensual agotada y pausa de llamadas; el propio servicio indica no reintentar ni reconectar. No se efectuaron más llamadas después de ese mensaje.
+- **No se leyó el contenido** de las notas efímeras; no se extrajeron ni copiaron secretos; no se ejecutó `Set-KhoraEnvVaultVariable`, no se cambió la bóveda destino, no se modificó Vercel y no se ejecutó preflight.
+- Estado del requisito de transferencia: **NO EJECUTADO / NO PERSISTIDO**. No marcar como guardadas ni como verificadas las variables `KHORA_B2_MASTER_APPLICATION_KEY_ID` y `KHORA_B2_MASTER_APPLICATION_KEY`.
+- **Siguiente paso:** resolver el límite de uso desde el panel de Desktop Commander y habilitar acceso bajo la identidad efectiva autorizada `CENTRAL\fila4`; después recuperar la nota, guardar cada variable por separado y verificar la lectura de vuelta cifrada, sin imprimir valores.
+
