@@ -24,9 +24,11 @@ El frente Custodia ha sido retomado, la nueva instrucción se conservó literalm
 | CUSTODIA-B2-006 | reconciliada, PC10 obsoleto marcado | `8bcc2df6d3b964a95aff9aebcaacff47b973d9b1` |
 | CUSTODIA-B2-005 | diagnóstico reconciliado | `92109c742fbf49952740ad8c366cc499fec6ecd3` |
 
-Los dos README P0 se leyeron de vuelta comparando su contenido completo. Los nuevos A y evidencia se recuperaron desde `main`; se comprobó el literal de la instrucción y la presencia de los identificadores técnicos. El OCP se actualizará con los hashes de esta salida B y de cada artefacto recién comprobado.
+Los dos README P0 se leyeron de vuelta comparando su contenido completo. Los nuevos A y evidencia se recuperaron desde `main`; se comprobó el literal de la instrucción y la presencia de los identificadores técnicos. La revisión previa del OCP quedó en CUSTODIA-v0.32 y fue leída de vuelta; esta salida B y la matriz de trazabilidad se incorporarán a la siguiente actualización del OCP.
 
 ## Contexto técnico actual
+
+**Matriz de trazabilidad actualizada:** blob leído de vuelta `a212aeaa8dbcf571d948abb3cd5d658df2cb2d9f`; incorpora el nuevo A/B y conserva los literales históricos con sus decisiones y estados.
 
 1. **PR #355:** MERGED. Corrige la cola/reintento de partes de audio antes del archivado en el cliente. No resuelve la conexión al proveedor B2.
 2. **PR #362:** OPEN · DRAFT · NOT MERGED. Añade observabilidad saneada del error B2. Su prueba unitaria añadida no se ejecutó. Su Preview READY compiló y pasó TypeScript/78 rutas estáticas, pero no ejecutó autenticación B2, PUT/GET físico ni archivado E2E.
