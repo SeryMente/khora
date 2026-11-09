@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.28; OBJECT_SEAL=CUSTODIA-v0.28; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.29; OBJECT_SEAL=CUSTODIA-v0.29; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · RESPONSABILIDAD DOCUMENTAL EN GENERACIÓN 11 · CUSTODIA-03/01/04 SIGUEN ABIERTAS · PROPUESTA PENDIENTE DE VISTO BUENO: CUSTODIA-B2-005 (DIAGNÓSTICO) → CUSTODIA-B2-006 (RESTABLECER ARCHIVADO) → CUSTODIA-B2-007 (PULIDO) → CUSTODIA-RES-001 (DISEÑO MULTIALMACÉN) → CUSTODIA-RES-002 (IMPLEMENTACIÓN Y CERTIFICACIÓN) · DICTAMEN C014: RECUPERACIÓN TOTAL NO DEMOSTRADA · GARANTÍAS DE PRODUCTO NO CERTIFICADAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.28. Metacanon: 1.29. Gobierno general consultado: Samantha v379 · NX-379m; Gobierno general v380 · NX-380m; GOW 2.18. Fuente central SeryMente/metodologia/main: blob cad464717c43733aa84b49f8c9c3af0875597fbd. La secuencia nueva es propuesta y no autoriza aún ejecución de producto o producción.
+> **ESTADO · VIVO · RESPONSABILIDAD DOCUMENTAL EN GENERACIÓN 11 · CUSTODIA-03/01/04 SIGUEN ABIERTAS · SECUENCIA APROBADA: CUSTODIA-B2-006 (RESTABLECER ARCHIVADO · EN CURSO) → CUSTODIA-B2-005 (VERIFICACIÓN/DIAGNÓSTICO RESIDUAL) → CUSTODIA-B2-007 (ESTABILIZAR) → CUSTODIA-RES-001 (DISEÑO MULTIALMACÉN) → CUSTODIA-RES-002 (IMPLEMENTAR/CERTIFICAR) · DICTAMEN C014: RECUPERACIÓN TOTAL NO DEMOSTRADA · GARANTÍAS DE PRODUCTO NO CERTIFICADAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.29. Metacanon: 1.29. Gobierno general consultado: Samantha v379 · NX-379m; Gobierno general v380 · NX-380m; GOW 2.18. Fuente central SeryMente/metodologia/main: blob cad464717c43733aa84b49f8c9c3af0875597fbd. La secuencia fue aprobada por el operador; la ejecución actual se limita a corrección en rama y pruebas no productivas, sin abrir compuertas productivas.
 
 ## 1. Control e identidad
 
@@ -12,9 +12,9 @@
 - **Único núcleo operativo:** este OBJETO-CANONICO.md.
 - **Control único de responsabilidad:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json). Titularidad documental/operativa transferida de generación 10 a 11 y leída de vuelta. Titular actual: chatgpt-custodia-INSTANCE-20261109-01A1C125; alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59; UUIDv7 local de conversación 01a1c125-af13-79b1-87cc-f1e5fe4b0b59; UUIDv7 local del evento 01a1c125-af13-7825-8af1-0ff35ad87b0e; control blob 01b1aac95e7d4f666cd67905ab54430f70a5de97. ID nativo de plataforma no expuesto. Titular previo gen. 10 y generaciones anteriores preservados. Folio PENDIENTE/NO ASIGNADO; FOL1 no está ACTIVO/verificado.
 - **Propósito literal aprobado:** [originales/PROPOSITO-OPERADOR-2026-10-28.md](originales/PROPOSITO-OPERADOR-2026-10-28.md). La sección 4 también conserva el texto aprobado íntegro para que el propósito sea visible en el núcleo.
-- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional de los pendientes; versión 0.21, con propuesta de secuencia diagnóstico/restablecimiento/pulido/resiliencia, pendiente de visto bueno. CUSTODIA-03 y CUSTODIA-01 continúan abiertas. CUSTODIA-02 continúa retirada y su identificador no se reutiliza; la lista sigue provisional.
+- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional de los pendientes; versión 0.22, con la secuencia aprobada y CUSTODIA-B2-006 en curso como primer hito. CUSTODIA-03 y CUSTODIA-01 continúan abiertas. CUSTODIA-02 continúa retirada y su identificador no se reutiliza; la lista sigue provisional.
 - **Inventario provisional de hallazgos:** [evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md](evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md), materialización de evidencia para CUSTODIA-01; no es un segundo estado vivo.
-- **Versión y sello vigentes:** CUSTODIA-v0.28. Es la vigésima sexta versión documental del objeto; no es una versión del producto.
+- **Versión y sello vigentes:** CUSTODIA-v0.29. Es la vigésima séptima versión documental del objeto; no es una versión del producto.
 - **Registro de la retoma anterior:** [originales/ChatGPT-CUSTODIA-20261106-1424.txt](originales/ChatGPT-CUSTODIA-20261106-1424.txt), instrucción textual parcial original y diagnóstico estático del límite de archivado.
 - **Original de esta retoma:** [originales/ChatGPT-CUSTODIA-20261107-1157.txt](originales/ChatGPT-CUSTODIA-20261107-1157.txt), exportación preservada en main; SHA-256 `7E256B9888F2A0227632D39D22B98E9BD1316548E057E83514ADE61376A93CC5`, 42,629 bytes; lectura de vuelta exacta.
 - **Original de esta retoma (2026-11-08 11:21):** [originales/ChatGPT-CUSTODIA-20261108-1121.md](originales/ChatGPT-CUSTODIA-20261108-1121.md), 39,896 bytes; SHA-256 `CB264E5979AA545F082B5CC9C59DEDA30CE9547100DB29B138A520C3592A866A`; Git blob `b7e13e3fe9fed70873535640e1124577f5b037e4`; commit `5d6cf7055f2ab5f0020bde220d078ffe077512a6`; lectura de vuelta idéntica.
@@ -108,7 +108,7 @@ Custodia es el frente transversal que define, verifica y gobierna las garantías
 
 ## 8. Estado vivo
 
-**Estado del frente: CUSTODIA-03 ABIERTA · CUSTODIA-01 EN CURSO · CUSTODIA-04 EN CURSO · CUSTODIA-B2-005/006/007 Y CUSTODIA-RES-001/002 PROPUESTAS PENDIENTES DE VISTO BUENO. CUSTODIA-02 RETIRADA. GARANTÍAS DE PRODUCTO NO CERTIFICADAS. RESPONSABILIDAD DOCUMENTAL/OPERATIVA EN GENERACIÓN 11.** La secuencia nueva no se declara activa hasta su aprobación; el restablecimiento del archivado queda como primera prioridad propuesta.
+**Estado del frente: CUSTODIA-03 ABIERTA · CUSTODIA-01 EN CURSO · CUSTODIA-04 EN CURSO · CUSTODIA-B2-006 EN CURSO (PRIMER HITO) · CUSTODIA-B2-005 EN CURSO (VERIFICACIÓN RESIDUAL) · CUSTODIA-B2-007/RES-001/RES-002 PENDIENTES. CUSTODIA-02 RETIRADA. GARANTÍAS DE PRODUCTO NO CERTIFICADAS. RESPONSABILIDAD DOCUMENTAL/OPERATIVA EN GENERACIÓN 11.** La secuencia fue aprobada por el operador; el producto no se declara recuperado hasta demostrar archivado y lectura de vuelta.
 
 ### Corrección de referencia metodológica · 2026-11-09
 
@@ -128,6 +128,18 @@ La relectura completa de la fuente central `SeryMente/metodologia/main` confirma
 - **Entorno RDC:** PC-14 ejecuta como PC 13, no como el perfil operativo requerido. La otra estación ejecuta como MantenimientoRCI, aunque fila4 esté cargado; P036/Metacanon §41.2 impide utilizar ese perfil como raíz de trabajo. No se escribieron archivos locales ni se ejecutaron pruebas en esas estaciones.
 - **Secuencia provisional:** CUSTODIA-B2-005 diagnóstico → B2-006 restablecer archivado → B2-007 pulir → RES-001 diseñar arquitectura → RES-002 implementar/certificar. Todas están marcadas propuesta_pendiente_aprobacion en LISTA-TAREAS-PROVISIONAL.md v0.21 y sus READMEs. CUSTODIA-03 y CUSTODIA-01 siguen abiertas; sus IDs y criterios no se modifican.
 - **No ejecutado:** no se cambió código, variables, credenciales, seguridad/CORS, selector, SQL productivo, objetos fuente ni deployments. Esta actualización es documental.
+
+
+
+### Nueva instrucción operativa · restablecer archivado primero · 2026-11-09
+
+- **Original literal:** [INSTRUCCION-RESTABLECER-ARCHIVADO-PRIMERO-20261109.md](originales/INSTRUCCION-RESTABLECER-ARCHIVADO-PRIMERO-20261109.md). UUIDv7 local A: `01a1c170-3d40-7edb-b707-9a14020a76b8`. Conserva literalmente la prioridad «volver a hacer que Cora vuelva a poder archivar registros» y la orden «Actualzia tareas conforme, lo que me estas diciendo, y resuelve punto 1, en tiempo record», además de la continuación «Continua».
+- **Aprobación:** el operador aprobó la secuencia amigable y ordenó actualizar el plan y resolver el primer punto. Se cambia el orden: CUSTODIA-B2-006 es el primer hito; CUSTODIA-B2-005 ya no bloquea el comienzo y pasa al segundo hito para cerrar diagnóstico residual y verificación ampliada. A continuación B2-007, RES-001 y RES-002.
+- **Ejecución inmediata autorizada:** cambios en rama y pruebas no productivas para restaurar el archivado mediante B2, manteniendo íntegra la compuerta de custodia. No esperar a completar el diseño multialmacén.
+- **Hallazgo del bloqueo actual:** el deployment de producción `dpl_DwfJkUPZ4NJnjTXgKCPFRNY5FR2f` (commit `7be5712a19aa98837e6d34449585ecb40e634af3`) falló durante `b2_authorize_account` con `storage_b2_authorization_failed`. El log de build no contiene HTTP status ni código B2; se desconoce si es `unauthorized`, `unsupported` u otro código. No se leyeron valores secretos. Backblaze describe HTTP 401 `unauthorized` como applicationKeyId/applicationKey incorrectos y `unsupported` como clave no compatible con la versión API; esto no permite inferir el status ausente. [Documentación de Backblaze](https://www.backblaze.com/apidocs/b2-authorize-account).
+- **Corrección anterior de UI:** PR #355 sí está integrada en main por merge `8489a09c03a330b85f3e31297415ada7a19fe10e`; deployment `dpl_HRPV5F7FteWVZquUjfZcumA52atg` se observó READY. Esto corrige el drenaje/reintento del cliente, pero no la autorización B2.
+- **Compuertas que permanecen:** no se autoriza merge, deploy ni cutover de producción; no se leen ni rotan credenciales; no se alteran CORS/seguridad del bucket, Neon Production ni objetos originales. El avance actual de código se prepara en rama separada y no declara el servicio restablecido.
+- **Lista actualizada:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md) v0.22; [índice de tareas](%F0%9F%93%81%20%F0%9F%A7%AD%20-%20Tareas%20provisionales/README.md) actualizado. CUSTODIA-03/01/04 y los identificadores existentes se conservan abiertos.
 
 ### Retoma 2026-11-08 · transporte B2 y límites de aceptación
 
