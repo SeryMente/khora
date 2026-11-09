@@ -1,48 +1,87 @@
 <!-- TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
 # 📁 Tareas provisionales · Frente Custodia
 
-**Estado:** PROVISIONAL · materialización de trabajo para continuidad del sprint; no es canon normativo ni un segundo OCP.  
-**Fuente de estado:** [OCP Custodia](../OBJETO-CANONICO.md) y [control único de responsabilidad](../CONTROL-RESPONSABILIDAD.json).  
-**Responsabilidad observada:** control único de Custodia, generación 8 (última transferencia verificada); esta colección no crea titularidad independiente.  
-**Autorización del sprint:** [instrucción literal del operador](../originales/INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md).  
-**Coordinación de continuidad:** [COORDINACION-SPRINT-CUSTODIA-v0.2.md](../entregas/COORDINACION-SPRINT-CUSTODIA-v0.2.md).
+**Estado:** PROVISIONAL · materialización de ejecución y continuidad; no es canon normativo ni segundo OCP.  
+**OCP único:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md).  
+**Control único:** [CONTROL-RESPONSABILIDAD.json](../CONTROL-RESPONSABILIDAD.json).  
+**Titularidad observada:** generación 11 · alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59 · control blob 21fe3e0ebae32d6e3988a5511fecaa5d63f8c3af. ID nativo no expuesto.  
+**Folio:** PENDIENTE/NO ASIGNADO · FOL1 no está ACTIVO.  
+**Instrucción literal vigente:** [INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](../originales/INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md).
 
-> Esta colección imita el patrón de Gobernanza: un índice y un objeto `README.md` por cada tarea nueva, anclados en una fuente literal. Los objetos heredan el titular, autorización, generación y sesión del OCP padre. No crean controles, responsables, sesiones, folios globales ni nuevos frentes. El identificador de tarea es local y estable dentro de este registro. No se canoniza el concepto «Tareas» como ámbito funcional.
+> Cada tarea nueva tiene un README de detalle y un ID local estable. Todas heredan del OCP padre titularidad, autorización y exclusiones. No crean controles, responsables, sesiones ni folios independientes. La aprobación de una tarea no amplía permisos de producción, credenciales, datos ni proveedores.
 
-## 1. Tareas existentes del frente
+## 1. Criterio operativo vigente
 
-Estas tareas ya existían en la lista provisional anterior y no se duplican ni renumeran. Sus descripciones y evidencia siguen viviendo en [LISTA-TAREAS-PROVISIONAL.md](../LISTA-TAREAS-PROVISIONAL.md).
+- **Primera urgencia:** recuperar la capacidad de archivar registros en Cora/Khora. El primer paso es diagnóstico positivo; el segundo, resolver la causa comprobada con B2.
+- **Después:** pulir la implementación que ya funcione.
+- **Luego:** diseñar la persistencia redundante multialmacén, con réplica, conmutación y recuperación verificables.
+- **No hay migración final Blob→B2 exclusiva como objetivo de arquitectura.** La decisión de 2026-11-07 que hacía de B2 el único proveedor final queda supersedida por la nueva instrucción del 2026-11-09. B2 sigue siendo el camino inmediato para restablecer el servicio; Vercel Blob solo será destino cuando su salud y capacidad se comprueben.
+- La secuencia de abajo está documentada como PROPUESTA PENDIENTE DE VISTO BUENO. No autoriza por sí sola cambios de producto o producción.
 
-| Identificador | Estado observado | Fuente |
+## 2. Tareas existentes del frente
+
+Se conservan los identificadores, criterios y evidencia existentes. No se duplican ni renumeran.
+
+| Identificador | Estado previo | Tratamiento |
 |---|---|---|
-| CUSTODIA-01 | `EN CURSO` | [Lista provisional existente](../LISTA-TAREAS-PROVISIONAL.md) |
-| CUSTODIA-03 | `ABIERTA` | [Lista provisional existente](../LISTA-TAREAS-PROVISIONAL.md) |
-| CUSTODIA-04 | `EN CURSO` | [Lista provisional existente](../LISTA-TAREAS-PROVISIONAL.md) |
-| CUSTODIA-02 | `RETIRADA` · no reutilizar | [Lista provisional existente](../LISTA-TAREAS-PROVISIONAL.md) |
+| CUSTODIA-01 | EN CURSO | Permanece abierta; retomar el catálogo visible tras restablecer archivado |
+| CUSTODIA-03 | ABIERTA | Permanece abierta; conserva prioridad de rescate histórico después de restablecer servicio |
+| CUSTODIA-04 | EN CURSO | Mantiene la historia de corrección de archivado y aceptación E2E; no se da por cerrada |
+| CUSTODIA-02 | RETIRADA | No reutilizar el ID |
+| CUSTODIA-B2-001 | en_curso | Conservar evidencia y código existente; reconciliar después del pulido |
+| CUSTODIA-B2-002 | en_curso | Backfill/inventario histórico queda fuera del desbloqueo inicial |
+| CUSTODIA-B2-003 | en_curso | Reutilizar sus preflights donde sigan vigentes |
+| CUSTODIA-B2-004 | supersedida como objetivo final exclusivo | Sus pruebas físicas B2 siguen siendo insumo; ya no gobierna una arquitectura B2-only |
 
-## 2. Tareas provisionales del sprint de migración exclusiva a Backblaze B2
+## 3. Secuencia propuesta · pendiente de aprobación
 
-| Identificador local | Estado | Objeto de tarea |
-|---|---|---|
-| CUSTODIA-B2-001 | `en_curso` | [Adaptador B2 exclusivo y flujos](./📁%20🧩%20-%20CUSTODIA-B2-001%20-%20Adaptador%20dual%20y%20flujos/README.md) |
-| CUSTODIA-B2-002 | `en_curso` | [Inventario y backfill no destructivo](./📁%20🧩%20-%20CUSTODIA-B2-002%20-%20Inventario%20y%20backfill%20no%20destructivo/README.md) |
-| CUSTODIA-B2-003 | `en_curso` | [Preflight y seguridad del proveedor](./📁%20🧩%20-%20CUSTODIA-B2-003%20-%20Preflight%20y%20seguridad%20del%20proveedor/README.md) |
-| CUSTODIA-B2-004 | `en_curso` · P0 | [Migración integral a B2 exclusivo y cutover sin persistencia dual](./📁%20🧩%20-%20CUSTODIA-B2-004%20-%20Aceptación%20E2E%20y%20cutover%20controlado/README.md) |
+| Orden | ID local | Prioridad | Estado | Dependencia | Resultado |
+|---:|---|---|---|---|---|
+| 1 | CUSTODIA-B2-005 | P0 | propuesta_pendiente_aprobacion | ninguna | Diagnóstico completo y positivo del bloqueo |
+| 2 | CUSTODIA-B2-006 | P0 | propuesta_pendiente_aprobacion | B2-005 | Archivado E2E restablecido con B2 |
+| 3 | CUSTODIA-B2-007 | P1 | propuesta_pendiente_aprobacion | B2-006 | Implementación B2 pulida y sin deuda accidental |
+| 4 | CUSTODIA-RES-001 | P1 | propuesta_pendiente_aprobacion | B2-007 | Diseño de resiliencia multialmacén que satisface el dictado |
+| 5 | CUSTODIA-RES-002 | P2 | propuesta_pendiente_aprobacion | RES-001 aprobado | Implementación y certificación no productiva |
 
-## 3. Convenciones de registro
+### Objetos de tarea
 
-- Estados de tarea: `pendiente`, `en_curso`, `completada` y `cancelada`.
-- Una tarea se considera completada solo cuando su enunciado queda atendido y la evidencia pertinente puede recuperarse desde la fuente canónica correspondiente.
-- Los estados son fotografías operativas; no sustituyen el estado vivo del OCP ni el control de responsabilidad.
-- No se agregan campos de prioridad, fecha objetivo, responsable independiente o dependencias por anticipación.
-- El alcance de este registro se limita al sprint actual y a las tareas provisionales de migración. Las obligaciones generales de recuperabilidad CUSTODIA-01/03/04 continúan abiertas con sus criterios originales.
-- El archivo histórico solicitado `ChatGPT-CUSTODIA-20261031-1458.txt` no fue localizado. No se declara incorporado ni se sustituye por un documento fabricado.
+| ID local | README de detalle |
+|---|---|
+| CUSTODIA-B2-005 | [Diagnóstico verificable del bloqueo de archivado](./📁%20🧩%20-%20CUSTODIA-B2-005%20-%20Diagnóstico%20verificable%20del%20bloqueo%20de%20archivado/README.md) |
+| CUSTODIA-B2-006 | [Habilitar archivado con Backblaze B2](./📁%20🧩%20-%20CUSTODIA-B2-006%20-%20Habilitar%20archivado%20con%20Backblaze%20B2/README.md) |
+| CUSTODIA-B2-007 | [Pulido de la implementación B2](./📁%20🧩%20-%20CUSTODIA-B2-007%20-%20Pulido%20de%20la%20implementación%20B2/README.md) |
+| CUSTODIA-RES-001 | [Diseño de resiliencia multialmacén](./📁%20🧩%20-%20CUSTODIA-RES-001%20-%20Diseño%20de%20resiliencia%20multialmacén/README.md) |
+| CUSTODIA-RES-002 | [Implementación y certificación multialmacén](./📁%20🧩%20-%20CUSTODIA-RES-002%20-%20Implementación%20y%20certificación%20multialmacén/README.md) |
 
-## 4. Relación con el sprint vigente
+## 4. Formato reutilizable
 
-La fotografía y el estado de la rama se mantienen en [COORDINACION-SPRINT-CUSTODIA-v0.2.md](../entregas/COORDINACION-SPRINT-CUSTODIA-v0.2.md). La instrucción de origen queda preservada en [INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md](../originales/INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md). El estado técnico de cada tarea está desarrollado en su propio `README.md`, sin replicar el control ni la fuente de estado del frente.
+La estructura estándar de una tarea nueva está en [PLANTILLA-TAREA-PROVISIONAL.md](./PLANTILLA-TAREA-PROVISIONAL.md). Añade campos mínimos que faltaban en la versión anterior: prioridad, posición en el hito, dependencias, precondiciones, criterios falsables y evidencia requerida.
 
+La plantilla no exige fechas objetivo ni responsables por tarea: se añaden solo si el OCP y el operador los autorizan y si aportan valor. La responsabilidad sigue siendo única y heredada.
 
-## Actualización operativa · 2026-11-07
+## 5. Estados y convenciones
 
-El operador establece B2 como **único proveedor de persistencia**. Se descarta persistencia dual, fallback y lectura dual Blob/B2 como estado final. CUSTODIA-B2-004 pasa a `en_curso`/P0 y concentra la aceptación E2E y cutover exclusivo. Los objetos Blob históricos solo se conservan temporalmente como fuentes de migración hasta verificar sus copias B2; esa retención no autoriza que la aplicación continúe leyéndolos. No borrar fuentes hasta autorización y reconciliación verificadas.
+- Estados: propuesta_pendiente_aprobacion, pendiente, en_curso, bloqueada, completada, cancelada y supersedida.
+- Prioridades: P0 (bloquea el servicio o la integridad), P1 (necesaria para estabilizar o completar el diseño) y P2 (posterior, depende de hitos previos).
+- Una propuesta documentada no está aprobada para ejecución.
+- Una tarea se completa solo con evidencia recuperable que satisface todos sus criterios; una prueba sintética no demuestra producción.
+- Una tarea supersedida conserva su README e historia; se enlaza la instrucción que la reemplaza y no se reutiliza su ID.
+- Dependencias organizan la secuencia, no crean autoridad.
+- La lista es el índice ejecutivo; cada README contiene el detalle; el OCP conserva el estado vivo.
+- CUSTODIA-03 y CUSTODIA-01 no se cierran ni se borran. El orden exacto de su reanudación se reconcilia después de restablecer el archivo de registros.
+
+## 6. Límites vigentes
+
+- Sin merge, deploy o cutover de producción en esta propuesta.
+- Sin cambios de credenciales/llaves, seguridad/CORS del bucket o SQL/backfill en Neon Production.
+- Sin lectura/exportación del contenido privado de dictados para documentación.
+- Sin eliminación ni sobrescritura de objetos originales.
+- Las pruebas de escritura/lectura deben usar contenido sintético en entornos aislados hasta obtener la compuerta aplicable.
+- No se crea CUSTODIA-05 ni se reactiva CUSTODIA-02.
+
+## 7. Registro de cambios
+
+- **2026-11-09 · secuencia de diagnóstico, restablecimiento y resiliencia · versión 0.21:** se registran cinco tareas nuevas en estado propuesta_pendiente_aprobacion; se preservan CUSTODIA-01/03/04 y B2-001..004. La decisión B2 exclusivo deja de ser el objetivo final, supersedida por la instrucción literal de arquitectura multialmacén. No se modificó código ni producción.
+- **2026-11-08 · B2 nativo y retoma documental · versión 0.20:** se conserva como antecedente de integración del transporte B2 nativo y sus límites de aceptación; no prueba autenticación física, disponibilidad ni archivado E2E.
+- Las entradas anteriores se conservan en LISTA-TAREAS-PROVISIONAL.md y no se eliminan al actualizar el resumen.
+
