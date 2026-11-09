@@ -1,13 +1,13 @@
 # CUSTODIA-B2-005 · Diagnóstico verificable del bloqueo de archivado
 
-> **Estado:** propuesta_pendiente_aprobacion · **Prioridad:** P0 · **Hito:** 1 de 5.
-> **Dependencia:** ninguna. **Desbloquea:** CUSTODIA-B2-006.
+> **Estado:** en_curso · **Prioridad:** P0 · **Hito:** 2 de 5.
+> **Depende de:** primera restauración de CUSTODIA-B2-006; el prediagnóstico ya entregado fue suficiente para iniciar la reparación. **Desbloquea:** aceptación E2E y CUSTODIA-B2-007.
 > **OCP padre:** frentes/custodia/OBJETO-CANONICO.md. **Control heredado:** CONTROL-RESPONSABILIDAD.json.
 > **Alcance:** diagnóstico y pruebas de solo lectura/sintéticas; no cambia producción.
 
 ## 1. Objetivo
 
-Determinar con evidencia positiva por qué Cora/Khora no confirma las partes de audio y por qué se bloquea «Archivar registro». Verificar la hipótesis de cuota agotada de Vercel Blob, identificar la falla de autorización de B2 y revisar la cadena completa para no atribuir todo a una sola causa sin pruebas.
+Completar el diagnóstico residual y la verificación positiva después de la reparación inmediata: estado actual de Blob, autenticación B2 con error saneado y cadena de archivado de extremo a extremo. El prediagnóstico inicial ya se ejecutó y habilitó comenzar CUSTODIA-B2-006; esta tarea ya no bloquea el inicio de la recuperación.
 
 ## 2. Motivo y evidencia inicial
 
@@ -35,11 +35,11 @@ Fuentes: OBJETO-CANONICO.md, LISTA-TAREAS-PROVISIONAL.md, originales/ChatGPT-CUS
 
 ## 4. Secuencia mínima
 
-1. Fijar deployment, commit, entorno y configuración no secreta realmente activos.
-2. Verificar el estado actual de Vercel Blob y obtener evidencia actual, no solo el incidente histórico.
-3. Capturar la respuesta saneada de autenticación B2 y distinguir credencial inválida, versión no compatible, capacidad insuficiente y configuración de bucket.
-4. Ejecutar pruebas sintéticas separadas para subida, lectura de vuelta, vínculo de parte y archivado.
-5. Entregar una matriz de fallos confirmados, descartados dentro del alcance probado y no verificables.
+1. Conservar el prediagnóstico y fijar el deployment/commit productivo realmente activo al realizar esta verificación.
+2. Una vez restablecido el flujo por CUSTODIA-B2-006, verificar el estado actual de Vercel Blob y su cuota; no inferir el estado actual a partir de datos históricos.
+3. Capturar status HTTP y código B2 saneados de `b2_authorize_account`; distinguir `unauthorized`, `unsupported`, `transaction_cap_exceeded` y otros códigos, sin exponer valores ni mensajes que puedan contener secretos.
+4. Ejecutar matriz E2E con datos sintéticos: captura → persistencia local → subida → GET/read-back → SHA/bytes → vínculo de parte → manifiesto → archivado → recuperación tras recarga.
+5. Clasificar causas confirmadas, descartadas dentro del alcance probado y pendientes; no declarar ausencia global de fallos.
 
 ## 5. Criterios de aceptación
 
@@ -58,7 +58,7 @@ Fuentes: OBJETO-CANONICO.md, LISTA-TAREAS-PROVISIONAL.md, originales/ChatGPT-CUS
 - Usar únicamente la bóveda autorizada de Khora y credenciales existentes; no reutilizar bóveda/cache de EP.
 - Registrar solo código de error, estado HTTP, request/correlation ID saneado y metadatos técnicos.
 - Conservar originales y no hacer escrituras sobre fuentes históricas.
-- **Salida que habilita B2-006:** causa concreta de Blob y B2, ruta de fallo exacta, dependencias y prueba mínima de corrección.
+- **Salida que acepta B2-006 y desbloquea B2-007:** informe residual de Blob/B2, recibos E2E correlacionados y matriz de fallos limitada al alcance realmente probado.
 
 ## Prediagnóstico de solo lectura · 2026-11-09
 
@@ -84,3 +84,18 @@ Fuentes: OBJETO-CANONICO.md, LISTA-TAREAS-PROVISIONAL.md, originales/ChatGPT-CUS
 Hay evidencia positiva de al menos tres problemas distintos del agotamiento de cuota: petición de proveedor fallida en roundtrip cifrado, módulo de preflight no resuelto y rechazo de autenticación nativa B2. También hay dos grupos de errores runtime independientes no correlacionados con archivado. **No es correcto afirmar que la cuota de Blob sea el único fallo ni que la aplicación ya esté archivando registros con B2.** La causa exacta del rechazo B2 y la causalidad de los errores OIDC/Neon siguen abiertas.
 
 **Siguiente paso de diagnóstico:** instrumentar el preflight para conservar de forma saneada status HTTP, código B2, etapa, request ID y mensaje no secreto; corregir primero la resolución de import; repetir pruebas sintéticas PUT/GET y después la cadena E2E. La ejecución de producto permanece pendiente de aprobación de la secuencia.
+
+
+## Actualización de prioridad · 2026-11-09
+
+El operador aprobó iniciar la recuperación del archivado sin esperar a completar todo el diagnóstico. El prediagnóstico de solo lectura registrado en esta tarea fue suficiente para abrir CUSTODIA-B2-006. Esta tarea se mantiene EN CURSO como cierre del diagnóstico y verificación ampliada posterior al primer restablecimiento, sin retrasar el trabajo de B2-006.
+
+### Nueva evidencia del build B2 nativo
+
+- Deployment: `dpl_DwfJkUPZ4NJnjTXgKCPFRNY5FR2f` · commit `7be5712a19aa98837e6d34449585ecb40e634af3`.
+- Vercel build ejecutó el preflight en producción y se detuvo con `storage_b2_authorization_failed` durante `b2_authorize_account`.
+- El código actual no registra el HTTP status ni el `code` JSON de B2; por tanto no sabemos si el proveedor devolvió `unauthorized`, `unsupported` u otro resultado. No se han consultado valores secretos.
+- Backblaze documenta HTTP 401 `unauthorized` como applicationKeyId/applicationKey incorrectos y HTTP 401 `unsupported` como clave no compatible con la versión de API. Esa tabla no permite afirmar que este deployment haya devuelto 401, pues su status no quedó registrado.
+- La corrección #355 del botón de archivado sí se fusionó y se desplegó antes del bloqueo B2; no prueba que B2 esté operativo.
+
+**Estado:** prediagnóstico parcial COMPLETADO; diagnóstico residual y verificación E2E PENDIENTES.
