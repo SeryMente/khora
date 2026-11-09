@@ -83,7 +83,7 @@
     "previous_authorization_ref": "Instrucción directa del operador, 2026-10-28, preservada en originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob 357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5). Autoriza inventariar provisionalmente los hallazgos sobre recuperabilidad dentro del OCP; no autoriza cambios de código, alteraciones de producción ni recuperaciones que puedan sobrescribir/eliminar originales. Asignación inicial desde control sin titular previo asignado. ID nativo de conversación no expuesto."
   },
   "transfer_generation": 11,
-  "transfer_authority": "Samantha v383 · NX-383m; Metacanon 1.29; GOW 2.18; DUG blob cad464717c43733aa84b49f8c9c3af0875597fbd; instrucción directa del operador 2026-11-09.",
+  "transfer_authority": "Samantha v379 · NX-379m; Metacanon 1.29; Gobierno general v380 · NX-380m; GOW integrado v2.18; DUG blob cad464717c43733aa84b49f8c9c3af0875597fbd; commit main de Metodología 3bcb32f4ddab543dacb92e05dbe12e2cc6e01727. Instrucción directa del operador 2026-11-09. MCP-NORMATIVO DESACTIVADO.",
   "previous_owner_observed_on": "2026-11-09",
   "local_conversation_uuidv7": "01a1c125-af13-79b1-87cc-f1e5fe4b0b59",
   "local_conversation_uuidv7_type": "local_registry_identity_not_native_platform_id",
@@ -408,5 +408,12 @@
     "authorization_ref": "Respuesta literal del operador en la conversación actual (2026-11-07): «Autorizo TRANSFER_RESPONSIBILITY para el frente Custodia, generación 8, con el alcance y exclusiones ya registrados.». Autoriza TRANSFER_RESPONSIBILITY para sustituir al titular de generación 8 por esta conversación, conservando sin ampliación el alcance y todas las exclusiones registrados. ID nativo de conversación no expuesto.",
     "record_kind": "owner_previous_to_generation_10",
     "blob_sha": "a198f888a730219e2cb59e9dac67240e8bc1f83f"
+  },
+  "transfer_authority_correction": {
+    "previous_value": "Samantha v383 · NX-383m; Metacanon 1.29; GOW 2.18; DUG blob cad464717c43733aa84b49f8c9c3af0875597fbd; instrucción directa del operador 2026-11-09.",
+    "corrected_at": "2026-11-09",
+    "reason": "Rectificación tras releer la fuente central; la referencia inicial v383/NX-383m no estaba respaldada. La fuente actual declara Samantha v379/NX-379m, Metacanon 1.29, gobierno general v380/NX-380m y GOW integrado 2.18.",
+    "source_blob": "cad464717c43733aa84b49f8c9c3af0875597fbd",
+    "source_commit": "3bcb32f4ddab543dacb92e05dbe12e2cc6e01727"
   }
 }
