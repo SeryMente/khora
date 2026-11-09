@@ -56,3 +56,11 @@
 - [Observabilidad runtime y dictado](../../OBJETO-CANONICO.md).
 
 **Regla de cierre:** no se declara resuelto el incidente por cambiar una variable, desplegar el adaptador o lograr un PUT. Se cierra cuando B2 es exclusivo, todas las partes se verifican, el archivado E2E concluye y la restauración desde B2 queda probada.
+
+
+### Actualización 2026-11-09 · decisión final B2-only supersedida
+
+La instrucción literal [INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](../../../originales/INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md) reemplaza la decisión de que B2 sea el único proveedor final. Esta tarea queda **SUPERSEDIDA COMO OBJETIVO DE CUTOVER EXCLUSIVO**. Su historia, pruebas y requisitos físicos B2 se conservan como insumo para CUSTODIA-B2-005/006 y la futura arquitectura multialmacén.
+
+B2 sigue siendo el camino inmediato para recuperar el archivado; esto no autoriza fallback actual a Blob ni demuestra disponibilidad real de B2. No migrar ni borrar objetos fuente por esta supersesión. La arquitectura final se define en CUSTODIA-RES-001 y su implementación solo procede tras la compuerta de aprobación correspondiente.
+
