@@ -140,6 +140,7 @@ La relectura completa de la fuente central `SeryMente/metodologia/main` confirma
 - **Corrección anterior de UI:** PR #355 sí está integrada en main por merge `8489a09c03a330b85f3e31297415ada7a19fe10e`; deployment `dpl_HRPV5F7FteWVZquUjfZcumA52atg` se observó READY. Esto corrige el drenaje/reintento del cliente, pero no la autorización B2.
 - **Compuertas que permanecen:** no se autoriza merge, deploy ni cutover de producción; no se leen ni rotan credenciales; no se alteran CORS/seguridad del bucket, Neon Production ni objetos originales. El avance actual de código se prepara en rama separada y no declara el servicio restablecido.
 - **Lista actualizada:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md) v0.22; [índice de tareas](%F0%9F%93%81%20%F0%9F%A7%AD%20-%20Tareas%20provisionales/README.md) actualizado. CUSTODIA-03/01/04 y los identificadores existentes se conservan abiertos.
+- **Trabajo de diagnóstico en rama:** PR [#362](https://github.com/SeryMente/khora/pull/362), OPEN · DRAFT · NOT MERGED, rama `fix/custodia-b2-auth-diagnostics-20261109`, punta `3b684a870a21ccf2f200ee684687beea42e3b235`. Añade HTTP status/código B2 saneados al preflight y una prueba unitaria sintética; la prueba no se ejecutó, GitHub Actions no reportó runs y los checks Vercel fallan por la restricción del plan. No se mergeó ni desplegó. Esta corrección aún no restaura el archivado.
 
 ### Retoma 2026-11-08 · transporte B2 y límites de aceptación
 
