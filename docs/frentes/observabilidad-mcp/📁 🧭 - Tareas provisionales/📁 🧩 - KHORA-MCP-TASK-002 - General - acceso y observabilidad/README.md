@@ -2,7 +2,7 @@
 
 **Naturaleza:** OCP provisional de tarea del frente Khora MCP; no es un frente independiente ni una unidad taxonómica canonizada.  
 **Estado:** `en_curso`  
-**Responsabilidad:** heredada del control `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`, generación 5; sin control, titularidad, sesión ni folio propios.  
+**Responsabilidad:** heredada del control único `docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json`, generación 10; titular global `chatgpt-khora-mcp-01a1c17f-ca60-73bb-8045-48eeff29141d`; Jules conserva autoridad arquitectónica modular; esta tarea no tiene control, titularidad, sesión ni folio propios.  
 **task_id:** `KHORA-MCP-TASK-002`  
 **scope_ref:** `docs/frentes/observabilidad-mcp/`
 
