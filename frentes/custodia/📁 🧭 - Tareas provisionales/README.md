@@ -1,13 +1,14 @@
 <!-- TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
 # 📁 Tareas provisionales · Frente Custodia
 
-**Estado:** PROVISIONAL · materialización de ejecución y continuidad; no es canon normativo ni segundo OCP. La secuencia operativa fue aprobada por el operador el 2026-11-09; CUSTODIA-B2-006 está EN CURSO dentro de la rama/no producción.  
+**Estado:** PROVISIONAL · materialización de ejecución y continuidad; no es canon normativo ni segundo OCP. La secuencia operativa fue aprobada el 2026-11-09 y se recibió asentimiento contextual para verificar/corregir solo credenciales B2 de Production mediante bóveda canónica y desplegar a producción únicamente tras pasar todos los gates. Ejecución pendiente.  
 **OCP único:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md).  
 **Control único:** [CONTROL-RESPONSABILIDAD.json](../CONTROL-RESPONSABILIDAD.json).  
 **Titularidad observada:** generación 11 · alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59 · control blob 21fe3e0ebae32d6e3988a5511fecaa5d63f8c3af. ID nativo no expuesto.  
 **Folio:** PENDIENTE/NO ASIGNADO · FOL1 no está ACTIVO.  
 **Instrucción literal vigente:** [INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](../originales/INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md).  
-**Instrucción operativa posterior (prioridad 1):** [INSTRUCCION-RESTABLECER-ARCHIVADO-PRIMERO-20261109.md](../originales/INSTRUCCION-RESTABLECER-ARCHIVADO-PRIMERO-20261109.md) · A UUIDv7 local `01a1c170-3d40-7edb-b707-9a14020a76b8`.  
+**Instrucción operativa posterior (prioridad 1):** [INSTRUCCION-RESTABLECER-ARCHIVADO-PRIMERO-20261109.md](../originales/INSTRUCCION-RESTABLECER-ARCHIVADO-PRIMERO-20261109.md) · A UUIDv7 local `01a1c170-3d40-7edb-b707-9a14020a76b8`.
+**Autorización B2 Production:** [INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md](../originales/INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md) · A UUIDv7 local `01a1c17d-189a-7fea-a644-6be002e2c07a`.  
 **Matriz de trazabilidad:** [TRAZABILIDAD-INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](../evidencias/TRAZABILIDAD-INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md).  
 **Salida visible B:** [SALIDA-MODELO-CUSTODIA-ARQUITECTURA-MULTIALMACEN-20261109.md](../originales/SALIDA-MODELO-CUSTODIA-ARQUITECTURA-MULTIALMACEN-20261109.md) · A UUIDv7 local 01a1c138-ead3-7678-a44e-a49bb72f11de · A2 correctiva 01a1c134-2125-7263-b011-14bc36a10d03 · B UUIDv7 local 01a1c134-2125-75e8-9c39-16a74610d034.
 
@@ -19,7 +20,7 @@
 - **Después:** cerrar la verificación E2E y el diagnóstico residual; estabilizar el flujo sin debilitar integridad, cifrado ni recuperación.
 - **Luego:** diseñar e implementar persistencia multialmacén, con cola local, réplica, conmutación y recuperación comprobables.
 - **No hay migración final Blob→B2 exclusiva como objetivo de arquitectura.** B2 es el medio inmediato para recuperar el servicio; cualquier proveedor adicional se incorpora solo después de comprobar su salud/capacidad y aprobar el diseño.
-- La secuencia fue aprobada por el operador el 2026-11-09. La ejecución actual permite corrección y pruebas en rama/no producción; producción, secretos, credenciales y datos originales conservan sus compuertas específicas.
+- La secuencia fue aprobada y la autorización contextual B2 Production recibida el 2026-11-09. Solo se permite verificar/corregir variables B2 de Production con la bóveda canónica; despliegue productivo condicionado a que todos los gates pasen. No implica autorización para otras credenciales, SQL/backfill, CORS/seguridad ni fuentes originales.
 
 ## 2. Tareas existentes del frente
 
@@ -75,8 +76,9 @@ La plantilla no exige fechas objetivo ni responsables por tarea: se añaden solo
 
 ## 6. Límites vigentes
 
-- Sin merge, deploy o cutover de producción en esta propuesta.
-- Sin cambios de credenciales/llaves, seguridad/CORS del bucket o SQL/backfill en Neon Production.
+- Se permite verificar/corregir únicamente variables B2 de Production mediante la bóveda canónica, conforme al original A enlazado arriba.
+- El despliegue/cutover productivo está autorizado solo después de pasar todos los gates técnicos y revisar el hook de build existente; si ejecuta mutaciones de Neon Production fuera de alcance, detenerlo.
+- Sin cambios de otras credenciales/llaves, seguridad/CORS del bucket o SQL/backfill en Neon Production.
 - Sin lectura/exportación del contenido privado de dictados para documentación.
 - Sin eliminación ni sobrescritura de objetos originales.
 - Las pruebas de escritura/lectura deben usar contenido sintético en entornos aislados hasta obtener la compuerta aplicable.
@@ -84,6 +86,7 @@ La plantilla no exige fechas objetivo ni responsables por tarea: se añaden solo
 
 ## 7. Registro de cambios
 
+- **2026-11-09 · AUTORIZACION-B2-PRODUCTION · actualización del índice:** se enlaza el original A de autorización, se limita su alcance a variables B2 Production gestionadas por la bóveda canónica y se condiciona el despliegue a gates completos. La ejecución técnica sigue pendiente.
 - **2026-11-09 · REORDENAMIENTO-RESTABLECER-ARCHIVADO-PRIMERO · versión 0.22:** por aprobación expresa del operador, CUSTODIA-B2-006 pasa al primer hito y queda EN CURSO; el prediagnóstico B2-005 se utiliza como insumo y su diagnóstico residual/verificación ampliada queda en segundo hito, sin bloquear el desbloqueo. Después siguen B2-007, RES-001 y RES-002. Se preservan IDs históricos, CUSTODIA-01/03/04 y B2-001..004. No hay autorización de merge/deploy/cutover productivo ni cambios de credenciales/secretos.
 - **2026-11-09 · secuencia de diagnóstico, restablecimiento y resiliencia · versión 0.21 (antecedente):** se registraron cinco tareas nuevas; se preservan CUSTODIA-01/03/04 y B2-001..004. La decisión B2 exclusivo dejó de ser el objetivo final. Esta secuencia fue reorganizada por instrucción posterior del operador.
 - **2026-11-08 · B2 nativo y retoma documental · versión 0.20:** se conserva como antecedente de integración del transporte B2 nativo y sus límites de aceptación; no prueba autenticación física, disponibilidad ni archivado E2E.
