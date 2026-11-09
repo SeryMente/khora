@@ -1,7 +1,7 @@
 # Matriz de trazabilidad · instrucción de arquitectura multialmacén · 2026-11-09
 
 **OCP:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md) · CUSTODIA-v0.27.
-**Fuente literal:** [INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](../originales/INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md).
+**Fuente literal:** [INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](../originales/INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md). A UUIDv7 local 01a1c138-ead3-7678-a44e-a49bb72f11de (instrucción principal); A2 UUIDv7 local 01a1c134-2125-7263-b011-14bc36a10d03 (corrección de cierre).
 **Estado:** matriz documental verificada contra la entrada fuente y los cinco objetos de tarea. No convierte propuestas en autorización de producto.
 
 | Elemento literal del operador | Interpretación trazable | Materialización / estado |
@@ -34,6 +34,8 @@
 **Fragmento incompleto conservado:** el dictado de conexiones termina con «o tareas que...». No se reconstruye qué tipo de tareas iba a mencionar el operador. La matriz registra solo el uso explícito para integración continua y el criterio de usar la conexión adicional únicamente cuando acelere el sprint.
 
 | «antes de dar tu respuesta, asegúrate de que la última entrada fue tomada en cuenta en su totalidad y que no dejaste ningún elemento verbatim sin trazar a tu resultado» | Se hizo un cotejo frase-por-frase; cada decisión está enlazada con tarea, estado o límite. Se preservó literalmente esta corrección y se registra la identidad A UUIDv7 local 01a1c134-2125-7263-b011-14bc36a10d03. | Original, matriz y OCP; salida final B UUIDv7 local 01a1c134-2125-75e8-9c39-16a74610d034; ciclo local UUIDv7 01a1c134-2125-70ac-847f-18058ba4b884. |
+
+| Entrada principal A UUIDv7 local 01a1c138-ead3-7678-a44e-a49bb72f11de | El encargo principal quedó preservado en la sección «Dictado de diagnóstico, secuencia y formato» y cada requisito se relaciona con su tarea, diagnóstico o límite. | Original A, esta matriz, OCP v0.27 y salida B UUIDv7 01a1c134-2125-75e8-9c39-16a74610d034. |
 
 ## Dictamen de cobertura
 
