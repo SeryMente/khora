@@ -1,11 +1,11 @@
-<!-- LIST_VERSION=0.26; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.27; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.26.
-- **Última actualización:** 2026-11-09 (Master Key KHORA autenticada; PUT/GET físico, SHA-256, bytes y SSE-B2 verificados; pendiente enlazar variables canónicas a Vercel Production y probar archivado E2E).
+- **Versión de esta lista provisional:** 0.27.
+- **Última actualización:** 2026-11-09 (PUT/GET físico B2 aprobado; evidencia preservada; OCP v0.36, control gen. 11 y README de tareas v0.23 alineados; Vercel Production y archivado E2E pendientes).
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
 - **Última lectura de metodología del ciclo 2 (referencia histórica):** Samantha v352 · NX-352m; Metacanon 1.21; GOW v2.3; blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
@@ -285,6 +285,9 @@ La propuesta continúa sin comprobar los bytes actuales de los objetos remotos n
 - **Estado:** CUSTODIA-03 → CUSTODIA-01 → CUSTODIA-04 permanece abierto; CUSTODIA-B2-004 sigue en curso/P0. La API nativa en código no equivale a persistencia B2 aceptada ni a garantía de producto.
 
 ## Registro de cambios
+
+- **2026-11-09 · prueba física B2 y reconciliación documental · v0.27:** se incorpora evidencia del PUT/GET sintético de 150 bytes con SHA-256 coincidente y SSE-B2/AES256; se preserva la instrucción B2-first/backfill Blob→B2; se registra la autorización acotada de credenciales maestras/Production/deployment/backfill en el control generación 11; OCP v0.36 y README de carpeta v0.23 releídos de vuelta. Vercel Production todavía carece de variables maestras canónicas y no existe archivado E2E publicado.
+
 
 - **2026-11-09 · prueba física B2 confirmada · v0.26:** objeto sintético de 150 bytes subido y descargado desde el bucket privado KHORA; SHA-256 de origen y read-back coinciden; SSE-B2/AES256 confirmado. Evidencia: [evidencias/PRUEBA-FISICA-B2-KHORA-20261109.md](evidencias/PRUEBA-FISICA-B2-KHORA-20261109.md), blob `c5043bc3ca6f6c492c4a5ca4cb55235d055488e1`. B2 local está operativo; Vercel Production aún no tiene las dos variables maestras canónicas ni despliegue nuevo. Archivado E2E y backfill histórico siguen pendientes.
 
