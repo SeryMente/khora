@@ -11,7 +11,7 @@
 
 Restablecer el archivo de registros de Cora/Khora usando Backblaze B2 como destino operativo inmediato, con captura de audio/texto, persistencia física, lectura de vuelta y vínculo a la sesión comprobados.
 
-B2 es el medio inmediato para desbloquear el servicio; esta tarea no declara que deba ser el único proveedor final.
+B2 es el destino único de todas las nuevas escrituras desde ahora. Vercel Blob conserva temporalmente solo lectura histórica hasta completar el backfill a B2; no se permite fallback silencioso a Blob para nuevas escrituras.
 
 ## 2. Precondiciones
 
@@ -150,3 +150,27 @@ La inspección cruzada de eventos Vercel corrige la nota previa: no todos los in
 - Estado del requisito de transferencia: **NO EJECUTADO / NO PERSISTIDO**. No marcar como guardadas ni como verificadas las variables `KHORA_B2_MASTER_APPLICATION_KEY_ID` y `KHORA_B2_MASTER_APPLICATION_KEY`.
 - **Siguiente paso:** resolver el límite de uso desde el panel de Desktop Commander y habilitar acceso bajo la identidad efectiva autorizada `CENTRAL\fila4`; después recuperar la nota, guardar cada variable por separado y verificar la lectura de vuelta cifrada, sin imprimir valores.
 
+
+
+### Retoma operativa y rectificación · 2026-11-09 · PC-7
+
+**Instrucción vigente:** restablecer el acceso KHORA a Backblaze B2, dirigir allí todas las escrituras nuevas y después copiar a B2 todo el histórico de Vercel Blob. La cuenta Backblaze es exclusiva de KHORA; la Master Application Key se usa de forma ubicua. No generar Application Keys adicionales ni sustituirla por credenciales EP.
+
+**Identidad RDC:** PC-7 es la única terminal RDC disponible; la sesión real observada es PC-7\\PC 7. No solicitar ni asumir CENTRAL\\fila4, PSK14, PC-14 ni otra terminal. La instrucción del operador supersede cualquier referencia histórica que los presente como requisito.
+
+**Comprobación B2 ejecutada desde PC-7 mediante EP Vault sin imprimir valores:**
+- b2_authorize_account: PASS.
+- El Key ID coincide con el Account ID y la respuesta expone capacidades maestras de lectura, listado, escritura y eliminación. No se aplicó restricción por bucket ni prefijo; esa amplitud es intencional porque la cuenta es exclusiva de KHORA.
+- Bucket khora-userdata-ecea4187, ID 35b8cbd6623b54a5a9130c18, pertenece a la cuenta autenticada y es allPrivate.
+- Esto confirma autenticación y metadatos del bucket, no PUT/GET físico.
+
+**Vercel Production, metadatos sin descifrar valores:**
+- KHORA_OBJECT_STORAGE ya está seleccionado para B2; KHORA_B2_PREFLIGHT=1.
+- Bucket name/ID ya configurados.
+- Existen nombres heredados KHORA_B2_KEY_ID y KHORA_B2_APPLICATION_KEY.
+- Faltan KHORA_B2_MASTER_APPLICATION_KEY_ID y KHORA_B2_MASTER_APPLICATION_KEY, nombres canónicos priorizados por el código actual.
+- Los valores secretos no fueron descifrados ni copiados a documentación.
+
+**Pruebas físicas:** no se completó el PUT/GET sintético en este ciclo; los intentos del script se detuvieron por errores locales de PowerShell antes de completar la subida. No hay SHA de read-back ni objeto de prueba acreditado. Tampoco se ha desplegado un runtime nuevo.
+
+**Siguiente secuencia inmediata:** terminar PUT/GET/SHA-256 sintético B2; transferir los dos valores existentes a las variables canónicas de Production sin mostrar valores; ejecutar preflight; desplegar y comprobar logs/archivado E2E; estabilizar; realizar backfill no destructivo de Blob.
