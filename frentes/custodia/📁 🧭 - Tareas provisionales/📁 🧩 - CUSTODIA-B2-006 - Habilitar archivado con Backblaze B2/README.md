@@ -3,7 +3,7 @@
 > **Estado:** en_curso · **Prioridad:** P0 · **Hito:** 1 de 5.
 > **Insumo disponible:** prediagnóstico parcial de CUSTODIA-B2-005; no se exige cerrar su diagnóstico residual para comenzar. **Desbloquea:** CUSTODIA-B2-005 (verificación residual) y CUSTODIA-B2-007 (tras aceptación E2E).
 > **OCP padre:** frentes/custodia/OBJETO-CANONICO.md. **Control heredado:** CONTROL-RESPONSABILIDAD.json.
-> **Autorización vigente:** corrección en rama y pruebas no productivas. Producción conserva una compuerta separada; no hay permiso de merge, deploy o cutover productivo.
+> **Autorización vigente (2026-11-09):** el operador respondió «Correcto , actualiza tareas provisionales rapidamente, y resuelve.» a la solicitud explícita para actuar sobre credenciales B2 de Production y desplegar condicionado a pruebas. Se autoriza verificar/corregir únicamente variables B2 de Production mediante la bóveda canónica y desplegar solo tras pasar todos los gates técnicos. La autorización está recibida; la ejecución y aceptación siguen PENDIENTES.
 
 ## 1. Objetivo
 
@@ -17,10 +17,10 @@ B2 es el medio inmediato para desbloquear el servicio; esta tarea no declara que
 
 - El prediagnóstico CUSTODIA-B2-005 ya documenta los bloqueos observados; la causa B2 exacta se puede completar durante esta reparación sin postergar su inicio.
 - El acceso a la cuenta/bucket correcto de Khora debe comprobarse con la identidad autorizada.
-- La credencial necesaria debe existir en la bóveda autorizada de Khora; no se leen valores ni se sustituye/rota una clave sin autorización específica.
+- La credencial necesaria debe comprobarse desde la bóveda canónica autorizada de Khora. Existe autorización específica para verificar/corregir solo el par B2 de Production; nunca se revelan sus valores. No rotar una clave sin evidencia de que la existente es incorrecta o no recuperable.
 - La rama de código se basa en main reconciliado y cuenta con pruebas del fallo previo.
 
-Si se requiere cambiar/rotar una credencial o modificar producción, se detiene solo esa mutación y se solicita la autorización específica correspondiente. No se imprimen ni transportan secretos por chat.
+La verificación/corrección B2 Production está autorizada dentro del alcance documentado. Cualquier cambio ajeno a esas variables, SQL/backfill/migración productiva, cambio de seguridad/CORS o alteración de objetos originales sigue bloqueado. No se imprimen ni transportan secretos por chat.
 
 ## 3. Alcance
 
@@ -33,7 +33,7 @@ Si se requiere cambiar/rotar una credencial o modificar producción, se detiene 
 
 **No incluye**
 - Fallback silencioso a Blob mientras se implementa el desbloqueo B2.
-- Merge, deploy o cambio de selector en producción sin autorización específica.
+- Desplegar antes de superar las pruebas. El despliegue productivo solo está autorizado de forma condicionada tras los gates completos.
 - SQL/backfill en Neon Production.
 - Borrado/sobrescritura de fuentes históricas o cambio de seguridad/CORS del bucket.
 
@@ -63,7 +63,8 @@ Si se requiere cambiar/rotar una credencial o modificar producción, se detiene 
 - El deployment productivo `dpl_DwfJkUPZ4NJnjTXgKCPFRNY5FR2f`, commit `7be5712a19aa98837e6d34449585ecb40e634af3`, falló al ejecutar el preflight nativo en `b2_authorize_account` con `storage_b2_authorization_failed`. El build no conserva el HTTP status ni el código devuelto por B2.
 - Según Backblaze, un HTTP 401 de `b2_authorize_account` puede significar `unauthorized` (par applicationKeyId/applicationKey incorrecto) o `unsupported` (clave no compatible con la versión de API). No se ha observado el status real de este deployment; no se atribuye todavía una causa concreta. [Documentación oficial de Backblaze](https://www.backblaze.com/apidocs/b2-authorize-account).
 - La corrección de cola/reintento del botón de archivo en PR #355 sí está integrada en `main` mediante merge `8489a09c03a330b85f3e31297415ada7a19fe10e` y tuvo un deployment `READY` `dpl_HRPV5F7FteWVZquUjfZcumA52atg`. Eso no resuelve la autenticación B2.
-- **Bloqueo actual:** falta instrumentar diagnóstico saneado y verificar el par de credenciales existente con la bóveda autorizada. Esta tarea no lee ni rota secretos ni cambia producción.
+- **Bloqueo técnico actual:** el par de credenciales B2 aún no se ha validado contra la bóveda canónica. La lectura de metadatos Vercel confirmó las variables B2 en target Production, pero sus valores no fueron descifrados ni leídos. La causa del rechazo sigue sin identificar.
+- **Estado de autorización:** autorización recibida; verificación/corrección de B2 Production permitida solo dentro del alcance anterior. Ejecución, PUT/GET físico, E2E y despliegue siguen PENDIENTES.
 
 ## 7. Salida
 
@@ -77,9 +78,9 @@ Cora vuelve a aceptar y archivar registros de prueba de extremo a extremo en el 
 - Punta: `3b684a870a21ccf2f200ee684687beea42e3b235`; 3 archivos de código/prueba cambiados: `object-storage.ts`, `preflight-object-storage.ts` y `object-storage.test.ts`.
 - La corrección conserva el HTTP status y el código JSON de B2 bajo validación estricta y los expone en el preflight sin imprimir claves, tokens, cabeceras Authorization, cuerpos ni mensajes libres.
 - La prueba unitaria sintética cubre HTTP 401/`unauthorized`; se añadió pero no se ejecutó en esta sesión. GitHub Actions no devolvió workflow runs para la punta; los checks Vercel fallan por la limitación del plan/repo privado de organización.
-- La PR no se integró ni desplegó. No cambia credenciales ni variables. Su finalidad es poder diagnosticar la autorización con evidencia segura; no demuestra todavía archivado operativo.
+- La PR no se integró ni desplegó a Production. La Preview existente quedó READY (build y TypeScript PASS, 78/78 páginas estáticas), pero no ejecutó el preflight B2 porque las variables están limitadas a Production. La prueba unitaria añadida no se ejecutó. La PR no demuestra archivado operativo.
 
-**Siguiente bloqueo:** ejecutar esta versión con acceso B2 autorizado para captar `http_status` y `provider_code`, resolver el par de credenciales desde la bóveda autorizada si procede y repetir el PUT/GET físico y el archivado E2E. La mutación productiva continúa separada y no está autorizada por este alcance.
+**Siguiente paso:** desbloquear la verificación desde la bóveda canónica, ejecutar preflight saneado, PUT/GET físico sintético y E2E. El despliegue productivo queda autorizado solo después de que todas las pruebas pasen. Antes debe inspeccionarse `migrate-runtime`; si produce mutaciones de Neon Production fuera de la autorización, detener el despliegue.
 
 
 ### Confirmación de la versión productiva activa · 2026-11-09
@@ -99,3 +100,8 @@ Cora vuelve a aceptar y archivar registros de prueba de extremo a extremo en el 
 - Estado final: READY. Build: `Compiled successfully in 37.2s`; TypeScript: PASS (16.8s); páginas estáticas: 78/78; `Build Completed in /vercel/output`. No se ejecutaron unitarias ni preflight B2; no se declara persistencia física ni archivado E2E.
 - Las credenciales B2 consultadas se encuentran asociadas únicamente a Production; el preview no dispone de ellas. El preflight de B2 está condicionado a Production, por lo que este preview solo puede validar compilación, nunca autenticación B2 ni archivado físico.
 - Es un preview aislado: no tiene alias productivo y no modifica el servicio activo.
+
+
+### Autorización y compuerta · 2026-11-09
+
+El asentimiento contextual del operador queda enlazado al original A [INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md](../../originales/INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md), UUIDv7 local `01a1c17d-189a-7fea-a644-6be002e2c07a`. Alcance autorizado: verificar/corregir solo las variables B2 de Production mediante la bóveda canónica y desplegar a producción únicamente tras pasar todos los criterios de aceptación. La autorización no equivale a ejecución ni permite mostrar secretos. Antes del despliegue se inspeccionará el hook de build `migrate-runtime`; si ejecuta mutaciones de Neon Production fuera de la autorización, el despliegue se detendrá. No se autoriza SQL/backfill productivo, cambios de CORS/seguridad ni borrado/sobrescritura de fuentes.
