@@ -2,7 +2,7 @@
 
 **Identificador:** OEP  
 **Nombre completo:** Persistencia de Entorno Operativo  
-**Versión:** v0.1.5
+**Versión:** v0.1.6
 **Estado:** ACTIVO · CANÓNICO PARA ESTE ÁMBITO · EN EVOLUCIÓN CONTROLADA  
 **Sistema emisor:** KHORA  
 **Plataforma objetivo actual:** Windows
@@ -381,6 +381,7 @@ La ubicación modifica parámetros de ejecución, no el objetivo del sistema. CS
 - `OEP-DEC-022`: el perfil de host/ubicación es estado de primera clase del arranque y queda persistido dentro del volumen cifrado.
 - `OEP-DEC-023`: `Desktop/EP` es una junction verificada hacia el workspace cifrado; no es una segunda copia.
 - `OEP-DEC-024`: la selección de repositorios es parte firmada de la sesión OEP y cada repositorio seleccionado obtiene continuidad WIP independiente.
+- `OEP-DEC-025`: ScriptPWS queda reconocido como módulo operativo de EP para automatización PowerShell y toolchain Windows; su baseline vigente se gobierna por un índice explícito y retiene hasta tres versiones exitosas verificadas.
 
 
 ## 52. Pendientes actuales
@@ -434,6 +435,9 @@ Se integra el ciclo 004 de hardening criptográfico y de superficie de ataque: P
 ### v0.1.5
 Se actualiza el snapshot canónico al commit `019d7ab396534148db111b7860697ec7c8029d81`, se registra que `khora-web.vercel.app` sigue operativo sobre un deployment previo por agotamiento de cuota de despliegues, y se corrige el diagnóstico del host BitLocker: `SYSTEM` puede ejecutar la operación pero el protector TPM no persiste mientras el TPM está en `RestartPending=True`; la reparación final queda pendiente de reinicio/provisión y verificación posteriores.
 
+### v0.1.6
+Se incorpora el módulo operativo ScriptPWS, con BASELINE-002 como vigente, BASELINE-001 preservado como fallback, hashes de los dos artefactos aceptados, punto de entrada local, regla de retención de hasta tres versiones y evidencia observada en PC-7. El tercer espacio queda reservado para una versión futura que supere prueba y aceptación; no se inventa una instancia no ejecutada.
+
 ## 57. Regla de modificación
 
 Toda modificación material debe aumentar versión, conservar historial, indicar qué cambió, conservar decisiones no sustituidas, marcar sustituciones explícitamente y conservar trazabilidad. No borrar contexto histórico relevante.
@@ -444,7 +448,7 @@ Toda modificación material debe aumentar versión, conservar historial, indicar
 
 ## 59. Estado al cierre
 
-**OEP:** `v0.1.5`
+**OEP:** `v0.1.6`
 **Estado:** ACTIVO  
 **Nivel:** arquitectura transversal en construcción  
 **Último ciclo integrado:** 004 · hardening criptográfico, reducción de superficie de ataque y validación E2E
@@ -453,3 +457,20 @@ Toda modificación material debe aumentar versión, conservar historial, indicar
 **Fuente metodológica:** `SeryMente/metodologia/SI-METACOGNITIVO.md v1.6.8`
 
 La ausencia de contexto conversacional no autoriza a reconstruir decisiones fuera de este objeto o de sus fuentes canónicas.
+
+## 60. Módulo ScriptPWS
+
+**Identificador:** `OEP-MOD-SCRIPTPWS`  
+**Estado:** ACTIVO · CANÓNICO PARA ESTE MÓDULO  
+**Objeto del módulo:** `docs/frentes/ep/modulos/scriptpws/OBJETO-CANONICO.md`  
+**Baseline vigente:** `BASELINE-002` · versión 2.0  
+**Baseline anterior preservado:** `BASELINE-001` · versión 1.0
+
+ScriptPWS conserva los scripts PowerShell de automatización, preparación de host, instalación y verificación del toolchain Windows e inicio de RDC. No reemplaza el launcher ni el núcleo del bootstrap KHORA/OEP.
+
+La retención se limita a las tres versiones exitosas más recientes. A la fecha de esta actualización existen dos baselines aceptados; la plaza restante corresponde a BASELINE-003 y no se declara ocupada. La identificación del baseline actual reside en `BASELINE-INDEX.json`; el artefacto vigente y su hash se detallan en el objeto del módulo.
+
+**Punto de entrada local:** `%LOCALAPPDATA%\ScriptPWS\START-RDC.ps1`. El módulo conserva `RDC-Remote.ps1` como lanzador estable para no romper el acceso directo existente. La ejecución de scripts utiliza bypass limitado al proceso; no modifica la política persistente de Windows.
+
+**Evidencia reportada y cotejada en PC-7 (2026-11-09):** Node.js `v24.22.2`, NPM/NPX `11.19.1`, parser PowerShell del launcher sin errores, SHA-256 de BASELINE-001 y BASELINE-002 cotejados, dispositivo RDC online y procesos de agente observados. La aceptación funcional de BASELINE-002 fue declarada por el operador. No se realizó un segundo arranque de RDC durante la canonización.
+
