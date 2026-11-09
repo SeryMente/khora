@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.37; OBJECT_SEAL=CUSTODIA-v0.37; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.38; OBJECT_SEAL=CUSTODIA-v0.38; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · RESPONSABILIDAD DOCUMENTAL EN GENERACIÓN 11 · CUSTODIA-03/01/04 SIGUEN ABIERTAS · B2 MASTER AUTH + PUT/GET/SHA-256 FÍSICO CONFIRMADOS DESDE PC-7 · PENDIENTE CONEXIÓN DE VARIABLES CANÓNICAS EN VERCEL PRODUCTION Y ARCHIVADO E2E · SECUENCIA: B2-006 → B2-005 → B2-007 → B2-002 (BACKFILL BLOB→B2) · RES-001/002 DIFERIDAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.37. Metacanon: 1.29. Gobierno metodológico vigente leído: Samantha v386 · NX-386m; GOW 2.18. Fuente central SeryMente/metodologia/main: blob 22dca684830a36dff019b47811d9b800cc9bea0a. La instrucción directa más reciente del operador fija B2 como destino único de nuevas escrituras y ordena copiar posteriormente todo Vercel Blob a B2 sin borrar originales.
+> **ESTADO · VIVO · RESPONSABILIDAD DOCUMENTAL EN GENERACIÓN 11 · CUSTODIA-03/01/04 SIGUEN ABIERTAS · B2 MASTER AUTH + PUT/GET/SHA-256 FÍSICO CONFIRMADOS · VARIABLES CANÓNICAS EN VERCEL PRODUCTION VERIFICADAS · PREFLIGHT B2 PASS · DEPLOYMENT PRODUCTION READY · ARCHIVADO E2E PENDIENTE · SECUENCIA: B2-006 → B2-005 → B2-007 → B2-002 (BACKFILL BLOB→B2) · RES-001/002 DIFERIDAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.38. Metacanon: 1.29. Gobierno metodológico vigente leído: Samantha v386 · NX-386m; GOW 2.18. Fuente central SeryMente/metodologia/main: blob 22dca684830a36dff019b47811d9b800cc9bea0a. La instrucción directa más reciente del operador fija B2 como destino único de nuevas escrituras y ordena copiar posteriormente todo Vercel Blob a B2 sin borrar originales.
 
 ## 1. Control e identidad
 
@@ -733,3 +733,12 @@ Se incorpora [GUIA-PERSISTENCIA-B2-MASTER.md](GUIA-PERSISTENCIA-B2-MASTER.md), p
 - **Estado:** la instrucción de transferencia está recibida, pero su ejecución está **BLOQUEADA POR DISPONIBILIDAD DEL CONECTOR** y la persistencia en fila4 es **NO EJECUTADA / NO VERIFICADA**. No afirmar que los valores ya estén guardados.
 - **Siguiente paso exacto:** resolver el límite de uso en el panel de Desktop Commander sin reintentar el conector mientras esté pausado; disponer de una sesión operativa con identidad efectiva `CENTRAL\fila4`; completar la extracción segura, promoción variable-a-variable y read-back cifrado en esa bóveda. Después importar únicamente las dos variables canónicas y ejecutar el preflight de solo lectura.
 - **Ciclo local:** `01a1c19d-259d-7d30-b6df-67e4257d5f35`; A/B son UUIDv7 locales, no folios oficiales. FOL1 permanece INACTIVO; CV/CY/A/B PENDIENTES/NO ASIGNADOS.
+
+## Retoma operativa verificada · 2026-11-09 · PC-7 / Vercel Production
+
+- Backblaze B2: autenticación Master Key KHORA, identidad del bucket privado y lectura de configuración SSE-B2 verificadas desde Production por el preflight.
+- Transferidas desde EP Vault las dos variables canónicas `KHORA_B2_MASTER_APPLICATION_KEY_ID` y `KHORA_B2_MASTER_APPLICATION_KEY`; read-back de metadatos Vercel confirma una entrada de tipo `sensitive` en Production para cada nombre. Los valores no se revelaron.
+- Deployment Production `dpl_6hUVD7LBXqtmnaMw2nfH2wwyrHUp`, commit `dd9527a223f65e7af834b042d51f716296151bf2`, estado `READY`; preflight `native_auth`, `master_key`, `bucket_identity`, `bucket_private` y `sse_b2_default`: PASS. URL: `https://khora-r25tmr78o-victorhugotorresmendez-8991s-projects.vercel.app`.
+- Para este build se aisló temporalmente el comando y se omitió `migrate-runtime.mjs`; el Build Command original se restauró en la configuración del proyecto después de iniciarse el build. No se ejecutó SQL ni backfill de Neon en este ciclo.
+- La ruta de código de nuevas escrituras usa `putEncryptedObject` (B2-only y fail-closed), y quedó desplegada; el archivado E2E real con sesión propietaria, vínculo/manifiesto y recuperación tras recarga permanece pendiente. Por tanto, la capacidad productiva está preflight-validada y desplegada, pero la aceptación funcional de archivo no está certificada.
+- No se ha iniciado el backfill histórico Blob→B2 ni se ha cambiado ninguna referencia Neon. Los originales Blob siguen sin borrarse.
