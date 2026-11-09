@@ -3,7 +3,7 @@
 **B UUIDv7 local:** 01a1c134-2125-75e8-9c39-16a74610d034 · no es folio global ni ID nativo.
 **Ciclo UUIDv7 local:** 01a1c134-2125-70ac-847f-18058ba4b884.
 **Entrada A correctiva UUIDv7 local:** 01a1c134-2125-7263-b011-14bc36a10d03 · literal conservado en [INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md).
-**OCP:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md) · CUSTODIA-v0.25 al redactar esta salida.
+**OCP:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md) · CUSTODIA-v0.26.
 
 ## Dictamen ejecutivo
 
@@ -12,13 +12,15 @@ El diagnóstico no confirma que el único problema sea la cuota de Vercel Blob. 
 ## 1. Qué está fallando
 
 - **Vercel Blob:** el expediente histórico registra el almacén khora-audio como limits-exceeded-suspended por cuota. Ese estado está documentado, pero en esta sesión no se obtuvo una lectura directa nueva del store; no se presenta como estado actual recién consultado.
-- **Backblaze B2:** el deployment dpl_DwfJkUPZ4NJnjTXgKCPFRNY5FR2f, commit 7be5712a, se bloqueó en b2_authorize_account con storage_b2_authorization_failed. La causa exacta —par de credenciales, respuesta API o cuenta— no está expuesta en el log saneado.
-- **Prueba B2 anterior:** el deployment dpl_36DeUEnuz2zoWtMJqp1BsZjWASUJ, commit b52003ee, falló el preflight en encrypted_roundtrip con storage_provider_request_failed. Se limpiaron las versiones sintéticas exactas y el log señala que no se borraron originales.
-- **Fallo de build independiente:** dpl_4ohubN6WFbQ2fVHTZ1FL5M6xR8ui, también sobre b52003ee, falló porque no resolvió el import khora-web/lib/server/cripto desde preflight-object-storage.ts.
-- **Producción:** dpl_Dczf3WWnPG4cnCaJhf6PS8MzmxLe está READY con b52003ee y el alias productivo asignado. READY confirma publicación, no escritura/lectura física actual ni archivado E2E.
+- **B2, roundtrip anterior:** dpl_36DeUEnuz2zoWtMJqp1BsZjWASUJ (commit b52003ee) falló el preflight encrypted_roundtrip con storage_provider_request_failed. El log confirma que se eliminaron las versiones sintéticas exactas y que no se borraron originales. El detalle HTTP/causa del proveedor no quedó expuesto.
+- **Preflight de despliegue:** dpl_4ohubN6WFbQ2fVHTZ1FL5M6xR8ui (commit b52003ee) falló antes de probar el proveedor porque Node no pudo resolver khora-web/lib/server/cripto importado desde scripts/preflight-object-storage.ts. Es un fallo independiente de import/resolución del preflight.
+- **B2, API nativa:** dpl_DwfJkUPZ4NJnjTXgKCPFRNY5FR2f (commit 7be5712) se bloqueó en b2_authorize_account con storage_b2_authorization_failed. El log no expone el status HTTP ni el código nativo que permitirían identificar el dato exacto rechazado.
+- **Producción:** dpl_Dczf3WWnPG4cnCaJhf6PS8MzmxLe está READY con commit b52003ee y tiene el alias productivo asignado. READY confirma publicación, no escritura/lectura física actual ni archivado E2E.
 - **Runtime:** se observaron errores Auth.js OIDC InvalidEndpoints y PostgreSQL 57P01, además de advertencias SSL. No se correlacionaron con las 14 partes de audio pendientes; quedan como hallazgos separados, no como causas atribuidas.
 
 El antecedente funcional sigue siendo una sesión con 14 partes pendientes y cero partes vinculadas como verificadas. El botón Archivar bloquea correctamente mientras falta integridad. La evidencia disponible no permite asegurar que no haya otros fallos.
+
+**Conclusión diagnóstica:** al menos tres fallos distintos de la cuota quedan demostrados en eventos de despliegue: fallo de roundtrip cifrado, fallo de resolución de módulo y rechazo de autorización B2. Los errores OIDC/Neon se observaron sin correlación con archivado. No es correcto afirmar que Blob sea el único problema ni que B2 ya esté aceptado.
 
 ## 2. RAID frente a la propuesta
 
