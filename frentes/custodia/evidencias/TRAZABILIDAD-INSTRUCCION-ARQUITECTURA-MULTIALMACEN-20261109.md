@@ -48,3 +48,18 @@
 - El B2-only anterior se conserva como antecedente y queda supersedido como arquitectura final.
 - No se inició implementación de código ni mutación de producción.
 - La promesa literal de «hasta el final de los tiempos» se traduce a reducir ventanas de pérdida, conservar versiones, proteger borrados y demostrar restauraciones. No se ofrece garantía absoluta ante pérdida simultánea de dispositivos, proveedores, claves y credenciales.
+
+
+## Addendum de trazabilidad · instrucción de prioridad operativa · 2026-11-09
+
+**Fuente literal:** [INSTRUCCION-RESTABLECER-ARCHIVADO-PRIMERO-20261109.md](../originales/INSTRUCCION-RESTABLECER-ARCHIVADO-PRIMERO-20261109.md), A UUIDv7 local `01a1c170-3d40-7edb-b707-9a14020a76b8`.
+
+| Entrada literal del operador | Decisión/resultante | Destino trazable |
+|---|---|---|
+| «volver a hacer que Cora vuelva a poder archivar registros y que funcione con normalidad» / «ese es el primer objetivo» | El restablecimiento pasa al hito operativo 1. Se inicia la corrección B2 en rama/no producción, sin esperar al diseño multialmacén. | CUSTODIA-B2-006 EN CURSO; README B2-006 y LISTA-TAREAS-PROVISIONAL.md v0.22. |
+| «Las demás tareas organízalas después en la secuencia» | El orden aprobado es B2-006 restablecer → B2-005 verificación/diagnóstico residual → B2-007 estabilizar → RES-001 diseñar → RES-002 implementar/certificar. | Índice de tareas, LISTA-TAREAS-PROVISIONAL.md v0.22 y OCP CUSTODIA-v0.29. |
+| «Correcto» | Visto bueno explícito a la secuencia amigable que se presentó inmediatamente antes. | La secuencia anterior queda aprobada; ya no se etiqueta como pendiente de aprobación. |
+| «Actualzia tareas conforme, lo que me estas diciendo, y resuelve punto 1, en tiempo record» | Actualizar los documentos ejecutivos y comenzar la tarea de restablecimiento. La aprobación habilita trabajo en rama y pruebas aisladas, pero no elimina las compuertas previas de producción, secretos, credenciales ni objetos originales. | B2-006 EN CURSO; OCP §8 y §13; LISTA v0.22; README B2-006. |
+| «Continua» | Continuar el mismo alcance operativo sin ampliar las autorizaciones. | Original de instrucción, OCP v0.29 y este addendum. |
+
+**Estado honesto al cierre de este addendum:** la documentación se reordenó y la primera tarea está en curso. La recuperación del archivado todavía NO está demostrada: el preflight B2 falla en `b2_authorize_account`; el status HTTP/código real no está registrado. No se ha leído ningún secreto ni se ha modificado producción.
