@@ -63,3 +63,11 @@ No aplicar SQL ni backfill a Neon Production, no alterar referencias de producci
 **Bloqueos técnicos conservados:** la tabla/ledger 035 no estaba presente en Neon main en el último corte leído; el backfill PR #348 contiene el defecto de conteo/posestado de referencias JSONB descrito arriba. No ejecutar APPLY productivo hasta corregirlo, probarlo en rama aislada y verificar el inventario completo. Esta limitación no bloquea el inventario read-only ni la copia física en un lote controlado sin cambiar referencias.
 
 **Estado actual:** secuenciada después de B2-006/005/007. No se ha copiado ningún objeto histórico Blob a B2 en esta retoma.
+
+## Retoma operativa verificada · 2026-11-09
+
+- La capa de credenciales de KHORA en Vercel Production ya está conectada: las dos variables maestras canónicas están registradas como `sensitive` y el preflight nativo confirmó Master Key, cuenta, bucket privado y SSE-B2.
+- Deployment `dpl_6hUVD7LBXqtmnaMw2nfH2wwyrHUp` está `READY` sobre `main` (`dd9527a223f65e7af834b042d51f716296151bf2`). Esto no constituye por sí mismo aceptación E2E del flujo de captura/archivo.
+- No se ha inventariado exhaustivamente ni copiado ningún objeto histórico físico de Vercel Blob en este ciclo; no se han actualizado referencias Neon y no se han eliminado originales.
+- Se conserva el bloqueo sobre APPLY/actualización de referencias hasta corregir `updateReferences()`, probar conteo individual de referencias JSONB, transacción, idempotencia y comprobación del posestado en un entorno no productivo.
+- Próximo avance técnico: corregir y probar el reconciliador y preparar inventario paginado/GET read-only de Blob; después copiar cada objeto a clave B2 estable, con read-back físico y SHA/bytes/KHC1. Solo tras esa prueba se podrá reconciliar referencias bajo la autorización y compuertas ya registradas.
