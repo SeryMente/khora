@@ -8,7 +8,7 @@
 **Folio:** PENDIENTE/NO ASIGNADO · FOL1 no está ACTIVO.  
 **Instrucción literal vigente:** [INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](../originales/INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md).  
 **Matriz de trazabilidad:** [TRAZABILIDAD-INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](../evidencias/TRAZABILIDAD-INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md).  
-**Salida visible B:** [SALIDA-MODELO-CUSTODIA-ARQUITECTURA-MULTIALMACEN-20261109.md](../originales/SALIDA-MODELO-CUSTODIA-ARQUITECTURA-MULTIALMACEN-20261109.md) · UUIDv7 local 01a1c134-2125-75e8-9c39-16a74610d034.
+**Salida visible B:** [SALIDA-MODELO-CUSTODIA-ARQUITECTURA-MULTIALMACEN-20261109.md](../originales/SALIDA-MODELO-CUSTODIA-ARQUITECTURA-MULTIALMACEN-20261109.md) · A UUIDv7 local 01a1c138-ead3-7678-a44e-a49bb72f11de · A2 correctiva 01a1c134-2125-7263-b011-14bc36a10d03 · B UUIDv7 local 01a1c134-2125-75e8-9c39-16a74610d034.
 
 > Cada tarea nueva tiene un README de detalle y un ID local estable. Todas heredan del OCP padre titularidad, autorización y exclusiones. No crean controles, responsables, sesiones ni folios independientes. La aprobación de una tarea no amplía permisos de producción, credenciales, datos ni proveedores.
 
