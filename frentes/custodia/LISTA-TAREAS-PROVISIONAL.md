@@ -69,11 +69,11 @@ Secuencia histórica (C006; antecedente conservado y supersedido por la secuenci
 
 ---
 
-## CUSTODIA-03 · Localizar y rescatar primero los dictados presuntamente perdidos; determinar el alcance real de la posible pérdida
+## CUSTODIA-03 · Localizar y rescatar los dictados presuntamente perdidos; determinar el alcance real de la posible pérdida
 
-**Prioridad:** P0 · CRÍTICA · PRIORIDAD OPERATIVA #1. La recuperación de ausentes precede al rescate masivo de unidades visibles.
+**Prioridad estructural:** P0 · CRÍTICA · PRIORIDAD #1 del rescate histórico de información. **Orden temporal actual:** inicia después del restablecimiento de archivado de CUSTODIA-B2-006 y su verificación E2E residual CUSTODIA-B2-005; no desplaza la urgencia de recuperar el servicio.
 
-**Estado:** ABIERTA · P0 · PRIMERA EN EJECUCIÓN. No se ha efectuado todavía la recuperación productiva; existen candidatos concretos que deben cotejarse primero.
+**Estado:** ABIERTA · P0 · PENDIENTE DE REANUDACIÓN TRAS B2-006/B2-005. No se ha efectuado todavía la recuperación productiva; existen candidatos concretos que deben cotejarse primero.
 
 **Motivo:** el incidente reportado el 28-10-2026 dejó de permitir asumir que todas las capturas relevantes están presentes en el inventario visible. El operador informa que falta un dictado realizado hacia el final de una sesión de terminal y que la última entrada visible en Recuperación fecha del 28-10-2026 a las 17:08. También reporta un contador que cambia de 40 a 20. La explicación de duplicados local/remoto es plausible por el código inspeccionado, pero no se ha comparado el catálogo real y no cuantifica las capturas ausentes.
 
