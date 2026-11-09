@@ -3,7 +3,7 @@
 **Estado:** materialización operativa provisional; no modifica ni sustituye el OCP único ni crea un sistema general de gestión de tareas.  
 **Contenedor:** `docs/frentes/observabilidad-mcp/📁 🧭 - Tareas provisionales/`  
 **OCP padre y fuente de estado:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md)  
-**Control heredado:** [CONTROL-RESPONSABILIDAD.json](../CONTROL-RESPONSABILIDAD.json), generación **9**, titular global `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229`; corresponsable arquitectónico del módulo Jules `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; blob leído de vuelta `4fba2187947730abca0cc338429dfacf4810594c`.  
+**Control heredado:** [CONTROL-RESPONSABILIDAD.json](../CONTROL-RESPONSABILIDAD.json), generación **10**, titular global `chatgpt-khora-mcp-01a1c17f-ca60-73bb-8045-48eeff29141d`; corresponsable arquitectónico del módulo Jules `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`; blob leído de vuelta `fc6432f884a8adeea59326adeabd38bc67242797`.  
 **Evento de creación:** instrucción expresa del operador en esta conversación · 2026-10-31.  
 **Fuente normativa vigente:** [DUG Samantha v377 · NX-377m](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html), Metacanon **1.28**, GOW **2.17**; blob HTML leído desde `main`: `54064c8fe00f872023a455f06596061ed69062ae`.
 
@@ -84,3 +84,11 @@ La tarea de continuidad documental y reconstrucción del workspace queda **compl
 El detalle, las salvedades de instalación npm, los warnings de build y la evidencia por ciclo están en [BACKLOG-CHECKLIST.md](../BACKLOG-CHECKLIST.md) y el núcleo de [TASK-001](./%F0%9F%93%81%20%F0%9F%A7%A9%20-%20KHORA-MCP-TASK-001%20-%20Continuidad%20y%20reconstrucci%C3%B3n%20del%20workspace/README.md).
 
 **No implica:** consentimiento OAuth, DPAPI aprovisionado, lecturas Jules autenticadas, aceptación E2E ni cierre de TASK-002/TASK-003. Esos trabajos permanecen abiertos.
+
+
+## Retoma de titularidad global · 2026-11-09
+
+- `TRANSFER_RESPONSIBILITY`: generación 9 → 10; evento `KHORA-MCP-TRANSFER-20261109-29141D`.
+- Titular global operativo: `chatgpt-khora-mcp-01a1c17f-ca60-73bb-8045-48eeff29141d` (UUIDv7 local, no ID nativo).
+- Jules conserva autoridad arquitectónica modular. Dos responsables activos; FOL1 sigue PREPARADO, NO ACTIVO.
+- Control verificado por lectura de vuelta: blob `fc6432f884a8adeea59326adeabd38bc67242797`.
