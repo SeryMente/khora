@@ -184,3 +184,12 @@ La inspección cruzada de eventos Vercel corrige la nota previa: no todos los in
 La lectura controlada de KHORA_B2_KEY_ID desde Vercel Production, sin imprimir el valor, mostró que **no coincide con el Account ID** de la cuenta KHORA (58b62b4593c8). El Master Application Key ID validado desde PC-7 sí coincide con ese Account ID. Por ello, las variables heredadas actuales no representan la Master Key esperada por el adaptador de KHORA y no deben simplemente renombrarse.
 
 **Corrección necesaria:** reemplazar, no renombrar, las dos entradas heredadas de Production con la pareja real KHORA_B2_MASTER_APPLICATION_KEY_ID / KHORA_B2_MASTER_APPLICATION_KEY leída desde la bóveda local y transferida por Vercel CLI autenticado. No descifrar ni copiar los valores a chat, consola o archivos de documentación.
+
+## Retoma operativa verificada · 2026-11-09 · PC-7 / Vercel Production
+
+- Backblaze B2: autenticación Master Key KHORA, identidad del bucket privado y lectura de configuración SSE-B2 verificadas desde Production por el preflight.
+- Transferidas desde EP Vault las dos variables canónicas `KHORA_B2_MASTER_APPLICATION_KEY_ID` y `KHORA_B2_MASTER_APPLICATION_KEY`; read-back de metadatos Vercel confirma una entrada de tipo `sensitive` en Production para cada nombre. Los valores no se revelaron.
+- Deployment Production `dpl_6hUVD7LBXqtmnaMw2nfH2wwyrHUp`, commit `dd9527a223f65e7af834b042d51f716296151bf2`, estado `READY`; preflight `native_auth`, `master_key`, `bucket_identity`, `bucket_private` y `sse_b2_default`: PASS. URL: `https://khora-r25tmr78o-victorhugotorresmendez-8991s-projects.vercel.app`.
+- Para este build se aisló temporalmente el comando y se omitió `migrate-runtime.mjs`; el Build Command original se restauró en la configuración del proyecto después de iniciarse el build. No se ejecutó SQL ni backfill de Neon en este ciclo.
+- La ruta de código de nuevas escrituras usa `putEncryptedObject` (B2-only y fail-closed), y quedó desplegada; el archivado E2E real con sesión propietaria, vínculo/manifiesto y recuperación tras recarga permanece pendiente. Por tanto, la capacidad productiva está preflight-validada y desplegada, pero la aceptación funcional de archivo no está certificada.
+- No se ha iniciado el backfill histórico Blob→B2 ni se ha cambiado ninguna referencia Neon. Los originales Blob siguen sin borrarse.
