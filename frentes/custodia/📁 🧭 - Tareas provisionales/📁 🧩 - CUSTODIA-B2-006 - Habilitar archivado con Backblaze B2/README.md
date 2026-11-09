@@ -171,6 +171,11 @@ La inspección cruzada de eventos Vercel corrige la nota previa: no todos los in
 - Faltan KHORA_B2_MASTER_APPLICATION_KEY_ID y KHORA_B2_MASTER_APPLICATION_KEY, nombres canónicos priorizados por el código actual.
 - Los valores secretos no fueron descifrados ni copiados a documentación.
 
-**Pruebas físicas:** no se completó el PUT/GET sintético en este ciclo; los intentos del script se detuvieron por errores locales de PowerShell antes de completar la subida. No hay SHA de read-back ni objeto de prueba acreditado. Tampoco se ha desplegado un runtime nuevo.
+**Prueba física B2:** PASS. Evidencia: [PRUEBA-FISICA-B2-KHORA-20261109.md](../../../evidencias/PRUEBA-FISICA-B2-KHORA-20261109.md), blob `c5043bc3ca6f6c492c4a5ca4cb55235d055488e1`. El objeto sintético de 150 bytes se subió y descargó desde el bucket privado; SHA-256 origen/read-back coincide (`9f0fccddda2ec3a56f808236d54701961a3f70269640a35a5771e7ecf399541e`), tamaño coincide y el proveedor informó SSE-B2/AES256. Objeto: `khora/custodia/preflight/20261109/342ed1ad-d8aa-4e9a-bf0b-fce84f31c3ab.json`; File ID: `4_z35b8cbd6623b54a5a9130c18_f1191dbb4dc31bbce_d20261109_m230230_c005_v0501036_t0032_u01794265350120`. Se conserva en B2; no se borraron objetos fuente de usuario. Esta prueba es independiente del runtime Vercel.
 
-**Siguiente secuencia inmediata:** terminar PUT/GET/SHA-256 sintético B2; transferir los dos valores existentes a las variables canónicas de Production sin mostrar valores; ejecutar preflight; desplegar y comprobar logs/archivado E2E; estabilizar; realizar backfill no destructivo de Blob.
+**Pendiente de Production:** Vercel Production ya selecciona B2 y tiene el bucket name/ID y preflight activos, pero solo muestra los nombres heredados KHORA_B2_KEY_ID / KHORA_B2_APPLICATION_KEY. Faltan los nombres canónicos KHORA_B2_MASTER_APPLICATION_KEY_ID / KHORA_B2_MASTER_APPLICATION_KEY. No se han descifrado valores ni desplegado un runtime nuevo. Hasta completar esa conexión y el archivado E2E, no afirmar que KHORA Production ya archiva.
+
+**Siguiente secuencia inmediata:** autenticar el Vercel CLI local de PC-7; transferir los dos valores existentes a las variables canónicas de Production sin mostrarlos; verificar que quedaron registradas como secretos; ejecutar preflight y build; comprobar el runtime de archivado E2E; estabilizar; realizar el backfill no destructivo Blob→B2.
+
+
+**Registro de evidencia:** evidencias/PRUEBA-FISICA-B2-KHORA-20261109.md · blob c5043bc3ca6f6c492c4a5ca4cb55235d055488e1 · SHA-256 sintético 9f0fccddda2ec3a56f808236d54701961a3f70269640a35a5771e7ecf399541e.
