@@ -1,11 +1,11 @@
-<!-- LIST_VERSION=0.22; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.23; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.22.
-- **Última actualización:** 2026-11-09 (instrucción directa: restablecimiento de archivado es prioridad 1; B2-006 EN CURSO en rama/no producción; B2-005 queda como verificación diagnóstica residual; sin cambios en producción).
+- **Versión de esta lista provisional:** 0.23.
+- **Última actualización:** 2026-11-09 (autorización contextual recibida para verificar/corregir solo credenciales B2 de Production mediante bóveda canónica y desplegar a producción únicamente después de superar todas las pruebas; ejecución aún pendiente).
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
 - **Última lectura de metodología del ciclo 2 (referencia histórica):** Samantha v352 · NX-352m; Metacanon 1.21; GOW v2.3; blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
@@ -14,7 +14,9 @@
 - **Revalidación metodológica C009–C011 (histórica):** Samantha v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`, leído de `SeryMente/metodologia/main` el 2026-10-29.
 - **Gobierno vigente revalidado en esta retoma (2026-11-08):** Samantha v383 · NX-383m; Metacanon 1.29; GOW 2.18; DUG blob `cad464717c43733aa84b49f8c9c3af0875597fbd`; commit main `5f703622f11182a048db97419d8d6ef96b40a1c9`. Se leyó §ARR y se consideraron los principios de cascada, no simulación, autorización explícita, resolución de colisión de responsabilidad, preponderancia del repositorio y anti-ineficiencia. MCP-NORMATIVO: DESACTIVADO.
 La lista sigue provisional; ni el relevo ni esta revalidación certifican su diseño.
-- **Alcance y orden operativo vigente:** (1) CUSTODIA-03, prioridad inmediata: localizar, cotejar y rescatar primero los dictados considerados ausentes/perdidos y las fuentes históricas con potencial de recuperación; (2) CUSTODIA-01: recuperar y verificar después todas las unidades visibles en Ingresos → Dictado → Recuperación; (3) CUSTODIA-04: completar la corrección sistémica y certificar el flujo E2E. El defecto «Archivar registro» continúa afectado por la indisponibilidad de Vercel Blob; PR #355 no resolvió la persistencia subyacente. Se prioriza migración integral a B2 exclusivo y certificación E2E. Este avance no desplaza ni cierra CUSTODIA-03/01. CUSTODIA-02 permanece retirada y su identificador no se reutiliza. No se afirma que estas tres tareas sean el inventario exhaustivo de todas las obligaciones futuras del frente.
+- **Alcance y orden operativo vigente:** para restablecer el servicio, la secuencia inmediata aprobada es (1) CUSTODIA-B2-006, restaurar archivado; (2) CUSTODIA-B2-005, verificación E2E y diagnóstico residual; (3) CUSTODIA-B2-007, estabilización; (4) CUSTODIA-RES-001, diseño multialmacén; (5) CUSTODIA-RES-002, implementación/certificación. CUSTODIA-03 y CUSTODIA-01 permanecen abiertas y conservan sus evidencias; su ejecución se retoma tras recuperar el archivado, sin declararlas cerradas ni renumerarlas. CUSTODIA-04 continúa abierta y no se sustituye.
+- **Autorización recibida 2026-11-09:** el operador respondió «Correcto , actualiza tareas provisionales rapidamente, y resuelve.» a la pregunta explícita de autorización para actuar sobre credenciales B2 de Production y desplegar a producción condicionado a pruebas satisfactorias. Se registra como asentimiento contextual limitado a verificar/corregir solo variables B2 de Production mediante la bóveda canónica y a desplegar solo cuando todos los gates técnicos pasen. Original: [INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md](originales/INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md), A UUIDv7 local `01a1c17d-189a-7fea-a644-6be002e2c07a`.
+- **Compuerta de despliegue:** la autorización no equivale a ejecución ni aceptación. Antes de producción deben pasar pruebas de autenticación, bucket privado/identidad, PUT/GET físico sintético, SHA-256/bytes, vínculo y manifiesto de partes, archivado E2E y recuperación tras recarga. Debe inspeccionarse primero el hook de build existente; no ejecutar SQL/backfill ni migraciones productivas fuera de autorización.
 - **Regla provisional de custodia de información:** no copiar a este repositorio el texto o audio de dictados reales, secretos, credenciales ni identificadores personales innecesarios. Registrar resultados mediante evidencia minimizada y sanitizada, en el soporte autorizado que corresponda.
 
 ### Secuencia de ejecución · antecedente histórico y secuencia vigente
@@ -55,7 +57,7 @@ Secuencia histórica (C006; antecedente conservado y supersedido por la secuenci
 **Límites de esta actualización:** solo documentación provisional. No se modificaron código, variables, credenciales, buckets, seguridad/CORS, base productiva, objetos originales ni despliegues. La aprobación de esta secuencia será la compuerta previa al trabajo de implementación.
 
 
-## Orden de prioridad y criterio de coordinación · vigente 2026-11-06
+## Orden de prioridad y criterio de coordinación · antecedente histórico (reordenado temporalmente el 2026-11-09)
 
 | Orden | Tarea existente | Objetivo prioritario | Condición para avanzar |
 |---|---|---|---|
@@ -282,6 +284,7 @@ La propuesta continúa sin comprobar los bytes actuales de los objetos remotos n
 
 ## Registro de cambios
 
+- **2026-11-09 · AUTORIZACION-B2-PRODUCTION · versión 0.23:** se registra el asentimiento contextual del operador a la autorización específica de verificar/corregir credenciales B2 Production mediante bóveda canónica y desplegar a producción únicamente tras superar todos los gates técnicos; se conserva el original A y se mantiene la ejecución/aceptación como PENDIENTE.
 - **2026-11-09 · REORDENAMIENTO-RESTABLECER-ARCHIVADO-PRIMERO · versión 0.22:** el operador aprobó que la recuperación del archivado sea prioridad inmediata. B2-006 pasa al hito 1 y EN CURSO; el prediagnóstico B2-005 sirve como insumo y su cierre diagnóstico/verificación ampliada queda en hito 2, sin bloquear el inicio de la reparación. Después se conservan B2-007 → RES-001 → RES-002. No se autorizan merge/deploy/cutover productivo ni cambios de credenciales. CUSTODIA-03/01/04 siguen abiertas.
 - **2026-11-09 · ARQUITECTURA-MULTIALMACEN-PROPUESTA · versión 0.21 (antecedente):** se preserva la instrucción literal y la secuencia previa diagnóstico → restablecimiento → pulido → diseño → implementación. Fue reorganizada por instrucción posterior del operador; el objetivo B2 exclusivo permanece supersedido.
 
