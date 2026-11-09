@@ -1,12 +1,13 @@
+<!-- TASKS_README_VERSION=0.23; TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
 <!-- TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
 # 📁 Tareas provisionales · Frente Custodia
 
-**Estado:** PROVISIONAL · materialización de ejecución y continuidad; no es canon normativo ni segundo OCP. La secuencia operativa está aprobada; CUSTODIA-B2-006 continúa EN CURSO y bloqueada en la validación local de credenciales, con evidencia de fallo de autorización B2 y sin archivado restaurado.  
+**Estado:** PROVISIONAL · materialización de ejecución y continuidad; no es canon normativo ni segundo OCP. CUSTODIA-B2-006 está EN CURSO: autenticación Master Key KHORA y prueba física B2 PUT/GET/SHA-256/SSE-B2 aprobadas desde PC-7; falta enlazar variables canónicas a Vercel Production y demostrar archivado E2E.  
 **OCP único:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md).  
 **Control único:** [CONTROL-RESPONSABILIDAD.json](../CONTROL-RESPONSABILIDAD.json).  
-**Titularidad observada:** generación 11 · alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59 · control blob `01b1aac95e7d4f666cd67905ab54430f70a5de97`. ID nativo no expuesto.  
+**Titularidad observada:** generación 11 · alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59 · control blob `c29349fc4d2e07d40cd6efe583171482578db6d3`. ID nativo no expuesto.  
 **Folio:** PENDIENTE/NO ASIGNADO · FOL1 no está ACTIVO.  
-**Instrucción literal vigente:** [INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](../originales/INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md).  
+**Instrucción arquitectónica original:** [INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](../originales/INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md). La decisión operativa posterior B2-first y backfill Blob→B2 está preservada en [INSTRUCCION-B2-KHORA-Y-BACKFILL-BLOB-20261109.md](../originales/INSTRUCCION-B2-KHORA-Y-BACKFILL-BLOB-20261109.md).  
 **Retoma actual:** [INSTRUCCION-RETOMA-CUSTODIA-20261109.md](../originales/INSTRUCCION-RETOMA-CUSTODIA-20261109.md) · A local `01a1c193-eccc-78ad-bcb1-a7f102ff4733`.  
 **Evidencia de despliegues/B2:** [DIAGNOSTICO-B2-PRODUCTION-20261109.md](../evidencias/DIAGNOSTICO-B2-PRODUCTION-20261109.md).   
 **Instrucción operativa posterior (prioridad 1):** [INSTRUCCION-RESTABLECER-ARCHIVADO-PRIMERO-20261109.md](../originales/INSTRUCCION-RESTABLECER-ARCHIVADO-PRIMERO-20261109.md) · A UUIDv7 local `01a1c170-3d40-7edb-b707-9a14020a76b8`.
@@ -17,15 +18,15 @@
 
 > Cada tarea nueva tiene un README de detalle y un ID local estable. Todas heredan del OCP padre titularidad, autorización y exclusiones. No crean controles, responsables, sesiones ni folios independientes. Una aprobación ordinaria no amplía permisos de producción, credenciales, datos ni proveedores; una autorización literal posterior, explícita y de alcance delimitado sí puede habilitar exclusivamente las operaciones expresamente enumeradas, como el original A B2 Production enlazado arriba.
 
-- **Gobierno vigente leído en esta retoma:** Samantha v384 · NX-384m; Metacanon 1.29; GOW 2.18; DUG blob `2f320e5e6e4768e9a77bc34d24b0639b47f2128d`. §ARR leído; MCP-NORMATIVO DESACTIVADO.  
+- **Gobierno vigente revalidado:** Samantha v386 · NX-386m; Metacanon 1.29; GOW 2.18; DUG blob `22dca684830a36dff019b47811d9b800cc9bea0a`. MCP-NORMATIVO DESACTIVADO.  
 
 ## 1. Criterio operativo vigente
 
-- **Primera urgencia:** restablecer que Cora/Khora vuelva a archivar registros con normalidad. CUSTODIA-B2-006 es el primer hito y ya está EN CURSO; el prediagnóstico disponible de CUSTODIA-B2-005 se usa como insumo, sin esperar a cerrar toda la investigación residual.
-- **Después:** cerrar la verificación E2E y el diagnóstico residual; estabilizar el flujo sin debilitar integridad, cifrado ni recuperación.
-- **Luego:** diseñar e implementar persistencia multialmacén, con cola local, réplica, conmutación y recuperación comprobables.
-- **No hay migración final Blob→B2 exclusiva como objetivo de arquitectura.** B2 es el medio inmediato para recuperar el servicio; cualquier proveedor adicional se incorpora solo después de comprobar su salud/capacidad y aprobar el diseño.
-- La secuencia fue aprobada y la autorización contextual B2 Production recibida el 2026-11-09. Solo se permite verificar/corregir variables B2 de Production con la bóveda canónica; despliegue productivo condicionado a que todos los gates pasen. No implica autorización para otras credenciales, SQL/backfill, CORS/seguridad ni fuentes originales.
+- **Primera urgencia:** B2 es el destino único de todas las nuevas escrituras de KHORA. CUSTODIA-B2-006 debe conectar las credenciales maestras canónicas a Vercel Production y demostrar archivado E2E.
+- **Después:** cerrar el diagnóstico residual CUSTODIA-B2-005 y estabilizar la implementación con CUSTODIA-B2-007.
+- **Luego:** CUSTODIA-B2-002 debe inventariar y copiar a B2 todo el histórico físico de Vercel Blob, verificar cada copia por read-back/bytes/SHA-256 y reconciliar referencias; conservar los originales sin borrado automático.
+- **Decisión actual:** B2-first y Blob→B2. RES-001/002 (multialmacén) se difieren; no son condición para recuperar archivado ni ejecutar este backfill.
+- La autorización directa del operador para credenciales maestras KHORA, variables Production, deployment condicionado y backfill no destructivo está registrada en CONTROL-RESPONSABILIDAD.json gen. 11. Los gates técnicos permanecen obligatorios.
 
 ## 2. Tareas existentes del frente
 
@@ -38,19 +39,20 @@ Se conservan los identificadores, criterios y evidencia existentes. No se duplic
 | CUSTODIA-04 | EN CURSO | Mantiene la historia de corrección de archivado y aceptación E2E; no se da por cerrada |
 | CUSTODIA-02 | RETIRADA | No reutilizar el ID |
 | CUSTODIA-B2-001 | en_curso | Conservar evidencia y código existente; reconciliar después del pulido |
-| CUSTODIA-B2-002 | en_curso | Backfill/inventario histórico queda fuera del desbloqueo inicial |
+| CUSTODIA-B2-002 | en_curso | Inventario y backfill completo Blob→B2; se ejecuta tras B2-006/005/007 |
 | CUSTODIA-B2-003 | en_curso | Reutilizar sus preflights donde sigan vigentes |
-| CUSTODIA-B2-004 | supersedida como objetivo final exclusivo | Sus pruebas físicas B2 siguen siendo insumo; ya no gobierna una arquitectura B2-only |
+| CUSTODIA-B2-004 | supersedida como objetivo final exclusivo | Sus pruebas físicas se conservan como evidencia; B2 es ahora destino único de nuevas escrituras y del backfill histórico |
 
-## 3. Secuencia operativa aprobada · 2026-11-09
+## 3. Secuencia operativa vigente · 2026-11-09 · B2-first
 
 | Orden | ID local | Prioridad | Estado | Dependencia | Resultado |
 |---:|---|---|---|---|---|
-| 1 | CUSTODIA-B2-006 | P0 | en_curso | Prediagnóstico disponible de B2-005; su cierre completo no bloquea el inicio | Recuperar archivado con B2 y demostrar PUT/GET físico, integridad y archivado E2E en entorno aislado |
-| 2 | CUSTODIA-B2-005 | P0 | en_curso | B2-006 | Cerrar diagnóstico residual y verificación ampliada: estado actual de Blob, respuesta B2 saneada y matriz de la cadena completa |
-| 3 | CUSTODIA-B2-007 | P1 | propuesta_pendiente_aprobacion | B2-006 y B2-005 aceptadas | Estabilizar y simplificar la implementación sin retirar controles esenciales |
-| 4 | CUSTODIA-RES-001 | P1 | propuesta_pendiente_aprobacion | B2-007 | Diseñar resiliencia multialmacén con cola local, réplica, failover y restauración |
-| 5 | CUSTODIA-RES-002 | P2 | propuesta_pendiente_aprobacion | RES-001 aprobado | Implementar y certificar fallos y recuperación en entorno aislado; producción sigue separada |
+| 1 | CUSTODIA-B2-006 | P0 | EN CURSO · B2 FÍSICO PASS / VERCEL PENDIENTE | Master Key y bucket confirmados; falta conexión Vercel Production | Variables maestras canónicas, preflight, deployment y archivado E2E |
+| 2 | CUSTODIA-B2-005 | P0 | EN CURSO | B2-006 | Cerrar diagnóstico residual y E2E de captura, partes, manifiesto, archivado y recuperación |
+| 3 | CUSTODIA-B2-007 | P1 | PROPUESTA | B2-006 y B2-005 | Estabilizar y simplificar la implementación sin retirar integridad ni lectura legacy |
+| 4 | CUSTODIA-B2-002 | P1 | EN CURSO · DIFERIDA | B2-006/005/007 aceptadas; corregir updateReferences() | Inventario y backfill completo de Blob a B2 con verificación y conservación de originales |
+| 5 | CUSTODIA-RES-001 | P2 | DIFERIDA | B2-002 aceptada | Evaluar segundo proveedor solo después del objetivo B2/Blob |
+| 6 | CUSTODIA-RES-002 | P2 | DIFERIDA | RES-001 aprobado | Implementar proveedor adicional únicamente si se vuelve a priorizar |
 
 ### Objetos de tarea
 
@@ -81,12 +83,13 @@ La plantilla no exige fechas objetivo ni responsables por tarea: se añaden solo
 
 ## 6. Límites vigentes
 
-- Se permite verificar/corregir únicamente variables B2 de Production mediante la bóveda canónica, conforme al original A enlazado arriba.
-- El despliegue/cutover productivo está autorizado solo después de pasar todos los gates técnicos y revisar el hook de build existente; si ejecuta mutaciones de Neon Production fuera de alcance, detenerlo.
-- Sin cambios de otras credenciales/llaves, seguridad/CORS del bucket o SQL/backfill en Neon Production.
-- Sin lectura/exportación del contenido privado de dictados para documentación.
-- Sin eliminación ni sobrescritura de objetos originales.
-- Las pruebas de escritura/lectura deben usar contenido sintético en entornos aislados hasta obtener la compuerta aplicable.
+- PC-7 es la única terminal RDC disponible. Identidad observada: PC-7\\PC 7. No asumir ni solicitar CENTRAL\\fila4, PC-14 o PSK14.
+- Usar la Master Application Key de la cuenta Backblaze exclusiva KHORA; no crear claves adicionales ni utilizar credenciales EP.
+- B2 es el único destino de nuevas escrituras; no hacer fallback silencioso a Blob.
+- La autorización de Production permite las dos variables maestras canónicas, preflight y deployment condicionado a pruebas.
+- El backfill Blob→B2 conserva los originales. Las referencias productivas solo se modifican después de corregir updateReferences(), dry-run, transacción, idempotencia y read-back.
+- No modificar CORS, lifecycle o seguridad del bucket si no es necesario y específicamente autorizado.
+- No leer/exportar contenido privado de dictados a documentación.
 - No se crea CUSTODIA-05 ni se reactiva CUSTODIA-02.
 
 
@@ -108,3 +111,13 @@ La plantilla no exige fechas objetivo ni responsables por tarea: se añaden solo
 - **2026-11-08 · B2 nativo y retoma documental · versión 0.20:** se conserva como antecedente de integración del transporte B2 nativo y sus límites de aceptación; no prueba autenticación física, disponibilidad ni archivado E2E.
 - Las entradas anteriores se conservan en LISTA-TAREAS-PROVISIONAL.md y no se eliminan al actualizar el resumen.
 
+
+
+### Retoma B2-first · 2026-11-09 · versión 0.23
+
+- PC-7 es la única terminal RDC disponible; identidad real observada PC-7\\PC 7. Las referencias históricas a CENTRAL\\fila4, PC-14 y PSK14 no son requisitos.
+- Master Application Key de KHORA aceptada por Backblaze. Bucket khora-userdata-ecea4187, ID 35b8cbd6623b54a5a9130c18, allPrivate.
+- Prueba física B2 PASS: PUT/GET sintético, 150 bytes, SHA-256 coincidente, SSE-B2/AES256. Evidencia: [PRUEBA-FISICA-B2-KHORA-20261109.md](../evidencias/PRUEBA-FISICA-B2-KHORA-20261109.md).
+- Vercel Production ya selecciona B2, pero siguen faltando los nombres canónicos KHORA_B2_MASTER_APPLICATION_KEY_ID / KHORA_B2_MASTER_APPLICATION_KEY. No hay deployment nuevo ni archivado E2E demostrado.
+- La autorización de uso Master Key, variables de Production, deployment condicionado y backfill no destructivo está registrada en el control gen. 11; no amplía permisos fuera de KHORA B2 ni autoriza borrar Blob.
+- La secuencia actual pasa a B2-006 → B2-005 → B2-007 → B2-002. RES-001/002 se difieren.
