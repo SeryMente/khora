@@ -80,3 +80,14 @@ Cora vuelve a aceptar y archivar registros de prueba de extremo a extremo en el 
 - La PR no se integró ni desplegó. No cambia credenciales ni variables. Su finalidad es poder diagnosticar la autorización con evidencia segura; no demuestra todavía archivado operativo.
 
 **Siguiente bloqueo:** ejecutar esta versión con acceso B2 autorizado para captar `http_status` y `provider_code`, resolver el par de credenciales desde la bóveda autorizada si procede y repetir el PUT/GET físico y el archivado E2E. La mutación productiva continúa separada y no está autorizada por este alcance.
+
+
+### Confirmación de la versión productiva activa · 2026-11-09
+
+- Una resolución de `khora-web.vercel.app` devuelve actualmente el deployment `dpl_Dczf3WWnPG4cnCaJhf6PS8MzmxLe`, estado READY, commit `b52003ee1809ad506db74e8ee97f0905f7aae91a`.
+- El log de ese build muestra el comando `node scripts/migrate-runtime.mjs; next build --webpack`; **no ejecutó `preflight-object-storage.ts`**. Su estado READY no es una prueba de autenticación B2.
+- El archivo `khora-web/lib/server/object-storage.ts` en ese commit usa AWS SDK `S3Client` y las variables `KHORA_B2_KEY_ID` / `KHORA_B2_APPLICATION_KEY`. El ensayo de roundtrip de ese mismo commit falló con `storage_provider_request_failed`.
+- El commit posterior `7be5712a` migró al transporte nativo B2, pero su preflight productivo falló en `b2_authorize_account` con `storage_b2_authorization_failed`.
+- Backblaze documenta el uso de claves estándar para integraciones S3-compatible y distingue la Master Application Key para acceso completo a la cuenta; la API nativa v4 acepta Master o claves normales. No se debe mezclar una Master Key con el cliente S3-compatible esperando que funcione. Referencias: [guía oficial de claves](https://help.backblaze.com/hc/en-us/articles/360052129034-Creating-and-Managing-Application-Keys) y [b2_authorize_account v4](https://www.backblaze.com/apidocs/b2-authorize-account).
+
+**Conclusión:** el alias productivo está aún sobre el transporte S3-compatible y no prueba su roundtrip. El transporte nativo es el camino técnico preparado, pero no puede pasar a producción hasta resolver el par de autenticación B2 y demostrar PUT/GET con SHA/bytes.
