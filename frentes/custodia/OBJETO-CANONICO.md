@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.34; OBJECT_SEAL=CUSTODIA-v0.34; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.35; OBJECT_SEAL=CUSTODIA-v0.35; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · RESPONSABILIDAD DOCUMENTAL EN GENERACIÓN 11 · CUSTODIA-03/01/04 SIGUEN ABIERTAS · SECUENCIA APROBADA: CUSTODIA-B2-006 (RESTABLECER ARCHIVADO · EN CURSO) → CUSTODIA-B2-005 (VERIFICACIÓN/DIAGNÓSTICO RESIDUAL) → CUSTODIA-B2-007 (ESTABILIZAR) → CUSTODIA-RES-001 (DISEÑO MULTIALMACÉN) → CUSTODIA-RES-002 (IMPLEMENTAR/CERTIFICAR) · DICTAMEN C014: RECUPERACIÓN TOTAL NO DEMOSTRADA · GARANTÍAS DE PRODUCTO NO CERTIFICADAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.34. Metacanon: 1.29. Gobierno metodológico vigente leído: Samantha v384 · NX-384m; GOW 2.18. Fuente central SeryMente/metodologia/main: blob 2f320e5e6e4768e9a77bc34d24b0639b47f2128d. La secuencia fue aprobada por el operador. El 2026-11-09 se recibió asentimiento contextual a la autorización específica para verificar/corregir solo variables B2 de Production mediante la bóveda canónica y desplegar únicamente después de superar todas las pruebas. La autorización fue registrada, pero no equivale a ejecución ni a aceptación; los gates técnicos siguen pendientes.
+> **ESTADO · VIVO · RESPONSABILIDAD DOCUMENTAL EN GENERACIÓN 11 · CUSTODIA-03/01/04 SIGUEN ABIERTAS · B2 MASTER AUTH + PUT/GET/SHA-256 FÍSICO CONFIRMADOS DESDE PC-7 · PENDIENTE CONEXIÓN DE VARIABLES CANÓNICAS EN VERCEL PRODUCTION Y ARCHIVADO E2E · SECUENCIA: B2-006 → B2-005 → B2-007 → B2-002 (BACKFILL BLOB→B2) · RES-001/002 DIFERIDAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.35. Metacanon: 1.29. Gobierno metodológico vigente leído: Samantha v386 · NX-386m; GOW 2.18. Fuente central SeryMente/metodologia/main: blob 22dca684830a36dff019b47811d9b800cc9bea0a. La instrucción directa más reciente del operador fija B2 como destino único de nuevas escrituras y ordena copiar posteriormente todo Vercel Blob a B2 sin borrar originales.
 
 ## 1. Control e identidad
 
@@ -12,9 +12,9 @@
 - **Único núcleo operativo:** este OBJETO-CANONICO.md.
 - **Control único de responsabilidad:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json). Titularidad documental/operativa transferida de generación 10 a 11 y leída de vuelta. Titular actual: chatgpt-custodia-INSTANCE-20261109-01A1C125; alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59; UUIDv7 local de conversación 01a1c125-af13-79b1-87cc-f1e5fe4b0b59; UUIDv7 local del evento 01a1c125-af13-7825-8af1-0ff35ad87b0e; control blob 01b1aac95e7d4f666cd67905ab54430f70a5de97. ID nativo de plataforma no expuesto. Titular previo gen. 10 y generaciones anteriores preservados. Folio PENDIENTE/NO ASIGNADO; FOL1 no está ACTIVO/verificado.
 - **Propósito literal aprobado:** [originales/PROPOSITO-OPERADOR-2026-10-28.md](originales/PROPOSITO-OPERADOR-2026-10-28.md). La sección 4 también conserva el texto aprobado íntegro para que el propósito sea visible en el núcleo.
-- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional de los pendientes; versión 0.24, con la secuencia aprobada y CUSTODIA-B2-006 en curso como primer hito. CUSTODIA-03 y CUSTODIA-01 continúan abiertas. CUSTODIA-02 continúa retirada y su identificador no se reutiliza; la lista sigue provisional.
+- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional de los pendientes; versión 0.26, con la secuencia B2-first y backfill Blob→B2. CUSTODIA-03 y CUSTODIA-01 continúan abiertas. CUSTODIA-02 continúa retirada y su identificador no se reutiliza; la lista sigue provisional.
 - **Inventario provisional de hallazgos:** [evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md](evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md), materialización de evidencia para CUSTODIA-01; no es un segundo estado vivo.
-- **Versión y sello vigentes:** CUSTODIA-v0.34. Es una versión documental del objeto; no es una versión del producto.
+- **Versión y sello vigentes:** CUSTODIA-v0.35. Es una versión documental del objeto; no es una versión del producto.
 - **Registro de la retoma anterior:** [originales/ChatGPT-CUSTODIA-20261106-1424.txt](originales/ChatGPT-CUSTODIA-20261106-1424.txt), instrucción textual parcial original y diagnóstico estático del límite de archivado.
 - **Original de esta retoma:** [originales/ChatGPT-CUSTODIA-20261107-1157.txt](originales/ChatGPT-CUSTODIA-20261107-1157.txt), exportación preservada en main; SHA-256 `7E256B9888F2A0227632D39D22B98E9BD1316548E057E83514ADE61376A93CC5`, 42,629 bytes; lectura de vuelta exacta.
 - **Original de esta retoma (2026-11-08 11:21):** [originales/ChatGPT-CUSTODIA-20261108-1121.md](originales/ChatGPT-CUSTODIA-20261108-1121.md), 39,896 bytes; SHA-256 `CB264E5979AA545F082B5CC9C59DEDA30CE9547100DB29B138A520C3592A866A`; Git blob `b7e13e3fe9fed70873535640e1124577f5b037e4`; commit `5d6cf7055f2ab5f0020bde220d078ffe077512a6`; lectura de vuelta idéntica.
@@ -269,6 +269,26 @@ El catálogo autenticado de Recuperación no se obtuvo en C010/C011/C012/C014 ni
 **Resultado:** mensaje originado por la ruta UI de Dictado; verificación de integridad y persistencia bajo responsabilidad compartida con Custodia. Dos rutas posibles identificadas en código, causa runtime no demostrada. No se cambió código, datos, credenciales, proveedor, despliegue ni producción. Garantías NO CERTIFICADAS.
 
 **Estructura:** no se crea CUSTODIA-05; se amplía CUSTODIA-04, que ya cubre corrección y pruebas E2E. CUSTODIA-01 y CUSTODIA-03 siguen abiertas por falta de catálogo autenticado y verificaciones por unidad.
+
+### Retoma operativa · Master Key KHORA, PC-7 y B2-first · 2026-11-09 · CUSTODIA-v0.35
+
+**Rectificación de identidad:** PC-7 es la única terminal RDC disponible. La identidad real observada es PC-7\\PC 7. No volver a asumir que existe, está disponible o es requisito CENTRAL\\fila4; tampoco solicitar PC-14 o PSK14. Las referencias históricas de identidad en el objeto se conservan como historia, pero no gobiernan la ejecución actual.
+
+**Decisión de almacenamiento más reciente del operador:** la cuenta Backblaze es de uso exclusivo KHORA y su Master Application Key se utiliza de forma ubicua. No generar otra Application Key. Todas las nuevas escrituras se dirigirán a B2; Vercel Blob queda para lectura histórica mientras se inventaría, copia y reconcilia todo su contenido en B2. No borrar ni modificar originales Blob durante el backfill.
+
+**Prueba ejecutada desde PC-7:** la Master Key aceptó b2_authorize_account; el Key ID coincidió con el Account ID. El bucket khora-userdata-ecea4187 (35b8cbd6623b54a5a9130c18) pertenece a esa cuenta y es allPrivate. Se hizo PUT y GET físico de un objeto sintético de 150 bytes; SHA-256 de origen y read-back coincidieron; SSE-B2/AES256 quedó confirmado. El objeto de prueba se conserva y no contiene datos de usuarios. Evidencia: [PRUEBA-FISICA-B2-KHORA-20261109.md](evidencias/PRUEBA-FISICA-B2-KHORA-20261109.md), blob c5043bc3ca6f6c492c4a5ca4cb55235d055488e1.
+
+**Vercel Production:** KHORA_OBJECT_STORAGE ya selecciona B2, KHORA_B2_PREFLIGHT=1 y el bucket name/ID están presentes. Siguen presentes los nombres heredados KHORA_B2_KEY_ID y KHORA_B2_APPLICATION_KEY; faltan los nombres canónicos KHORA_B2_MASTER_APPLICATION_KEY_ID y KHORA_B2_MASTER_APPLICATION_KEY. Los valores no se descifraron. No se desplegó un runtime nuevo ni se ha acreditado el archivado E2E.
+
+**Secuencia vigente:**
+1. CUSTODIA-B2-006: transferir las dos variables maestras existentes a Vercel Production bajo los nombres canónicos; preflight, deployment y verificación del archivado E2E.
+2. CUSTODIA-B2-005: cerrar diagnóstico residual de la cadena completa.
+3. CUSTODIA-B2-007: estabilizar la implementación.
+4. CUSTODIA-B2-002: inventariar y copiar todo Vercel Blob a B2; verificar cada objeto y reconciliar referencias antes de declarar completo el backfill. Conservar los originales.
+5. CUSTODIA-RES-001/002: diferidas; no son requisito para este encargo B2-first.
+
+**Estado:** acceso físico a Backblaze KHORA verificado; Production aún no conectado a la pareja canónica ni desplegado; archivado real E2E pendiente; backfill histórico no iniciado. No afirmar que los dictados nuevos ya se guardan en Production hasta verificar el deployment y una captura real.
+
 ## 9. Aceptación y viabilidad
 
 La viabilidad transversal queda **pendiente de auditoría y pruebas**. Para aceptar una garantía deben existir evidencia y un criterio reproducible, no solo documentación o código.
