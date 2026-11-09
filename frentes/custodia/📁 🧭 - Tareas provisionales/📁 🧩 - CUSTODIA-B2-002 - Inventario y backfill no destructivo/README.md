@@ -12,7 +12,7 @@
 
 **Fuente literal:** [INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md](../../../originales/INSTRUCCION-SPRINT-BACKPLANE-2026-10-31.md).
 
-**Desglose operativo (derivado, no cita literal):** completar una herramienta reanudable que inventarie todas las referencias Blob, verifique cada objeto real y migre únicamente los candidatos elegibles a B2, conservando los originales y dejando conflictos o insuficiencias en cuarentena.
+**Desglose operativo (derivado, no cita literal):** inventariar el universo completo de objetos y referencias de Vercel Blob, copiar todos los objetos a la cuenta/bucket KHORA en Backblaze B2, verificar cada copia mediante lectura física y SHA/bytes, reconciliar referencias relacionales/JSONB y conservar todos los originales Blob hasta la aceptación del inventario completo. La instrucción vigente pide que B2 sea el destino de todas las escrituras nuevas y que después se transfiera allí todo el histórico Blob.
 
 ## Alcance de trabajo
 
@@ -43,3 +43,23 @@
 ## Límites
 
 No aplicar SQL ni backfill a Neon Production, no alterar referencias de producción ni borrar Blob. El script no se ejecutará con `--apply` hasta corregir la reconciliación y validar el procedimiento en el entorno aislado. La responsabilidad, autorización y sesión se heredan del [control único de Custodia](../../CONTROL-RESPONSABILIDAD.json), generación 6; no se crea un control por tarea.
+
+
+## Repriorización vigente · 2026-11-09
+
+**Orden:** esta tarea se ejecuta después de CUSTODIA-B2-006 (nuevas escrituras B2 verificadas), CUSTODIA-B2-005 (diagnóstico E2E residual) y CUSTODIA-B2-007 (estabilización). Su resultado es que todo el histórico de Vercel Blob esté copiado y reconciliado en B2.
+
+**Alcance ampliado por instrucción directa:** no limitarse a las filas que aparecen actualmente en Neon. Primero inventariar todos los objetos físicos del store Blob y cruzarlos con referencias en tablas, JSONB, volcados, sesiones y manifests. Clasificar cada objeto como referenciado, no referenciado, duplicado, huérfano candidato, ausente o ambiguo. No descartar elementos por falta de volcado_id.
+
+**Reglas de transferencia:**
+1. Copiar cada objeto Blob a una ruta B2 estable, privada e idempotente.
+2. Leer físicamente el objeto B2 y cotejar tamaño y SHA-256 de bytes cifrados; validar envelope KHC1 y, cuando corresponda, tamaño/SHA del contenido claro.
+3. No actualizar una referencia hasta tener read-back verificado del objeto destino y registro de correspondencia origen/destino.
+4. Reconciliar referencias SQL y JSONB dentro de transacción, con conteo de referencias individuales y comprobación de posestado. Corregir primero el defecto conocido de updateReferences().
+5. Mantener los originales y versiones de Blob. No borrar Blob como parte de la transferencia ni por una respuesta de upload; cualquier eliminación futura se considera trabajo independiente tras aceptación expresa.
+
+**Línea base histórica disponible (solo lectura, corte 2026-11-09):** Neon main reportó 624 referencias de audio con URL Blob, repartidas en 140 sesiones; 498 de las 624 estaban sin volcado_id. Estas cifras son referencias de base, no inventario exhaustivo de objetos físicos ni prueba de recuperabilidad. Hay además 1,360 filas dictado_audio_parte en total y 1,158 sin volcado_id; no clasificar estas últimas automáticamente como huérfanas.
+
+**Bloqueos técnicos conservados:** la tabla/ledger 035 no estaba presente en Neon main en el último corte leído; el backfill PR #348 contiene el defecto de conteo/posestado de referencias JSONB descrito arriba. No ejecutar APPLY productivo hasta corregirlo, probarlo en rama aislada y verificar el inventario completo. Esta limitación no bloquea el inventario read-only ni la copia física en un lote controlado sin cambiar referencias.
+
+**Estado actual:** secuenciada después de B2-006/005/007. No se ha copiado ningún objeto histórico Blob a B2 en esta retoma.
