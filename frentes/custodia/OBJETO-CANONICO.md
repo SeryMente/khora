@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.33; OBJECT_SEAL=CUSTODIA-v0.33; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.34; OBJECT_SEAL=CUSTODIA-v0.34; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · RESPONSABILIDAD DOCUMENTAL EN GENERACIÓN 11 · CUSTODIA-03/01/04 SIGUEN ABIERTAS · SECUENCIA APROBADA: CUSTODIA-B2-006 (RESTABLECER ARCHIVADO · EN CURSO) → CUSTODIA-B2-005 (VERIFICACIÓN/DIAGNÓSTICO RESIDUAL) → CUSTODIA-B2-007 (ESTABILIZAR) → CUSTODIA-RES-001 (DISEÑO MULTIALMACÉN) → CUSTODIA-RES-002 (IMPLEMENTAR/CERTIFICAR) · DICTAMEN C014: RECUPERACIÓN TOTAL NO DEMOSTRADA · GARANTÍAS DE PRODUCTO NO CERTIFICADAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.33. Metacanon: 1.29. Gobierno metodológico vigente leído: Samantha v384 · NX-384m; GOW 2.18. Fuente central SeryMente/metodologia/main: blob 2f320e5e6e4768e9a77bc34d24b0639b47f2128d. La secuencia fue aprobada por el operador. El 2026-11-09 se recibió asentimiento contextual a la autorización específica para verificar/corregir solo variables B2 de Production mediante la bóveda canónica y desplegar únicamente después de superar todas las pruebas. La autorización fue registrada, pero no equivale a ejecución ni a aceptación; los gates técnicos siguen pendientes.
+> **ESTADO · VIVO · RESPONSABILIDAD DOCUMENTAL EN GENERACIÓN 11 · CUSTODIA-03/01/04 SIGUEN ABIERTAS · SECUENCIA APROBADA: CUSTODIA-B2-006 (RESTABLECER ARCHIVADO · EN CURSO) → CUSTODIA-B2-005 (VERIFICACIÓN/DIAGNÓSTICO RESIDUAL) → CUSTODIA-B2-007 (ESTABILIZAR) → CUSTODIA-RES-001 (DISEÑO MULTIALMACÉN) → CUSTODIA-RES-002 (IMPLEMENTAR/CERTIFICAR) · DICTAMEN C014: RECUPERACIÓN TOTAL NO DEMOSTRADA · GARANTÍAS DE PRODUCTO NO CERTIFICADAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.34. Metacanon: 1.29. Gobierno metodológico vigente leído: Samantha v384 · NX-384m; GOW 2.18. Fuente central SeryMente/metodologia/main: blob 2f320e5e6e4768e9a77bc34d24b0639b47f2128d. La secuencia fue aprobada por el operador. El 2026-11-09 se recibió asentimiento contextual a la autorización específica para verificar/corregir solo variables B2 de Production mediante la bóveda canónica y desplegar únicamente después de superar todas las pruebas. La autorización fue registrada, pero no equivale a ejecución ni a aceptación; los gates técnicos siguen pendientes.
 
 ## 1. Control e identidad
 
@@ -14,7 +14,7 @@
 - **Propósito literal aprobado:** [originales/PROPOSITO-OPERADOR-2026-10-28.md](originales/PROPOSITO-OPERADOR-2026-10-28.md). La sección 4 también conserva el texto aprobado íntegro para que el propósito sea visible en el núcleo.
 - **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional de los pendientes; versión 0.24, con la secuencia aprobada y CUSTODIA-B2-006 en curso como primer hito. CUSTODIA-03 y CUSTODIA-01 continúan abiertas. CUSTODIA-02 continúa retirada y su identificador no se reutiliza; la lista sigue provisional.
 - **Inventario provisional de hallazgos:** [evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md](evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md), materialización de evidencia para CUSTODIA-01; no es un segundo estado vivo.
-- **Versión y sello vigentes:** CUSTODIA-v0.33. Es una versión documental del objeto; no es una versión del producto.
+- **Versión y sello vigentes:** CUSTODIA-v0.34. Es una versión documental del objeto; no es una versión del producto.
 - **Registro de la retoma anterior:** [originales/ChatGPT-CUSTODIA-20261106-1424.txt](originales/ChatGPT-CUSTODIA-20261106-1424.txt), instrucción textual parcial original y diagnóstico estático del límite de archivado.
 - **Original de esta retoma:** [originales/ChatGPT-CUSTODIA-20261107-1157.txt](originales/ChatGPT-CUSTODIA-20261107-1157.txt), exportación preservada en main; SHA-256 `7E256B9888F2A0227632D39D22B98E9BD1316548E057E83514ADE61376A93CC5`, 42,629 bytes; lectura de vuelta exacta.
 - **Original de esta retoma (2026-11-08 11:21):** [originales/ChatGPT-CUSTODIA-20261108-1121.md](originales/ChatGPT-CUSTODIA-20261108-1121.md), 39,896 bytes; SHA-256 `CB264E5979AA545F082B5CC9C59DEDA30CE9547100DB29B138A520C3592A866A`; Git blob `b7e13e3fe9fed70873535640e1124577f5b037e4`; commit `5d6cf7055f2ab5f0020bde220d078ffe077512a6`; lectura de vuelta idéntica.
@@ -684,7 +684,7 @@ Se incorpora [GUIA-PERSISTENCIA-B2-MASTER.md](GUIA-PERSISTENCIA-B2-MASTER.md), p
 **Estado y autorización:** esta incorporación es documental. No se creó cuenta B2 de Khora, no se guardaron credenciales, no se cambió bucket, configuración, selector de proveedor, código, producción ni objetos fuente. El alcance de CUSTODIA continúa limitado a ramas y entornos aislados no productivos; las exclusiones vigentes permanecen intactas. La guía no modifica el orden prioritario CUSTODIA-03 → CUSTODIA-01 → CUSTODIA-04 ni certifica la migración.
 
 
-### Retoma y diagnóstico vigente · 2026-11-09 · CUSTODIA-v0.33
+### Retoma y diagnóstico vigente · 2026-11-09 · CUSTODIA-v0.34
 
 - **Nueva instrucción A:** [INSTRUCCION-RETOMA-CUSTODIA-20261109.md](originales/INSTRUCCION-RETOMA-CUSTODIA-20261109.md), UUIDv7 local `01a1c193-eccc-78ad-bcb1-a7f102ff4733`. Conserva literalmente la orden de retomar y remite al paquete histórico original A/A2/B ya persistido, sin crear una copia divergente del material previo.
 - **A original leída de vuelta:** [INSTRUCCION-RETOMA-CUSTODIA-20261109.md](originales/INSTRUCCION-RETOMA-CUSTODIA-20261109.md), blob `d6923cccb1d947e38caeee79dc3c0d830f2a2b66`; literal de entrada cotejado.
@@ -699,3 +699,15 @@ Se incorpora [GUIA-PERSISTENCIA-B2-MASTER.md](GUIA-PERSISTENCIA-B2-MASTER.md), p
 - **Secuencia y límites:** B2-006 permanece como primer hito P0; B2-005 como cierre diagnóstico/verificación residual; luego B2-007, RES-001 y RES-002. No se cambia código de autenticación, variables, bucket, Neon, SQL, merge, deploy ni alias productivo en esta retoma.
 - **Ciclo local:** `01a1c193-eccc-77e3-a7f7-4c29b0de0df0`. **B local:** `01a1c193-eccc-7302-a7bd-99135476b8e4`, persistida y leída de vuelta. Son identidades locales, no folios globales. FOL1 no está ACTIVO; folios CV/CY/A/B: PENDIENTE/NO ASIGNADO.
 - **OCP CUSTODIA-v0.32:** leída de vuelta antes de registrar B; esta revisión v0.33 registra el blob final de B, la matriz, la lista v0.24 y el índice actualizado.
+
+
+### Intento urgente de transferencia a bóveda fila4 · 2026-11-09 · CUSTODIA-v0.34
+
+- **Nueva instrucción A:** [INSTRUCCION-TRANSFERENCIA-EPVAULT-FILA4-20261109.md](originales/INSTRUCCION-TRANSFERENCIA-EPVAULT-FILA4-20261109.md), UUIDv7 local `01a1c19d-259d-7348-ab19-4ba87044a8d8`.
+- **Salida visible B:** [SALIDA-MODELO-TRANSFERENCIA-EPVAULT-FILA4-20261109.md](originales/SALIDA-MODELO-TRANSFERENCIA-EPVAULT-FILA4-20261109.md), UUIDv7 local `01a1c19d-259d-7afb-b310-e259a5d77f9d`.
+- **Endpoint fuente observado:** PC-14 apareció Online (device ID `4fc35a07-2192-4b88-81ec-96cb450d565e`). Una ejecución de identidad no destructiva devolvió `PC-14\PC 13`, perfil `C:\Users\PC 13`; no devolvió `CENTRAL\fila4`.
+- **Conector remoto:** la llamada posterior informó cuota mensual de Desktop Commander agotada y llamadas pausadas; el servicio instruyó no reintentar ni reconectar. No se repitieron llamadas una vez recibido ese mensaje.
+- **Secretos y bóvedas:** las notas efímeras no se leyeron. No se extrajeron, imprimieron ni copiaron claves. No se escribió ninguna variable en la bóveda destino fila4; no hubo read-back. No se modificaron variables Vercel ni se ejecutó preflight B2.
+- **Estado:** la instrucción de transferencia está recibida, pero su ejecución está **BLOQUEADA POR DISPONIBILIDAD DEL CONECTOR** y la persistencia en fila4 es **NO EJECUTADA / NO VERIFICADA**. No afirmar que los valores ya estén guardados.
+- **Siguiente paso exacto:** resolver el límite de uso en el panel de Desktop Commander sin reintentar el conector mientras esté pausado; disponer de una sesión operativa con identidad efectiva `CENTRAL\fila4`; completar la extracción segura, promoción variable-a-variable y read-back cifrado en esa bóveda. Después importar únicamente las dos variables canónicas y ejecutar el preflight de solo lectura.
+- **Ciclo local:** `01a1c19d-259d-7d30-b6df-67e4257d5f35`; A/B son UUIDv7 locales, no folios oficiales. FOL1 permanece INACTIVO; CV/CY/A/B PENDIENTES/NO ASIGNADOS.
