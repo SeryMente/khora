@@ -1,11 +1,11 @@
 # Checklist maestro de backlog — KHORA-MCP
 
 **Tipo:** documento vivo de seguimiento del backlog; no crea tareas, frentes, módulos, controles, responsables ni folios nuevos.  
-**Corte:** 2026-11-01 · America/Mexico_City.  
-**OCP padre:** [OBJETO-CANONICO.md](./OBJETO-CANONICO.md), versión v0.3.12.  
-**Control vigente:** [CONTROL-RESPONSABILIDAD.json](./CONTROL-RESPONSABILIDAD.json), generación 9.  
+**Corte técnico del backlog:** 2026-11-01 · America/Mexico_City (los resultados de ejecución listados conservan esa fecha).  
+**OCP padre:** [OBJETO-CANONICO.md](./OBJETO-CANONICO.md), versión v0.3.13.  
+**Control de responsabilidad vigente al 2026-11-09:** [CONTROL-RESPONSABILIDAD.json](./CONTROL-RESPONSABILIDAD.json), generación 10; blob leído de vuelta `fc6432f884a8adeea59326adeabd38bc67242797`.  
 **Índice de tareas formales:** [Tareas provisionales](./📁%20🧭%20-%20Tareas%20provisionales/README.md).  
-**Titular global:** `chatgpt-khora-mcp-01a199dd-30ba-7843-92ae-278ff01d4229`.  
+**Titular global vigente:** `chatgpt-khora-mcp-01a1c17f-ca60-73bb-8045-48eeff29141d`.  
 **Corresponsable arquitectónico Jules:** `chatgpt-khora-mcp-module-jules-01a19912-7918-7602-af7a-e2828585e314`.
 
 ## Convenciones de estado
