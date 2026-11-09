@@ -1,11 +1,11 @@
-<!-- LIST_VERSION=0.23; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.24; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.23.
-- **Última actualización:** 2026-11-09 (autorización contextual recibida para verificar/corregir solo credenciales B2 de Production mediante bóveda canónica y desplegar a producción únicamente después de superar todas las pruebas; ejecución aún pendiente).
+- **Versión de esta lista provisional:** 0.24.
+- **Última actualización:** 2026-11-09 (retoma y evidencia de deployments B2, actualización de OCP y corrección del bloqueo local; las pruebas físicas siguen pendientes).
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
 - **Última lectura de metodología del ciclo 2 (referencia histórica):** Samantha v352 · NX-352m; Metacanon 1.21; GOW v2.3; blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
@@ -13,6 +13,7 @@
 - **Última lectura metodológica histórica (C008):** Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; blob `89a28e4d05f5baab9c4b86abdb9fbfc532690c75`.
 - **Revalidación metodológica C009–C011 (histórica):** Samantha v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`, leído de `SeryMente/metodologia/main` el 2026-10-29.
 - **Gobierno vigente revalidado en esta retoma (2026-11-08):** Samantha v383 · NX-383m; Metacanon 1.29; GOW 2.18; DUG blob `cad464717c43733aa84b49f8c9c3af0875597fbd`; commit main `5f703622f11182a048db97419d8d6ef96b40a1c9`. Se leyó §ARR y se consideraron los principios de cascada, no simulación, autorización explícita, resolución de colisión de responsabilidad, preponderancia del repositorio y anti-ineficiencia. MCP-NORMATIVO: DESACTIVADO.
+- **Gobierno vigente adquirido en la retoma actual (2026-11-09):** Samantha v384 · NX-384m; Metacanon 1.29; GOW 2.18; DUG blob `2f320e5e6e4768e9a77bc34d24b0639b47f2128d`. §ARR fue leído como vocabulario esencial de entrada; CNP y principios de cascada, no simulación, autorización, seguridad/presencia, continuidad, perfil operativo, persistencia documental, reinstanciación, foliación y anti-ineficiencia revisados. MCP-NORMATIVO permanece DESACTIVADO.
 La lista sigue provisional; ni el relevo ni esta revalidación certifican su diseño.
 - **Alcance y orden operativo vigente:** para restablecer el servicio, la secuencia inmediata aprobada es (1) CUSTODIA-B2-006, restaurar archivado; (2) CUSTODIA-B2-005, verificación E2E y diagnóstico residual; (3) CUSTODIA-B2-007, estabilización; (4) CUSTODIA-RES-001, diseño multialmacén; (5) CUSTODIA-RES-002, implementación/certificación. CUSTODIA-03 y CUSTODIA-01 permanecen abiertas y conservan sus evidencias; su ejecución se retoma tras recuperar el archivado, sin declararlas cerradas ni renumerarlas. CUSTODIA-04 continúa abierta y no se sustituye.
 - **Autorización recibida 2026-11-09:** el operador respondió «Correcto , actualiza tareas provisionales rapidamente, y resuelve.» a la pregunta explícita de autorización para actuar sobre credenciales B2 de Production y desplegar a producción condicionado a pruebas satisfactorias. Se registra como asentimiento contextual limitado a verificar/corregir solo variables B2 de Production mediante la bóveda canónica y a desplegar solo cuando todos los gates técnicos pasen. Original: [INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md](originales/INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md), A UUIDv7 local `01a1c17d-189a-7fea-a644-6be002e2c07a`.
@@ -320,3 +321,16 @@ La propuesta continúa sin comprobar los bytes actuales de los objetos remotos n
 - **Salida de ejecución parcial C007:** [originales/SALIDA-MODELO-CUSTODIA-IMPLEMENTACION-PARCIAL-2026-10-28.md](originales/SALIDA-MODELO-CUSTODIA-IMPLEMENTACION-PARCIAL-2026-10-28.md), commit `423115ff56c8ae10fb9abd02d0fd978eddfaf2a8`.
 - **Salida de validación de integración C008:** [originales/SALIDA-MODELO-CUSTODIA-VALIDACION-INTEGRACION-2026-10-28.md](originales/SALIDA-MODELO-CUSTODIA-VALIDACION-INTEGRACION-2026-10-28.md), commit `ba57b98cf4045f57e841add13e5d1b9d64895d41`.
 - **Estado de ejecución:** no se recuperaron ni inspeccionaron dictados como parte de esta modificación documental.
+
+
+### Retoma y estado operativo comprobado · 2026-11-09
+
+- **A de retoma:** [INSTRUCCION-RETOMA-CUSTODIA-20261109.md](originales/INSTRUCCION-RETOMA-CUSTODIA-20261109.md) · UUIDv7 local `01a1c193-eccc-78ad-bcb1-a7f102ff4733`.
+- **Evidencia:** [DIAGNOSTICO-B2-PRODUCTION-20261109.md](evidencias/DIAGNOSTICO-B2-PRODUCTION-20261109.md). El OCP es la única fuente viva; esta lista sigue siendo un índice provisional.
+- **Secuencia sin cambios:** (1) B2-006 restablecer archivado; (2) B2-005 cerrar diagnóstico residual y E2E; (3) B2-007 estabilizar; (4) RES-001 diseñar redundancia multialmacén; (5) RES-002 implementar y certificar. CUSTODIA-03/01/04 siguen abiertas y sus IDs se conservan.
+- **Evidencia técnica nueva:** PR #355 está integrada; no resolvió B2. PR #362 sigue abierta en borrador. El último intento de API nativa B2 falla en `b2_authorize_account` / `storage_b2_authorization_failed`; la prueba física PUT/GET y el archivado E2E permanecen pendientes.
+- **Variables Production:** existen los nombres heredados `KHORA_B2_KEY_ID` y `KHORA_B2_APPLICATION_KEY`; los nombres canónicos `KHORA_B2_MASTER_APPLICATION_KEY_ID` y `KHORA_B2_MASTER_APPLICATION_KEY` no aparecen en el inventario leído. No se revelaron valores ni se modificó configuración.
+- **Bóveda:** el operador reporta sesión EP Vault abierta y notas efímeras con ambos valores; no se han leído/promovido aún. PC10 es una sesión efímera antigua y se descarta como pista actual. «PSK14» no se equipara por inferencia a equipo/perfil; la identidad efectiva debe verificarse antes de operar.
+- **Build de Production:** un intento anterior ejecutó migraciones 023–029 antes de fallar en `encrypted_roundtrip`; el log no confirma de forma separada `032_graph_twins.sql`. El intento nativo posterior ejecutó primero preflight y falló en autorización, por lo que no alcanzó el hook de migración. No reintentar build Production que pueda mutar Neon sin verificar el esquema y resolver una ruta autorizada.
+- **Estado del hito 1:** EN CURSO, con bloqueo concreto de acceso a la bóveda/identidad del endpoint y credenciales no validadas. No afirmar que Cora ya archiva.
+- **2026-11-09 · RETOMA-CUSTODIA-v0.24:** persistida la instrucción de retoma, leída fuente metodológica v384, creada evidencia de diagnóstico, corregida la nota histórica PC10 y reconciliado el orden real de los hooks de build. Sin código, variables, SQL, bucket, merge ni deploy modificados.
