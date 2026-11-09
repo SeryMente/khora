@@ -68,3 +68,8 @@
 ### Trabajo técnico derivado · PR #362
 
 La orden de «resolver punto 1» dio lugar a una corrección en rama/no producción: PR [#362](https://github.com/SeryMente/khora/pull/362), rama `fix/custodia-b2-auth-diagnostics-20261109`, punta `3b684a870a21ccf2f200ee684687beea42e3b235`. La implementación conserva HTTP status y el código de error saneado de B2, sin cuerpos ni mensajes libres; la prueba unitaria sintética quedó añadida, pero no ejecutada. GitHub Actions no devolvió workflows y los checks Vercel fallaron por limitación del plan/repo privado. PR en borrador; no fusionada ni desplegada. La tarea de restauración sigue bloqueada por autenticación B2 no caracterizada y compuertas productivas explícitas.
+
+
+### Evidencia posterior sobre el deployment productivo activo
+
+El dominio `khora-web.vercel.app` resuelve a `dpl_Dczf3WWnPG4cnCaJhf6PS8MzmxLe`, commit `b52003ee1809ad506db74e8ee97f0905f7aae91a`. Su build no ejecutó el preflight B2 (comando de build: migración runtime + Next build); el código de esa punta usa AWS SDK `S3Client`. El preflight separado de roundtrip para la misma punta falló con `storage_provider_request_failed`. El deployment posterior con transporte nativo `7be5712a` falló en `b2_authorize_account`; por tanto, el alias activo no es prueba de archivado físico verificado. La evidencia queda ligada a CUSTODIA-B2-006.
