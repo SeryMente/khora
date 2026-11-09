@@ -91,3 +91,11 @@ Cora vuelve a aceptar y archivar registros de prueba de extremo a extremo en el 
 - Backblaze documenta el uso de claves estándar para integraciones S3-compatible y distingue la Master Application Key para acceso completo a la cuenta; la API nativa v4 acepta Master o claves normales. No se debe mezclar una Master Key con el cliente S3-compatible esperando que funcione. Referencias: [guía oficial de claves](https://help.backblaze.com/hc/en-us/articles/360052129034-Creating-and-Managing-Application-Keys) y [b2_authorize_account v4](https://www.backblaze.com/apidocs/b2-authorize-account).
 
 **Conclusión:** el alias productivo está aún sobre el transporte S3-compatible y no prueba su roundtrip. El transporte nativo es el camino técnico preparado, pero no puede pasar a producción hasta resolver el par de autenticación B2 y demostrar PUT/GET con SHA/bytes.
+
+
+### Preview de validación del código · 2026-11-09
+
+- Se creó el deployment preview `dpl_9gWxfH72UD2b2S115QpEUwa2M9Bt`, URL `https://khora-ghmy4m41f-victorhugotorresmendez-8991s-projects.vercel.app`, desde la rama `fix/custodia-b2-auth-diagnostics-20261109`, commit `3b684a870a21ccf2f200ee684687beea42e3b235`.
+- Último estado observado: BUILDING, en `next build --webpack`. No se declara aún aprobado.
+- Las credenciales B2 consultadas se encuentran asociadas únicamente a Production; el preview no dispone de ellas. El preflight de B2 está condicionado a Production, por lo que este preview solo puede validar compilación, nunca autenticación B2 ni archivado físico.
+- Es un preview aislado: no tiene alias productivo y no modifica el servicio activo.
