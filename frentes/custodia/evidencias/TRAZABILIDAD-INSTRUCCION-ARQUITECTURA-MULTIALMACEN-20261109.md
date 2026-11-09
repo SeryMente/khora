@@ -73,3 +73,8 @@ La orden de «resolver punto 1» dio lugar a una corrección en rama/no producci
 ### Evidencia posterior sobre el deployment productivo activo
 
 El dominio `khora-web.vercel.app` resuelve a `dpl_Dczf3WWnPG4cnCaJhf6PS8MzmxLe`, commit `b52003ee1809ad506db74e8ee97f0905f7aae91a`. Su build no ejecutó el preflight B2 (comando de build: migración runtime + Next build); el código de esa punta usa AWS SDK `S3Client`. El preflight separado de roundtrip para la misma punta falló con `storage_provider_request_failed`. El deployment posterior con transporte nativo `7be5712a` falló en `b2_authorize_account`; por tanto, el alias activo no es prueba de archivado físico verificado. La evidencia queda ligada a CUSTODIA-B2-006.
+
+
+### Preview de corrección aislada · PR #362
+
+Deployment `dpl_9gWxfH72UD2b2S115QpEUwa2M9Bt`, rama `fix/custodia-b2-auth-diagnostics-20261109`, commit `3b684a870a21ccf2f200ee684687beea42e3b235`, creado como preview (target no productivo). Estado al último read-back: BUILDING durante `next build --webpack`. B2 envs están en Production; el preview no ejecuta el preflight nativo ni puede probar auth/PUT/GET. No se afirma build aprobado ni restauración del archivado.
