@@ -1,7 +1,7 @@
 <!-- TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
 # 📁 Tareas provisionales · Frente Custodia
 
-**Estado:** PROVISIONAL · materialización de ejecución y continuidad; no es canon normativo ni segundo OCP.  
+**Estado:** PROVISIONAL · materialización de ejecución y continuidad; no es canon normativo ni segundo OCP. La secuencia operativa fue aprobada por el operador el 2026-11-09; CUSTODIA-B2-006 está EN CURSO dentro de la rama/no producción.  
 **OCP único:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md).  
 **Control único:** [CONTROL-RESPONSABILIDAD.json](../CONTROL-RESPONSABILIDAD.json).  
 **Titularidad observada:** generación 11 · alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59 · control blob 21fe3e0ebae32d6e3988a5511fecaa5d63f8c3af. ID nativo no expuesto.  
@@ -14,11 +14,11 @@
 
 ## 1. Criterio operativo vigente
 
-- **Primera urgencia:** recuperar la capacidad de archivar registros en Cora/Khora. El primer paso es diagnóstico positivo; el segundo, resolver la causa comprobada con B2.
-- **Después:** pulir la implementación que ya funcione.
-- **Luego:** diseñar la persistencia redundante multialmacén, con réplica, conmutación y recuperación verificables.
-- **No hay migración final Blob→B2 exclusiva como objetivo de arquitectura.** La decisión de 2026-11-07 que hacía de B2 el único proveedor final queda supersedida por la nueva instrucción del 2026-11-09. B2 sigue siendo el camino inmediato para restablecer el servicio; Vercel Blob solo será destino cuando su salud y capacidad se comprueben.
-- La secuencia de abajo está documentada como PROPUESTA PENDIENTE DE VISTO BUENO. No autoriza por sí sola cambios de producto o producción.
+- **Primera urgencia:** restablecer que Cora/Khora vuelva a archivar registros con normalidad. CUSTODIA-B2-006 es el primer hito y ya está EN CURSO; el prediagnóstico disponible de CUSTODIA-B2-005 se usa como insumo, sin esperar a cerrar toda la investigación residual.
+- **Después:** cerrar la verificación E2E y el diagnóstico residual; estabilizar el flujo sin debilitar integridad, cifrado ni recuperación.
+- **Luego:** diseñar e implementar persistencia multialmacén, con cola local, réplica, conmutación y recuperación comprobables.
+- **No hay migración final Blob→B2 exclusiva como objetivo de arquitectura.** B2 es el medio inmediato para recuperar el servicio; cualquier proveedor adicional se incorpora solo después de comprobar su salud/capacidad y aprobar el diseño.
+- La secuencia fue aprobada por el operador el 2026-11-09. La ejecución actual permite corrección y pruebas en rama/no producción; producción, secretos, credenciales y datos originales conservan sus compuertas específicas.
 
 ## 2. Tareas existentes del frente
 
@@ -35,15 +35,15 @@ Se conservan los identificadores, criterios y evidencia existentes. No se duplic
 | CUSTODIA-B2-003 | en_curso | Reutilizar sus preflights donde sigan vigentes |
 | CUSTODIA-B2-004 | supersedida como objetivo final exclusivo | Sus pruebas físicas B2 siguen siendo insumo; ya no gobierna una arquitectura B2-only |
 
-## 3. Secuencia propuesta · pendiente de aprobación
+## 3. Secuencia operativa aprobada · 2026-11-09
 
 | Orden | ID local | Prioridad | Estado | Dependencia | Resultado |
 |---:|---|---|---|---|---|
-| 1 | CUSTODIA-B2-005 | P0 | propuesta_pendiente_aprobacion | ninguna | Diagnóstico completo y positivo del bloqueo |
-| 2 | CUSTODIA-B2-006 | P0 | propuesta_pendiente_aprobacion | B2-005 | Archivado E2E restablecido con B2 |
-| 3 | CUSTODIA-B2-007 | P1 | propuesta_pendiente_aprobacion | B2-006 | Implementación B2 pulida y sin deuda accidental |
-| 4 | CUSTODIA-RES-001 | P1 | propuesta_pendiente_aprobacion | B2-007 | Diseño de resiliencia multialmacén que satisface el dictado |
-| 5 | CUSTODIA-RES-002 | P2 | propuesta_pendiente_aprobacion | RES-001 aprobado | Implementación y certificación no productiva |
+| 1 | CUSTODIA-B2-006 | P0 | en_curso | Prediagnóstico disponible de B2-005; su cierre completo no bloquea el inicio | Recuperar archivado con B2 y demostrar PUT/GET físico, integridad y archivado E2E en entorno aislado |
+| 2 | CUSTODIA-B2-005 | P0 | en_curso | B2-006 | Cerrar diagnóstico residual y verificación ampliada: estado actual de Blob, respuesta B2 saneada y matriz de la cadena completa |
+| 3 | CUSTODIA-B2-007 | P1 | propuesta_pendiente_aprobacion | B2-006 y B2-005 aceptadas | Estabilizar y simplificar la implementación sin retirar controles esenciales |
+| 4 | CUSTODIA-RES-001 | P1 | propuesta_pendiente_aprobacion | B2-007 | Diseñar resiliencia multialmacén con cola local, réplica, failover y restauración |
+| 5 | CUSTODIA-RES-002 | P2 | propuesta_pendiente_aprobacion | RES-001 aprobado | Implementar y certificar fallos y recuperación en entorno aislado; producción sigue separada |
 
 ### Objetos de tarea
 
@@ -69,7 +69,7 @@ La plantilla no exige fechas objetivo ni responsables por tarea: se añaden solo
 - Una tarea se completa solo con evidencia recuperable que satisface todos sus criterios; una prueba sintética no demuestra producción.
 - Una tarea supersedida conserva su README e historia; se enlaza la instrucción que la reemplaza y no se reutiliza su ID.
 - Dependencias organizan la secuencia, no crean autoridad.
-- La lista es el índice ejecutivo; cada README contiene el detalle; el OCP conserva el estado vivo.
+- La lista es el índice ejecutivo; cada README contiene el detalle; el OCP conserva el estado vivo. El primer hito autorizado es B2-006 en rama/no producción; no se declara restauración real hasta completar sus criterios físicos.
 - CUSTODIA-03 y CUSTODIA-01 no se cierran ni se borran. El orden exacto de su reanudación se reconcilia después de restablecer el archivo de registros.
 
 ## 6. Límites vigentes
@@ -83,7 +83,8 @@ La plantilla no exige fechas objetivo ni responsables por tarea: se añaden solo
 
 ## 7. Registro de cambios
 
-- **2026-11-09 · secuencia de diagnóstico, restablecimiento y resiliencia · versión 0.21:** se registran cinco tareas nuevas en estado propuesta_pendiente_aprobacion; se preservan CUSTODIA-01/03/04 y B2-001..004. La decisión B2 exclusivo deja de ser el objetivo final, supersedida por la instrucción literal de arquitectura multialmacén. No se modificó código ni producción.
+- **2026-11-09 · REORDENAMIENTO-RESTABLECER-ARCHIVADO-PRIMERO · versión 0.22:** por aprobación expresa del operador, CUSTODIA-B2-006 pasa al primer hito y queda EN CURSO; el prediagnóstico B2-005 se utiliza como insumo y su diagnóstico residual/verificación ampliada queda en segundo hito, sin bloquear el desbloqueo. Después siguen B2-007, RES-001 y RES-002. Se preservan IDs históricos, CUSTODIA-01/03/04 y B2-001..004. No hay autorización de merge/deploy/cutover productivo ni cambios de credenciales/secretos.
+- **2026-11-09 · secuencia de diagnóstico, restablecimiento y resiliencia · versión 0.21 (antecedente):** se registraron cinco tareas nuevas; se preservan CUSTODIA-01/03/04 y B2-001..004. La decisión B2 exclusivo dejó de ser el objetivo final. Esta secuencia fue reorganizada por instrucción posterior del operador.
 - **2026-11-08 · B2 nativo y retoma documental · versión 0.20:** se conserva como antecedente de integración del transporte B2 nativo y sus límites de aceptación; no prueba autenticación física, disponibilidad ni archivado E2E.
 - Las entradas anteriores se conservan en LISTA-TAREAS-PROVISIONAL.md y no se eliminan al actualizar el resumen.
 
