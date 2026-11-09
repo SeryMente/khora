@@ -44,7 +44,7 @@
     "global_uniqueness": "not_verified"
   },
   "acquired_at": "2026-11-09",
-  "bootstrap_scope": "Responsabilidad documental y operativa del frente transversal Custodia: mantener el OCP y los objetos provisionales; conducir la migración Vercel Blob → Backblaze B2 mediante trabajo en rama, revisión y pruebas/entornos aislados no productivos. No autoriza merge/deploy/cutover de producción, aplicación SQL/backfill en Neon Production, cambio de selector de producción, modificación de credenciales, cambios efectivos de seguridad/configuración del bucket o eliminación de objetos fuente.",
+  "bootstrap_scope": "Responsabilidad documental y operativa de Custodia. Alcance adicional autorizado por instrucción directa del operador del 2026-11-09: usar la Master Application Key de la cuenta Backblaze exclusiva KHORA, configurar las dos variables maestras canónicas en Vercel Production, dirigir todas las nuevas escrituras a B2 y, tras estabilizar el archivado, inventariar/copiar todo el histórico Vercel Blob a B2 con read-back y reconciliación. PC-7 es la única terminal RDC disponible. No borrar objetos fuente ni generar Application Keys adicionales. Las referencias productivas de Neon quedan detrás de corrección del defecto updateReferences(), dry-run, transacción e idempotencia.",
   "enforcement": "cooperative registry; no server fencing of arbitrary writes",
   "readback_required": true,
   "transcript_scope": "Instrucción del operador preservada en el original de este ciclo; la continuidad visible se limita a mensajes adquiridos y no es una exportación nativa exhaustiva.",
@@ -227,6 +227,28 @@
       "native_thread_id": "NOT_EXPOSED",
       "instance_alias": "chatgpt-custodia-INSTANCE-20261109-01A1C125",
       "conversation_alias": "chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59"
+    },
+    {
+      "event": "CUSTODIA-B2-KHORA-20261109-01a1c28e-d442-7297-911a-c7b0b5da5be1",
+      "local_event_uuidv7": "01a1c28e-d442-7297-911a-c7b0b5da5be1",
+      "acquired_at": "2026-11-09",
+      "authorization_source": "Instrucción directa y aclaraciones del operador en la conversación actual, preservadas en frentes/custodia/originales/INSTRUCCION-B2-KHORA-Y-BACKFILL-BLOB-20261109.md (blob 4f3abd8e4b2912062d3e87b9b66402bf4adf5d6d). El operador ordenó resolver acceso B2 KHORA, dirigir todas las nuevas escrituras a B2 y transferir posteriormente todo Vercel Blob a B2; confirmó que la cuenta es exclusiva de KHORA y que la Master Application Key se utilizará de forma ubicua; confirmó que PC-7 es la única terminal RDC y prohibió volver a asumir CENTRAL\\\\fila4.",
+      "original": {
+        "path": "frentes/custodia/originales/INSTRUCCION-B2-KHORA-Y-BACKFILL-BLOB-20261109.md",
+        "blob_sha": "4f3abd8e4b2912062d3e87b9b66402bf4adf5d6d",
+        "local_uuidv7": "01a1c28e-d442-7dc9-a18f-c1fdac28de01"
+      },
+      "scope": "Autoriza (1) transferencia segura de KHORA_B2_MASTER_APPLICATION_KEY_ID y KHORA_B2_MASTER_APPLICATION_KEY a las variables canónicas de Vercel Production; (2) preflight, deployment staged/controlled y promoción del runtime B2 tras pruebas satisfactorias; (3) B2 como único destino de nuevas escrituras; y (4) backfill completo/no destructivo de todos los objetos Vercel Blob hacia B2, con inventario, read-back, SHA/bytes, validación KHC1 y reconciliación de referencias conforme a gates documentados. No autoriza crear claves adicionales ni borrar originales Blob.",
+      "exclusions": [
+        "No generar Application Keys adicionales.",
+        "No utilizar credenciales EP ni modificar la cuenta B2 de EP.",
+        "No modificar seguridad/CORS/lifecycle del bucket salvo necesidad específica autorizada.",
+        "No eliminar ni sobrescribir objetos originales Blob.",
+        "No aplicar referencias en Neon Production hasta reparar updateReferences(), pasar dry-run, probar transacción/idempotencia y validar el posestado.",
+        "No asumir ninguna identidad Windows o terminal distinta de la sesión real de PC-7."
+      ],
+      "native_thread_id": "NOT_EXPOSED",
+      "instance_alias": "chatgpt-custodia-INSTANCE-20261109-01A1C125"
     }
   ],
   "previous_control_snapshot": {
@@ -365,13 +387,14 @@
     ]
   },
   "scope_limits": [
-    "No modificar código/producto sin autorización específica de implementación",
-    "No realizar merge, deploy o cutover de producción",
-    "No aplicar SQL/backfill en Neon Production",
-    "No modificar credenciales o claves",
-    "No cambiar configuración real de seguridad/CORS del bucket sin autorización específica",
-    "No borrar ni sobrescribir objetos originales",
-    "No operar sobre el perfil Windows excluido por Metacanon §41.2 / P036"
+    "No crear Application Keys adicionales de Backblaze; usar la Master Application Key de la cuenta exclusiva KHORA.",
+    "No usar, mezclar ni intercambiar credenciales o cuentas B2 de EP.",
+    "No modificar credenciales ni variables ajenas a KHORA B2.",
+    "No modificar CORS, lifecycle ni políticas de seguridad del bucket salvo necesidad técnica demostrada y autorización específica.",
+    "No realizar merge/deploy de producción antes de superar preflight B2, build y pruebas requeridas.",
+    "No ejecutar backfill ni actualización de referencias en Neon Production hasta corregir updateReferences(), demostrar dry-run, transacción, idempotencia y validación del posestado.",
+    "No borrar ni sobrescribir objetos originales de Vercel Blob; conservar fuentes hasta aceptación explícita e independiente.",
+    "No asumir ni solicitar CENTRAL\\\\fila4, PC-14 o PSK14; PC-7 es la única terminal RDC disponible y la identidad real se observa en esa sesión."
   ],
   "previous_owner_generation_7": {
     "status": "assigned",
