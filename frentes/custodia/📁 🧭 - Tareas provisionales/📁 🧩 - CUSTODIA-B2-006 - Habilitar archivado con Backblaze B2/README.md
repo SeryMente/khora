@@ -105,3 +105,11 @@ Cora vuelve a aceptar y archivar registros de prueba de extremo a extremo en el 
 ### Autorización y compuerta · 2026-11-09
 
 El asentimiento contextual del operador queda enlazado al original A [INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md](../../originales/INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md), UUIDv7 local `01a1c17d-189a-7fea-a644-6be002e2c07a`. Alcance autorizado: verificar/corregir solo las variables B2 de Production mediante la bóveda canónica y desplegar a producción únicamente tras pasar todos los criterios de aceptación. La autorización no equivale a ejecución ni permite mostrar secretos. Antes del despliegue se inspeccionará el hook de build `migrate-runtime`; si ejecuta mutaciones de Neon Production fuera de la autorización, el despliegue se detendrá. No se autoriza SQL/backfill productivo, cambios de CORS/seguridad ni borrado/sobrescritura de fuentes.
+
+
+### Límite de acceso a bóveda local · 2026-11-09
+
+- Se inspeccionó de forma no destructiva el equipo remoto PC10RCIF4EI4 (el único usado en este ciclo; no se accedió a equipos excluidos). En la ruta estándar del clon Khora no estaba el repositorio; tampoco apareció `secrets/env-vault.enc.json` ni el archivo temporal DPAPI de acceso de la bóveda bajo el perfil de ese equipo.
+- Esta observación **no prueba** que el repositorio o la bóveda no existan en el equipo activo del operador; solo identifica que no están disponibles en el PC10 consultado.
+- Consecuencia: no se pudo importar la bóveda canónica, comparar el par B2 local con el proveedor ni ejecutar el preflight real. No se leyeron ni modificaron credenciales, y no se realizó PUT/GET de objetos reales ni despliegue.
+- Próximo paso local: desde el clon propietario con la bóveda presente y desbloqueada, importar únicamente las entradas B2 necesarias y ejecutar el preflight de solo lectura. El resultado debe mostrar únicamente etapa/código/HTTP/provider-code; nunca valores.
