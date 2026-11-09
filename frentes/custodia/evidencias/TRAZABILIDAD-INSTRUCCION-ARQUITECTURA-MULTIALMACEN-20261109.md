@@ -77,4 +77,4 @@ El dominio `khora-web.vercel.app` resuelve a `dpl_Dczf3WWnPG4cnCaJhf6PS8MzmxLe`,
 
 ### Preview de corrección aislada · PR #362
 
-Deployment `dpl_9gWxfH72UD2b2S115QpEUwa2M9Bt`, rama `fix/custodia-b2-auth-diagnostics-20261109`, commit `3b684a870a21ccf2f200ee684687beea42e3b235`, creado como preview (target no productivo). Estado al último read-back: BUILDING durante `next build --webpack`. B2 envs están en Production; el preview no ejecuta el preflight nativo ni puede probar auth/PUT/GET. No se afirma build aprobado ni restauración del archivado.
+Deployment `dpl_9gWxfH72UD2b2S115QpEUwa2M9Bt`, rama `fix/custodia-b2-auth-diagnostics-20261109`, commit `3b684a870a21ccf2f200ee684687beea42e3b235`, creado como preview (target no productivo). Estado final READY: compilación, TypeScript y generación de 78/78 páginas completados. No se ejecutaron unitarias ni preflight nativo. B2 envs están en Production; el preview no puede probar auth/PUT/GET. No se afirma restauración del archivado.
