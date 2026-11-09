@@ -117,6 +117,7 @@ Custodia es el frente transversal que define, verifica y gobierna las garantías
 - **Exclusiones vigentes:** no revelar secretos; no rotar por sospecha; no modificar otras variables, CORS/seguridad del bucket, Neon Production, SQL/backfill/migraciones manuales ni objetos originales. Inspeccionar el hook de build antes del despliegue; si ejecuta migraciones de Neon Production fuera de alcance, detener el release hasta autorización específica.
 - **Estado al corte documental:** autorización contextual RECIBIDA; validación de la bóveda y credenciales NO EJECUTADA; preflight/PUT/GET/E2E PENDIENTES; despliegue productivo NO EJECUTADO; archivado restaurado NO DEMOSTRADO.
 - **Evidencia de configuración:** los nombres de las variables B2 y su target Production fueron observados mediante metadatos Vercel sin descifrar valores. No se ha demostrado que el par de credenciales de la bóveda coincida con el valor configurado en Vercel.
+- **Acceso local en esta retoma:** PC10RCIF4EI4 fue inspeccionado de forma no destructiva; la ruta estándar del clon Khora, la bóveda cifrada y el archivo temporal DPAPI no estaban presentes en ese equipo. Esto no demuestra su ausencia en el equipo activo del operador. La importación de bóveda y el preflight no se ejecutaron; no se leyó ni cambió ningún secreto.
 
 ### Corrección de referencia metodológica · 2026-11-09
 
