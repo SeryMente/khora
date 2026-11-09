@@ -18,6 +18,24 @@ test('new B2 writes fail closed when provider flag is not enabled; no Blob fallb
 test('chunk size and total hash bounds are enforced before network access',async()=>{const previous=process.env.KHORA_OBJECT_STORAGE;process.env.KHORA_OBJECT_STORAGE='b2';try{await assert.rejects(()=>putStagingChunk(session,createStagingUploadId(),0,Buffer.alloc(STAGING_CHUNK_BYTES+1)),/storage_staging_chunk_invalid/);await assert.rejects(()=>finalizeStagingUpload(session,createStagingUploadId(),1024,1,'bad'),/storage_staging_invalid/);}finally{if(previous===undefined)delete process.env.KHORA_OBJECT_STORAGE;else process.env.KHORA_OBJECT_STORAGE=previous;}});
 test('untrusted stored URLs are rejected before network access',async()=>{await assert.rejects(()=>fetchStoredObject('http://127.0.0.1/private'),/reference_not_allowed/);});
 test('staging deletion rejects original audio URLs',async()=>{await assert.rejects(()=>deleteStagedObject('https://store.public.blob.vercel-storage.com/dictado/x/1.khc',session),/not_staging/);});
+test('B2 authorization failures retain only HTTP status and sanitized provider code',async()=>{
+ const names=['KHORA_B2_MASTER_APPLICATION_KEY_ID','KHORA_B2_MASTER_APPLICATION_KEY','KHORA_B2_BUCKET_NAME','KHORA_B2_BUCKET_ID','KHORA_B2_REGION'];
+ const before=Object.fromEntries(names.map(k=>[k,process.env[k]]));const originalFetch=globalThis.fetch;let calls=0;
+ try{
+  process.env.KHORA_B2_MASTER_APPLICATION_KEY_ID='synthetic-key-id';process.env.KHORA_B2_MASTER_APPLICATION_KEY='synthetic-key';
+  process.env.KHORA_B2_BUCKET_NAME=c.bucket;process.env.KHORA_B2_BUCKET_ID='bucket-123';process.env.KHORA_B2_REGION=c.region;
+  globalThis.fetch=(async()=>{calls++;return new Response(JSON.stringify({status:401,code:'unauthorized',message:'DO_NOT_LOG_SECRET_OR_PROVIDER_MESSAGE'}),{status:401});}) as typeof fetch;
+  await assert.rejects(()=>inspectB2ReadOnly(),(error:unknown)=>{
+   const failure=error as Error & {status?:number;providerCode?:string};
+   assert.equal(failure.message,'storage_b2_authorization_failed');
+   assert.equal(failure.status,401);
+   assert.equal(failure.providerCode,'unauthorized');
+   assert.equal(failure.message.includes('DO_NOT_LOG_SECRET_OR_PROVIDER_MESSAGE'),false);
+   return true;
+  });
+  assert.equal(calls,1);
+ }finally{globalThis.fetch=originalFetch;for(const k of names){if(before[k]===undefined)delete process.env[k];else process.env[k]=before[k];}}
+});
 test('read-only preflight proves Master Key identity and exact private bucket',async()=>{
  const names=['KHORA_B2_MASTER_APPLICATION_KEY_ID','KHORA_B2_MASTER_APPLICATION_KEY','KHORA_B2_BUCKET_NAME','KHORA_B2_BUCKET_ID','KHORA_B2_REGION'];
  const before=Object.fromEntries(names.map(k=>[k,process.env[k]]));const originalFetch=globalThis.fetch;const calls:string[]=[];
