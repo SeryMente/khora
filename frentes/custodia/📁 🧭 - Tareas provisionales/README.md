@@ -1,8 +1,8 @@
-<!-- TASKS_README_VERSION=0.23; TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
+<!-- TASKS_README_VERSION=0.24; TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
 <!-- TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
 # 📁 Tareas provisionales · Frente Custodia
 
-**Estado:** PROVISIONAL · materialización de ejecución y continuidad; no es canon normativo ni segundo OCP. CUSTODIA-B2-006 está EN CURSO: autenticación Master Key KHORA y prueba física B2 PUT/GET/SHA-256/SSE-B2 aprobadas desde PC-7; falta enlazar variables canónicas a Vercel Production y demostrar archivado E2E.  
+**Estado:** PROVISIONAL · materialización de ejecución y continuidad; no es canon normativo ni segundo OCP. CUSTODIA-B2-006 permanece EN CURSO: Master Key y bucket confirmados; variables canónicas transferidas y verificadas en Vercel Production; preflight B2 PASS y deployment Production READY. Archivado E2E real pendiente.  
 **OCP único:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md).  
 **Control único:** [CONTROL-RESPONSABILIDAD.json](../CONTROL-RESPONSABILIDAD.json).  
 **Titularidad observada:** generación 11 · alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59 · control blob `c29349fc4d2e07d40cd6efe583171482578db6d3`. ID nativo no expuesto.  
@@ -121,3 +121,12 @@ La plantilla no exige fechas objetivo ni responsables por tarea: se añaden solo
 - Vercel Production ya selecciona B2, pero siguen faltando los nombres canónicos KHORA_B2_MASTER_APPLICATION_KEY_ID / KHORA_B2_MASTER_APPLICATION_KEY. No hay deployment nuevo ni archivado E2E demostrado.
 - La autorización de uso Master Key, variables de Production, deployment condicionado y backfill no destructivo está registrada en el control gen. 11; no amplía permisos fuera de KHORA B2 ni autoriza borrar Blob.
 - La secuencia actual pasa a B2-006 → B2-005 → B2-007 → B2-002. RES-001/002 se difieren.
+
+## Retoma operativa verificada · 2026-11-09 · PC-7 / Vercel Production
+
+- Backblaze B2: autenticación Master Key KHORA, identidad del bucket privado y lectura de configuración SSE-B2 verificadas desde Production por el preflight.
+- Transferidas desde EP Vault las dos variables canónicas `KHORA_B2_MASTER_APPLICATION_KEY_ID` y `KHORA_B2_MASTER_APPLICATION_KEY`; read-back de metadatos Vercel confirma una entrada de tipo `sensitive` en Production para cada nombre. Los valores no se revelaron.
+- Deployment Production `dpl_6hUVD7LBXqtmnaMw2nfH2wwyrHUp`, commit `dd9527a223f65e7af834b042d51f716296151bf2`, estado `READY`; preflight `native_auth`, `master_key`, `bucket_identity`, `bucket_private` y `sse_b2_default`: PASS. URL: `https://khora-r25tmr78o-victorhugotorresmendez-8991s-projects.vercel.app`.
+- Para este build se aisló temporalmente el comando y se omitió `migrate-runtime.mjs`; el Build Command original se restauró en la configuración del proyecto después de iniciarse el build. No se ejecutó SQL ni backfill de Neon en este ciclo.
+- La ruta de código de nuevas escrituras usa `putEncryptedObject` (B2-only y fail-closed), y quedó desplegada; el archivado E2E real con sesión propietaria, vínculo/manifiesto y recuperación tras recarga permanece pendiente. Por tanto, la capacidad productiva está preflight-validada y desplegada, pero la aceptación funcional de archivo no está certificada.
+- No se ha iniciado el backfill histórico Blob→B2 ni se ha cambiado ninguna referencia Neon. Los originales Blob siguen sin borrarse.
