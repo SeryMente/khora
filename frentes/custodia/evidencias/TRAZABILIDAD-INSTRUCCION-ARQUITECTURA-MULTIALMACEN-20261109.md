@@ -1,6 +1,6 @@
 # Matriz de trazabilidad · instrucción de arquitectura multialmacén · 2026-11-09
 
-**OCP:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md) · CUSTODIA-v0.27.
+**OCP:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md) · CUSTODIA-v0.29.
 **Fuente literal:** [INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](../originales/INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md). A UUIDv7 local 01a1c138-ead3-7678-a44e-a49bb72f11de (instrucción principal); A2 UUIDv7 local 01a1c134-2125-7263-b011-14bc36a10d03 (corrección de cierre).
 **Estado:** matriz documental verificada contra la entrada fuente y los cinco objetos de tarea. No convierte propuestas en autorización de producto.
 
@@ -63,3 +63,8 @@
 | «Continua» | Continuar el mismo alcance operativo sin ampliar las autorizaciones. | Original de instrucción, OCP v0.29 y este addendum. |
 
 **Estado honesto al cierre de este addendum:** la documentación se reordenó y la primera tarea está en curso. La recuperación del archivado todavía NO está demostrada: el preflight B2 falla en `b2_authorize_account`; el status HTTP/código real no está registrado. No se ha leído ningún secreto ni se ha modificado producción.
+
+
+### Trabajo técnico derivado · PR #362
+
+La orden de «resolver punto 1» dio lugar a una corrección en rama/no producción: PR [#362](https://github.com/SeryMente/khora/pull/362), rama `fix/custodia-b2-auth-diagnostics-20261109`, punta `3b684a870a21ccf2f200ee684687beea42e3b235`. La implementación conserva HTTP status y el código de error saneado de B2, sin cuerpos ni mensajes libres; la prueba unitaria sintética quedó añadida, pero no ejecutada. GitHub Actions no devolvió workflows y los checks Vercel fallaron por limitación del plan/repo privado. PR en borrador; no fusionada ni desplegada. La tarea de restauración sigue bloqueada por autenticación B2 no caracterizada y compuertas productivas explícitas.
