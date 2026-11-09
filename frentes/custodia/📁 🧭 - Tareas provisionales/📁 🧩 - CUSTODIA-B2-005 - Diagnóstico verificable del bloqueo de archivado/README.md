@@ -124,3 +124,18 @@ La lectura actual de Vercel y de `main` deja los siguientes hechos, con sus lím
 **Dictamen:** hay fallos demostrados adicionales al antecedente de cuota de Blob. El último error B2 específico permanece en autenticación; su causa exacta está pendiente de capturar status/código. No existe evidencia de PUT/GET físico ni de archivado E2E exitoso; por tanto, Cora/Khora continúa NO RESTABLECIDA/NO DEMOSTRADA.
 
 **Fuentes:** [evidencia consolidada de B2 Production](../../evidencias/DIAGNOSTICO-B2-PRODUCTION-20261109.md), [retoma A](../../originales/INSTRUCCION-RETOMA-CUSTODIA-20261109.md), eventos de los tres deployments arriba identificados y metadatos Vercel Production sin valores secretos.
+
+
+## Actualización posterior · 2026-11-09 · autenticación local B2 confirmada
+
+La explicación «credencial KHORA incorrecta» deja de ser el diagnóstico principal: desde la única terminal RDC disponible, PC-7 (PC-7\\PC 7), EP Vault inyectó las dos variables maestras KHORA a un proceso hijo aislado y Backblaze aceptó b2_authorize_account.
+
+- Account ID y Key ID coincidieron.
+- La cuenta devolvió capacidades maestras y el listado del bucket correcto.
+- Bucket khora-userdata-ecea4187, ID 35b8cbd6623b54a5a9130c18, allPrivate, con pertenencia de cuenta confirmada.
+- Vercel Production todavía tiene solo los nombres heredados KHORA_B2_KEY_ID / KHORA_B2_APPLICATION_KEY; faltan los nombres canónicos KHORA_B2_MASTER_APPLICATION_KEY_ID / KHORA_B2_MASTER_APPLICATION_KEY. No se descifraron valores.
+- El selector Production KHORA_OBJECT_STORAGE está en B2 y KHORA_B2_PREFLIGHT=1.
+- No se acreditó PUT/GET físico ni archivado E2E. La causa local de autenticación está resuelta; la conexión de Production y su despliegue siguen pendientes.
+- Los errores OIDC/PostgreSQL siguen sin correlación demostrada con archivado. El estado actual de Vercel Blob no se volvió a consultar en este ciclo.
+
+**Dictamen actualizado:** el bloqueo no es inexistencia de la cuenta ni rechazo de la Master Key KHORA. El siguiente punto causal es alinear los secretos canónicos de Vercel Production y completar el roundtrip físico.
