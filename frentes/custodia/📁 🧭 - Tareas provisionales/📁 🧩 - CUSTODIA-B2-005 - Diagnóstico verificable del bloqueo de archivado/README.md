@@ -29,8 +29,9 @@ Fuentes: OBJETO-CANONICO.md, LISTA-TAREAS-PROVISIONAL.md, originales/ChatGPT-CUS
 - Usar datos sintéticos en pruebas no productivas; separar evidencia histórica de evidencia actual.
 
 **No incluye**
-- Leer, copiar, mostrar o rotar credenciales; modificar bóvedas o variables productivas.
-- Cambiar código de producto, hacer merge/deploy, aplicar SQL productivo o alterar bucket/CORS.
+- Revelar, copiar a la conversación o registrar valores secretos.
+- Modificar variables productivas desde esta tarea; la autorización específica de verificación/corrección B2 Production pertenece a CUSTODIA-B2-006 y se ejecuta únicamente mediante la bóveda canónica.
+- Hacer merge/deploy antes de que B2-006 supere sus gates, aplicar SQL/backfill productivo o alterar bucket/CORS.
 - Leer o exportar el texto/audio personal de la sesión real.
 
 ## 4. Secuencia mínima
@@ -99,3 +100,9 @@ El operador aprobó iniciar la recuperación del archivado sin esperar a complet
 - La corrección #355 del botón de archivado sí se fusionó y se desplegó antes del bloqueo B2; no prueba que B2 esté operativo.
 
 **Estado:** prediagnóstico parcial COMPLETADO; diagnóstico residual y verificación E2E PENDIENTES.
+
+## Actualización de autorización y PR diagnóstica · 2026-11-09
+
+El operador respondió «Correcto , actualiza tareas provisionales rapidamente, y resuelve.» a la pregunta explícita de autorización sobre credenciales B2 de Production y despliegue condicionado. El original A es [INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md](../../originales/INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md), UUIDv7 local `01a1c17d-189a-7fea-a644-6be002e2c07a`. La verificación/corrección de B2 Production se asigna a B2-006; esta tarea conserva el diagnóstico residual y E2E sin modificar por sí sola credenciales.
+
+PR #362 sigue OPEN · DRAFT · NOT MERGED, head `3b684a870a21ccf2f200ee684687beea42e3b235`, 3 archivos. La Preview asociada está READY con compilación y TypeScript correctos (78/78 páginas), pero no ejecutó preflight B2 por ausencia de variables B2 en Preview. La prueba unitaria añadida no fue ejecutada. Por tanto, no hay todavía status HTTP/código B2 actual ni evidencia de PUT/GET físico; todos los criterios de aceptación de esta tarea permanecen PENDIENTES.
