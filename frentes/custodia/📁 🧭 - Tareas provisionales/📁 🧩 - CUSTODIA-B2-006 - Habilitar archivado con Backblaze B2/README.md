@@ -107,15 +107,34 @@ Cora vuelve a aceptar y archivar registros de prueba de extremo a extremo en el 
 El asentimiento contextual del operador queda enlazado al original A [INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md](../../originales/INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md), UUIDv7 local `01a1c17d-189a-7fea-a644-6be002e2c07a`. Alcance autorizado: verificar/corregir solo las variables B2 de Production mediante la bóveda canónica y desplegar a producción únicamente tras pasar todos los criterios de aceptación. La autorización no equivale a ejecución ni permite mostrar secretos. Antes del despliegue se inspeccionará el hook de build `migrate-runtime`; si ejecuta mutaciones de Neon Production fuera de la autorización, el despliegue se detendrá. No se autoriza SQL/backfill productivo, cambios de CORS/seguridad ni borrado/sobrescritura de fuentes.
 
 
-### Límite de acceso a bóveda local · 2026-11-09
+### Nota de acceso local anterior · SUPERSEDIDA EN ESTA RETOMA
 
-- Se inspeccionó de forma no destructiva el equipo remoto PC10RCIF4EI4 (el único usado en este ciclo; no se accedió a equipos excluidos). En la ruta estándar del clon Khora no estaba el repositorio; tampoco apareció `secrets/env-vault.enc.json` ni el archivo temporal DPAPI de acceso de la bóveda bajo el perfil de ese equipo.
-- Esta observación **no prueba** que el repositorio o la bóveda no existan en el equipo activo del operador; solo identifica que no están disponibles en el PC10 consultado.
-- Consecuencia: no se pudo importar la bóveda canónica, comparar el par B2 local con el proveedor ni ejecutar el preflight real. No se leyeron ni modificaron credenciales, y no se realizó PUT/GET de objetos reales ni despliegue.
-- Próximo paso local: desde el clon propietario con la bóveda presente y desbloqueada, importar únicamente las entradas B2 necesarias y ejecutar el preflight de solo lectura. El resultado debe mostrar únicamente etapa/código/HTTP/provider-code; nunca valores.
+- La mención de PC10RCIF4EI4 describe una sesión efímera antigua, de días previos. El operador indicó expresamente que debe descartarse; no es la estación activa ni un bloqueo vigente.
+- No volver a utilizar ni a investigar esa sesión PC10. No inferir que la bóveda o el clon estén ausentes en el equipo actual por la inspección histórica.
+- La instrucción actual reporta EP Vault abierta con las notas efímeras de Key ID y Master Application Key. No se ha leído ni promovido ninguno de esos valores en este ciclo.
+- «PSK14» es el identificador literal informado para la conexión RDS. Su correspondencia con un dispositivo y, especialmente, con la identidad efectiva del perfil operativo no está verificada. Antes de cualquier operación local se debe validar `whoami`, SID y perfil de destino autorizado; no utilizar PC 13 ni MantenimientoRCI.
+- No copiar secretos a chat, documentación, argumentos, historial de shell o logs. Promover cada valor mediante la bóveda canónica y el flujo de portapapeles autorizado, de forma individual, con read-back sin imprimirlo.
 
-### Compuerta adicional del build de Production · 2026-11-09
+### Orden de build y efecto real de migraciones · CORREGIDO · 2026-11-09
 
-- Se inspeccionó `khora-web/scripts/migrate-runtime.mjs` (blob `52e98b1ce1db3d18881bef66443a0af0b1b74095`). El build productivo observado ejecuta `node scripts/migrate-runtime.mjs; next build --webpack`; el script abre `DATABASE_URL` y aplica mediante PostgreSQL los archivos `023_runtime_state.sql`, `024_oauth_scopes.sql`, `025_normative_receipts.sql`, `026_normative_turns.sql`, `027_manual_mcp_tokens.sql`, `028_normative_order_ledger.sql`, `029_github_credentials.sql` y `032_graph_twins.sql`.
-- Aunque varias instrucciones SQL usan `IF NOT EXISTS`, el script es una vía de mutación de esquema de Neon Production. La autorización recibida cubre credenciales B2 y despliegue condicionado, pero excluye migraciones/SQL productivo; no se ejecutó este script ni se intentó deploy.
-- **Gate de release:** Production permanece bloqueado mientras el build hook incluya esas migraciones. Solo se puede proceder si se aprueba específicamente esa mutación o si se prepara y valida una ruta de build/deploy que no ejecute mutaciones de base de datos ni cambie comportamiento fuera del alcance autorizado.
+La inspección cruzada de eventos Vercel corrige la nota previa: no todos los intentos se detuvieron antes de migrar.
+
+1. **Deployment `dpl_36DeUEnuz2zoWtMJqp1BsZjWASUJ` · commit `b52003ee1809ad506db74e8ee97f0905f7aae91a`.** El comando observado ejecutó primero `node scripts/migrate-runtime.mjs` y después `node --import tsx scripts/preflight-object-storage.ts`. El log del proveedor informa: «Migraciones 023-029 de runtime, OAuth, evidencia normativa, Bearer manual y ledger de orden aplicadas». Tras ello, el preflight falló en `encrypted_roundtrip` con `storage_provider_request_failed`. Por tanto, es falso afirmar que el hook nunca se ejecutó.
+2. **Deployment `dpl_DwfJkUPZ4NJnjTXgKCPFRNY5FR2f` · commit `7be5712a19aa98837e6d34449585ecb40e634af3`.** El comando observado fue `preflight-object-storage.ts && migrate-runtime.mjs`. El preflight nativo falló en `b2_authorize_account` con `storage_b2_authorization_failed`; por la semántica de `&&`, ese intento no alcanzó el hook de migraciones.
+3. El archivo inspeccionado `khora-web/scripts/migrate-runtime.mjs` enumera 023–029 y `032_graph_twins.sql`. El log confirma expresamente la aplicación de 023–029; no permite confirmar por separado el resultado de 032. No inferirlo.
+4. La autorización recibida cubre exclusivamente la comprobación/corrección B2 y el despliegue condicionado a todos los gates; no cubre nuevas migraciones, SQL ni backfill productivo. El hecho histórico de que un build ya haya ejecutado 023–029 no autoriza repetirlo.
+
+**Gate vigente:** no provocar otro build/deployment Production mientras el hook pueda volver a ejecutar mutaciones de Neon sin verificar el estado aplicado y sin un procedimiento aprobado que evite mutaciones fuera de alcance. Registrar cualquier comprobación de esquema solo mediante evidencia autorizada y no destructiva. No retirar a ciegas el hook ni cambiar el comportamiento del proyecto sin revisión presencial del operador, dado que afecta seguridad/arquitectura.
+
+### Retoma actual · EP Vault y diagnóstico B2 · 2026-11-09
+
+- **Instrucción A:** [INSTRUCCION-RETOMA-CUSTODIA-20261109.md](../../originales/INSTRUCCION-RETOMA-CUSTODIA-20261109.md) · UUIDv7 local `01a1c193-eccc-78ad-bcb1-a7f102ff4733`.
+- **Evidencia vigente:** [DIAGNOSTICO-B2-PRODUCTION-20261109.md](../../evidencias/DIAGNOSTICO-B2-PRODUCTION-20261109.md).
+- En el inventario no descifrado de Vercel Production existen los nombres heredados `KHORA_B2_KEY_ID` y `KHORA_B2_APPLICATION_KEY`, además de `KHORA_OBJECT_STORAGE`, `KHORA_B2_PREFLIGHT`, `KHORA_B2_BUCKET_NAME` y `KHORA_B2_BUCKET_ID`. No aparecen los nombres canónicos `KHORA_B2_MASTER_APPLICATION_KEY_ID` y `KHORA_B2_MASTER_APPLICATION_KEY`. Los valores no fueron leídos.
+- El código nativo prioriza los nombres canónicos y usa los heredados como fallback. La falta de nombres canónicos en Vercel es una diferencia de configuración constatada, pero no basta para concluir qué credencial concreta B2 rechazó.
+- El operador reporta que EP Vault sigue abierta y que las notas efímeras contienen ambos valores. No se ha leído el contenido, no se ha promovido a la bóveda formal, no se han importado variables y no se ha ejecutado el preflight desde esa sesión.
+- El último preflight nativo disponible sigue siendo fallo de autenticación B2. El HTTP status y el código del proveedor no se conservan en ese deployment; PR #362 añade captura saneada pero continúa OPEN · DRAFT · NOT MERGED, y su preview no dispone de las variables Production.
+- **Estado de aceptación:** autenticación, PUT/GET físico, SHA-256/bytes, vínculo/manifiesto de partes, archivado E2E y recuperación tras recarga siguen PENDIENTES. Cora/Khora no se declara restaurada.
+
+**Siguiente acción causal:** resolver la conexión RDS referida como `PSK14`, validar que el proceso opere bajo un perfil autorizado y comprobar la sesión abierta de EP Vault. Después promover cada valor individualmente a la bóveda canónica mediante portapapeles, leer de vuelta sin imprimir secretos e importar solo las dos variables canónicas para ejecutar el preflight de solo lectura. No usar PC10, no exponer secretos, no rotar por sospecha y no reintentar despliegue productivo con migraciones.
+
