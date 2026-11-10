@@ -1,4 +1,4 @@
-<!-- TASKS_README_VERSION=0.29; TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
+<!-- TASKS_README_VERSION=0.30; TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
 # Tareas vigentes · Frente Custodia
 
 **Estado:** PROVISIONAL · índice de ejecución subordinado al [OCP único](../OBJETO-CANONICO.md).  
@@ -18,7 +18,7 @@
 
 | ID | Estado | Alcance único |
 |---|---|---|
-| CUSTODIA-B2-006 | EN CURSO · P0 | Completar y validar persistencia nueva B2-only con read-back físico SHA-256/longitud; indicador por archivo Blob histórico; aislamiento de fallos; pruebas y publicación cuando pasen los gates. |
+| CUSTODIA-B2-006 | EN CURSO · P0 | Ejecutar la aceptación E2E autenticada pendiente: captura nueva, recuperación tras recarga y cotejo de bytes/longitud/SHA-256; comprobar aislamiento de texto/checkpoints y comportamiento de sesión mixta. Production ya está publicada. |
 
 ## Trabajo diferido · no ejecutar en este hito
 
@@ -42,13 +42,18 @@ No hay una secuencia posterior automática: reactivar Blob no autoriza por sí m
 
 CUSTODIA-01, CUSTODIA-03 y CUSTODIA-04 conservan sus identidades y estados previos fuera de esta entrega. CUSTODIA-02 permanece retirada; no reutilizar el ID.
 
-## Gates de aceptación
+## Gates de aceptación y estado
 
-1. Nuevas escrituras únicamente B2 y fail-closed; ninguna escritura secundaria a Blob.
-2. GET/read-back y cotejo SHA-256/bytes antes de registrar una escritura B2 como verificada.
-3. Estado por objeto para Blob histórico: temporalmente no disponible, recuperación/migración pendiente.
-4. Prueba de que el bloqueo legacy no interrumpe texto, checkpoints, edición ni nuevas capturas B2.
-5. Prueba de sesión autenticada real, recarga y recuperación desde B2.
-6. Typecheck, suites relevantes y build del commit exacto PASS antes de publicar.
+| Gate | Estado verificable |
+|---|---|
+| 1. Nuevas escrituras solo B2, fail-closed y sin escritura secundaria Blob | PASS en el adaptador y suite focal |
+| 2. GET/read-back y cotejo SHA-256/longitud antes de registrar verificado | PASS en prueba sintética del adaptador; captura real autenticada pendiente |
+| 3. Estado individual Blob legacy temporalmente no disponible / recuperación pendiente | Implementado y publicado; smoke UI autenticado pendiente por SSO |
+| 4. Texto, checkpoints y edición no dependen de Blob legacy | Implementado por separación de rutas; demostración autenticada pendiente |
+| 5. Captura autenticada, recarga y read-back B2 | PENDIENTE — requiere sesión KHORA autorizada en navegador |
+| 6. Typecheck, UI Contract, cuatro suites focales y build | PASS en Preview del código de aplicación; Production build y TypeScript PASS |
+| 7. Preflight y publicación Production | PASS — deployment `dpl_6M6ebaAvNPpAtRspfX5QhffEJvVJ` READY; SHA `f0224c1`; preflight B2 read-only PASS |
+
+La suite unitaria global no se declara PASS. El fetch anónimo del alias canónico devolvió `login_required` por SSO y los perfiles de navegador conectados no tienen sesión KHORA registrada; no se ha simulado login ni captura.
 
 No ejecutar migración histórica, backfill, actualización de referencias SQL/JSONB, borrado de originales ni reactivación de lectura Blob dentro de este hito.
