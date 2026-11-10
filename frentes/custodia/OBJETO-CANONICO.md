@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.46; OBJECT_SEAL=CUSTODIA-v0.46; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.47; OBJECT_SEAL=CUSTODIA-v0.47; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.46. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.47. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -877,12 +877,58 @@ Estados de salida: `ARCHIVADO_VERIFICADO`, `PARCIAL_ARCHIVADO`, `BLOQUEADO_AHORA
 
 - El control [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json) permanece en generación 11; no se transfirió titularidad ni se alteró su SHA durante este ciclo.
 - La instrucción de objetivo cambia el resultado solicitado y la lista de tareas. No borra las compuertas técnicas aún vigentes para escrituras en Neon Production, idempotencia, integridad y lectura de vuelta. La autorización C sí queda registrada para las dos sesiones locales, pero no se presume que todos los controles de producción estén superados.
-- La salida literal previa preguntó por una ampliación formal del OCP para archivar los registros de la cuenta. En el tramo suministrado no aparece una respuesta afirmativa explícita a esa pregunta completa; por tanto, no se declara concedida esa ampliación adicional ni se eluden las compuertas del control.
+- La pregunta previa delimitó expresamente la ampliación: procesar las dos sesiones locales, leer B2/Blob cuando sea posible, crear y vincular Volcados en Neon Production con idempotencia, SHA y read-back, excluir otros titulares y registros sin titular, y preservar originales. La respuesta inmediata del operador fue «Si tienes las autorizaciones que necesias», afirmativa en ese contexto. La autorización se registra en `originales/INSTRUCCION-AUTORIZACION-ARCHIVO-PRODUCTION-20261110.md` y en la adenda del control generación 11. No se interpreta como autorización ilimitada.
 - **Acciones ejecutadas en este ciclo:** persistencia documental y actualización de la lista/expediente/OCP en la rama de trabajo, con lectura de vuelta exacta.
 - **Acciones no ejecutadas en este ciclo:** no se archivó ningún Volcado, no se hicieron escrituras en Neon Production/B2/Vercel Blob, no se descifró audio, no se modificaron código, credenciales, despliegue ni perfiles locales.
+
+- **Eficiencia solicitada por el operador:** reducir rondas burocráticas y comprobaciones redundantes, agrupar lecturas/consultas y evitar repetir cotejos ya respaldados por evidencia vigente. No se omiten los controles de alto impacto: titularidad, exclusión de archivados, SHA/longitud/bytes cuando se copian objetos, idempotencia de vínculos, lectura de vuelta del archivo y preservación de fuentes. Se acepta el riesgo de que una primera ejecución requiera corrección, pero no el riesgo de corromper, duplicar o atribuir material incorrectamente.
+- **Acciones documentales de este ciclo:** registrar la autorización contextual, actualizar OCP, índice de tareas, expediente y control de responsabilidad; lectura de vuelta requerida para cada artefacto.
+- **Acciones de archivo:** autorizadas dentro del alcance descrito, pero su ejecución y verificación se reportarán por separado; esta actualización documental no declara ningún Volcado creado ni ninguna copia B2/Neon ya realizada.
 
 ### 17.7 Criterio de cierre actualizado
 
 CUSTODIA-01 se resolverá cuando todos los registros archivables con los medios y permisos vigentes hayan quedado archivados y verificados, y únicamente permanezcan registros que en el momento del cierre no puedan archivarse por bloqueos concretos, ausencia de titularidad demostrable o ausencia confirmada de contenido. Todo residual debe identificar el registro/componente, causa actual, evidencia, fuente consultada y condición necesaria para reabrirlo.
 
 La sección 16 y el objetivo exclusivamente inventarial de CUSTODIA-v0.45 quedan preservados como antecedente histórico; esta sección 17 gobierna el objetivo operativo actual.
+
+
+## 18. Autorización de ejecución y política de eficiencia · 2026-11-10 · CUSTODIA-v0.47
+
+### 18.1 Autorización contextual registrada
+
+El operador respondió afirmativamente a la pregunta concreta de ampliación de autorización para ejecutar el archivo histórico de los registros de su cuenta. La respuesta literal fue: «Si tienes las autorizaciones que necesias.» La pregunta precedente enumeró el procesamiento de los 216 fragmentos locales, el read-back físico de B2, la recuperación de Blob cuando vuelva a ser legible, y la creación/vinculación de Volcados en Neon Production con idempotencia, SHA y lectura de vuelta.
+
+La instrucción literal y su contexto se conservan en [INSTRUCCION-AUTORIZACION-ARCHIVO-PRODUCTION-20261110.md](originales/INSTRUCCION-AUTORIZACION-ARCHIVO-PRODUCTION-20261110.md). Se registra como autorización específica para CUSTODIA-01, no como permiso ilimitado.
+
+### 18.2 Alcance autorizado
+
+1. Consultar los checkpoints y metadatos necesarios para clasificar y archivar las sesiones de la cuenta propietaria confirmada.
+2. Archivar como texto las transcripciones sin audio localizado, con `Audio: No localizado` y `Procedencia: No verificada`.
+3. Leer y cotejar los objetos B2 elegibles; procesar los 216 fragmentos locales de las dos sesiones autorizadas, transferirlos a B2, verificar bytes/longitud/SHA y vincularlos.
+4. Crear los Volcados y vínculos correspondientes en Neon Production para los registros elegibles, con idempotencia y lectura de vuelta.
+5. Leer objetos Vercel Blob cuando el proveedor permita GET; mientras el almacén permanezca suspendido, conservarlos como existentes/bloqueados.
+6. No archivar bajo la cuenta del operador los seis registros de otros titulares ni los 81 sin titularidad demostrada. No inspeccionar el perfil Chrome excluido.
+7. No borrar ni sobrescribir originales locales, B2, Blob o Neon. No crear claves B2 adicionales ni usar credenciales EP.
+
+### 18.3 Eficiencia sin sacrificar integridad
+
+- Agrupar consultas por tabla/proveedor y procesar lotes con manifiestos deterministas.
+- No repetir una lectura física ya verificada si el objeto, versión, longitud y SHA no han cambiado y la evidencia es trazable al mismo localizador.
+- Aplicar una sola comprobación previa de elegibilidad por sesión y una verificación posterior por unidad archivada.
+- No exigir pruebas de resiliencia, fault injection, nuevas capturas ni auditorías generales fuera del objetivo.
+- Mantener como controles no negociables: propietario, no duplicación, integridad del objeto copiado, idempotencia de archivo, read-back del resultado y conservación de originales.
+- Si una unidad falla, aislarla y continuar con las demás; no detener todo el lote por un fallo independiente.
+
+### 18.4 Secuencia inmediata
+
+1. Revalidar el estado mínimo actual de la rama y de los almacenes que se van a tocar.
+2. Archivar primero las sesiones de texto cuyo audio no está localizado, sin confundirlas con las dos sesiones que tienen audio local.
+3. Procesar las dos sesiones locales autorizadas y las partes B2 con verificación física.
+4. Registrar por separado las sesiones con Blob bloqueado y los casos sin titularidad.
+5. Hacer lectura de vuelta de los Volcados/vínculos creados y conciliar el conjunto final.
+
+### 18.5 Estado de ejecución
+
+La autorización queda registrada; la ejecución no se presume. Cada lote debe terminar con cantidades de entrada, éxito, fallo y residuales; los fallos individuales no detienen el resto del trabajo. La tarea CUSTODIA-01 permanece EN CURSO hasta completar el archivo y dejar únicamente los impedimentos actuales documentados.
+
+La sección 17 queda preservada como antecedente inmediato; esta sección 18 gobierna la autorización y la eficiencia actuales.
