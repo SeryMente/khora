@@ -1,100 +1,99 @@
-<!-- TASK_VERSION=0.1; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
-# CUSTODIA-01 · Inventario forense de dictados recuperables y conciliación del panel
+<!-- TASK_VERSION=0.2; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
+# CUSTODIA-01 · Archivo de todos los registros recuperables
 
 > **Estado:** EN CURSO · **Prioridad:** P0 · **Único expediente activo del frente CUSTODIA.**  
 > **OCP padre:** [OBJETO-CANONICO.md](../../OBJETO-CANONICO.md).  
 > **Control de responsabilidad:** [CONTROL-RESPONSABILIDAD.json](../../CONTROL-RESPONSABILIDAD.json).  
 > **Índice provisional:** [LISTA-TAREAS-PROVISIONAL.md](../../LISTA-TAREAS-PROVISIONAL.md).
 
-## 1. Objetivo
+## 1. Objetivo vigente
 
-Determinar, archivo por archivo y dictado por dictado, qué contenido histórico permanece conservado y qué puede recuperarse en el estado actual de las fuentes. Conciliar el resultado con el panel «Recuperar capturas» para establecer qué elementos deben figurar allí y cuáles deben excluirse por estar archivados, no contener artefactos o haber sido confirmados como irrecuperables.
+Archivar todos los registros históricos de dictado/captura que puedan archivarse con el contenido existente, la titularidad comprobada y las autorizaciones aplicables. Al cerrar, deben quedar pendientes únicamente los registros que no puedan archivarse en este momento por un impedimento concreto y documentado.
 
-El objetivo no es certificar que KHORA funciona, probar la resiliencia del producto, reparar fallos ni recuperar/migrar datos. Se observa el resultado histórico que el sistema dejó y su disponibilidad actual.
+El alcance es operativo y acotado al archivo de los registros que el sistema alcanzó a conservar. No incluye auditoría general de resiliencia, pruebas de nuevos dictados, escenarios sintéticos de fallo, reparación general de producto, rediseño de arquitectura ni certificación de que KHORA no pierde datos.
 
-## 2. Clasificación obligatoria por unidad de contenido
+## 2. Reglas de archivo
+
+1. Archivar cada unidad elegible sin duplicar Volcados ya existentes y sin sobrescribir la fuente.
+2. Verificar cada resultado persistido con la lectura de vuelta y los cotejos disponibles; no considerar suficiente la respuesta HTTP ni un estado escrito en metadatos.
+3. Mantener el estado de cada componente por separado: texto/checkpoint, cada parte de audio y MP3. Una parte archivada no convierte automáticamente toda la captura mixta en archivada.
+4. Si hay transcripción y no se localiza audio, archivar el texto sin audio, con `Audio: No localizado` y `Procedencia: No verificada`. No afirmar que fue copy/paste ni inferir su origen.
+5. Un objeto Vercel Blob localizado pero bloqueado por suspensión/cuota no equivale a audio inexistente. Debe permanecer registrado como existente/bloqueado; no marcarlo `No localizado`.
+6. Para los 216 fragmentos locales de las dos sesiones identificadas, aplicar el mecanismo de KHORA, transferir a B2 y cotejar bytes/longitud/SHA antes de vincularlos; conservar intactos los originales locales. La decisión C fue autorizada expresamente por el operador.
+7. No archivar bajo la cuenta del operador sesiones de otros titulares ni registros sin titularidad demostrada. No usar `reclamarSesion()` como prueba de titularidad histórica.
+8. Excluir lo que ya está correctamente archivado y deduplicar por vínculos/identidad comprobable.
+9. No inventar texto, audio, procedencia, titularidad, UUID, ID de Volcado, URL, SHA, tamaño ni estado de verificación.
+
+## 3. Secuencia interna de CUSTODIA-01
+
+Las siguientes fases son subunidades del expediente existente. No crean IDs maestros adicionales ni folios.
+
+### CUSTODIA-01.a · Conciliación de candidatos y exclusiones
+
+- Reunir sesiones, texto, revisiones, partes, MP3, localizadores, snapshots y Volcados.
+- Confirmar propietario y excluir archivados/duplicados.
+- Usar como única fuente local Chrome autorizada el perfil `Profile` vinculado a `the.willfreeman@gmail.com` en el equipo `PC10RCIF4EI4`; ignorar el otro perfil.
+- Tratar los conteos heredados como línea base reportada hasta su nueva lectura.
+
+### CUSTODIA-01.b · Archivo de texto sin audio localizado
+
+- Archivar las transcripciones elegibles aunque no se localice audio, conforme a la instrucción del operador.
+- Marcar audio como `No localizado` y procedencia como `No verificada`.
+- No atribuirles origen copy/paste, voz ni otro canal sin evidencia.
+
+### CUSTODIA-01.c · Archivo de audio B2
+
+- Leer los objetos B2 de las sesiones elegibles.
+- Cotejar bytes, longitud y SHA-256 del objeto leído frente al manifiesto y los datos de Neon.
+- Archivar y vincular cada sesión/parte solo después del cotejo requerido.
+- Si un objeto no se puede leer o no coincide, conservarlo como pendiente con el motivo preciso.
+
+### CUSTODIA-01.d · Archivo de audio local autorizado (decisión C)
+
+- Procesar los 216 fragmentos cifrados de dos sesiones con el mecanismo de descifrado propio de KHORA.
+- No exponer claves ni texto/audio en logs o documentación.
+- Escribir los objetos en B2 y validar la copia con read-back, longitud y SHA-256.
+- Vincularlos a las sesiones correspondientes y preservar todos los registros/bytes locales originales.
+
+### CUSTODIA-01.e · Casos con bloqueo actual
+
+- Mantener identificados los objetos Vercel Blob que existen por referencia/listado pero no se pueden leer por suspensión/cuota.
+- Mantener pendientes los registros con referencias B2 no cotejadas físicamente.
+- Mantener separados los registros sin propietario demostrado y los que pertenecen a otros titulares.
+- No convertir un bloqueo temporal en irrecuperabilidad ni borrar evidencia.
+
+### CUSTODIA-01.f · Cierre de archivo y residuales
+
+- Para cada registro, consignar estado final de archivo, componentes incluidos/faltantes, vínculos, prueba de lectura de vuelta y fecha.
+- Retirar del conjunto pendiente solo los registros cuyo archivo haya sido verificado.
+- Dejar como residuales únicamente los registros con impedimento actual, individualizado y sustentado, o sin contenido/titularidad demostrables.
+- Conciliar el resultado con «Recuperar capturas»: archivados fuera, parciales/bloqueados visibles con el estado real y sin duplicaciones.
+
+## 4. Estados de salida
 
 | Estado | Criterio |
 |---|---|
-| RECUPERABLE_AHORA | El contenido físico existe y una lectura actual autorizada permite obtenerlo. |
-| EXISTE_BLOQUEADO | El objeto o contenido está localizado y existe evidencia suficiente de su persistencia, pero un bloqueo temporal/proveedor impide leerlo ahora (por ejemplo, Vercel Blob suspendido). |
-| REFERENCIA_SIN_COTEJO_FISICO | Hay URL, fila, manifiesto, hash o referencia, pero todavía no se demostró que el contenido físico siga existiendo. |
-| SOLO_SEÑAL_SIN_CONTENIDO | Solo hay telemetría, eventos o metadatos de captura; no se ha localizado texto/audio/archivo. |
-| IRRECUPERABLE_CONFIRMADO | Se agotaron las fuentes pertinentes y no queda copia ni contenido recuperable. Debe adjuntarse evidencia de búsqueda y descarte por fuente. |
-| NO_INSPECCIONADO | La fuente no pudo consultarse o no se ha consultado. No equivale a pérdida ni permite declarar irrecuperabilidad. |
+| ARCHIVADO_VERIFICADO | Volcado/vínculos persistidos y lectura de vuelta cotejada para los componentes archivados. |
+| PARCIAL_ARCHIVADO | Se archivó un componente (por ejemplo, texto), pero otro componente de la misma captura sigue pendiente. |
+| BLOQUEADO_AHORA | El contenido existe/localizador confirmado, pero un impedimento actual impide completar su archivo. |
+| PENDIENTE_TITULARIDAD | Hay contenido o referencia, pero no está probada la titularidad que permita archivarlo bajo esta cuenta. |
+| PENDIENTE_INTEGRIDAD | Existe referencia, pero falta lectura física o cotejo de integridad. |
+| SIN_CONTENIDO_LOCALIZADO | Solo queda metadata/telemetría o no se localizó contenido tras inspeccionar fuentes pertinentes. |
+| IRRESOLUBLE_EN_ESTE_MOMENTO | Se agotaron los pasos permitidos y el impedimento concreto impide archivarlo ahora; mantener evidencia y no borrar fuentes. |
 
-El estado debe asignarse por componente cuando la captura sea mixta: texto/checkpoint y cada parte de audio, incluidos MP3 actuales e históricos. No extender a todas las partes el estado de una sola.
+Los estados se asignan por registro y por componente; no se infiere el estado de audio a partir del texto ni viceversa.
 
-## 3. Desglose provisional de trabajo
+## 5. Límites y compuertas
 
-Estas fases son subunidades internas de CUSTODIA-01; no crean nuevos identificadores maestros CUSTODIA, folios ni expedientes independientes.
+- No auditar resiliencia general, probar nuevas capturas ni ejecutar fault injection/E2E ajenos al archivo histórico.
+- No reparar código, UI, proveedor o datos como parte de este objetivo. Si el archivo requiere una modificación de producto no comprendida en el control vigente, documentar el bloqueo y no implementarla por inferencia.
+- No migrar el histórico Vercel Blob a B2 como tarea de proveedor independiente; el objetivo es archivar registros elegibles. Los objetos Blob bloqueados permanecen intactos.
+- No borrar ni sobrescribir fuentes locales, B2, Blob o Neon.
+- El control generación 11 y sus compuertas de producción siguen vigentes. Esta actualización cambia el objetivo del expediente, pero no elimina gates de escritura en Neon Production, idempotencia, integridad ni read-back.
+- La decisión C del operador autoriza procesar las dos sesiones de audio local y su copia verificable; la ejecución sigue sujeta a las compuertas técnicas y de producción registradas.
 
-### CUSTODIA-01.a · Inventario relacional y de contenido lógico
+## 6. Criterio de cierre
 
-- Enumerar sesiones anteriores al corte, estados, propietarios registrados, checkpoint_text, revisiones/checkpoints y revisiones históricas.
-- Enumerar cada parte de audio con su índice, proveedor, URL/localizador, estado histórico de verificación, longitud y SHA cuando estén registrados.
-- Incluir MP3 actuales e históricos, manifiestos, Volcados y relaciones de archivo.
-- Separar referencias, metadatos y contenido físicamente observado.
-- No escribir ni reparar relaciones en Neon.
+CUSTODIA-01 se resuelve cuando todos los registros elegibles están archivados y verificados, los ya archivados/duplicados están excluidos y solo quedan registros imposibles de archivar en el momento del cierre por bloqueos concretos y documentados, falta de titularidad o ausencia confirmada de contenido. Los bloqueos temporales se describen como actuales, no como pérdidas definitivas.
 
-### CUSTODIA-01.b · Inventario físico de almacenes remotos
-
-- Inventariar objetos B2 y Vercel Blob, incluidos objetos sin fila relacional.
-- Inspeccionar rutas/prefijos relevantes, incluidos `khora/dictado/` y `khora/staging/`, y formatos distintos de WebM.
-- Para cada objeto, registrar existencia/listado, proveedor, localizador, tamaño y metadatos disponibles; realizar GET/read-back y cotejo de bytes/SHA solo cuando exista acceso autorizado.
-- Clasificar un objeto de Blob bloqueado por cuota como EXISTE_BLOQUEADO cuando el listado/metadata del proveedor confirme que sigue allí; no llamarlo perdido.
-- No copiar, reescribir, migrar ni borrar objetos.
-
-### CUSTODIA-01.c · Inventario local y fuentes de captura
-
-- Consultar IndexedDB del navegador/perfil original disponible: snapshots mutables, revisiones inmutables y audios.
-- Consultar, cuando estén disponibles, los datos locales de Aisthesis/Chrome y otras fuentes locales pertinentes.
-- Registrar los dispositivos/perfiles efectivamente inspeccionados. Una fuente local inaccesible queda NO_INSPECCIONADA.
-- Distinguir registros de telemetría de archivos de contenido.
-
-### CUSTODIA-01.d · Identidad, deduplicación y exclusión de archivados
-
-- Conciliar identificadores de sesión, referencias, hashes, URLs, manifiestos y huellas de contenido.
-- Determinar propietario comprobado o no comprobado; nunca atribuir por inferencia ni usar una reclamación posterior como prueba de propiedad histórica.
-- Excluir del catálogo de recuperación todo contenido ya archivado, usando vínculos verificables y deduplicación documentada.
-- Mantener separadas las señales de captura sin artefacto y los elementos sin propietario.
-- Conservar las discrepancias no resueltas como pendientes, no forzar coincidencias.
-
-### CUSTODIA-01.e · Clasificación consolidada por archivo/parte
-
-- Aplicar los estados de la sección 2 a cada texto, checkpoint, parte de audio, MP3 y objeto huérfano localizado.
-- Distinguir recuperabilidad actual de bloqueo temporal y de referencia pendiente de comprobación física.
-- Solo declarar IRRECUPERABLE_CONFIRMADO después del cotejo exhaustivo de las fuentes pertinentes.
-- Registrar motivo, evidencia, fecha y fuentes consultadas/no consultadas por unidad.
-
-### CUSTODIA-01.f · Conciliación con «Recuperar capturas»
-
-- Comparar el inventario consolidado con todas las tarjetas/páginas del panel.
-- Entregar el conjunto esperado: contenido recuperable ahora y contenido existente temporalmente bloqueado, con estado y motivo por separado.
-- Identificar omisiones, duplicados, archivados que reaparecen y señales sin contenido que no deben presentarse como archivos recuperables.
-- Emitir conteos reconciliados y una lista de diferencias. En esta fase no corregir el código ni los datos del panel.
-
-## 4. Fuera de alcance explícito
-
-- Auditoría de arquitectura de resiliencia o garantías de no pérdida.
-- Pruebas E2E de nuevas capturas, pruebas de fallo, fault injection, pruebas de cierre de navegador o reconexión.
-- Reparación de código, aplicación o catálogo; cambios de configuración/proveedor.
-- Recuperación/restauración de contenido a destinos nuevos.
-- Backfill, migración Blob→B2, cambios de referencias/relaciones o SQL de escritura.
-- Reclamación o reasignación de propietarios.
-- Eliminación, sobrescritura o limpieza física de originales.
-
-Las lecturas necesarias para demostrar la existencia y accesibilidad actual de un archivo forman parte del inventario forense; no autorizan ninguna operación de escritura.
-
-## 5. Criterios de cierre
-
-1. Todas las fuentes pertinentes tienen estado explícito: inspeccionada, bloqueada o no inspeccionada.
-2. Cada unidad de contenido localizada está inventariada y clasificada, o marcada con precisión como pendiente.
-3. Las referencias no se confunden con objetos físicamente existentes; las marcas históricas de verificación no se presentan como lectura actual.
-4. Los objetos temporalmente bloqueados no se declaran perdidos.
-5. Las capturas archivadas no se duplican en recuperación.
-6. Las señales metadata-only y los elementos sin propietario se separan sin atribución ni exposición indebida.
-7. La lista esperada del panel se concilia con todas las tarjetas/páginas existentes y se documentan diferencias.
-8. No se realizan reparaciones, restauraciones, migraciones, eliminaciones ni cambios de producto.
-
-**Resultado final requerido:** inventario completo de lo conservado y clasificación veraz de su recuperabilidad actual. El panel no se declara completo hasta que la conciliación del punto 7 esté demostrada.
+**Resultado final requerido:** archivo máximo no destructivo de todo lo recuperable con los medios y permisos vigentes, acompañado de una relación exacta de los únicos residuales que no se pueden archivar ahora.
