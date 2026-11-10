@@ -753,7 +753,7 @@ export function PipelineView({
                                   {part.storage_provider === "vercel_blob_legacy"
                                     ? "Vercel Blob · temporalmente no disponible · migración pendiente"
                                     : part.storage_provider === "backblaze_b2"
-                                      ? (part.verificado ? "Backblaze B2 · verificado al guardar" : "Backblaze B2 · lectura no comprobada")
+                                      ? "Backblaze B2 · referencia registrada; disponibilidad no comprobada ahora"
                                       : "Proveedor de almacenamiento no identificado"}
                                 </span>
                               </div>
