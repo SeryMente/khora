@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.51; OBJECT_SEAL=CUSTODIA-v0.51; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.52; OBJECT_SEAL=CUSTODIA-v0.52; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.51. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.52. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1031,8 +1031,8 @@ El servidor cifra y descifra github_credentials usando X_KHORA_KEY vía cripto.t
 ### 21.4 Decisiones operativas
 1. No revocar los dos Bearer Tokens manuales MCP ni el refresh OAuth.
 2. No pulsar revocación global, no emitir tokens MCP nuevos y no confundirlos con capacidad canonical-vault.
-3. El operador puede restablecer el PIN desde la UI web, eligiendo el nuevo PIN localmente y sin comunicarlo al chat. El cambio solo reemplaza el PIN; es una operación de usuario, no ejecutada desde el frente.
-4. Después, consultar únicamente el estado de los usos norm y ep (configurado/ausente y fecha). No revelar ni copiar valores.
+3. El restablecimiento de PIN queda como alternativa para inspeccionar el panel web; no es necesario para la prueba EP del §22 y no se ha ejecutado. Solo usarlo si posteriormente se requiere la lectura visual de metadatos.
+4. Si se abre la bóveda web, consultar únicamente el estado norm/ep (configurado/ausente y fecha); no revelar valores. La ruta prioritaria actual es la sesión EP con ep:github:read.
 5. Si ep está configurado, intentar su flujo de lectura autenticado y registrar solo éxito/error. Si falla GITHUB_VAULT_UNAVAILABLE, conservar ciphertext y tratar X_KHORA_KEY como bloqueo.
 6. El objetivo primario sigue siendo archivar registros por las rutas KHORA autenticadas. No considerar el panel MCP como sustituto.
 
