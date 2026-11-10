@@ -46,11 +46,11 @@ Fuentes: OBJETO-CANONICO.md, LISTA-TAREAS-PROVISIONAL.md, originales/ChatGPT-CUS
 
 | Criterio | Evidencia exigida | Resultado |
 |---|---|---|
-| Estado de Blob confirmado en el corte actual | Estado del store y cuota/limitación, con fecha y cuenta/proyecto | PENDIENTE |
-| Causa del fallo de autorización B2 identificada | Estado HTTP/código saneado de B2; ninguna clave impresa | PENDIENTE |
-| Cadena de archivado inspeccionada de extremo a extremo | Recibo correlacionado de cada transición sintética | PENDIENTE |
-| Otros fallos del alcance probado clasificados | Matriz de pruebas PASS/FAIL/NO VERIFICADO | PENDIENTE |
-| Informe reproducible y seguro | Documento con versión, entorno, evidencias y límites | PENDIENTE |
+| Estado de Blob confirmado en el corte actual | Estado del store y cuota/limitación, con fecha y cuenta/proyecto | PENDIENTE · no se consultó el estado actual del store |
+| Causa del fallo de autorización B2 identificada | Estado HTTP/código saneado de B2; ninguna clave impresa | PASS OPERATIVO · Master Key canónica instalada en Production y preflight nativo PASS; el HTTP/código exacto del fallo histórico sigue sin capturar |
+| Cadena de archivado inspeccionada de extremo a extremo | Recibo correlacionado de cada transición de una captura real | PASS PARCIAL REPORTADO · 10,052 caracteres, 191/191 partes de audio marcadas verificadas en B2; recuperación tras recarga NO VERIFICADA |
+| Otros fallos del alcance probado clasificados | Matriz de pruebas PASS/FAIL/NO VERIFICADO | PENDIENTE · no se extrapola una captura a todas las rutas |
+| Informe reproducible y seguro | Documento con versión, entorno, evidencias y límites | EN CURSO · corte 2026-11-10, con límites explícitos |
 
 «No existe otro fallo» solo podrá afirmarse para el conjunto exacto de rutas, versiones, escenarios y ventana probados; nunca como certeza global sin evidencia exhaustiva.
 
@@ -166,3 +166,13 @@ La lectura controlada de KHORA_B2_KEY_ID desde Vercel Production, sin imprimir e
 - Para este build se aisló temporalmente el comando y se omitió `migrate-runtime.mjs`; el Build Command original se restauró en la configuración del proyecto después de iniciarse el build. No se ejecutó SQL ni backfill de Neon en este ciclo.
 - La ruta de código de nuevas escrituras usa `putEncryptedObject` (B2-only y fail-closed), y quedó desplegada; el archivado E2E real con sesión propietaria, vínculo/manifiesto y recuperación tras recarga permanece pendiente. Por tanto, la capacidad productiva está preflight-validada y desplegada, pero la aceptación funcional de archivo no está certificada.
 - No se ha iniciado el backfill histórico Blob→B2 ni se ha cambiado ninguna referencia Neon. Los originales Blob siguen sin borrarse.
+
+
+## Actualización de diagnóstico · 2026-11-10
+
+- **Autenticación B2 actual:** el par canónico Master Application Key KHORA fue transferido desde EP Vault a Vercel Production como Secrets sensibles; el preflight de Production pasó `native_auth`, `master_key`, `bucket_identity`, `bucket_private` y `sse_b2_default`. Esto resuelve el bloqueo operativo de autenticación observado en el deployment anterior. El status HTTP/código JSON exacto de aquel rechazo histórico no se recuperó; no inventar una causa HTTP concreta.
+- **Nueva captura:** la sesión anterior reportó una captura real de 10,052 caracteres, SHA-256 con prefijo `d69033c4`, 191 partes de audio, 15,617,130 bytes y cero faltantes. Las 191 partes aparecían vinculadas a `khora-userdata-ecea4187`, con metadatos SHA/bytes y marca de verificación. Registro `en_revision`. La recuperación posterior a recarga permanece NO VERIFICADA.
+- **Vercel Blob:** sigue pendiente consultar de forma actual el estado del store y su cuota. El antecedente `limits-exceeded-suspended` no se presenta como observación fresca.
+- **Alcance diagnóstico pendiente:** no se ha demostrado ausencia de otros fallos. Mantener la matriz de escenarios y versiones; no atribuir los errores OIDC/PostgreSQL al archivado sin correlación.
+- **Relación con B2-002:** este diagnóstico residual no debe retrasar el inventario read-only ni la copia física Blob→B2. Las referencias productivas solo se actualizan después de reparar el reconciliador, validar ledger, transacción, idempotencia y read-back.
+- **Fuentes históricas conservadas:** los estados de deployment de 2026-11-09 y los fallos previos se mantienen como antecedentes, no se reescriben como si hubieran sido exitosos.
