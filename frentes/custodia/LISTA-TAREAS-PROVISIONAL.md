@@ -1,4 +1,4 @@
-<!-- LIST_VERSION=0.41; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.42; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
@@ -33,6 +33,7 @@ Las fases son subunidades internas del expediente existente, no nuevos expedient
 | CUSTODIA-01.g | EN CURSO · ALCANCE CERRADO | Limitar la búsqueda de la copia de X_KHORA_KEY a las dos bóvedas indicadas por el operador (primera y reconstruida); no ampliar a LastPass, perfiles alternos ni otros almacenes. Preservar ciphertext. |
 | CUSTODIA-01.h | NO APLICABLE PARA RECUPERAR LA LLAVE | No restablecer PIN como intento de recuperar X_KHORA_KEY: solo abre la bóveda web y no recupera ni rota la llave criptográfica. |
 | CUSTODIA-01.i | PENDIENTE DEL OPERADOR | Si se necesita distinguir pérdida de la copia en bóvedas frente a clave aún operativa en producción, emitir una sesión EP nueva (invalida la anterior) y ejecutar una sola lectura autenticada de `/api/ep/github-credential`; registrar solo OK/código, sin imprimir token. No ejecutar bootstrap. |
+| CUSTODIA-01.j | BACKLOG · NO ACTIVO | Verificar la dependencia de `X_KHORA_KEY` en el catálogo y recuperación; separar el fallo de descifrado de Blob, revisión ausente y titularidad. No rotar ni cambiar la llave; cualquier cambio de código requiere autorización específica. |
 
 ## 3. Estados de salida
 
@@ -134,3 +135,17 @@ La pesquisa de la copia recuperable queda restringida a las dos bóvedas identif
 **Consecuencias:** si la clave activa sigue funcionando en producción, el runtime podría permitir continuar operaciones autenticadas, pero la pérdida de la copia crea un punto único de fallo ante pérdida/cambio de la variable de entorno o del entorno productivo. Si la clave ya no está disponible ni en las bóvedas ni en el runtime, los datos cifrados con ella conservan sus bytes pero no pueden descifrarse con los medios actuales; no deben clasificarse como borrados, pero su recuperación práctica queda bloqueada. Los registros de texto legible y con titularidad demostrada pueden seguir siendo candidatos a archivo textual, respetando las marcas de audio/procedencia y la verificación correspondiente.
 
 El alcance se cierra aquí: no se emprenden nuevas rutas de búsqueda de la clave fuera de las dos bóvedas indicadas. La prueba de producción, si se ejecuta, se clasifica aparte de la recuperación de su copia.
+
+
+## 10. Backlog · dependencia de X_KHORA_KEY en Recuperar capturas
+
+**Entrada del operador:** [INSTRUCCION-BACKLOG-DEPENDENCIA-X-KHORA-KEY-20261110.md](originales/INSTRUCCION-BACKLOG-DEPENDENCIA-X-KHORA-KEY-20261110.md).  
+**Evidencia técnica:** [DEPENDENCIA-X-KHORA-KEY-CATALOGO-RECUPERACION-20261110.md](evidencias/DEPENDENCIA-X-KHORA-KEY-CATALOGO-RECUPERACION-20261110.md).
+
+La ausencia/divergencia de `X_KHORA_KEY` queda registrada como posible causa adicional a Vercel Blob para que registros aún presentes en Neon no puedan aparecer o recuperarse desde el panel. El catálogo descifra snapshots para producir tarjetas; si falla el descifrado, su manejador puede devolver 503 `catalogo_no_disponible`. También se descifran revisiones, checkpoint text y snapshots al recuperar.
+
+La inspección de código confirma AES-256-GCM para payloads marcados `khc1.`/`KHC1`. Los call sites verificados incluyen checkpoints/snapshots, partes de audio, MP3, texto/versiones de Volcados y credenciales GitHub. Los registros nuevos que usen esos flujos requieren la misma llave al escribir y leer. Los metadatos de Neon no se consideran cifrados automáticamente. La compatibilidad con valores históricos sin marca impide generalizar la dependencia a cada fila antigua.
+
+**Separación de causas:** Blob suspendido impide el GET físico del objeto histórico; llave ausente/divergente impide descifrar payloads. B2 tampoco elimina la necesidad de descifrar KHC1. Falta de revisión y falta de titularidad son bloqueos separados.
+
+**Siguiente trabajo .j (backlog, no activo):** comprobar de forma autenticada y sin exponer secretos la disponibilidad funcional de la llave en Production; recorrer catálogo/revisiones por páginas; reconciliar cada registro y separar error criptográfico, ausencia de revisión, titularidad y proveedor; proponer aislamiento de error por tarjeta si una sola snapshot fallida provoca 503 global. No tocar código ni configuración sin autorización expresa y no rotar, sustituir o re-cifrar.
