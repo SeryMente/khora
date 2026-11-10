@@ -1,4 +1,4 @@
-<!-- TASK_VERSION=0.6; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
+<!-- TASK_VERSION=0.7; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
 # CUSTODIA-01 · Archivo de todos los registros recuperables
 
 > **Estado:** EN CURSO · **Prioridad:** P0 · **Único expediente activo del frente CUSTODIA.**  
@@ -133,3 +133,10 @@ La salida de Seguridad mostró Control MCP generación #1, dos Bearer Tokens man
 El código de producción demuestra que Restablecer PIN actualiza únicamente el hash Scrypt/sal y crea una cookie temporal de 30 minutos; no rota X_KHORA_KEY ni re-cifra registros. El PIN es una puerta web, no la raíz criptográfica. GitHubSecretsPanel separa norm y ep y expone solo estado configured/updatedAt. Leer el token ep requiere un token de sesión EP con scopes ep:bootstrap y ep:github:read.
 
 Siguiente acción de operador: restablecer PIN únicamente en la interfaz local (no compartirlo), abrir la bóveda y copiar solo los metadatos de credenciales norm/ep. No revelar valores, no revocar Control MCP, no ejecutar rotación de clave. Evidencia: evidencias/ESTADO-BOVEDA-WEB-KHORA-20261110.md.
+
+
+## 11. Próximo paso: lectura EP autenticada sin revelar la credencial
+
+La fuente actual khora-web/lib/server/ep.ts incluye ep:github:read en sesiones EP nuevas. El endpoint POST /api/ep/github-credential requiere ep:bootstrap + ep:github:read, valida el propietario y descifra exclusivamente la credencial ep almacenada. Puede comprobarse si X_KHORA_KEY aún permite abrir el ciphertext.
+
+El operador debe emitir una sesión EP nueva desde Entorno Persistente; esto revoca la sesión EP anterior, no los Bearer Tokens manuales MCP. Después se consumirá el JWT solo en memoria local contra ese endpoint y se emitirá únicamente OK/código de error. No pegar el token en el chat. No ejecutar el comando de bootstrap ni crear VHDX/deploy. OCP §22.
