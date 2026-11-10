@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.52; OBJECT_SEAL=CUSTODIA-v0.52; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.53; OBJECT_SEAL=CUSTODIA-v0.53; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.52. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.53. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1055,3 +1055,41 @@ Esta prueba **no** debe ejecutar el comando largo de bootstrap: no crea VHDX, no
 
 ### 22.3 Alcance y decisión
 La emisión de sesión EP nueva es una mutación de autenticación acotada que invalida la sesión EP anterior; no afecta los Bearer Tokens manuales de Control MCP ni los ciphertext de bóveda. Se requiere que el operador la inicie en la UI. No se emitió todavía. No pulsar revocación global MCP ni restablecer PIN para esta prueba. La emisión y el test quedan pendientes de la acción del operador; la autorización de archivo CUSTODIA-01 permanece vigente.
+
+## 23. Límite de recuperación de X_KHORA_KEY · 2026-11-10 · CUSTODIA-v0.53
+
+**Instrucción literal:** [originales/INSTRUCCION-LIMITE-RECUPERACION-X-KHORA-KEY-20261110.md](originales/INSTRUCCION-LIMITE-RECUPERACION-X-KHORA-KEY-20261110.md).
+
+### 23.1 Alcance cerrado de búsqueda
+
+La pesquisa de la copia recuperable de `X_KHORA_KEY` queda limitada exclusivamente a las dos bóvedas que el operador identifica como la primera bóveda y la bóveda reconstruida. No se amplía a LastPass, perfiles alternos, otros almacenes, DPAPI/notas externas ni nuevas búsquedas generales de respaldos o ubicaciones.
+
+La inspección debe distinguir:
+- Nombre literal: `X_KHORA_KEY`.
+- Posible alias histórico: `KHORA_API_KEY`, que solo se considerará equivalente cuando la evidencia de configuración lo justifique.
+- Credenciales diferentes que no deben confundirse: contraseña maestra EP, PIN de bóveda web, PAT GitHub y Bearer tokens MCP.
+
+### 23.2 Criterio de decisión
+
+- **Ambas bóvedas abiertas y enumeradas válidamente, sin variable ni alias acreditado:** registrar **NO LOCALIZADA EN LAS DOS BÓVEDAS; PRESUNTA PÉRDIDA DEFINITIVA DE LA COPIA RECUPERABLE DENTRO DEL ALCANCE AUTORIZADO**. No continuar con nuevas fuentes de búsqueda.
+- **Alguna bóveda sellada, inaccesible o sin listado verificable:** registrar **NO VERIFICADO**; no convertir imposibilidad de inspección en ausencia.
+- **Variable configurada aún en Vercel Production:** tratarla como copia operativa independiente. Puede seguir funcionando aunque la copia recuperable de las bóvedas se haya perdido.
+- **Lectura autenticada correcta de una credencial EP cifrada:** prueba que la clave activa del servidor puede descifrar ese ciphertext específico; no recupera ni revela el valor de `X_KHORA_KEY`.
+- **Error de lectura:** no basta por sí solo para probar pérdida definitiva; puede reflejar ausencia de credencial, backend, ciphertext o clave divergente. Registrar únicamente código seguro.
+
+### 23.3 Prohibiciones y preservación
+
+No ampliar la búsqueda fuera de las dos bóvedas. No probar contraseñas, fuerza bruta, reinicialización, sustitución o rotación de `X_KHORA_KEY`, re-cifrado, ni escritura/destrucción de ciphertext. Restablecer PIN web no recupera la llave criptográfica. Preservar originales y respaldos intactos.
+
+### 23.4 Consecuencias operativas
+
+1. **Copia de bóveda ausente, clave todavía operativa en producción:** las rutas autenticadas del servidor podrían seguir descifrando y permitir continuar el archivo dentro de las capacidades disponibles. Sin embargo, la pérdida de la copia recuperable crea un punto único de fallo: una pérdida, cambio o sustitución de la variable en producción podría volver inaccesibles los datos cifrados, sin una copia conocida desde la que restaurarla.
+2. **Clave ausente o inoperante también en runtime:** los ciphertext de checkpoints, snapshots, Volcados, audio y credenciales protegidos por esa llave conservan sus bytes, pero no pueden descifrarse con los medios actuales. Se clasifican como **bloqueados por pérdida presunta de llave**, no como borrados ni corruptos. La recuperación práctica queda detenida salvo que el propio runtime conserve una copia operativa no exportable.
+3. **Contenido legible independiente:** registros cuyo texto ya esté disponible de forma legible, con titularidad demostrada y procedencia registrada, siguen siendo candidatos a archivo textual. No se inferirá audio ni procedencia y se mantiene la verificación de integridad/read-back requerida.
+4. **Rotación o sustitución:** no recupera datos históricos. Una llave nueva no descifra ciphertext creado con la llave anterior y podría agravar la inaccesibilidad; por tanto, queda prohibida en este frente.
+
+### 23.5 Próxima compuerta
+
+La búsqueda de la copia queda cerrada al universo de dos bóvedas. La única prueba adicional admisible es una comprobación operacional separada, autenticada y sin revelar secretos, para determinar si la clave ya configurada en Vercel Production todavía descifra la credencial EP existente. Emitir una sesión EP nueva invalida la anterior y requiere acción del operador; no ejecutar bootstrap. El resultado se registrará solo como éxito o código de error.
+
+Esta sección sustituye cualquier invitación previa a ampliar la búsqueda a DPAPI, notas, LastPass u otras ubicaciones; los hechos históricos de esas inspecciones permanecen conservados como contexto, no como nuevas vías activas.
