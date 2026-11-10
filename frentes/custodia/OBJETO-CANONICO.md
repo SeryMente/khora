@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.50; OBJECT_SEAL=CUSTODIA-v0.50; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.51; OBJECT_SEAL=CUSTODIA-v0.51; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.50. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.51. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1037,3 +1037,21 @@ El servidor cifra y descifra github_credentials usando X_KHORA_KEY vía cripto.t
 6. El objetivo primario sigue siendo archivar registros por las rutas KHORA autenticadas. No considerar el panel MCP como sustituto.
 
 La sección 20 conserva la localización de bóvedas EP y KHORA; esta sección 21 añade la semántica de PIN y la vía de lectura de metadatos sin alterar la autorización de archivo ni las exclusiones.
+
+
+## 22. Prueba local de lectura de credencial EP sin exponerla · 2026-11-10 · CUSTODIA-v0.51
+
+### 22.1 Contrato vigente de sesión EP
+La fuente de producción `khora-web/lib/server/ep.ts`, blob `ff1f345a1745a0488317a94fe0a0d5232d090568`, firma sesiones nuevas con los scopes `ep:bootstrap ep:logs:write ep:logs:read ep:github:read`. La ruta `POST /api/ep/github-credential`, blob `22019d14a59aa2c10007af8e5eaba0c6fae9e766`, requiere `ep:bootstrap` y `ep:github:read`, verifica el sujeto propietario y recupera solo el uso `ep`. La ruta no requiere abrir el PIN de la bóveda web; sí exige una sesión EP válida y que `X_KHORA_KEY` pueda descifrar la credencial almacenada.
+
+### 22.2 Prueba de solo lectura propuesta
+Una sesión nueva emitida desde el panel Entorno Persistente habilita el scope requerido y copia el JWT al portapapeles. La propia UI avisa que emitir una sesión nueva revoca la anterior. La prueba usará el JWT solo en memoria local para hacer POST al endpoint de credencial; el proceso debe descartar el JWT y la respuesta y emitir exclusivamente un resultado fijo:
+- `GITHUB_EP_CREDENTIAL_READBACK_OK`: el servidor pudo descifrar la credencial EP; el valor no se imprime ni se conserva.
+- `GITHUB_EP_READ_FAIL:GITHUB_EP_TOKEN_MISSING`: no existe credencial EP guardada.
+- `GITHUB_EP_READ_FAIL:GITHUB_VAULT_UNAVAILABLE`: el servidor no pudo descifrar el ciphertext; posible clave ausente/divergente o problema de backend.
+- Otros códigos: registrar solo el identificador de error, nunca cuerpo que contenga el valor.
+
+Esta prueba **no** debe ejecutar el comando largo de bootstrap: no crea VHDX, no clona workspace, no hace deploy y no modifica la bóveda. Es una lectura autenticada del endpoint que devuelve el secreto al proceso local; el programa cliente lo suprime antes de salida. El token no debe pegarse en el chat.
+
+### 22.3 Alcance y decisión
+La emisión de sesión EP nueva es una mutación de autenticación acotada que invalida la sesión EP anterior; no afecta los Bearer Tokens manuales de Control MCP ni los ciphertext de bóveda. Se requiere que el operador la inicie en la UI. No se emitió todavía. No pulsar revocación global MCP ni restablecer PIN para esta prueba. La emisión y el test quedan pendientes de la acción del operador; la autorización de archivo CUSTODIA-01 permanece vigente.
