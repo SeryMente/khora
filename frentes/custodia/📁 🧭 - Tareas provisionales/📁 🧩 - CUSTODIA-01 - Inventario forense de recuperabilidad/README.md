@@ -1,4 +1,4 @@
-<!-- TASK_VERSION=0.5; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
+<!-- TASK_VERSION=0.6; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
 # CUSTODIA-01 · Archivo de todos los registros recuperables
 
 > **Estado:** EN CURSO · **Prioridad:** P0 · **Único expediente activo del frente CUSTODIA.**  
@@ -124,3 +124,12 @@ Se localizaron la bóveda EP y copias cifradas R1/R2. La arquitectura efectiva e
 Siguiente paso seguro: si el operador recuerda la contraseña EP, introducirla en la GUI local; después consultar nombres de variables sin revelar valores y usar KHORA_API_KEY en un proceso hijo de allowlist exacta. Nunca copiar la contraseña maestra al chat ni imprimir los valores. La evidencia está en evidencias/LOCALIZACION-CLAVE-KHORA-EPVAULT-20261110.md.
 
 Esta búsqueda no constituye archivo de datos CUSTODIA ni elimina el bloqueo de ejecución del objetivo principal.
+
+
+## 10. Bóveda web KHORA: PIN y estado de GitHub
+
+La salida de Seguridad mostró Control MCP generación #1, dos Bearer Tokens manuales activos con scopes efectivos runtime:read, volcados:read, norm:turn y último uso Nunca; bóveda web cerrada; capacidad local 1 expirada/0 activas. No se usaron, emitieron ni revocaron tokens.
+
+El código de producción demuestra que Restablecer PIN actualiza únicamente el hash Scrypt/sal y crea una cookie temporal de 30 minutos; no rota X_KHORA_KEY ni re-cifra registros. El PIN es una puerta web, no la raíz criptográfica. GitHubSecretsPanel separa norm y ep y expone solo estado configured/updatedAt. Leer el token ep requiere un token de sesión EP con scopes ep:bootstrap y ep:github:read.
+
+Siguiente acción de operador: restablecer PIN únicamente en la interfaz local (no compartirlo), abrir la bóveda y copiar solo los metadatos de credenciales norm/ep. No revelar valores, no revocar Control MCP, no ejecutar rotación de clave. Evidencia: evidencias/ESTADO-BOVEDA-WEB-KHORA-20261110.md.
