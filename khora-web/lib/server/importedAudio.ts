@@ -62,18 +62,3 @@ export function decryptStagedAudio(
   return Buffer.concat([decipher.update(body), decipher.final()]);
 }
 
-export function isKhoraStagingBlobUrl(
-  urlValue: string,
-  sessionId: string,
-): boolean {
-  try {
-    const url = new URL(urlValue);
-    const hostAllowed =
-      url.protocol === "https:" &&
-      url.hostname.endsWith(".blob.vercel-storage.com");
-    const pathAllowed = url.pathname.includes(`/staging/audio/${sessionId}/`);
-    return hostAllowed && pathAllowed;
-  } catch {
-    return false;
-  }
-}
