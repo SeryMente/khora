@@ -1,4 +1,4 @@
-<!-- TASKS_README_VERSION=0.28; TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
+<!-- TASKS_README_VERSION=0.29; TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
 # Tareas vigentes · Frente Custodia
 
 **Estado:** PROVISIONAL · índice de ejecución subordinado al [OCP único](../OBJETO-CANONICO.md).  
@@ -14,15 +14,22 @@
 - La indisponibilidad de objetos Blob antiguos no debe impedir guardar nuevas capturas, texto, checkpoints o ediciones de texto.
 - La migración histórica Blob→B2 queda DIFERIDA hasta reactivar el servicio Blob, comprobar GET y recibir autorización expresa para esa fase.
 
-## Secuencia de ejecución
+## Trabajo que se ejecutará ahora
 
-| Orden | ID existente | Estado | Trabajo / condición |
-|---:|---|---|---|
-| 1 | CUSTODIA-B2-006 | EN CURSO · P0 | Código híbrido, nuevas escrituras B2 verificadas, indicador por objeto legacy, aislamiento del fallo Blob, pruebas y publicación condicionada a aceptación E2E. |
-| 2 | CUSTODIA-B2-005 | DIFERIDA | Diagnóstico de acceso físico Blob solo después de que el propietario reactive el almacén y solicite verificarlo. |
-| 3 | CUSTODIA-B2-002 | DIFERIDA | Copia histórica no destructiva y reconciliación de referencias solo tras reactivar Blob y recibir autorización específica. |
-| 4 | CUSTODIA-B2-007 | DIFERIDA | Pulido posterior únicamente ante deuda concreta. |
-| 5 | CUSTODIA-RES-001/002 | DIFERIDAS | Diseño/implementación multiproveedor fuera del alcance vigente. |
+| ID | Estado | Alcance único |
+|---|---|---|
+| CUSTODIA-B2-006 | EN CURSO · P0 | Completar y validar persistencia nueva B2-only con read-back físico SHA-256/longitud; indicador por archivo Blob histórico; aislamiento de fallos; pruebas y publicación cuando pasen los gates. |
+
+## Trabajo diferido · no ejecutar en este hito
+
+| ID | Estado | Condición para reabrir |
+|---|---|---|
+| CUSTODIA-B2-005 | DIFERIDA | Vercel Blob reactivado y petición expresa para volver a comprobar el acceso. |
+| CUSTODIA-B2-002 | DIFERIDA | Vercel Blob reactivado, GET físico confirmado y nueva autorización expresa para migrar el histórico. |
+| CUSTODIA-B2-007 | DIFERIDA | CUSTODIA-B2-006 aceptada y deuda técnica concreta priorizada. |
+| CUSTODIA-RES-001/002 | DIFERIDAS | Nueva decisión expresa de evaluar resiliencia multiproveedor. |
+
+No hay una secuencia posterior automática: reactivar Blob no autoriza por sí mismo la migración.
 
 ## Expedientes de detalle
 
