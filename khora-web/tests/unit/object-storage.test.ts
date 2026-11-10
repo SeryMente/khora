@@ -56,7 +56,7 @@ test('native B2 encrypted writes use only the server-side bucket upload token',a
    if(url.endsWith('/b2api/v4/b2_authorize_account'))return new Response(JSON.stringify({accountId:'master-id',authorizationToken:'synthetic-account-token',apiInfo:{storageApi:{apiUrl:'https://api.test.b2',downloadUrl:'https://f001.test.b2',allowed:{capabilities:['listBuckets','listFiles','readFiles','writeFiles','deleteFiles'],buckets:null,namePrefix:null}}}}),{status:200});
    if(url.endsWith('/b2api/v4/b2_get_upload_url'))return new Response(JSON.stringify({bucketId:'bucket-123',uploadUrl:'https://pod.test.b2/b2api/v4/b2_upload_file',authorizationToken:'bucket-upload-token'}),{status:200});
    if(url==='https://pod.test.b2/b2api/v4/b2_upload_file')return new Response(JSON.stringify({fileId:'synthetic-file-id',fileName:decodeURIComponent(headers.get('X-Bz-File-Name')||''),contentLength:Number(headers.get('Content-Length'))}),{status:200});
-   if(url.startsWith('https://f001.test.b2/file/'))return new Response(readbackPayload,{status:200});
+   if(url.startsWith('https://f001.test.b2/file/'))return new Response(readbackPayload ? new Uint8Array(readbackPayload) : null,{status:200});
    throw new Error('unexpected fetch '+url);
   }) as typeof fetch;
   const payload=Buffer.concat([Buffer.from('KHC1'),Buffer.alloc(32,7)]);
