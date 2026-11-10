@@ -3,6 +3,7 @@ import { getDb } from "./neon";
 import { descifrarTexto } from "./cripto";
 import { driver as neo4jDriver, auth as neo4jAuth } from "neo4j-driver";
 import { esAudioEsperado } from "./domainAudio";
+import { describeStoredObject } from "./object-storage";
 import { registrarEvento } from "./eventos";
 
 export interface PipelineVolcado {
@@ -10,7 +11,9 @@ export interface PipelineVolcado {
   folio: number | null;
   session_id: string | null;
   session_estado: string | null;
-  audio_status: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable" | "no_aplica";
+  audio_status: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable" | "no_aplica" | "temporalmente_no_disponible";
+  storage_parts: Array<{ part_index: number; storage_provider: "backblaze_b2" | "vercel_blob_legacy" | "unknown"; storage_generation: "new" | "legacy" | "unknown"; availability: "not_checked" | "temporarily_unavailable"; migration_status: "not_required" | "pending" }>;
+  storage_summary: { legacy_pending_count: number; legacy_unavailable_count: number; b2_count: number; unknown_count: number };
   partes_count: number;
   blob_paths: string[];
   titulo: string | null;
@@ -255,10 +258,25 @@ export async function obtenerPipelineAggregated(usuario?: string): Promise<Pipel
 
     const partesDb = (sessionId ? partesMap.get(sessionId) : null) || partesMap.get(vId) || [];
     const blobPaths = Array.from(new Set([
-      ...partesDb.map((p) => p.blob_path || p.blob_url),
+      ...partesDb.map((p) => p.blob_url || p.blob_path),
       ...(Array.isArray(audioPartesJson) ? audioPartesJson.map((p) => p.url) : []),
       ...(v.audio_url ? [v.audio_url] : []),
     ])).filter(Boolean);
+    const storageLocators = partesDb.length > 0
+      ? partesDb.map((p) => p.blob_url || p.blob_path)
+      : Array.isArray(audioPartesJson) && audioPartesJson.length > 0
+        ? audioPartesJson.map((p) => p.url)
+        : v.audio_url ? [v.audio_url] : [];
+    const storageParts = storageLocators.map((locator, index) => ({
+      part_index: index + 1,
+      ...describeStoredObject(String(locator || "")),
+    }));
+    const storageSummary = {
+      legacy_pending_count: storageParts.filter((part) => part.storage_provider === "vercel_blob_legacy" && part.migration_status === "pending").length,
+      legacy_unavailable_count: storageParts.filter((part) => part.availability === "temporarily_unavailable").length,
+      b2_count: storageParts.filter((part) => part.storage_provider === "backblaze_b2").length,
+      unknown_count: storageParts.filter((part) => part.storage_provider === "unknown").length,
+    };
 
     const partesCount = Math.max(partesDb.length, Array.isArray(audioPartesJson) ? audioPartesJson.length : 0);
     const hasAudio = !!v.audio_url || partesCount > 0;
@@ -294,9 +312,15 @@ export async function obtenerPipelineAggregated(usuario?: string): Promise<Pipel
     } else {
       audioStatus = "no_aplica";
     }
+    if (storageSummary.legacy_unavailable_count > 0) {
+      audioStatus = "temporalmente_no_disponible";
+    }
 
     let status: "sync" | "text_without_audio" | "audio_without_text" | "audio_partial" | "text_edited" | "broken_provenance" | "unknown" = "sync";
     const flags: string[] = [];
+    if (storageSummary.legacy_unavailable_count > 0) {
+      flags.push("Audio histórico en Vercel Blob temporalmente no disponible; recuperación/migración pendiente");
+    }
 
     if (v.estado === "ingerido" && !v.io_id) {
       status = "broken_provenance";
@@ -337,6 +361,8 @@ export async function obtenerPipelineAggregated(usuario?: string): Promise<Pipel
       session_id: sessionId,
       session_estado: sesionObj?.estado || null,
       audio_status: audioStatus,
+      storage_parts: storageParts,
+      storage_summary: storageSummary,
       partes_count: partesCount,
       blob_paths: blobPaths,
       titulo: v.titulo ?? null,
