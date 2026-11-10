@@ -220,7 +220,7 @@ async function main():Promise<void> {
     const totalBytes=inventory.blobs.reduce((sum,item)=>sum+item.size,0);
     process.stdout.write(JSON.stringify({mode:"metadata-only",inventoryPages:inventory.pages,
       physicalBlobObjects:inventory.blobs.length,totalBytes,storeAccess:"not inferred from URLs",
-      sourceWrites:0,destinationWrites:0,neonWrites:0},null,2)+"\\n");
+      sourceWrites:0,destinationWrites:0,neonWrites:0},null,2)+"\n");
     return;
   }
   if(sourceProbe){
@@ -234,7 +234,7 @@ async function main():Promise<void> {
     process.stdout.write(JSON.stringify({mode:"source-probe",inventoryPages:inventory.pages,
       physicalBlobObjects:inventory.blobs.length,offset,selected:selectedProbe.length,
       sourceRead,sourceReadFailed:selectedProbe.length-sourceRead,sourceBytes,errors,
-      sourceWrites:0,destinationWrites:0,neonWrites:0},null,2)+"\\n");
+      sourceWrites:0,destinationWrites:0,neonWrites:0},null,2)+"\n");
     return;
   }
   const referenceIndex=await loadReferenceIndex();
