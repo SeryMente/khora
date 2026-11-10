@@ -1,4 +1,4 @@
-import { fetchStoredObject } from "@/lib/server/object-storage";
+import { fetchStoredObject, isLegacyBlobTemporarilyUnavailable, describeStoredObject } from "@/lib/server/object-storage";
 import { poseeVolcado } from "@/lib/server/custodia-acceso";
 import { auth } from "@/auth";
 // @l0 L0-002-R · @req REVISION-COCKPIT/REQ-1
@@ -11,6 +11,17 @@ import { reportarIncidente } from "@/lib/server/incidentes";
 import { detectAudioFormat } from "@/lib/server/importedAudio";
 
 export const runtime = "nodejs";
+
+function legacyUnavailableResponse() {
+  return NextResponse.json({
+    error: "storage_legacy_temporarily_unavailable",
+    storage_provider: "vercel_blob_legacy",
+    availability: "temporarily_unavailable",
+    migration_status: "pending",
+    detail: "Audio histórico en Vercel Blob: temporalmente no disponible. La recuperación queda pendiente de reactivar el almacén; el archivo no se declara perdido ni dañado.",
+  }, { status: 503, headers: { "cache-control": "no-store" } });
+}
+
 
 export async function GET(
   req: NextRequest,
@@ -123,26 +134,31 @@ export async function GET(
     try {
       remoto = await fetchStoredObject(blobUrl, { cache: "no-store" });
     } catch (err: any) {
+      if (isLegacyBlobTemporarilyUnavailable(err) || describeStoredObject(blobUrl).storage_provider === "vercel_blob_legacy") {
+        return legacyUnavailableResponse();
+      }
       await reportarIncidente({
         volcadoId,
         tipo: "blob_inaccesible",
         severidad: "alta",
         origen: "reproducir_parte",
-        evidencia: { url: blobUrl, error: String(err) },
+        evidencia: { provider: describeStoredObject(blobUrl).storage_provider, code: err?.message || "fetch_failed" },
       });
       return NextResponse.json(
-        { error: "blob_inaccesible", detail: `Blob inaccesible: ${blobUrl}` },
+        { error: "storage_object_unavailable", detail: "No fue posible recuperar esta parte desde su proveedor de almacenamiento." },
         { status: 502 },
       );
     }
 
     if (!remoto.ok) {
+      if (remoto.status === 403 && describeStoredObject(blobUrl).storage_provider === "vercel_blob_legacy") return legacyUnavailableResponse();
+      if (remoto.status === 404) return NextResponse.json({ error: "storage_object_not_found", detail: "El objeto no se encuentra en el proveedor de almacenamiento." }, { status: 404 });
       await reportarIncidente({
         volcadoId,
         tipo: "blob_inaccesible",
         severidad: "alta",
         origen: "reproducir_parte",
-        evidencia: { url: blobUrl, status: remoto.status },
+        evidencia: { provider: describeStoredObject(blobUrl).storage_provider, status: remoto.status },
       });
       return NextResponse.json(
         {
