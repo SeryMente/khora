@@ -143,11 +143,18 @@ async function loadReferenceIndex(): Promise<ReferenceIndex> {
 }
 
 async function readSourceBlob(item: PhysicalBlob): Promise<{bytes:Buffer;contentType:string|null}> {
-  const result = await getVercelBlob(item.url, { access: blobAccess(item.url) });
-  if (!result || result.statusCode !== 200 || !result.stream) throw new Error("blob_source_read_failed");
-  const bytes = Buffer.from(await new Response(result.stream).arrayBuffer());
-  if (bytes.length !== item.size) throw new Error("blob_source_size_mismatch");
-  return { bytes, contentType: typeof result.blob.contentType === "string" ? result.blob.contentType : null };
+  if(blobAccess(item.url)==="public"){
+    const response=await fetch(item.url,{cache:"no-store",redirect:"error",signal:AbortSignal.timeout(60000)});
+    if(!response.ok)throw new Error(response.status===403?"blob_read_forbidden":"blob_source_http_"+response.status);
+    const bytes=Buffer.from(await response.arrayBuffer());
+    if(bytes.length!==item.size)throw new Error("blob_source_size_mismatch");
+    return {bytes,contentType:response.headers.get("content-type")};
+  }
+  const result=await getVercelBlob(item.url,{access:"private"});
+  if(!result||result.statusCode!==200||!result.stream)throw new Error("blob_source_read_failed");
+  const bytes=Buffer.from(await new Response(result.stream).arrayBuffer());
+  if(bytes.length!==item.size)throw new Error("blob_source_size_mismatch");
+  return {bytes,contentType:typeof result.blob.contentType==="string"?result.blob.contentType:null};
 }
 
 async function processBlob(item:PhysicalBlob,refs:ReferenceInfo|undefined,apply:boolean,summary:Summary):Promise<ManifestEntry> {
