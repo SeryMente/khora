@@ -8,6 +8,7 @@ import { reportarIncidente } from "@/lib/server/incidentes";
 import { esAudioEsperado } from "@/lib/server/domainAudio";
 import { obtenerPalabrasTiming } from "@/lib/server/transcribir";
 import { evaluarCustodiaAudio } from "@/lib/audio/custodia";
+import { describeStoredObject } from "@/lib/server/object-storage";
 
 export const runtime = "nodejs";
 
@@ -81,6 +82,10 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
       fuente_audio: "microphone" | "chrome_tab";
       verificado: boolean;
       download_path: string;
+      storage_provider: "backblaze_b2" | "vercel_blob_legacy" | "unknown";
+      storage_generation: "new" | "legacy" | "unknown";
+      availability: "not_checked" | "temporarily_unavailable";
+      migration_status: "not_required" | "pending";
     }> = [];
 
     if (partesDb.length > 0) {
@@ -102,6 +107,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
           fuente_audio: p.fuente_audio === "chrome_tab" ? "chrome_tab" : "microphone",
           verificado: p.estado_verificacion === "verificado",
           download_path: `/api/audio/${volcadoId}/parte/${p.part_index ?? (idx + 1)}`,
+          ...describeStoredObject(String(p.blob_url || p.blob_path || "")),
         };
       });
     } else if (volcado.audio_partes) {
@@ -131,6 +137,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
             fuente_audio: p.fuenteAudio === "chrome_tab" ? "chrome_tab" : "microphone",
             verificado: true,
             download_path: `/api/audio/${volcadoId}/parte/${p.parte ?? (idx + 1)}`,
+            ...describeStoredObject(String(p.url || "")),
           };
         });
       }
@@ -147,6 +154,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
           fuente_audio: "microphone",
           verificado: true,
           download_path: `/api/audio/${volcadoId}/parte/1`,
+          ...describeStoredObject(String(volcado.audio_url || "")),
         },
       ];
     }
@@ -192,7 +200,15 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
       totalPartesEsperado ?? partesManifiesto.length,
     );
 
-    const computedStatus = custodia.ok ? "disponible" : "incompleto";
+    const legacyUnavailable = partesManifiesto.some((part) => part.availability === "temporarily_unavailable");
+    const computedStatus = legacyUnavailable
+      ? "temporalmente_no_disponible"
+      : custodia.ok ? "disponible" : "incompleto";
+    const storageSummary = {
+      legacy_pending_count: partesManifiesto.filter((part) => part.storage_provider === "vercel_blob_legacy" && part.migration_status === "pending").length,
+      legacy_unavailable_count: partesManifiesto.filter((part) => part.availability === "temporarily_unavailable").length,
+      b2_count: partesManifiesto.filter((part) => part.storage_provider === "backblaze_b2").length,
+    };
 
     // Obtener timing de palabras si existe
     let timing: any[] = [];
@@ -216,6 +232,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
       total_partes: partesManifiesto.length,
       duracion_total_ms: duracionTotalMs,
       bytes_totales: bytesTotales,
+      storage_summary: storageSummary,
       partes: partesManifiesto,
       timing,
       custodia: {
