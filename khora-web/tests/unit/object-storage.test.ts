@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { b2Endpoint,b2ObjectUrl,parseB2ObjectUrl,legacyBlobUrl,safeObjectKey,stagingKeyForSession } from '../../lib/storage/object-reference';
-import { fetchStoredObject,putEncryptedObject,deleteStagedObject,createStagingUploadId,STAGING_CHUNK_BYTES,putStagingChunk,finalizeStagingUpload,inspectB2ReadOnly } from '../../lib/server/object-storage';
+import { fetchStoredObject,putEncryptedObject,deleteStagedObject,createStagingUploadId,STAGING_CHUNK_BYTES,putStagingChunk,finalizeStagingUpload,inspectB2ReadOnly,putMigratedBlobObject } from '../../lib/server/object-storage';
 const c={bucket:'khora-test-private',region:'us-east-005'};
 const session='12345678-1234-1234-1234-123456789012';
 test('B2 region cannot become an SSRF host',()=>assert.throws(()=>b2Endpoint('us-east-005.evil.invalid')));
@@ -56,4 +56,99 @@ test('native B2 encrypted writes use only the server-side bucket upload token',a
   assert.equal(upload.headers.get('X-Bz-Server-Side-Encryption'),'AES256');
   assert.equal(calls.some(x=>x.url.includes('amazonaws.com')||x.url.includes('s3.us-east-005')),false);
  }finally{globalThis.fetch=originalFetch;for(const k of names){if(before[k]===undefined)delete process.env[k];else process.env[k]=before[k];}}
+});
+test('physical Blob migration copies arbitrary bytes to deterministic B2 key and verifies GET readback',async()=>{
+ const names=['KHORA_B2_MASTER_APPLICATION_KEY_ID','KHORA_B2_MASTER_APPLICATION_KEY','KHORA_B2_BUCKET_NAME','KHORA_B2_BUCKET_ID','KHORA_B2_REGION','KHORA_OBJECT_STORAGE'];
+ const before=Object.fromEntries(names.map(k=>[k,process.env[k]]));
+ const originalFetch=globalThis.fetch;
+ const calls:Array<{url:string;method:string;headers:Headers;body:BodyInit|null|undefined}>=[];
+ const payload=Buffer.from('plain user document bytes; this is deliberately not a KHC1 envelope');
+ let uploaded:Buffer|null=null;
+ const sourceUrl='https://store.public.blob.vercel-storage.com/user-content/document.bin';
+ const sourceHash=createHash('sha256').update(sourceUrl).digest('hex');
+ const key='khora/legacy/vercel-blob/'+sourceHash+'.blob';
+ try{
+  process.env.KHORA_B2_MASTER_APPLICATION_KEY_ID='master-id';
+  process.env.KHORA_B2_MASTER_APPLICATION_KEY='synthetic-master-secret';
+  process.env.KHORA_B2_BUCKET_NAME=c.bucket;
+  process.env.KHORA_B2_BUCKET_ID='bucket-123';
+  process.env.KHORA_B2_REGION=c.region;
+  process.env.KHORA_OBJECT_STORAGE='b2';
+  globalThis.fetch=(async(input:RequestInfo|URL,init?:RequestInit)=>{
+   const url=String(input),headers=new Headers(init?.headers);
+   calls.push({url,method:init?.method||'GET',headers,body:init?.body});
+   if(url.endsWith('/b2api/v4/b2_authorize_account'))return new Response(JSON.stringify({
+    accountId:'master-id',authorizationToken:'synthetic-account-token',
+    apiInfo:{storageApi:{apiUrl:'https://api.test.b2',downloadUrl:'https://f001.test.b2',
+     allowed:{capabilities:['listBuckets','listFiles','readFiles','writeFiles','deleteFiles'],buckets:null,namePrefix:null}}}
+   }),{status:200});
+   if(url.endsWith('/b2api/v4/b2_list_file_versions'))return new Response(JSON.stringify({files:[]}),{status:200});
+   if(url.endsWith('/b2api/v4/b2_get_upload_url'))return new Response(JSON.stringify({
+    bucketId:'bucket-123',uploadUrl:'https://pod.test.b2/b2api/v4/b2_upload_file',authorizationToken:'bucket-upload-token'
+   }),{status:200});
+   if(url==='https://pod.test.b2/b2api/v4/b2_upload_file'){
+    uploaded=Buffer.from(init?.body as Uint8Array);
+    return new Response(JSON.stringify({fileId:'migration-file-id',fileName:decodeURIComponent(headers.get('X-Bz-File-Name')||''),contentLength:Number(headers.get('Content-Length'))}),{status:200});
+   }
+   if(url==='https://f001.test.b2/file/'+c.bucket+'/'+key)return new Response(uploaded,{status:200});
+   throw new Error('unexpected_fetch');
+  }) as typeof fetch;
+  const stored=await putMigratedBlobObject(sourceHash,payload,'application/pdf');
+  assert.equal(stored.pathname,'khora/legacy/vercel-blob/'+sourceHash+'.blob');
+  assert.equal(stored.bytes,payload.length);
+  assert.equal(stored.sha256,createHash('sha256').update(payload).digest('hex'));
+  assert.equal(stored.reused,false);
+  const upload=calls.find(x=>x.url==='https://pod.test.b2/b2api/v4/b2_upload_file');
+  assert.ok(upload);
+  assert.equal(upload.headers.get('Authorization'),'bucket-upload-token');
+  assert.equal(upload.headers.get('Content-Type'),'application/pdf');
+  assert.equal(upload.headers.get('X-Bz-Server-Side-Encryption'),'AES256');
+  const get=calls.find(x=>x.url==='https://f001.test.b2/file/'+c.bucket+'/'+key);
+  assert.ok(get);
+  assert.equal(get.headers.get('Authorization'),'synthetic-account-token');
+  assert.deepEqual(uploaded,payload);
+ }finally{
+  globalThis.fetch=originalFetch;
+  for(const k of names){if(before[k]===undefined)delete process.env[k];else process.env[k]=before[k];}
+ }
+});
+test('physical Blob migration reuses an existing B2 object only after byte/hash readback',async()=>{
+ const names=['KHORA_B2_MASTER_APPLICATION_KEY_ID','KHORA_B2_MASTER_APPLICATION_KEY','KHORA_B2_BUCKET_NAME','KHORA_B2_BUCKET_ID','KHORA_B2_REGION','KHORA_OBJECT_STORAGE'];
+ const before=Object.fromEntries(names.map(k=>[k,process.env[k]]));
+ const originalFetch=globalThis.fetch;
+ const calls:string[]=[];
+ const payload=Buffer.from('previously copied raw Blob bytes');
+ const sourceUrl='https://store.private.blob.vercel-storage.com/users/a/file.bin';
+ const sourceHash=createHash('sha256').update(sourceUrl).digest('hex');
+ const key='khora/legacy/vercel-blob/'+sourceHash+'.blob';
+ try{
+  process.env.KHORA_B2_MASTER_APPLICATION_KEY_ID='master-id';
+  process.env.KHORA_B2_MASTER_APPLICATION_KEY='synthetic-master-secret';
+  process.env.KHORA_B2_BUCKET_NAME=c.bucket;
+  process.env.KHORA_B2_BUCKET_ID='bucket-123';
+  process.env.KHORA_B2_REGION=c.region;
+  process.env.KHORA_OBJECT_STORAGE='b2';
+  globalThis.fetch=(async(input:RequestInfo|URL,init?:RequestInit)=>{
+   const url=String(input),headers=new Headers(init?.headers);calls.push(url);
+   if(url.endsWith('/b2api/v4/b2_authorize_account'))return new Response(JSON.stringify({
+    accountId:'master-id',authorizationToken:'synthetic-account-token',
+    apiInfo:{storageApi:{apiUrl:'https://api.test.b2',downloadUrl:'https://f001.test.b2',
+     allowed:{capabilities:['listBuckets','listFiles','readFiles','writeFiles','deleteFiles'],buckets:null,namePrefix:null}}}
+   }),{status:200});
+   if(url.endsWith('/b2api/v4/b2_list_file_versions'))return new Response(JSON.stringify({
+    files:[{fileName:key,fileId:'prior-id',action:'upload',contentLength:payload.length,uploadTimestamp:10}]
+   }),{status:200});
+   if(url==='https://f001.test.b2/file/'+c.bucket+'/'+key)return new Response(payload,{status:200});
+   throw new Error('unexpected_fetch');
+  }) as typeof fetch;
+  const stored=await putMigratedBlobObject(sourceHash,payload,'application/octet-stream');
+  assert.equal(stored.reused,true);
+  assert.equal(stored.bytes,payload.length);
+  assert.equal(stored.sha256,createHash('sha256').update(payload).digest('hex'));
+  assert.equal(calls.some(url=>url.endsWith('/b2api/v4/b2_get_upload_url')),false);
+  assert.equal(calls.some(url=>url==='https://f001.test.b2/file/'+c.bucket+'/'+key),true);
+ }finally{
+  globalThis.fetch=originalFetch;
+  for(const k of names){if(before[k]===undefined)delete process.env[k];else process.env[k]=before[k];}
+ }
 });
