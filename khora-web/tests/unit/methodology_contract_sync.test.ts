@@ -19,9 +19,17 @@ test("KHORA local contract matches the canonical Metodología contract", async (
   const localPath = path.resolve(process.cwd(), "contracts/FORMATO-REGISTRO-VERIFICACION-CICLO.schema.json");
   const localBytes = fs.readFileSync(localPath);
   const local = JSON.parse(localBytes.toString("utf8"));
-  const response = await fetch(canonicalUrl, { headers: { "User-Agent": "Khora-Contract-Sync-Test" } });
+  let response: Response | null = null;
+  try {
+    response = await fetch(canonicalUrl, {
+      headers: { "User-Agent": "Khora-Contract-Sync-Test" },
+      signal: AbortSignal.timeout(5000),
+    });
+  } catch {
+    // A private/offline canonical source falls back to authenticated gh or the verified Git blob pin.
+  }
 
-  if (response.ok) {
+  if (response?.ok) {
     const remote = await response.json();
     assert.deepEqual(local, remote);
     return;
