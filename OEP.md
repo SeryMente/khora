@@ -2,7 +2,7 @@
 
 **Identificador:** OEP  
 **Nombre completo:** Persistencia de Entorno Operativo  
-**Versión:** v0.1.6
+**Versión:** v0.1.7
 **Estado:** ACTIVO · CANÓNICO PARA ESTE ÁMBITO · EN EVOLUCIÓN CONTROLADA  
 **Sistema emisor:** KHORA  
 **Plataforma objetivo actual:** Windows
@@ -461,16 +461,19 @@ La ausencia de contexto conversacional no autoriza a reconstruir decisiones fuer
 ## 60. Módulo ScriptPWS
 
 **Identificador:** `OEP-MOD-SCRIPTPWS`  
-**Estado:** ACTIVO · CANÓNICO PARA ESTE MÓDULO  
-**Objeto del módulo:** `docs/frentes/ep/modulos/scriptpws/OBJETO-CANONICO.md`  
-**Baseline vigente:** `BASELINE-002` · versión 2.0  
-**Baseline anterior preservado:** `BASELINE-001` · versión 1.0
+**Clasificación:** módulo funcional subordinado al frente Entorno Persistente (EP), no frente independiente.  
+**Objeto canónico del módulo:** `docs/frentes/ep/modulos/scriptpws/OBJETO-CANONICO.md`  
+**Ubicación dentro del workspace:** `Desktop/EP/khora/docs/frentes/ep/modulos/scriptpws/`, solo cuando KHORA está seleccionado y materializado en la sesión.  
+**Baseline vigente:** `BASELINE-002` · v2.0 · comando bootstrap completo de una línea.  
+**Fallback:** `BASELINE-001` · v1.0.  
+**Espejo:** `BASELINE-CURRENT.ps1`; no cuenta como una versión adicional.
 
-ScriptPWS conserva los scripts PowerShell de automatización, preparación de host, instalación y verificación del toolchain Windows e inicio de RDC. No reemplaza el launcher ni el núcleo del bootstrap KHORA/OEP.
+La separación de artefactos es obligatoria: el bootstrap completo es el comando que el operador ejecuta; `RDC-Remote.ps1` es el lanzador runtime generado por el bootstrap; `Remote Desktop Commander.lnk` es un acceso directo. El lanzador runtime generado previamente se conserva en `docs/frentes/ep/modulos/scriptpws/artifacts/RDC-Remote.generated-from-BASELINE-002.ps1`.
 
-La retención se limita a las tres versiones exitosas más recientes. A la fecha de esta actualización existen dos baselines aceptados; la plaza restante corresponde a BASELINE-003 y no se declara ocupada. La identificación del baseline actual reside en `BASELINE-INDEX.json`; el artefacto vigente y su hash se detallan en el objeto del módulo.
+El bootstrap V2.0 fue reportado expresamente por el operador como ejecutado sin errores. Comprueba/instala Node.js 24, NPM y NPX; usa `npm.cmd`/`npx.cmd`; prepara y valida el lanzador oficial de RDC; crea el acceso directo; registra transcript en `Desktop/log.txt`; y gestiona diagnóstico en portapapeles.
 
-**Punto de entrada local:** `%LOCALAPPDATA%\ScriptPWS\START-RDC.ps1`. El módulo conserva `RDC-Remote.ps1` como lanzador estable para no romper el acceso directo existente. La ejecución de scripts utiliza bypass limitado al proceso; no modifica la política persistente de Windows.
+**Punto de entrada canónico:** contenido íntegro de `docs/frentes/ep/modulos/scriptpws/baselines/BASELINE-CURRENT.ps1`. El archivo contiene el bootstrap completo. No se debe referenciar `START-RDC.ps1`: el bootstrap aceptado no crea ese archivo. El lanzador runtime local generado es `%LOCALAPPDATA%\ScriptPWS\RDC-Remote.ps1`.
 
-**Evidencia reportada y cotejada en PC-7 (2026-11-09):** Node.js `v24.22.2`, NPM/NPX `11.19.1`, parser PowerShell del launcher sin errores, SHA-256 de BASELINE-001 y BASELINE-002 cotejados, dispositivo RDC online y procesos de agente observados. La aceptación funcional de BASELINE-002 fue declarada por el operador. No se realizó un segundo arranque de RDC durante la canonización.
+**Autenticación nueva:** el operador requiere que cada arranque de RDC no presuma una sesión autenticada anterior y permita seleccionar la cuenta Google correcta. La opción upstream `--no-persist-session` está documentada en Desktop Commander; queda como candidata BASELINE-003 · v2.1, pendiente de prueba y aceptación. BASELINE-002 no se altera mientras tanto.
 
+**Retención:** máximo tres baselines completos exitosos aceptados por el operador. Actualmente existen dos versiones únicas; el espejo CURRENT no ocupa una plaza adicional. SHA-256, byte count y read-back se gobiernan mediante `BASELINE-INDEX.json`.

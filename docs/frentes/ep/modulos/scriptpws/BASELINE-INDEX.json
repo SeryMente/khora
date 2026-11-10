@@ -1,11 +1,11 @@
 {
-  "schema": "scriptpws-baseline-index/v1",
+  "schema": "scriptpws-baseline-index/v2",
   "module": "ScriptPWS",
   "currentBaseline": "BASELINE-002",
-  "currentPath": "Baselines/BASELINE-CURRENT.ps1",
+  "currentPath": "baselines/BASELINE-CURRENT.ps1",
   "retention": {
     "maxSuccessfulVersions": 3,
-    "policy": "Retain the latest three operator-accepted, read-back-verified baselines; retire the oldest only after the new baseline has passed verification.",
+    "policy": "Retain the latest three operator-accepted, read-back-verified complete bootstrap commands; retire the oldest only after the new baseline has passed verification.",
     "qualifiedVersions": 2,
     "nextBaseline": "BASELINE-003"
   },
@@ -14,22 +14,54 @@
       "id": "BASELINE-001",
       "version": "1.0",
       "status": "PREVIOUS_FALLBACK",
-      "path": "Baselines/BASELINE-001.ps1",
-      "sha256": "2E7393FE26774FD469F1D846E394D733CFD64B1D20ED70D18750B3E65A1C9742",
-      "bytes": 1601,
-      "source": "Operator-provided original command",
+      "path": "baselines/BASELINE-001.ps1",
+      "sha256": "0B7ECC23BCC87027557EDF29A0FBB6B807174F87F2F8F74ED81B8160F75A2A1D",
+      "bytes": 1599,
+      "source": "Operator-provided original complete installer command; repository bytes read and hashed during ScriptPWS reconciliation.",
       "acceptance": "Operator reported this command worked."
     },
     {
       "id": "BASELINE-002",
       "version": "2.0",
       "status": "CURRENT",
-      "path": "Baselines/BASELINE-002.ps1",
-      "sha256": "702E54E8B0E8DB72A7DC57D19CC69AEDE742BE0D7D97953EA1AE273AB7980629",
-      "bytes": 11587,
-      "source": "Official Windows RDC launcher with npm.cmd/npx.cmd checks and version output",
-      "acceptance": "Operator reported successful execution without errors."
+      "path": "baselines/BASELINE-002.ps1",
+      "sha256": "5CB48CDC4E3CC8E7F8FEDD42700C5173B0A8B469C55EED8D0581D07BB66EDF46",
+      "bytes": 6856,
+      "source": "Exact complete one-line ScriptPWS V2 bootstrap: baseline preservation, official RDC launcher acquisition/structural checks, Node/NPM/NPX diagnostics, parser validation, shortcut, transcript and clipboard.",
+      "acceptance": "Operator explicitly reported successful execution without errors; no new execution was performed during this documentation reconciliation."
     }
   ],
-  "updatedUtc": "2026-11-09T20:12:45Z"
+  "updatedUtc": "2026-11-10T19:46:47.288Z",
+  "baselineKind": "complete-bootstrap-command",
+  "currentMirror": {
+    "path": "baselines/BASELINE-CURRENT.ps1",
+    "sha256": "5CB48CDC4E3CC8E7F8FEDD42700C5173B0A8B469C55EED8D0581D07BB66EDF46",
+    "bytes": 6856,
+    "identicalToCurrent": true,
+    "countsAsBaseline": false
+  },
+  "generatedArtifacts": [
+    {
+      "id": "RDC-REMOTE-GENERATED-FROM-BASELINE-002",
+      "path": "artifacts/RDC-Remote.generated-from-BASELINE-002.ps1",
+      "role": "generated-runtime-launcher; not a bootstrap baseline",
+      "sha256": "A4EAD4B96E39369E2357E447C2838DFB3788CA2CB8BCDFEF37C9776E20C0BADF",
+      "bytes": 11585,
+      "source": "Exact content preserved from the former BASELINE-002.ps1 before reclassifying BASELINE-002 as the complete bootstrap command.",
+      "readBackVerified": true
+    }
+  ],
+  "pendingChanges": [
+    {
+      "id": "AUTH-FRESH-SESSION-PER-RUN",
+      "status": "REQUIREMENT_ACCEPTED_IMPLEMENTATION_PENDING_TEST",
+      "targetBaseline": "BASELINE-003",
+      "targetVersion": "2.1 candidate",
+      "requirement": "Do not assume a previously authenticated RDC session; start a fresh authentication flow and allow the operator to select the intended Google account.",
+      "candidateFlag": "remote --no-persist-session",
+      "upstreamEvidence": "wonderwhy-er/DesktopCommanderMCP commit 9d5afdf5da6bdee4d4c52caf9a78128235a1b0d4",
+      "caveat": "The flag prevents RDC authentication reuse/persistence for that run; it does not clear Google browser cookies or force a Gmail identity.",
+      "promotionRule": "Do not change currentBaseline until the operator executes and accepts the complete candidate."
+    }
+  ]
 }
