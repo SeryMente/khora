@@ -66,7 +66,7 @@ type MigrationPutResult={url:string;pathname:string;bytes:number;sha256:string;r
 
 /** Byte-preserving, deterministic and non-overwriting B2 write used by the Blob archive migrator. */
 async function putCustodiaMigrationObject(key:string,data:Buffer,contentType:string):Promise<MigrationPutResult>{
-  if(data.length===0||data.length>512*1024*1024)throw new Error('migration_object_size_unsupported');
+  if(data.length>512*1024*1024)throw new Error('migration_object_size_unsupported');
   const c=storageLocation();
   if(!c.bucket||!c.bucketId)throw new Error('storage_b2_bucket_config_missing');
   safeObjectKey(key);
