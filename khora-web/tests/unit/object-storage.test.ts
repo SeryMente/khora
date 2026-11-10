@@ -90,7 +90,7 @@ test('physical Blob migration copies arbitrary bytes to deterministic B2 key and
     uploaded=Buffer.from(init?.body as Uint8Array);
     return new Response(JSON.stringify({fileId:'migration-file-id',fileName:decodeURIComponent(headers.get('X-Bz-File-Name')||''),contentLength:Number(headers.get('Content-Length'))}),{status:200});
    }
-   if(url==='https://f001.test.b2/file/'+c.bucket+'/'+key)return new Response(uploaded,{status:200});
+   if(url==='https://f001.test.b2/file/'+c.bucket+'/'+key){if(!uploaded)throw new Error('uploaded_bytes_missing');return new Response(new Uint8Array(uploaded),{status:200});}
    throw new Error('unexpected_fetch');
   }) as typeof fetch;
   const stored=await putMigratedBlobObject(sourceHash,payload,'application/pdf');
