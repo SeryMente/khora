@@ -1,4 +1,4 @@
-<!-- LIST_VERSION=0.31; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.32; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL. El único objeto canónico es [OBJETO-CANONICO.md](OBJETO-CANONICO.md); este archivo es el índice ejecutivo de trabajo. Se eliminan de la ejecución activa los planes ya supersedidos. Los registros históricos e instrucciones originales se conservan en sus rutas de evidencia.
@@ -12,7 +12,7 @@
 
 | Orden | ID existente | Prioridad | Estado | Trabajo que sí se ejecutará |
 |---:|---|---|---|---|
-| 1 | CUSTODIA-B2-006 | P0 | EN CURSO | Completar el contrato híbrido: B2-only para nuevas escrituras; GET/read-back físico de cada escritura B2 con cotejo de bytes y SHA-256; clasificación por objeto legacy/B2; indicador por archivo Blob temporalmente no disponible; rutas y UI que preserven texto/checkpoints y permitan reproducir las partes B2 disponibles; pruebas E2E y publicación cuando pasen todos los gates. |
+| 1 | CUSTODIA-B2-006 | P0 | EN CURSO | Cerrar la aceptación E2E autenticada que queda pendiente: crear una captura nueva con sesión KHORA autorizada; verificar que cada parte se escribe en B2 y que la aplicación la recupera después de recarga con longitud y SHA-256 cotejados; demostrar que texto/checkpoints y una sesión mixta con partes Blob legacy temporalmente no disponibles siguen operativos. Production ya está publicada y el preflight B2 de solo lectura pasó; falta esta prueba en navegador autenticado. |
 
 ## 2. Trabajo diferido y condiciones de reanudación
 
@@ -37,8 +37,8 @@
 4. Una parte B2 nueva sigue siendo utilizable aunque otras partes históricas Blob estén temporalmente no disponibles. La reproducción/descarga que requiera un conjunto incompleto no se presenta como completa.
 5. La indisponibilidad Blob no bloquea texto, checkpoints, nuevas capturas ni edición de texto.
 6. La prueba negativa confirma que un fallo de B2 no produce fallback de escritura a Blob.
-7. Una captura autenticada se archiva en B2, se recarga y se recupera desde B2 con sus referencias, partes, bytes y SHA-256 cotejados.
-8. Build, typecheck, pruebas del adaptador y comprobaciones E2E pertinentes pasan en el commit que se publica.
+7. Una captura autenticada se archiva en B2, se recarga y se recupera desde B2 con sus referencias, partes, bytes y SHA-256 cotejados. **Estado: PENDIENTE — falta una sesión de navegador KHORA autenticada autorizada.**
+8. **Publicación y build:** PASS. Production `dpl_6M6ebaAvNPpAtRspfX5QhffEJvVJ`, `READY`, `main` SHA `f0224c1368fb15a3452335a44305c6efa85eef79`; preflight B2 de solo lectura PASS; Next build y TypeScript PASS; 78/78 páginas. Preview del mismo código de aplicación SHA `9c171f798c03a24246b6fcff55c3f68a5d073cec`: cuatro suites focales 40 PASS/0 FAIL según el registro de validación, UI Contract y build PASS. **El E2E autenticado no se da por aprobado.**
 
 ## 5. Exclusiones vigentes
 
