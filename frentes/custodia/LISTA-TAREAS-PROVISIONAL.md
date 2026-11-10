@@ -1,75 +1,77 @@
-<!-- LIST_VERSION=0.33; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.34; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
-> **Actualización:** 2026-11-10 · reenfoque expreso del operador.
-> **Único objetivo activo:** determinar qué dictados/archivos históricos existen y cuáles son recuperables, están bloqueados temporalmente, tienen solo referencia pendiente, son señales sin contenido o son irrecuperables después de agotar las fuentes pertinentes; conciliar ese universo con «Recuperar capturas».
+> **Actualización:** 2026-11-10 · cambio expreso del objetivo del operador.
+> **Único objetivo activo:** archivar todos los registros históricos que puedan archivarse; dejar pendientes únicamente los que tengan un impedimento actual, concreto y documentado.
 
-**Instrucción literal:** [INSTRUCCION-REENFOQUE-INVENTARIO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-REENFOQUE-INVENTARIO-RECUPERABILIDAD-20261110.md).  
-**Evidencia inicial ya preservada:** [DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md](evidencias/DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md).  
-**Salida literal del ciclo anterior:** [SALIDA-MODELO-CUSTODIA-RECUPERAR-CAPTURAS-CORA-20261110.md](originales/SALIDA-MODELO-CUSTODIA-RECUPERAR-CAPTURAS-CORA-20261110.md).
+**Instrucción literal:** [INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md).  
+**Salida literal preservada:** [SALIDA-MODELO-CUSTODIA-ARCHIVO-REGISTROS-20261110.md](originales/SALIDA-MODELO-CUSTODIA-ARCHIVO-REGISTROS-20261110.md).  
+**Estado base:** [ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md](evidencias/ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md).  
+**Diagnóstico previo:** [DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md](evidencias/DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md).
 
 ## 1. Único trabajo activo
 
 | Orden | ID existente | Prioridad | Estado | Objetivo |
 |---:|---|---|---|---|
-| 1 | CUSTODIA-01 | P0 | EN CURSO | Inventario forense de dictados recuperables y conciliación del conjunto que debe mostrarse en «Recuperar capturas». |
+| 1 | CUSTODIA-01 | P0 | EN CURSO | Archivar, sin duplicación y con verificación, todos los registros/capturas que puedan archivarse; dejar como pendientes solo los impedimentos actuales documentados. |
 
-Detalle: [CUSTODIA-01 · Inventario forense de recuperabilidad](./📁%20🧩%20-%20CUSTODIA-01%20-%20Inventario%20forense%20de%20recuperabilidad/README.md).
+Detalle: [CUSTODIA-01 · Archivo de todos los registros recuperables](./📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20CUSTODIA-01%20-%20Inventario%20forense%20de%20recuperabilidad/README.md).
 
 ## 2. Desglose de fases de CUSTODIA-01
 
-Las siguientes fases son subunidades internas del expediente existente CUSTODIA-01. No son nuevos expedientes maestros ni folios.
+Las fases son subunidades internas del expediente existente, no nuevos expedientes maestros ni folios.
 
 | Fase | Estado | Alcance |
 |---|---|---|
-| CUSTODIA-01.a | PENDIENTE | Inventario relacional: sesiones, checkpoint_text, revisiones, partes de audio, MP3 actuales/históricos, manifiestos y vínculos a Volcados. |
-| CUSTODIA-01.b | PENDIENTE | Inventario físico remoto: B2, Vercel Blob, objetos huérfanos y prefijos staging; registrar existencia y accesibilidad por objeto. |
-| CUSTODIA-01.c | PENDIENTE | Fuentes locales: IndexedDB del navegador/perfil original, snapshots, revisiones, audios y evidencia local de Aisthesis/Chrome. |
-| CUSTODIA-01.d | PENDIENTE | Conciliación de identidad, hashes, URL, manifiestos, propietarios y exclusión de todo lo ya archivado; deduplicación documentada. |
-| CUSTODIA-01.e | PENDIENTE | Clasificación individual: recuperable ahora, existe bloqueado, referencia sin cotejo físico, señal sin contenido, irrecuperable confirmado o fuente no inspeccionada. |
-| CUSTODIA-01.f | PENDIENTE | Comparar el universo consolidado contra todas las tarjetas/páginas del panel y documentar omisiones, duplicados y conjunto esperado. |
+| CUSTODIA-01.a | PENDIENTE | Conciliar candidatos, propietarios, Volcados/archivados y duplicados; Chrome solo en el perfil autorizado `Profile` de `the.willfreeman@gmail.com` en `PC10RCIF4EI4`. |
+| CUSTODIA-01.b | PENDIENTE | Archivar transcripciones sin audio localizado como texto; marcar `Audio: No localizado` y `Procedencia: No verificada`, sin inferir copy/paste. |
+| CUSTODIA-01.c | PENDIENTE | Leer y cotejar físicamente las partes B2 elegibles; archivar solo tras comprobar bytes, longitud y SHA-256. |
+| CUSTODIA-01.d | PENDIENTE | Procesar las 216 partes locales de dos sesiones conforme a autorización C, copiarlas a B2 con read-back y preservar originales. |
+| CUSTODIA-01.e | PENDIENTE | Registrar como bloqueados los Blob suspendidos, referencias sin read-back y registros sin titularidad demostrada; no declarar pérdida. |
+| CUSTODIA-01.f | PENDIENTE | Verificar cada Volcado, retirar del pendiente lo archivado y dejar solo residuales actualmente no archivables con evidencia. |
 
-## 3. Definiciones de estado
+## 3. Estados de salida
 
-- **RECUPERABLE_AHORA:** el contenido existe y una lectura actual autorizada permite obtenerlo.
-- **EXISTE_BLOQUEADO:** existe evidencia del objeto conservado, pero una restricción temporal/proveedor impide leerlo ahora; por ejemplo, Blob suspendido por cuota.
-- **REFERENCIA_SIN_COTEJO_FISICO:** existe una referencia o manifiesto, pero la persistencia física actual aún no está demostrada.
-- **SOLO_SEÑAL_SIN_CONTENIDO:** únicamente hay telemetría o metadatos de captura; no se localizó archivo/contenido.
-- **IRRECUPERABLE_CONFIRMADO:** todas las fuentes pertinentes fueron inspeccionadas y no queda copia recuperable; exige evidencia de búsqueda y descarte.
-- **NO_INSPECCIONADO:** la fuente no se consultó o no fue accesible. Nunca equivale a perdido.
+- **ARCHIVADO_VERIFICADO:** archivo y vínculos comprobados por lectura de vuelta.
+- **PARCIAL_ARCHIVADO:** uno o más componentes archivados y otro componente de la misma captura pendiente.
+- **BLOQUEADO_AHORA:** el contenido existe, pero un bloqueo actual impide terminar el archivo.
+- **PENDIENTE_TITULARIDAD:** no se ha demostrado que el registro pertenezca a la cuenta que se archivaría.
+- **PENDIENTE_INTEGRIDAD:** referencia existente, pero sin lectura física/cotejo actual suficiente.
+- **SIN_CONTENIDO_LOCALIZADO:** solo señales o metadatos, sin texto/audio/archivo localizado.
+- **IRRESOLUBLE_EN_ESTE_MOMENTO:** impedimento actual concreto, sustentado y no superable con las vías permitidas.
 
-El estado se determina por componente: texto/checkpoint y cada parte de audio/MP3. En capturas mixtas no se extrapola el estado de un componente al resto. Los objetos bloqueados no se declaran irrecuperables por esa sola causa.
+El estado se asigna por registro y componente. Un archivo parcial no se presenta como archivo íntegro. Blob localizado pero inaccesible no se etiqueta como audio inexistente.
 
 ## 4. Cierre de tareas provisionales anteriores
 
-**Disposición:** RESUELTAS ADMINISTRATIVAMENTE POR REENFOQUE. El cierre retira esos trabajos del conjunto activo del frente; no afirma que cada objetivo técnico haya sido ejecutado, probado o aceptado. Sus documentos, código, resultados y límites históricos se conservan sin borrado.
+**Disposición:** RESUELTAS ADMINISTRATIVAMENTE POR REENFOQUE. El cierre retira esos trabajos del conjunto activo; no afirma que cada objetivo técnico haya sido ejecutado, probado o aceptado. Sus documentos, código, resultados y límites históricos se conservan sin borrado.
 
 | ID existente | Estado anterior | Disposición actual |
 |---|---|---|
-| CUSTODIA-03 | ABIERTA | RESUELTA POR REENFOQUE; el rescate/restauración de contenido queda fuera. Los candidatos históricos se inventarían como artefactos. |
-| CUSTODIA-04 | EN CURSO | RESUELTA POR REENFOQUE; reparación/certificación del archivado queda fuera. No se declara E2E aprobado. |
-| CUSTODIA-B2-001 | EN CURSO | RESUELTA POR REENFOQUE; la evidencia histórica de implementación se conserva. |
-| CUSTODIA-B2-002 | DIFERIDA | RESUELTA POR REENFOQUE; no se hará migración ni backfill Blob→B2. |
-| CUSTODIA-B2-003 | EN CURSO | RESUELTA POR REENFOQUE; no se ejecutará preflight ni trabajo de seguridad de proveedor como tarea independiente. |
+| CUSTODIA-03 | ABIERTA | RESUELTA POR REENFOQUE; su evidencia histórica permanece disponible como insumo para el archivo actual. |
+| CUSTODIA-04 | EN CURSO | RESUELTA POR REENFOQUE; no se declara E2E aprobado ni reparación aceptada. |
+| CUSTODIA-B2-001 | EN CURSO | RESUELTA POR REENFOQUE; evidencia histórica conservada. |
+| CUSTODIA-B2-002 | DIFERIDA | RESUELTA POR REENFOQUE; no se activa migración histórica Blob→B2. |
+| CUSTODIA-B2-003 | EN CURSO | RESUELTA POR REENFOQUE; evidencia histórica conservada. |
 | CUSTODIA-B2-004 | SUPERSEDIDA | RESUELTA POR REENFOQUE; conserva su condición histórica de supersedida. |
-| CUSTODIA-B2-005 | DIFERIDA | RESUELTA POR REENFOQUE; se conserva el diagnóstico histórico de acceso Blob. |
+| CUSTODIA-B2-005 | DIFERIDA | RESUELTA POR REENFOQUE; diagnóstico histórico conservado. |
 | CUSTODIA-B2-006 | EN CURSO | RESUELTA POR REENFOQUE; la aceptación E2E autenticada sigue técnicamente pendiente y no se declara PASS. |
-| CUSTODIA-B2-007 | DIFERIDA | RESUELTA POR REENFOQUE; no se realizará pulido de implementación. |
-| CUSTODIA-RES-001 | PROPUESTA PENDIENTE | RESUELTA POR REENFOQUE; no se diseñará resiliencia multialmacén en este alcance. |
-| CUSTODIA-RES-002 | PROPUESTA PENDIENTE | RESUELTA POR REENFOQUE; no se implementará ni certificará resiliencia multialmacén en este alcance. |
+| CUSTODIA-B2-007 | DIFERIDA | RESUELTA POR REENFOQUE; evidencia histórica conservada. |
+| CUSTODIA-RES-001 | PROPUESTA PENDIENTE | RESUELTA POR REENFOQUE; resiliencia multialmacén fuera del alcance actual. |
+| CUSTODIA-RES-002 | PROPUESTA PENDIENTE | RESUELTA POR REENFOQUE; resiliencia multialmacén fuera del alcance actual. |
 
 **CUSTODIA-02:** continúa RETIRADA; no se reactiva ni se reutiliza su identificador.  
-**CUSTODIA-01:** único expediente activo. No se crea CUSTODIA-05 ni se generan nuevos identificadores maestros.
+**CUSTODIA-01:** único expediente activo. No se crea CUSTODIA-05 ni se generan IDs maestros adicionales.
 
-## 5. Exclusiones y límites del trabajo activo
+## 5. Límites y compuertas
 
-No auditar la resiliencia general del producto; no probar nuevos dictados, escenarios de fallo ni flujos E2E; no reparar código, interfaz, datos o proveedor; no recuperar/restaurar contenido; no reclamar propietarios; no migrar/backfill; no actualizar referencias; no borrar ni sobrescribir objetos.
+No auditar resiliencia general ni probar nuevas capturas. No reparar código/datos/proveedores ni rediseñar arquitectura. No borrar, sobrescribir ni destruir originales. No atribuir registros sin titularidad demostrada. No duplicar lo archivado.
 
-Se permiten únicamente lecturas e inventarios necesarios para determinar la existencia y recuperabilidad actuales de artefactos históricos, dentro de las autorizaciones disponibles. Si una fuente o un objeto no puede inspeccionarse, quedará expresamente NO_INSPECCIONADO o EXISTE_BLOQUEADO, nunca se supondrá su ausencia.
+Se permite el archivo no destructivo de los registros elegibles, con verificación por componente. La lectura física, la copia local autorizada a B2 y los vínculos de archivo deben respetar el control generación 11 y sus compuertas de producción. Esta actualización del objetivo no anula por sí sola gates de Neon Production, idempotencia o read-back.
 
 ## 6. Criterio único de cierre de CUSTODIA-01
 
-El frente se considerará resuelto cuando el inventario de todas las fuentes pertinentes esté cotejado, cada unidad de contenido tenga clasificación justificada, los archivos ya archivados estén excluidos sin duplicación y la lista esperada del panel coincida con sus tarjetas/páginas observadas. Las fuentes inaccesibles deben seguir identificadas como pendientes/bloqueadas; no se inventa un cierre de irrecuperabilidad.
+El frente se considerará resuelto cuando todos los registros que pueden archivarse con los medios y permisos vigentes estén archivados y verificados, los registros ya archivados/duplicados estén excluidos y solo permanezcan casos actualmente imposibles de archivar por bloqueos concretos, falta de titularidad o ausencia confirmada de contenido. Cada residual debe tener evidencia, causa y componente afectado.
 
-La resolución de CUSTODIA-01 no requiere reparar ni modificar el producto. El resultado es documental: saber qué archivos sobreviven y cuáles pueden recuperarse hoy.
+El cierre no requiere reparar el producto ni certificar su resiliencia. El resultado es un archivo máximo no destructivo y una lista exacta de lo que no se pudo archivar en este momento.
