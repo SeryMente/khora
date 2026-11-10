@@ -1,197 +1,29 @@
-# CUSTODIA-B2-005 · Diagnóstico verificable del bloqueo de archivado
+# CUSTODIA-B2-005 · Revalidar el acceso al histórico Vercel Blob
 
-> **Estado:** en_curso · **Prioridad:** P0 · **Hito:** 2 de 5.
-> **Depende de:** primera restauración de CUSTODIA-B2-006; el prediagnóstico ya entregado fue suficiente para iniciar la reparación. **Desbloquea:** aceptación E2E y CUSTODIA-B2-007.
-> **OCP padre:** frentes/custodia/OBJETO-CANONICO.md. **Control heredado:** CONTROL-RESPONSABILIDAD.json.
-> **Alcance:** diagnóstico y pruebas de solo lectura/sintéticas; no cambia producción.
+> **Estado:** DIFERIDA · **Prioridad:** condicionada a la reactivación del origen.  
+> **OCP padre:** [frentes/custodia/OBJETO-CANONICO.md](../../../OBJETO-CANONICO.md).  
+> **Control:** hereda titularidad y autorización del OCP padre; no crea autoridad independiente.
 
-## 1. Objetivo
+## Objetivo al reanudar
 
-Completar el diagnóstico residual y la verificación positiva después de la reparación inmediata: estado actual de Blob, autenticación B2 con error saneado y cadena de archivado de extremo a extremo. El prediagnóstico inicial ya se ejecutó y habilitó comenzar CUSTODIA-B2-006; esta tarea ya no bloquea el inicio de la recuperación.
+Comprobar si los objetos históricos de khora-audio vuelven a ser legibles desde Vercel Blob después de que el propietario reactive el servicio. El bloqueo actual no autoriza inferir que los archivos hayan sido borrados o corrompidos.
 
-## 2. Motivo y evidencia inicial
+## Condiciones de reanudación
 
-- El almacén Vercel Blob khora-audio fue documentado como limits-exceeded-suspended por cuota excedida.
-- Una sesión reportada dejó 14 partes pendientes de confirmación remota y cero filas vinculadas como partes verificadas; el checkpoint de texto sí estaba presente.
-- El despliegue de main que contiene el transporte B2 nativo terminó bloqueado por el preflight con storage_b2_authorization_failed.
-- El código de preflight no expone la causa HTTP concreta de b2_authorize_account; debe mejorarse la captura diagnóstica sin revelar secretos.
-- La publicación READY anterior no demuestra que el transporte B2 del commit posterior esté operativo.
+1. El propietario reactiva/paga el servicio Vercel Blob.
+2. El estado del store deja de aparecer suspendido y se confirma acceso GET/exportación.
+3. El operador solicita expresamente reanudar esta comprobación.
+4. Se utilizan credenciales existentes autorizadas; no se crean ni rotan claves por esta tarea.
 
-Fuentes: OBJETO-CANONICO.md, LISTA-TAREAS-PROVISIONAL.md, originales/ChatGPT-CUSTODIA-20261107-1302.txt y logs del despliegue fallido 7be5712a19aa98837e6d34449585ecb40e634af3.
+## Alcance al reanudar
 
-## 3. Alcance
+- Comprobar estado del almacén y una muestra de lecturas físicas autorizadas.
+- Separar 403 por bloqueo de proveedor, 404 real, error de red e integridad de objeto.
+- Confirmar qué objetos históricos son recuperables sin cambiar sus localizadores.
+- Entregar evidencia minimizada para decidir la fase posterior CUSTODIA-B2-002.
 
-**Incluye**
-- Verificar el estado actual y cuota/limitación del store Blob desde la cuenta/proyecto autorizados.
-- Diagnosticar b2_authorize_account con estado HTTP y código de error saneados; comprobar identidad de cuenta, tipo/capacidades de llave y bucket privado sin mostrar valores.
-- Seguir la cadena: captura → IndexedDB → subida → respuesta → GET/read-back → registro de parte → manifiesto → endpoint/transacción de archivado.
-- Revisar build/deployment y errores runtime de los endpoints pertinentes, además de la persistencia de metadatos.
-- Usar datos sintéticos en pruebas no productivas; separar evidencia histórica de evidencia actual.
+## Exclusiones
 
-**No incluye**
-- Revelar, copiar a la conversación o registrar valores secretos.
-- Modificar variables productivas desde esta tarea; la autorización específica de verificación/corrección B2 Production pertenece a CUSTODIA-B2-006 y se ejecuta únicamente mediante la bóveda canónica.
-- Hacer merge/deploy antes de que B2-006 supere sus gates, aplicar SQL/backfill productivo o alterar bucket/CORS.
-- Leer o exportar el texto/audio personal de la sesión real.
+Mientras permanezca diferida, no realizar probes repetidos, descargas, copia de objetos, backfill, actualización de referencias Neon, borrado de originales, escrituras Blob ni cambios de configuración del proveedor.
 
-## 4. Secuencia mínima
-
-1. Conservar el prediagnóstico y fijar el deployment/commit productivo realmente activo al realizar esta verificación.
-2. Una vez restablecido el flujo por CUSTODIA-B2-006, verificar el estado actual de Vercel Blob y su cuota; no inferir el estado actual a partir de datos históricos.
-3. Capturar status HTTP y código B2 saneados de `b2_authorize_account`; distinguir `unauthorized`, `unsupported`, `transaction_cap_exceeded` y otros códigos, sin exponer valores ni mensajes que puedan contener secretos.
-4. Ejecutar matriz E2E con datos sintéticos: captura → persistencia local → subida → GET/read-back → SHA/bytes → vínculo de parte → manifiesto → archivado → recuperación tras recarga.
-5. Clasificar causas confirmadas, descartadas dentro del alcance probado y pendientes; no declarar ausencia global de fallos.
-
-## 5. Criterios de aceptación
-
-| Criterio | Evidencia exigida | Resultado |
-|---|---|---|
-| Estado de Blob confirmado en el corte actual | Estado del store y cuota/limitación, con fecha y cuenta/proyecto | PENDIENTE · no se consultó el estado actual del store |
-| Causa del fallo de autorización B2 identificada | Estado HTTP/código saneado de B2; ninguna clave impresa | PASS OPERATIVO · Master Key canónica instalada en Production y preflight nativo PASS; el HTTP/código exacto del fallo histórico sigue sin capturar |
-| Cadena de archivado inspeccionada de extremo a extremo | Recibo correlacionado de cada transición de una captura real | PASS PARCIAL REPORTADO · 10,052 caracteres, 191/191 partes de audio marcadas verificadas en B2; recuperación tras recarga NO VERIFICADA |
-| Otros fallos del alcance probado clasificados | Matriz de pruebas PASS/FAIL/NO VERIFICADO | PENDIENTE · no se extrapola una captura a todas las rutas |
-| Informe reproducible y seguro | Documento con versión, entorno, evidencias y límites | EN CURSO · corte 2026-11-10, con límites explícitos |
-
-«No existe otro fallo» solo podrá afirmarse para el conjunto exacto de rutas, versiones, escenarios y ventana probados; nunca como certeza global sin evidencia exhaustiva.
-
-## 6. Seguridad y salida
-
-- Usar únicamente la bóveda autorizada de Khora y credenciales existentes; no reutilizar bóveda/cache de EP.
-- Registrar solo código de error, estado HTTP, request/correlation ID saneado y metadatos técnicos.
-- Conservar originales y no hacer escrituras sobre fuentes históricas.
-- **Salida que acepta B2-006 y desbloquea B2-007:** informe residual de Blob/B2, recibos E2E correlacionados y matriz de fallos limitada al alcance realmente probado.
-
-## Prediagnóstico de solo lectura · 2026-11-09
-
-**Resultado principal:** la hipótesis «solo se agotó la cuota de Blob» queda refutada como explicación completa. Blob tiene un antecedente de suspensión por cuota, pero también hay fallos distintos en B2 y en la preparación de despliegues.
-
-| Deployment | Commit | Evidencia | Alcance |
-|---|---|---|---|
-| dpl_Dczf3WWnPG4cnCaJhf6PS8MzmxLe | b52003ee1809ad506db74e8ee97f0905f7aae91a | READY, alias productivo asignado | La publicación está lista; no demuestra por sí sola PUT/GET físico ni archivado E2E actual. |
-| dpl_36DeUEnuz2zoWtMJqp1BsZjWASUJ | b52003ee1809ad506db74e8ee97f0905f7aae91a | Preflight encrypted_roundtrip falló con storage_provider_request_failed; se eliminaron las versiones sintéticas exactas; el log indica que no se borraron originales. | Falla de petición del proveedor durante la prueba de ida/vuelta cifrada; HTTP/causa detallada no expuestos por el preflight. |
-| dpl_4ohubN6WFbQ2fVHTZ1FL5M6xR8ui | b52003ee1809ad506db74e8ee97f0905f7aae91a | ERR_MODULE_NOT_FOUND: el runtime no pudo resolver khora-web/lib/server/cripto desde scripts/preflight-object-storage.ts. | Fallo independiente de resolución de módulo/import en la preparación de despliegue; el preflight del proveedor no llegó a ejecutarse. |
-| dpl_DwfJkUPZ4NJnjTXgKCPFRNY5FR2f | 7be5712a19aa98837e6d34449585ecb40e634af3 | Preflight nativo B2: storage_b2_authorization_failed, durante b2_authorize_account. | Rechazo de autenticación/autorización API B2; el código no registra el status HTTP ni el código nativo que permitiría identificar el dato exacto rechazado. |
-
-### Configuración y errores runtime relacionados
-
-- En Vercel Production se observaron nombres de variables KHORA_OBJECT_STORAGE, KHORA_B2_BUCKET_NAME, KHORA_B2_BUCKET_ID, KHORA_B2_KEY_ID y KHORA_B2_APPLICATION_KEY. No se leyeron sus valores. El código actual acepta las variables heredadas KHORA_B2_KEY_ID / KHORA_B2_APPLICATION_KEY como fallback de KHORA_B2_MASTER_APPLICATION_KEY_ID / KHORA_B2_MASTER_APPLICATION_KEY; por tanto, la ausencia de los nombres nuevos no demuestra por sí sola la causa.
-- La publicación READY de b52003ee no contiene, en los eventos consultados, una prueba física verificable del ciclo completo de archivado. No se declara funcional el producto por estado READY.
-- La agrupación de errores runtime de siete días devolvió también Auth.js InvalidEndpoints para el proveedor OIDC y PostgreSQL 57P01 (terminación de conexión por orden administrativa), además de advertencias SSL de pg-connection-string. No se ha correlacionado ninguno de esos errores con las partes pendientes ni con el botón Archivar; se conservan como fallos/alertas observados, no como causas atribuidas.
-- La búsqueda de logs de /api/audio en la ventana reciente no devolvió eventos. La consulta histórica de runtime logs de siete días fue rechazada por la retención del plan Hobby; no equivale a ausencia de fallos.
-- El estado limits-exceeded-suspended de khora-audio por cuota proviene del expediente histórico y del original del operador. No se consultó directamente el estado actual del store en esta sesión; no se presenta como lectura fresca del proveedor.
-
-### Dictamen acotado
-
-Hay evidencia positiva de al menos tres problemas distintos del agotamiento de cuota: petición de proveedor fallida en roundtrip cifrado, módulo de preflight no resuelto y rechazo de autenticación nativa B2. También hay dos grupos de errores runtime independientes no correlacionados con archivado. **No es correcto afirmar que la cuota de Blob sea el único fallo ni que la aplicación ya esté archivando registros con B2.** La causa exacta del rechazo B2 y la causalidad de los errores OIDC/Neon siguen abiertas.
-
-**Siguiente paso de diagnóstico:** instrumentar el preflight para conservar de forma saneada status HTTP, código B2, etapa, request ID y mensaje no secreto; corregir primero la resolución de import; repetir pruebas sintéticas PUT/GET y después la cadena E2E. La ejecución de producto permanece pendiente de aprobación de la secuencia.
-
-
-## Actualización de prioridad · 2026-11-09
-
-El operador aprobó iniciar la recuperación del archivado sin esperar a completar todo el diagnóstico. El prediagnóstico de solo lectura registrado en esta tarea fue suficiente para abrir CUSTODIA-B2-006. Esta tarea se mantiene EN CURSO como cierre del diagnóstico y verificación ampliada posterior al primer restablecimiento, sin retrasar el trabajo de B2-006.
-
-### Nueva evidencia del build B2 nativo
-
-- Deployment: `dpl_DwfJkUPZ4NJnjTXgKCPFRNY5FR2f` · commit `7be5712a19aa98837e6d34449585ecb40e634af3`.
-- Vercel build ejecutó el preflight en producción y se detuvo con `storage_b2_authorization_failed` durante `b2_authorize_account`.
-- El código actual no registra el HTTP status ni el `code` JSON de B2; por tanto no sabemos si el proveedor devolvió `unauthorized`, `unsupported` u otro resultado. No se han consultado valores secretos.
-- Backblaze documenta HTTP 401 `unauthorized` como applicationKeyId/applicationKey incorrectos y HTTP 401 `unsupported` como clave no compatible con la versión de API. Esa tabla no permite afirmar que este deployment haya devuelto 401, pues su status no quedó registrado.
-- La corrección #355 del botón de archivado sí se fusionó y se desplegó antes del bloqueo B2; no prueba que B2 esté operativo.
-
-**Estado:** prediagnóstico parcial COMPLETADO; diagnóstico residual y verificación E2E PENDIENTES.
-
-## Actualización de autorización y PR diagnóstica · 2026-11-09
-
-El operador respondió «Correcto , actualiza tareas provisionales rapidamente, y resuelve.» a la pregunta explícita de autorización sobre credenciales B2 de Production y despliegue condicionado. El original A es [INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md](../../originales/INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md), UUIDv7 local `01a1c17d-189a-7fea-a644-6be002e2c07a`. La verificación/corrección de B2 Production se asigna a B2-006; esta tarea conserva el diagnóstico residual y E2E sin modificar por sí sola credenciales.
-
-PR #362 sigue OPEN · DRAFT · NOT MERGED, head `3b684a870a21ccf2f200ee684687beea42e3b235`, 3 archivos. La Preview asociada está READY con compilación y TypeScript correctos (78/78 páginas), pero no ejecutó preflight B2 por ausencia de variables B2 en Preview. La prueba unitaria añadida no fue ejecutada. Por tanto, no hay todavía status HTTP/código B2 actual ni evidencia de PUT/GET físico; todos los criterios de aceptación de esta tarea permanecen PENDIENTES.
-
-
-### Reconciliación diagnóstica vigente · 2026-11-09
-
-La lectura actual de Vercel y de `main` deja los siguientes hechos, con sus límites:
-
-- **Cliente/flujo de archivado:** PR #355 está MERGED en `main` (merge `8489a09c03a330b85f3e31297415ada7a19fe10e`). Su corrección de drenaje/reintento de partes es real, pero no prueba que la persistencia B2 esté habilitada.
-- **Transporte S3-compatible:** `dpl_36DeUEnuz2zoWtMJqp1BsZjWASUJ` ejecutó `migrate-runtime.mjs` antes del preflight; el log confirma migraciones 023–029 aplicadas. Después falló el roundtrip cifrado con `storage_provider_request_failed`.
-- **Transporte nativo B2:** `dpl_DwfJkUPZ4NJnjTXgKCPFRNY5FR2f` ejecutó primero preflight y después migración, pero falló en `b2_authorize_account` con `storage_b2_authorization_failed`; no alcanzó el hook de migración. La evidencia no contiene HTTP status ni código JSON nativo.
-- **Variables Production:** metadatos no descifrados confirman nombres heredados `KHORA_B2_KEY_ID` y `KHORA_B2_APPLICATION_KEY` más selector, preflight y bucket. No aparecen los nombres canónicos Master Key. No se leyó ningún valor.
-- **PR #362:** continúa OPEN · DRAFT · NOT MERGED. Añade status/código saneados y una prueba sintética de 401, pero la prueba no se ejecutó. Su Preview READY compiló (78/78 páginas estáticas y TypeScript PASS), pero no ejecutó preflight con credenciales, PUT/GET o E2E.
-- **Build/migraciones:** el primer intento del commit b52003ee aplicó migraciones 023–029 antes de fallar en roundtrip. El script enumera también 032, pero el log no confirma si esa última quedó aplicada. El intento nativo falló antes de migrar. No repetir hook Production hasta reconciliar el estado del esquema y contar con vía autorizada sin mutaciones adicionales.
-- **Vercel Blob:** `khora-audio` tiene antecedente histórico `limits-exceeded-suspended`; no se consultó el estado actual del store en esta retoma, por lo que su condición presente sigue NO VERIFICADA.
-- **Archivos del usuario:** no se recuperó evidencia runtime actual de /api/audio que permita asociar otros errores de OIDC o PostgreSQL al botón Archivar. No inferir ausencia de fallos fuera de la ventana probada.
-
-**Dictamen:** hay fallos demostrados adicionales al antecedente de cuota de Blob. El último error B2 específico permanece en autenticación; su causa exacta está pendiente de capturar status/código. No existe evidencia de PUT/GET físico ni de archivado E2E exitoso; por tanto, Cora/Khora continúa NO RESTABLECIDA/NO DEMOSTRADA.
-
-**Fuentes:** [evidencia consolidada de B2 Production](../../evidencias/DIAGNOSTICO-B2-PRODUCTION-20261109.md), [retoma A](../../originales/INSTRUCCION-RETOMA-CUSTODIA-20261109.md), eventos de los tres deployments arriba identificados y metadatos Vercel Production sin valores secretos.
-
-
-## Actualización posterior · 2026-11-09 · autenticación local B2 confirmada
-
-La explicación «credencial KHORA incorrecta» deja de ser el diagnóstico principal: desde la única terminal RDC disponible, PC-7 (PC-7\\PC 7), EP Vault inyectó las dos variables maestras KHORA a un proceso hijo aislado y Backblaze aceptó b2_authorize_account.
-
-- Account ID y Key ID coincidieron.
-- La cuenta devolvió capacidades maestras y el listado del bucket correcto.
-- Bucket khora-userdata-ecea4187, ID 35b8cbd6623b54a5a9130c18, allPrivate, con pertenencia de cuenta confirmada.
-- Vercel Production todavía tiene solo los nombres heredados KHORA_B2_KEY_ID / KHORA_B2_APPLICATION_KEY; faltan los nombres canónicos KHORA_B2_MASTER_APPLICATION_KEY_ID / KHORA_B2_MASTER_APPLICATION_KEY. No se descifraron valores.
-- El selector Production KHORA_OBJECT_STORAGE está en B2 y KHORA_B2_PREFLIGHT=1.
-- La prueba física B2 local ya pasó: objeto sintético 150 bytes subido/descargado, SHA-256 coincidente y SSE-B2/AES256. La evidencia está en PRUEBA-FISICA-B2-KHORA-20261109.md (blob c5043bc3ca6f6c492c4a5ca4cb55235d055488e1). El archivado E2E de Production sigue pendiente porque faltan las dos variables maestras canónicas y un deployment nuevo.
-- Los errores OIDC/PostgreSQL siguen sin correlación demostrada con archivado. El estado actual de Vercel Blob no se volvió a consultar en este ciclo.
-
-**Dictamen actualizado:** el bloqueo no es inexistencia de la cuenta ni rechazo de la Master Key KHORA. El siguiente punto causal es alinear los secretos canónicos de Vercel Production y completar el roundtrip físico.
-
-
-### Prueba física posterior · 2026-11-09 · PASS
-
-- Objeto sintético: khora/custodia/preflight/20261109/342ed1ad-d8aa-4e9a-bf0b-fce84f31c3ab.json.
-- File ID: 4_z35b8cbd6623b54a5a9130c18_f1191dbb4dc31bbce_d20261109_m230230_c005_v0501036_t0032_u01794265350120.
-- Tamaño: 150 bytes.
-- SHA-256 origen y read-back: 9f0fccddda2ec3a56f808236d54701961a3f70269640a35a5771e7ecf399541e; coincidencia exacta.
-- SSE-B2/AES256 confirmado; objeto de prueba retenido.
-- Evidencia detallada: [PRUEBA-FISICA-B2-KHORA-20261109.md](../../../evidencias/PRUEBA-FISICA-B2-KHORA-20261109.md), blob c5043bc3ca6f6c492c4a5ca4cb55235d055488e1.
-
-**Conclusión:** Backblaze KHORA autentica y persiste físicamente desde PC-7. La causa residual está en conectar la Master Key al runtime Vercel Production y probar el archivado E2E, no en acceso al proveedor B2.
-
-### Hallazgo causal adicional · 2026-11-09 · Vercel legacy key ID no es Master Key
-
-La lectura controlada de KHORA_B2_KEY_ID desde Vercel Production, sin imprimir el valor, mostró que **no coincide con el Account ID** de la cuenta KHORA (58b62b4593c8). El Master Application Key ID validado desde PC-7 sí coincide con ese Account ID. Por ello, las variables heredadas actuales no representan la Master Key esperada por el adaptador de KHORA y no deben simplemente renombrarse.
-
-**Corrección necesaria:** reemplazar, no renombrar, las dos entradas heredadas de Production con la pareja real KHORA_B2_MASTER_APPLICATION_KEY_ID / KHORA_B2_MASTER_APPLICATION_KEY leída desde la bóveda local y transferida por Vercel CLI autenticado. No descifrar ni copiar los valores a chat, consola o archivos de documentación.
-
-## Retoma operativa verificada · 2026-11-09 · PC-7 / Vercel Production
-
-- Backblaze B2: autenticación Master Key KHORA, identidad del bucket privado y lectura de configuración SSE-B2 verificadas desde Production por el preflight.
-- Transferidas desde EP Vault las dos variables canónicas `KHORA_B2_MASTER_APPLICATION_KEY_ID` y `KHORA_B2_MASTER_APPLICATION_KEY`; read-back de metadatos Vercel confirma una entrada de tipo `sensitive` en Production para cada nombre. Los valores no se revelaron.
-- Deployment Production `dpl_6hUVD7LBXqtmnaMw2nfH2wwyrHUp`, commit `dd9527a223f65e7af834b042d51f716296151bf2`, estado `READY`; preflight `native_auth`, `master_key`, `bucket_identity`, `bucket_private` y `sse_b2_default`: PASS. URL: `https://khora-r25tmr78o-victorhugotorresmendez-8991s-projects.vercel.app`.
-- Para este build se aisló temporalmente el comando y se omitió `migrate-runtime.mjs`; el Build Command original se restauró en la configuración del proyecto después de iniciarse el build. No se ejecutó SQL ni backfill de Neon en este ciclo.
-- La ruta de código de nuevas escrituras usa `putEncryptedObject` (B2-only y fail-closed), y quedó desplegada; el archivado E2E real con sesión propietaria, vínculo/manifiesto y recuperación tras recarga permanece pendiente. Por tanto, la capacidad productiva está preflight-validada y desplegada, pero la aceptación funcional de archivo no está certificada.
-- No se ha iniciado el backfill histórico Blob→B2 ni se ha cambiado ninguna referencia Neon. Los originales Blob siguen sin borrarse.
-
-
-## Actualización de diagnóstico · 2026-11-10
-
-- **Autenticación B2 actual:** el par canónico Master Application Key KHORA fue transferido desde EP Vault a Vercel Production como Secrets sensibles; el preflight de Production pasó `native_auth`, `master_key`, `bucket_identity`, `bucket_private` y `sse_b2_default`. Esto resuelve el bloqueo operativo de autenticación observado en el deployment anterior. El status HTTP/código JSON exacto de aquel rechazo histórico no se recuperó; no inventar una causa HTTP concreta.
-- **Nueva captura:** la sesión anterior reportó una captura real de 10,052 caracteres, SHA-256 con prefijo `d69033c4`, 191 partes de audio, 15,617,130 bytes y cero faltantes. Las 191 partes aparecían vinculadas a `khora-userdata-ecea4187`, con metadatos SHA/bytes y marca de verificación. Registro `en_revision`. La recuperación posterior a recarga permanece NO VERIFICADA.
-- **Vercel Blob:** sigue pendiente consultar de forma actual el estado del store y su cuota. El antecedente `limits-exceeded-suspended` no se presenta como observación fresca.
-- **Alcance diagnóstico pendiente:** no se ha demostrado ausencia de otros fallos. Mantener la matriz de escenarios y versiones; no atribuir los errores OIDC/PostgreSQL al archivado sin correlación.
-- **Relación con B2-002:** este diagnóstico residual no debe retrasar el inventario read-only ni la copia física Blob→B2. Las referencias productivas solo se actualizan después de reparar el reconciliador, validar ledger, transacción, idempotencia y read-back.
-- **Fuentes históricas conservadas:** los estados de deployment de 2026-11-09 y los fallos previos se mantienen como antecedentes, no se reescriben como si hubieran sido exitosos.
-
-## Diagnóstico de origen Blob · 2026-11-10 · bloqueo confirmado
-
-- Store Vercel conectado a KHORA Web: khora-audio; ID store_VyX9EI8q6DKhp4RV; región iad1; access public.
-- Estado del store: limits-exceeded-suspended; billingState=suspended; usageQuotaExceeded=true.
-- Conteo físico de Vercel: 636 objetos; 1,010,497,194 bytes. list() llegó a cursor final en 1 página sin error.
-- Lectura con SDK: 5/5 objetos de muestra rechazados como blob_read_forbidden.
-- Lectura directa de las URL públicas/CDN: 5/5 rechazadas como blob_read_forbidden.
-- Resultado: el inventario de metadatos funciona; el origen no entrega bytes en este estado. Cero bytes descargados y cero objetos históricos copiados.
-- La ruta de nuevas escrituras no se ve afectada; el deployment Production dpl_6hUVD7LBXqtmnaMw2nfH2wwyrHUp continúa READY y los Secrets B2 permanecen configurados.
-- No se borraron ni sobrescribieron objetos. No hubo escritura en Blob, B2 o Neon durante los probes.
-
-### Acción externa necesaria
-
-Solicitar a Vercel una reactivación temporal/one-time read-only de khora-audio o una vía de exportación. La ayuda oficial de precios de Blob dice que los equipos Hobby pierden acceso al exceder el límite y deben esperar 30 días para volver a usar Blob; no se obtuvo la fecha blockedUntil específica de KHORA. La reactivación debe habilitar GET, no escritura ni borrado. Después se repetirá source-probe y, si pasa, se ejecutará el backfill físico byte-preserving hacia el bucket B2 privado.
-
-### Dictamen
-
-CUSTODIA-B2-005 diagnostica ahora un bloqueo externo del proveedor, no un error de autenticación B2. CUSTODIA-B2-002 queda bloqueada en la fase de lectura del origen; el inventario de los 636 objetos ya está acreditado, pero la descarga, la copia B2 y la reconciliación de referencias siguen pendientes. No marcar el frente ni la migración como completados.
+La copia histórica Blob→B2 no se ejecuta en esta tarea. Requiere una autorización específica posterior, inventario fuente legible y aceptación de la estrategia de migración.
