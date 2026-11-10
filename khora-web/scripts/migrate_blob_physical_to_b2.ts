@@ -42,6 +42,9 @@ function flag(name: string): boolean { return process.argv.includes("--" + name)
 function sha256(value: Buffer | string): string { return createHash("sha256").update(value).digest("hex"); }
 function safeErrorCode(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error);
+  if (/suspend/i.test(message)) return "blob_store_suspended";
+  if (/403|forbidden|blocked/i.test(message)) return "blob_read_forbidden";
+  if (/429|rate.?limit/i.test(message)) return "blob_service_rate_limited";
   return /^[a-z0-9_:-]{1,80}$/i.test(message) ? message : "migration_unexpected_error";
 }
 function addError(summary: Summary, code: string): void { summary.errors[code] = (summary.errors[code] || 0) + 1; }
@@ -186,6 +189,10 @@ async function runPool<T>(items:T[],concurrency:number,worker:(item:T,index:numb
 
 async function main():Promise<void> {
   const apply=flag("apply");
+  const metadataOnly=flag("metadata-only");
+  const sourceProbe=flag("source-probe");
+  if(metadataOnly&&sourceProbe)throw new Error("migration_probe_mode_conflict");
+  if((metadataOnly||sourceProbe)&&apply)throw new Error("migration_probe_cannot_apply");
   if(apply&&arg("confirm")!==CONFIRM)throw new Error("apply_requires_confirm_flag");
   if(!process.env.BLOB_READ_WRITE_TOKEN&&!process.env.VERCEL_OIDC_TOKEN)throw new Error("vercel_blob_authentication_required");
   const offset=readInt(arg("offset"),0,"offset");
@@ -206,9 +213,31 @@ async function main():Promise<void> {
     throw new Error("migration_b2_preflight_failed");
   }
 
-  const [inventory,referenceIndex]=await Promise.all([listEveryBlob(),loadReferenceIndex()]);
+  const inventory=await listEveryBlob();
   summary.inventoryPages=inventory.pages;
   summary.physicalBlobObjects=inventory.blobs.length;
+  if(metadataOnly){
+    const totalBytes=inventory.blobs.reduce((sum,item)=>sum+item.size,0);
+    process.stdout.write(JSON.stringify({mode:"metadata-only",inventoryPages:inventory.pages,
+      physicalBlobObjects:inventory.blobs.length,totalBytes,storeAccess:"not inferred from URLs",
+      sourceWrites:0,destinationWrites:0,neonWrites:0},null,2)+"\\n");
+    return;
+  }
+  if(sourceProbe){
+    const selectedProbe=inventory.blobs.slice(offset,offset+limit);
+    const errors:Record<string,number>={};
+    let sourceRead=0,sourceBytes=0;
+    await runPool(selectedProbe,concurrency,async(item)=>{
+      try{const data=await readSourceBlob(item);sourceRead+=1;sourceBytes+=data.bytes.length;sha256(data.bytes);}
+      catch(error){const code=safeErrorCode(error);errors[code]=(errors[code]||0)+1;}
+    });
+    process.stdout.write(JSON.stringify({mode:"source-probe",inventoryPages:inventory.pages,
+      physicalBlobObjects:inventory.blobs.length,offset,selected:selectedProbe.length,
+      sourceRead,sourceReadFailed:selectedProbe.length-sourceRead,sourceBytes,errors,
+      sourceWrites:0,destinationWrites:0,neonWrites:0},null,2)+"\\n");
+    return;
+  }
+  const referenceIndex=await loadReferenceIndex();
   summary.distinctDatabaseBlobUrls=referenceIndex.distinctUrls;
   summary.databaseReferenceOccurrences=referenceIndex.occurrences;
   const physicalUrls=new Set(inventory.blobs.map(item=>item.url));
