@@ -1,6 +1,6 @@
 # CUSTODIA-B2-006 · Persistencia nueva B2 y disponibilidad por archivo legacy
 
-> **Estado:** EN CURSO · **Prioridad:** P0 · **Hito:** publicación de persistencia híbrida.  
+> **Estado:** EN CURSO · **Prioridad:** P0 · **Hito:** persistencia híbrida publicada; falta aceptación E2E autenticada.  
 > **OCP padre:** [frentes/custodia/OBJETO-CANONICO.md](../../../OBJETO-CANONICO.md).  
 > **Control heredado:** [CONTROL-RESPONSABILIDAD.json](../../../CONTROL-RESPONSABILIDAD.json).
 
@@ -44,13 +44,13 @@ Asegurar que todo contenido creado desde ahora en KHORA se escriba exclusivament
 
 | Criterio | Evidencia exigida | Estado |
 |---|---|---|
-| Localizador nuevo siempre B2 | Prueba de rutas B2-only y ausencia de fallback Blob | PENDIENTE |
-| Integridad de escritura nueva | GET físico posterior al PUT; longitud y SHA-256 idénticos | PENDIENTE |
-| Blob legacy claramente identificado | Estado por archivo y respuesta 503 estructurada, sin marcar corrupción/pérdida | PENDIENTE |
-| Contenido de texto aislado del audio legacy | Guardar/editar texto y checkpoints con Blob inaccesible | PENDIENTE |
-| Sesión mixta | Partes B2 utilizables; partes Blob señalan espera de recuperación; MP3 completo bloqueado si falta audio requerido | PENDIENTE |
-| Prueba E2E autenticada | Captura real, registro B2, recarga y read-back de texto/audio con referencias/bytes/SHA cotejados | PENDIENTE |
-| Publicación | Build y typecheck del commit exacto PASS; smoke checks de la deployment | PENDIENTE |
+| Localizador nuevo siempre B2 | Adaptador B2-only, todas las rutas nuevas usan el adaptador; prueba negativa sin fallback | PASS en código y suite focal; captura productiva autenticada pendiente |
+| Integridad de escritura nueva | GET/read-back posterior al PUT; longitud y SHA-256 idénticos | PASS sintético en suite del adaptador; el roundtrip de una captura productiva autenticada tras recarga sigue pendiente |
+| Blob legacy claramente identificado | Estado por archivo y respuesta 503 estructurada, sin marcar corrupción/pérdida | Implementado y desplegado; smoke visual autenticado pendiente por SSO |
+| Contenido de texto aislado del audio legacy | Guardar/editar texto y checkpoints con Blob inaccesible | Implementación separada; demostración autenticada en sesión real pendiente |
+| Sesión mixta | Partes B2 utilizables; partes Blob señalan espera de recuperación; MP3 completo bloqueado si falta audio requerido | Implementado en manifiesto/pipeline/UI; E2E real pendiente |
+| Prueba E2E autenticada | Captura real, registro B2, recarga y read-back de texto/audio con referencias/bytes/SHA cotejados | PENDIENTE — requiere sesión KHORA autenticada autorizada |
+| Publicación | Build y typecheck del commit exacto PASS; preflight B2 y deployment Production | PASS — `dpl_6M6ebaAvNPpAtRspfX5QhffEJvVJ` READY; SHA `f0224c1`; preflight read-only PASS; Next build/TypeScript PASS, 78/78 páginas. Acceso autenticado de navegador pendiente |
 
 ## Exclusiones
 
@@ -60,4 +60,8 @@ La migración histórica se reabrirá en una tarea/fase posterior cuando el oper
 
 ## Estado de implementación
 
-La rama fix/custodia-legacy-blob-status-b2-writes-20261110 contiene los cambios de esta entrega. No marcar criterios como PASS ni considerar B2 garantizado hasta que las pruebas se ejecuten sobre el commit exacto y se acepte la recuperación E2E autenticada.
+Los cambios están integrados en `main` (commit `f0224c1368fb15a3452335a44305c6efa85eef79`) y publicados en Vercel Production (`dpl_6M6ebaAvNPpAtRspfX5QhffEJvVJ`, `READY`). El preflight Production confirmó `native_auth`, `master_key`, `bucket_identity`, `bucket_private` y `sse_b2_default`: PASS. El build de Production se ejecutó con `node --import tsx scripts/preflight-object-storage.ts && next build --webpack`; `migrate-runtime.mjs` se omitió deliberadamente y no se ejecutaron migraciones SQL/Neon. El Preview del mismo código de aplicación (SHA `9c171f798c03a24246b6fcff55c3f68a5d073cec`) completó TypeScript, UI Contract, cuatro suites focales (40 PASS/0 FAIL según el acta de validación) y Next build. La suite global conserva fallos ajenos al alcance y no se declara PASS.
+
+El endpoint público `https://khora-web.vercel.app/` respondió al lector de comprobación con `login_required` por la protección SSO; los perfiles de navegador conectados no tienen una sesión KHORA registrada. Por tanto no se completó la prueba autenticada de captura/recarga/read-back. No afirmar aceptación E2E ni cierre de B2-006 hasta realizarla.
+
+No se ejecutó migración histórica, backfill, actualización de referencias Neon ni borrado de originales Blob. Los objetos históricos siguen en sus localizadores; la recuperación/migración continúa pendiente de reactivación de Blob y nueva autorización.
