@@ -1,6 +1,6 @@
 # CUSTODIA-RES-001 · Diseño de resiliencia multialmacén
 
-> **Estado:** propuesta_pendiente_aprobacion · **Prioridad:** P1 · **Hito:** 4 de 5.
+> **Estado:** RESUELTA POR REENFOQUE · propuesta archivada; no diseñar resiliencia en el alcance actual.
 > **Depende de:** CUSTODIA-B2-007. **Desbloquea:** CUSTODIA-RES-002.
 > **OCP padre:** frentes/custodia/OBJETO-CANONICO.md. **Control heredado:** CONTROL-RESPONSABILIDAD.json.
 
@@ -59,3 +59,12 @@ No existe garantía matemática de conservación «hasta el final de los tiempos
 - Revisión de que el diseño es mínimo y no agrega componentes sin beneficio demostrado.
 
 La tarea produce diseño y especificación. No implementa ni despliega el diseño.
+
+
+## Disposición de cierre · 2026-11-10 · reenfoque de CUSTODIA
+
+**Estado de gestión:** RESUELTA POR REENFOQUE. El único objetivo actual del frente es el inventario forense de dictados/archivos conservados y la conciliación del panel «Recuperar capturas» (CUSTODIA-01).
+
+Este cierre es administrativo y de alcance. No significa que el objetivo técnico histórico de este expediente se haya ejecutado, probado o aceptado. Se conserva todo el contenido y evidencia histórica de este README.
+
+No reabrir ni ejecutar este expediente dentro del alcance actual. No se ha modificado código, Neon, B2, Blob, configuración ni producción.
