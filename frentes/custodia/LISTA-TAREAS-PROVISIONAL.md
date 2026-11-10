@@ -1,4 +1,4 @@
-<!-- LIST_VERSION=0.34; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.35; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
@@ -24,11 +24,11 @@ Las fases son subunidades internas del expediente existente, no nuevos expedient
 
 | Fase | Estado | Alcance |
 |---|---|---|
-| CUSTODIA-01.a | PENDIENTE | Conciliar candidatos, propietarios, Volcados/archivados y duplicados; Chrome solo en el perfil autorizado `Profile` de `the.willfreeman@gmail.com` en `PC10RCIF4EI4`. |
+| CUSTODIA-01.a | EN CURSO | Conciliar candidatos, propietarios, Volcados/archivados y duplicados; Chrome solo en el perfil autorizado `Profile` de `the.willfreeman@gmail.com` en `PC10RCIF4EI4`. |
 | CUSTODIA-01.b | PENDIENTE | Archivar transcripciones sin audio localizado como texto; marcar `Audio: No localizado` y `Procedencia: No verificada`, sin inferir copy/paste. |
-| CUSTODIA-01.c | PENDIENTE | Leer y cotejar físicamente las partes B2 elegibles; archivar solo tras comprobar bytes, longitud y SHA-256. |
-| CUSTODIA-01.d | PENDIENTE | Procesar las 216 partes locales de dos sesiones conforme a autorización C, copiarlas a B2 con read-back y preservar originales. |
-| CUSTODIA-01.e | PENDIENTE | Registrar como bloqueados los Blob suspendidos, referencias sin read-back y registros sin titularidad demostrada; no declarar pérdida. |
+| CUSTODIA-01.c | EN CURSO | Leer y cotejar físicamente las partes B2 elegibles; archivar solo tras comprobar bytes, longitud y SHA-256. |
+| CUSTODIA-01.d | EN CURSO | Procesar las 216 partes locales de dos sesiones conforme a autorización C, copiarlas a B2 con read-back y preservar originales. |
+| CUSTODIA-01.e | EN CURSO | Registrar como bloqueados los Blob suspendidos, referencias sin read-back y registros sin titularidad demostrada; no declarar pérdida. |
 | CUSTODIA-01.f | PENDIENTE | Verificar cada Volcado, retirar del pendiente lo archivado y dejar solo residuales actualmente no archivables con evidencia. |
 
 ## 3. Estados de salida
@@ -68,10 +68,16 @@ El estado se asigna por registro y componente. Un archivo parcial no se presenta
 
 No auditar resiliencia general ni probar nuevas capturas. No reparar código/datos/proveedores ni rediseñar arquitectura. No borrar, sobrescribir ni destruir originales. No atribuir registros sin titularidad demostrada. No duplicar lo archivado.
 
-Se permite el archivo no destructivo de los registros elegibles, con verificación por componente. La lectura física, la copia local autorizada a B2 y los vínculos de archivo deben respetar el control generación 11 y sus compuertas de producción. Esta actualización del objetivo no anula por sí sola gates de Neon Production, idempotencia o read-back.
+Se permite el archivo no destructivo de los registros elegibles, con verificación por componente. La lectura física, la copia local autorizada a B2 y los vínculos de archivo deben respetar el control generación 11 y sus compuertas de producción. La respuesta afirmativa del operador a la ampliación específica se conserva en el OCP y el control generación 11. Quedan autorizadas las escrituras de archivo en Neon Production dentro del alcance de CUSTODIA-01; se mantienen los controles mínimos de titularidad, idempotencia, integridad, read-back y preservación de originales.
 
 ## 6. Criterio único de cierre de CUSTODIA-01
 
 El frente se considerará resuelto cuando todos los registros que pueden archivarse con los medios y permisos vigentes estén archivados y verificados, los registros ya archivados/duplicados estén excluidos y solo permanezcan casos actualmente imposibles de archivar por bloqueos concretos, falta de titularidad o ausencia confirmada de contenido. Cada residual debe tener evidencia, causa y componente afectado.
 
 El cierre no requiere reparar el producto ni certificar su resiliencia. El resultado es un archivo máximo no destructivo y una lista exacta de lo que no se pudo archivar en este momento.
+
+## 7. Autorización y política de ejecución · 2026-11-10
+
+El operador confirmó la ampliación de autorización descrita en el OCP-v0.47. Se permite ejecutar el archivo de registros elegibles de su cuenta, incluidos los 216 fragmentos locales de las dos sesiones autorizadas, las partes B2 cotejadas y la creación/vinculación de Volcados en Neon Production. El alcance, los límites y la frase literal están preservados en el OCP y en `originales/INSTRUCCION-AUTORIZACION-ARCHIVO-PRODUCTION-20261110.md`.
+
+**Eficiencia:** agrupar consultas, lecturas y operaciones por lotes; evitar verificaciones duplicadas cuando la evidencia vigente cubra el mismo objeto/versionado; aislar fallos por registro y continuar. No omitir titularidad, deduplicación, SHA/longitud/bytes de las copias, idempotencia, lectura de vuelta del archivo ni preservación de originales.
