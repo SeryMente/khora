@@ -360,21 +360,21 @@
   ],
   "authorized_device": {
     "name": "PC10RCIF4EI4",
-    "device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
-    "status": "authorized_for_harmonia_scoped_subproject_implementation_and_validation",
-    "scope": "Local HARMONIA subproject implementation and validation only at C:\\Users\\fila4\\Desktop\\Ser y Mente\\EP\\Harmonia\\subproyectos\\bucle-mejora-supervisada. This includes creating/editing source code, local data schemas, UI/configuration, documentation, and automated tests inside that exact subproject folder; creating an isolated candidate copy/worktree inside it; running local tests and a local loopback-only prototype with synthetic/sanitized fixtures. It excludes modification/replacement of the existing parent extension package, reading or entering real credentials, paid/external API calls before the operator supplies the key and expressly enables them, browser automation against ChatGPT Web, merge/push/deployment, Chrome installation/activation, or unrelated paths. No ChatGPT Web UI automation or programmatic extraction of ChatGPT Web outputs. Any expansion requires a separate explicit gate.",
-    "observed_platform": "Windows",
-    "observed_user": "CENTRAL\\fila4 (interactive console session ID 4; active)",
+    "device_id": "b573344f-c68f-47c9-9c2e-ae67f2e63bdb",
+    "status": "authorized_for_harmonia_local_workspace_and_chrome_package_materialization",
+    "scope": "Local HARMONIA workspace only within SeryMente/Repositorios/KHORA, front root Harmonia/ and Chrome load directory Harmonia/Extension/. Explicitly includes materializing SeryMente/khora main at the previously absent verified destination C:\\Users\\fila4\\Desktop\\SeryMente\\Repositorios\\KHORA; creating the front workspace Harmonia/ and the loadable package Harmonia/Extension/ with manifest.json directly inside, sourced from the canonical main code under apps/harmonia-observability/extension; maintaining HARMONIA-scoped provisional task documentation under docs/frentes/harmonia/OBJETO-CANONICO.md; local isolated branch/worktree changes and local tests with synthetic/sanitized fixtures; and loopback-only local prototype validation. Does not authorize changing or pushing main, merging, deployment, modifying unrelated fronts or paths, paid/external API calls, credential access/entry, Chrome installation or activation, browser automation against ChatGPT Web, or programmatic extraction of ChatGPT Web outputs. Any expansion beyond this exact repository/front workspace requires a separate explicit gate.",
+    "observed_platform": "Windows (win32; host version not separately collected)",
+    "observed_user": "CENTRAL\\fila4 (interactive console session ID 1; active)",
     "observed_profile": "C:\\Users\\fila4",
     "sid": "S-1-5-21-1529298404-1161420656-882029410-5167",
-    "observed_rdc_process_user": "CENTRAL\\mantenimientorci",
+    "observed_rdc_process_user": "CENTRAL\\MantenimientoRCI",
     "observed_rdc_process_profile": "C:\\Users\\MantenimientoRCI",
-    "authorized_by": "Explicit instructions in current conversation: “Utiliza la conexión RDC a fila 4” and clarification “PC10RCIF4EI4 es fila 4”. Live inventory identified exact device UUID; quser and Win32_UserAccount/Win32_UserProfile verified the fila4 interactive session, SID and profile. RDC process identity separately observed as CENTRAL\\mantenimientorci. Additional explicit current instruction: “considera autorizado el empezar a trabajar en lo que te acabo de decir, considerando que sí sea viable. Si es así resuelve de extremo a extremo”.",
-    "authorized_at": "2026-11-08T22:12:08.389Z",
+    "authorized_by": "Explicit current instruction: “Si claro ... Hazlo, Harmonia es frente de Khora, Es en Khora/Harmonia/Extension, donde vas a poner lo que yo cargare en chrome.” User authorizes this exact connected device and the KHORA/Harmonia/Extension workspace. Live RDC inventory confirms exact device UUID; quser confirms CENTRAL\\fila4 interactive console session 1; Win32_UserAccount and Win32_UserProfile confirm the account, SID and C:\\Users\\fila4 profile. RDC process identity separately observed as CENTRAL\\MantenimientoRCI.",
+    "authorized_at": "2026-11-10T16:48:36.476Z",
     "authorized_timezone": "America/Mexico_City"
   },
   "uuidv7_local_event": "01a1b6ca-4543-7578-85d9-7624877c2e80",
-  "authorized_device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
+  "authorized_device_id": "b573344f-c68f-47c9-9c2e-ae67f2e63bdb",
   "previous_authorized_device": {
     "name": "PC-13",
     "device_id": "1227e578-55c8-4231-82bb-4dbf9234855a",
@@ -388,17 +388,17 @@
     "authorized_at": "2026-11-08 (exact local time not captured)"
   },
   "device_authorization_event": {
-    "type": "EXPAND_RDC_DEVICE_TASK_SCOPE",
-    "event_uuidv7": "01a1bd38-0845-7ced-b2e7-a8d608efd701",
-    "authorization_ref": "Current conversation 2026-11-08: user explicitly authorized starting and completing the viable parts of the supervised improvement-loop subproject.",
+    "type": "REAUTHORIZE_RDC_DEVICE_AND_EXPAND_HARMONIA_WORKSPACE",
+    "event_uuidv7": "01a1c65c-8c7c-7cd4-abac-7e5afe2ffa5b",
+    "authorization_ref": "Current conversation, 2026-11-10: explicit user authorization to use the connected PC10RCIF4EI4 device and materialize the HARMONIA front in SeryMente/Repositorios/KHORA/Harmonia/Extension.",
     "previous_device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
-    "new_device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
-    "scope": "Local HARMONIA subproject implementation and validation only at C:\\Users\\fila4\\Desktop\\Ser y Mente\\EP\\Harmonia\\subproyectos\\bucle-mejora-supervisada. This includes creating/editing source code, local data schemas, UI/configuration, documentation, and automated tests inside that exact subproject folder; creating an isolated candidate copy/worktree inside it; running local tests and a local loopback-only prototype with synthetic/sanitized fixtures. It excludes modification/replacement of the existing parent extension package, reading or entering real credentials, paid/external API calls before the operator supplies the key and expressly enables them, browser automation against ChatGPT Web, merge/push/deployment, Chrome installation/activation, or unrelated paths. No ChatGPT Web UI automation or programmatic extraction of ChatGPT Web outputs. Any expansion requires a separate explicit gate.",
+    "new_device_id": "b573344f-c68f-47c9-9c2e-ae67f2e63bdb",
+    "scope": "Local HARMONIA workspace only within SeryMente/Repositorios/KHORA, front root Harmonia/ and Chrome load directory Harmonia/Extension/. Explicitly includes materializing SeryMente/khora main at the previously absent verified destination C:\\Users\\fila4\\Desktop\\SeryMente\\Repositorios\\KHORA; creating the front workspace Harmonia/ and the loadable package Harmonia/Extension/ with manifest.json directly inside, sourced from the canonical main code under apps/harmonia-observability/extension; maintaining HARMONIA-scoped provisional task documentation under docs/frentes/harmonia/OBJETO-CANONICO.md; local isolated branch/worktree changes and local tests with synthetic/sanitized fixtures; and loopback-only local prototype validation. Does not authorize changing or pushing main, merging, deployment, modifying unrelated fronts or paths, paid/external API calls, credential access/entry, Chrome installation or activation, browser automation against ChatGPT Web, or programmatic extraction of ChatGPT Web outputs. Any expansion beyond this exact repository/front workspace requires a separate explicit gate.",
     "owner_alias_unchanged": true,
     "responsibility_generation_unchanged": true,
     "session_folio": null,
     "readback_required": true,
-    "acquired_at": "2026-11-08T22:12:08.389Z"
+    "acquired_at": "2026-11-10T16:48:36.476Z"
   },
   "environment_reset": {
     "state": "TOTAL_LOCAL_ENVIRONMENT_LOSS_DECLARED_BY_OPERATOR",
@@ -440,7 +440,7 @@
     {
       "name": "PC10RCIF4EI4",
       "device_id": "d0bbb2a3-d7b4-45e1-8870-652c2c3844fc",
-      "status": "superseded_prior_narrow_scope",
+      "status": "historical_superseded_by_explicit_operator_authorization_2026-11-10",
       "scope": "Local HARMONIA subproject implementation and validation only at C:\\Users\\fila4\\Desktop\\Ser y Mente\\EP\\Harmonia\\subproyectos\\bucle-mejora-supervisada. This includes creating/editing source code, local data schemas, UI/configuration, documentation, and automated tests inside that exact subproject folder; creating an isolated candidate copy/worktree inside it; running local tests and a local loopback-only prototype with synthetic/sanitized fixtures. It excludes modification/replacement of the existing parent extension package, reading or entering real credentials, paid/external API calls before the operator supplies the key and expressly enables them, browser automation against ChatGPT Web, merge/push/deployment, Chrome installation/activation, or unrelated paths. No ChatGPT Web UI automation or programmatic extraction of ChatGPT Web outputs. Any expansion requires a separate explicit gate.",
       "observed_platform": "Windows",
       "observed_user": "CENTRAL\\fila4 (interactive console session ID 4; active)",
@@ -451,7 +451,8 @@
       "authorized_by": "Explicit instructions in current conversation: “Utiliza la conexión RDC a fila 4” and clarification “PC10RCIF4EI4 es fila 4”. Live inventory identified exact device UUID; quser and Win32_UserAccount/Win32_UserProfile verified the fila4 interactive session, SID and profile. RDC process identity separately observed as CENTRAL\\mantenimientorci. Additional explicit current instruction: “considera autorizado el empezar a trabajar en lo que te acabo de decir, considerando que sí sea viable. Si es así resuelve de extremo a extremo”.",
       "authorized_at": "2026-11-08T22:12:08.389Z",
       "authorized_timezone": "America/Mexico_City",
-      "authorization_event": "01a1bd38-0845-7ced-b2e7-a8d608efd701"
+      "superseded_at": "2026-11-10T16:48:36.476Z",
+      "superseded_by_device_id": "b573344f-c68f-47c9-9c2e-ae67f2e63bdb"
     }
   ]
 }
