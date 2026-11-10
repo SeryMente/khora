@@ -130,7 +130,7 @@ export async function putEncryptedObject(pathname:string,data:Buffer,options:{ac
   if(data.length<32||data.subarray(0,4).toString('ascii')!=='KHC1') throw new Error('storage_requires_encrypted_envelope');
   if(!b2Enabled()) throw new Error('storage_b2_not_enabled');
   const c=storageLocation(),key=safeObjectKey(pathname.startsWith('khora/')?pathname:'khora/'+pathname);
-  const unique=key.replace(/(\.[^/.]+)?$/, \`-\${randomUUID()}$1\`);
+  const unique=key.replace(/(\.[^/.]+)?$/, `-${randomUUID()}$1`);
   const auth=await authorize();
   let target=await uploadUrl(auth);
   try { await uploadFile(target.uploadUrl,target.authorizationToken,unique,data); }
