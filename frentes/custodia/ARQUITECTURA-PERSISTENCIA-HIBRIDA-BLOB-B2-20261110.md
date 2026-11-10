@@ -1,6 +1,6 @@
 # KHORA · Persistencia híbrida temporal Vercel Blob → Backblaze B2
 
-**Estado:** diseño técnico propuesto para implementación y aceptación; no constituye despliegue ni migración.
+**Estado:** contrato técnico adoptado; implementación en rama y pendiente de pruebas, merge y despliegue. No constituye aceptación E2E ni migración histórica.
 **Fecha:** 2026-11-10
 **Rama de trabajo:** `fix/custodia-legacy-blob-status-b2-writes-20261110`
 **Alcance:** audio original, partes, importaciones, derivados MP3 y sus referencias en Neon.
@@ -142,7 +142,7 @@ Hasta que ese proceso se ejecute y se acepte, `migration_status=pending`.
 - No cambiar credenciales ni crear Application Keys adicionales.
 - No activar una arquitectura de fallback dual de escritura.
 
-## 10. Estado inicial de esta especificación
+## 10. Estado técnico de la entrega
 
 - Inventario Vercel Blob: 636/636 objetos enumerados.
 - Lectura de contenido probada: 0/5 vía SDK y 0/5 vía URL/CDN; ambas rutas devolvieron `blob_read_forbidden`.
@@ -150,4 +150,6 @@ Hasta que ese proceso se ejecute y se acepte, `migration_status=pending`.
 - Referencias Neon cambiadas por backfill: 0.
 - Objetos Blob eliminados: 0.
 - B2: preflight/autorización, bucket privado y prueba sintética PUT/GET/SHA-256 acreditados en el ciclo previo; archivado E2E productivo con sesión propietaria y read-back tras recarga todavía no aceptado.
-- Esta especificación queda en rama de trabajo. No está fusionada ni desplegada.
+- Implementación en rama `fix/custodia-legacy-blob-status-b2-writes-20261110`: lectura legacy desactivada por defecto mediante `KHORA_LEGACY_BLOB_READS_ENABLED`; clasificación de proveedor por localizador; `putEncryptedObject()` requiere GET/read-back y SHA-256/longitud; manifiesto y pipeline exponen estado por objeto; rutas de reproducción normalizan legacy suspendido a 503; reproductor muestra estado y preserva texto.
+- Se añadieron pruebas unitarias para estado legacy pausado, clasificación B2, read-back B2 y fallo cerrado ante hash/longitud discordantes. Su ejecución en el commit final aún debe acreditarse.
+- Rama no fusionada ni desplegada. Captura autenticada E2E y recuperación después de recarga siguen pendientes.
