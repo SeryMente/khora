@@ -124,7 +124,7 @@ Custodia es el frente transversal que define, verifica y gobierna las garantías
 
 ## 8. Estado vivo
 
-**Estado del frente: CUSTODIA-03 ABIERTA · CUSTODIA-01 EN CURSO · CUSTODIA-04 EN CURSO · CUSTODIA-B2-006 EN CURSO (NUEVA ESCRITURA B2 CONFIRMADA EN UNA CAPTURA REAL; RECUPERACIÓN TRAS RECARGA PENDIENTE) · CUSTODIA-B2-002 EN CURSO (P0; SIGUIENTE PRIORIDAD PARA BACKFILL HISTÓRICO) · CUSTODIA-B2-005 EN CURSO (DIAGNÓSTICO RESIDUAL; NO BLOQUEA INVENTARIO/COPIA FÍSICA) · CUSTODIA-B2-007/RES-001/RES-002 DIFERIDAS. CUSTODIA-02 RETIRADA. GARANTÍA DE RECUPERACIÓN COMPLETA Y MIGRACIÓN HISTÓRICA AÚN NO CERTIFICADAS. RESPONSABILIDAD DOCUMENTAL/OPERATIVA EN GENERACIÓN 11.**
+**Estado del frente:** CUSTODIA-03 ABIERTA · CUSTODIA-01 EN CURSO · CUSTODIA-04 EN CURSO · **CUSTODIA-B2-006 ÚNICA TAREA ACTIVA (P0):** terminar y validar persistencia nueva B2-only, read-back físico SHA-256/longitud, estados individuales de Blob legado, aislamiento funcional, pruebas y publicación condicionada a los gates. **CUSTODIA-B2-002 DIFERIDA:** no migrar el histórico hasta reactivar Blob, confirmar GET y recibir autorización expresa nueva. **CUSTODIA-B2-005 DIFERIDA:** no revalidar el acceso histórico hasta la reactivación y petición del operador. CUSTODIA-B2-007 y RES-001/002 DIFERIDAS. CUSTODIA-02 RETIRADA. No ejecutar backfill, cambios de referencias Neon ni borrado de originales. La persistencia nueva B2 no se declara aceptada E2E hasta recuperar una captura autenticada tras recarga y cotejar sus bytes/SHA. Responsabilidad documental/operativa generación 11.
 
 ### Autorización B2 Production · 2026-11-09
 
@@ -285,22 +285,26 @@ El catálogo autenticado de Recuperación no se obtuvo en C010/C011/C012/C014 ni
 
 **Estructura:** no se crea CUSTODIA-05; se amplía CUSTODIA-04, que ya cubre corrección y pruebas E2E. CUSTODIA-01 y CUSTODIA-03 siguen abiertas por falta de catálogo autenticado y verificaciones por unidad.
 
-### Retoma operativa · Master Key KHORA, PC-7 y B2-first · 2026-11-09 · CUSTODIA-v0.35
+### Antecedente histórico · SUPERSEDIDO el 2026-11-10 · Retoma Master Key KHORA y B2-first · 2026-11-09 · CUSTODIA-v0.35
+
+> Esta secuencia documenta la instrucción vigente en esa fecha. **No gobierna la ejecución actual**: la migración histórica Blob→B2 queda diferida hasta reactivación y nueva autorización. La identidad RDC mencionada abajo también es un dato histórico, no una instrucción operativa actual.
 
 **Rectificación de identidad:** PC-7 es la única terminal RDC disponible. La identidad real observada es PC-7\\PC 7. No volver a asumir que existe, está disponible o es requisito CENTRAL\\fila4; tampoco solicitar PC-14 o PSK14. Las referencias históricas de identidad en el objeto se conservan como historia, pero no gobiernan la ejecución actual.
 
-**Decisión de almacenamiento más reciente del operador:** la cuenta Backblaze es de uso exclusivo KHORA y su Master Application Key se utiliza de forma ubicua. No generar otra Application Key. Todas las nuevas escrituras se dirigirán a B2; Vercel Blob queda para lectura histórica mientras se inventaría, copia y reconcilia todo su contenido en B2. No borrar ni modificar originales Blob durante el backfill.
+**Decisión de almacenamiento registrada en ese momento (SUPERSEDIDA para la fase actual):** la cuenta Backblaze es de uso exclusivo KHORA y su Master Application Key se utiliza de forma ubicua. No generar otra Application Key. La instrucción de inventariar, copiar y reconciliar el histórico Blob era el plan anterior; **no se ejecutará ahora**. La decisión actual conserva los objetos Blob en su origen y dirige solo el contenido nuevo a B2.
 
 **Prueba ejecutada desde PC-7:** la Master Key aceptó b2_authorize_account; el Key ID coincidió con el Account ID. El bucket khora-userdata-ecea4187 (35b8cbd6623b54a5a9130c18) pertenece a esa cuenta y es allPrivate. Se hizo PUT y GET físico de un objeto sintético de 150 bytes; SHA-256 de origen y read-back coincidieron; SSE-B2/AES256 quedó confirmado. El objeto de prueba se conserva y no contiene datos de usuarios. Evidencia: [PRUEBA-FISICA-B2-KHORA-20261109.md](evidencias/PRUEBA-FISICA-B2-KHORA-20261109.md), blob c5043bc3ca6f6c492c4a5ca4cb55235d055488e1.
 
 **Vercel Production:** KHORA_OBJECT_STORAGE ya selecciona B2, KHORA_B2_PREFLIGHT=1 y el bucket name/ID están presentes. Siguen presentes los nombres heredados KHORA_B2_KEY_ID y KHORA_B2_APPLICATION_KEY; faltan los nombres canónicos KHORA_B2_MASTER_APPLICATION_KEY_ID y KHORA_B2_MASTER_APPLICATION_KEY. Los valores no se descifraron. No se desplegó un runtime nuevo ni se ha acreditado el archivado E2E.
 
-**Secuencia vigente:**
-1. CUSTODIA-B2-006: transferir las dos variables maestras existentes a Vercel Production bajo los nombres canónicos; preflight, deployment y verificación del archivado E2E.
-2. CUSTODIA-B2-005: cerrar diagnóstico residual de la cadena completa.
-3. CUSTODIA-B2-007: estabilizar la implementación.
-4. CUSTODIA-B2-002: inventariar y copiar todo Vercel Blob a B2; verificar cada objeto y reconciliar referencias antes de declarar completo el backfill. Conservar los originales.
-5. CUSTODIA-RES-001/002: diferidas; no son requisito para este encargo B2-first.
+**Secuencia que rigió el 2026-11-09 (SUPERSEDIDA el 2026-11-10; conservar solo como antecedente):**
+1. CUSTODIA-B2-006: conectar credenciales existentes, preflight, deployment y prueba E2E.
+2. CUSTODIA-B2-005: diagnóstico residual.
+3. CUSTODIA-B2-007: estabilización.
+4. CUSTODIA-B2-002: inventario/copia Blob→B2 y reconciliación de referencias.
+5. RES-001/002: diferidas.
+
+**Secuencia vigente:** CUSTODIA-B2-006 es la única tarea activa. Primero cerrar la validación de la persistencia nueva B2 y la disponibilidad por archivo del Blob histórico; después publicar el commit aceptado. B2-002 y B2-005 no se ejecutan hasta reactivar Blob y recibir una nueva autorización expresa para migración.
 
 **Estado:** acceso físico a Backblaze KHORA verificado; Production aún no conectado a la pareja canónica ni desplegado; archivado real E2E pendiente; backfill histórico no iniciado. No afirmar que los dictados nuevos ya se guardan en Production hasta verificar el deployment y una captura real.
 **Control de autorización actualizado:** CONTROL-RESPONSABILIDAD.json generación 11, blob `c29349fc4d2e07d40cd6efe583171482578db6d3`. Se agregó el evento `CUSTODIA-B2-KHORA-20261109-01a1c28e-d442-7297-911a-c7b0b5da5be1` para autorizar exclusivamente el uso ubicuo de la Master Key de la cuenta KHORA, las dos variables canónicas de Production, el deployment B2 condicionado y el backfill no destructivo. El control conserva exclusiones de otras cuentas, nuevas Application Keys, seguridad no necesaria, borrado de Blob y SQL productivo hasta superar los gates de reconciliación.
@@ -758,19 +762,19 @@ Se incorpora [GUIA-PERSISTENCIA-B2-MASTER.md](GUIA-PERSISTENCIA-B2-MASTER.md), p
 - No se ha iniciado el backfill histórico Blob→B2 ni se ha cambiado ninguna referencia Neon. Los originales Blob siguen sin borrarse.
 
 
-### Retoma operativa · 2026-11-10 · persistencia nueva B2 y backfill histórico
+### Antecedente histórico · corte del 2026-11-10 · persistencia nueva B2 y plan de backfill (SUPERSEDIDO para ejecución)
 
 **Resultado positivo, limitado a una captura real:** la última sesión reportó un registro de 10,052 caracteres, SHA-256 con prefijo `d69033c4` (hash completo informado: `d69033c4876d82a64aa6adc5182c51dab0cd2d02f83a79155de35b970c4704ce`), con 191 partes de audio. La inspección de base de datos comunicada en esa sesión reportó 191/191 partes con destino al bucket `khora-userdata-ecea4187`, metadatos de tamaño/SHA y marca de verificación, 15,617,130 bytes y cero faltantes; estado de registro `en_revision`. Esto constituye evidencia reportada de que la ruta de nuevas escrituras ya archivó una captura real en B2.
 
 **Límites de aceptación:** no se repitió en este ciclo un GET manual independiente ni se verificó la recuperación desde la aplicación tras recarga. No elevar el resultado a certificación general del producto ni cerrar CUSTODIA-B2-006 hasta obtener ese read-back de recuperación. La inspección y los datos descritos proceden de la sesión anterior, no de una nueva consulta de producción en esta actualización.
 
-**Prioridad inmediata siguiente: CUSTODIA-B2-002 (Blob histórico → B2).** La migración física sigue sin comenzar. Línea base read-only reportada en Neon main: 624 URLs Blob en `dictado_audio_parte`, 15 en `dictado_mp3`, 15 en `dictado_mp3_historial`, 37 en `volcado.audio_url`, y 248 referencias individuales dentro de JSONB; 186 sesiones. Estos son conteos de referencias, no cantidad de objetos físicos únicos. También se reportaron 1,360 filas de audio, 1,158 sin `volcado_id`; no clasificarlas como huérfanas por ese solo dato.
+**Plan anterior de migración histórica — DIFERIDO, NO EJECUTAR:** los conteos read-only reportados en Neon main (624 URLs Blob en `dictado_audio_parte`, 15 en `dictado_mp3`, 15 en `dictado_mp3_historial`, 37 en `volcado.audio_url` y 248 referencias dentro de JSONB; 186 sesiones) describen una línea base histórica, no una tarea activa ni un mandato para tocar Neon. Los conteos son referencias y no equivalen a objetos físicos únicos. También se reportaron 1,360 filas de audio, 1,158 sin `volcado_id`; no clasificarlas como huérfanas por ese dato.
 
-**Bloqueos de backfill:** no hay inventario físico paginado completo de Blob ni copia histórica verificada; el ledger `custodia_blob_b2_migration` no existe en Neon main y no se encontró `035_custodia_blob_b2_migration.sql` en main. La función `updateReferences()` revisada en PR #348 no cuenta cada referencia individual de JSONB y no acredita el posestado completo. Corregir y probar ese defecto antes de cualquier actualización de referencias; el inventario read-only y la copia física no destructiva pueden avanzar por separado. No aplicar SQL ni backfill de referencias a Neon Production en este estado.
+**Diagnóstico técnico del plan anterior — SOLO HISTÓRICO:** en el corte anterior no había inventario físico completo ni copia Blob→B2; también se habían identificado pendientes en el ledger y el reconciliador `updateReferences()`. Esos trabajos pertenecen a la migración diferida. No se corregirán ni ejecutarán ahora porque no se harán cambios SQL/JSONB ni backfill en esta fase.
 
 **Custodia de origen:** Vercel Blob se mantiene intacto. No se ha copiado ningún objeto histórico físico en este corte, no se han cambiado referencias Neon y no se han eliminado originales.
 
-**Secuencia actual:** (1) terminar la prueba de recuperación tras recarga de B2-006; (2) ejecutar inmediatamente inventario y copia física no destructiva de B2-002; (3) corregir/testear ledger y reconciliador antes del cutover de referencias; (4) cerrar diagnóstico residual B2-005 sin bloquear los pasos no destructivos; (5) B2-007 y RES-001/002 permanecen diferidos.
+**Secuencia actual (vigente desde la decisión híbrida):** (1) completar pruebas del estado Blob legacy por archivo y el aislamiento de texto/checkpoints; (2) demostrar que cada nueva escritura B2 realiza GET/read-back físico con longitud/SHA-256 coincidentes y no cae a Blob; (3) validar sesión mixta y recuperación autenticada tras recarga; (4) publicar únicamente el commit cuyo build, typecheck y pruebas hayan pasado. No hay un paso activo de migración histórica, ledger o reconciliación de referencias.
 
 
 ## Corte de ejecución verificado · 2026-11-10 · bloqueo de lectura del origen Blob
