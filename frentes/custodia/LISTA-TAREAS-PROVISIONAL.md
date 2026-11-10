@@ -1,11 +1,11 @@
-<!-- LIST_VERSION=0.28; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.29; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.28.
-- **Última actualización:** 2026-11-09 (Master Key KHORA incorporada a Vercel Production; preflight B2 PASS; deployment Production READY; aceptación de archivado E2E y backfill histórico Blob→B2 pendientes).
+- **Versión de esta lista provisional:** 0.29.
+- **Última actualización:** 2026-11-10 (una captura real de Production fue reportada archivada con texto y 191/191 partes de audio apuntando a B2 y marcadas verificadas; recuperación tras recarga aún NO VERIFICADA; backfill histórico Blob→B2 no iniciado).
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
 - **Última lectura de metodología del ciclo 2 (referencia histórica):** Samantha v352 · NX-352m; Metacanon 1.21; GOW v2.3; blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
@@ -13,9 +13,9 @@
 - **Última lectura metodológica histórica (C008):** Samantha v358 · NX-358m; Metacanon 1.23; GOW v2.7; blob `89a28e4d05f5baab9c4b86abdb9fbfc532690c75`.
 - **Revalidación metodológica C009–C011 (histórica):** Samantha v359 · NX-359m; Metacanon 1.24; GOW 2.8; blob `b2ff2845a5a99dc4ce3cafafc4f8e43607d48145`, leído de `SeryMente/metodologia/main` el 2026-10-29.
 - **Gobierno vigente revalidado en esta retoma (2026-11-08):** Samantha v383 · NX-383m; Metacanon 1.29; GOW 2.18; DUG blob `cad464717c43733aa84b49f8c9c3af0875597fbd`; commit main `5f703622f11182a048db97419d8d6ef96b40a1c9`. Se leyó §ARR y se consideraron los principios de cascada, no simulación, autorización explícita, resolución de colisión de responsabilidad, preponderancia del repositorio y anti-ineficiencia. MCP-NORMATIVO: DESACTIVADO.
-- **Gobierno vigente revalidado en esta actualización (2026-11-09):** Samantha v386 · NX-386m; Metacanon 1.29; GOW 2.18; DUG blob `22dca684830a36dff019b47811d9b800cc9bea0a`. MCP-NORMATIVO permanece DESACTIVADO.
+- **Gobierno vigente consultado para esta actualización (2026-11-10):** Samantha v386 · NX-386m; Metacanon 1.29; GOW 2.18; DUG blob `22dca684830a36dff019b47811d9b800cc9bea0a`. §ARR/GOW:ARR no estuvo disponible como destino resoluble en la sesión; no se afirma lectura de su texto desarrollado. MCP-NORMATIVO permanece DESACTIVADO.
 La lista sigue provisional; ni el relevo ni esta revalidación certifican su diseño.
-- **Alcance y orden operativo vigente:** (1) CUSTODIA-B2-006, activar B2 como destino exclusivo de escrituras nuevas; (2) CUSTODIA-B2-005, cerrar diagnóstico residual y aceptación E2E; (3) CUSTODIA-B2-007, estabilizar; (4) CUSTODIA-B2-002, inventariar y copiar todo el histórico Blob a B2 con verificación y sin borrar originales. RES-001/002 se difieren como evolución posterior, no como requisito de este encargo. CUSTODIA-01/03/04 permanecen abiertas y conservan sus IDs y evidencias.
+- **Alcance y orden operativo vigente (2026-11-10):** (1) CUSTODIA-B2-006 conserva el cierre de aceptación de nuevas escrituras; una captura real de Production se reportó archivada con 191/191 partes verificadas en B2, pero la recuperación tras recarga falta cotejarla; (2) CUSTODIA-B2-002 pasa a PRIORIDAD P0 inmediata para inventariar y copiar todo el histórico físico Blob→B2 sin borrar originales; el cambio de referencias SQL/JSONB permanece condicionado a corregir y probar `updateReferences()`; (3) CUSTODIA-B2-005 cierra diagnóstico residual sin bloquear inventario/copia no destructivos; (4) CUSTODIA-B2-007 queda diferida mientras no sea requisito causal. RES-001/002 siguen diferidas. CUSTODIA-01/03/04 permanecen abiertas y conservan sus IDs y evidencias.
 - **Autorización recibida 2026-11-09:** el operador respondió «Correcto , actualiza tareas provisionales rapidamente, y resuelve.» a la pregunta explícita de autorización para actuar sobre credenciales B2 de Production y desplegar a producción condicionado a pruebas satisfactorias. Se registra como asentimiento contextual limitado a verificar/corregir solo variables B2 de Production mediante la bóveda canónica y a desplegar solo cuando todos los gates técnicos pasen. Original: [INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md](originales/INSTRUCCION-AUTORIZAR-B2-PRODUCTION-20261109.md), A UUIDv7 local `01a1c17d-189a-7fea-a644-6be002e2c07a`.
 - **Compuerta de despliegue:** la autorización no equivale a ejecución ni aceptación. Antes de producción deben pasar pruebas de autenticación, bucket privado/identidad, PUT/GET físico sintético, SHA-256/bytes, vínculo y manifiesto de partes, archivado E2E y recuperación tras recarga. Debe inspeccionarse primero el hook de build existente; no ejecutar SQL/backfill ni migraciones productivas fuera de autorización.
 - **Regla provisional de custodia de información:** no copiar a este repositorio el texto o audio de dictados reales, secretos, credenciales ni identificadores personales innecesarios. Registrar resultados mediante evidencia minimizada y sanitizada, en el soporte autorizado que corresponda.
@@ -42,20 +42,20 @@ Secuencia histórica (C006; antecedente conservado y supersedido por la secuenci
 ---
 
 
-## Secuencia operativa vigente · 2026-11-09 · B2-first y backfill Blob→B2
+## Secuencia operativa vigente · 2026-11-10 · captura nueva B2 confirmada y migración histórica priorizada
 
 **Instrucción vigente:** todas las escrituras nuevas de KHORA deben ir a Backblaze B2. Una vez restaurado y probado el archivado, se copiará a B2 todo el histórico físico de Vercel Blob y se reconciliarán sus referencias. Vercel Blob se conserva como origen hasta la lectura de vuelta, cotejo y aceptación; no se borran fuentes.
 
 | Orden | ID | Prioridad | Estado | Resultado que cierra |
 |---:|---|---|---|---|
-| 1 | CUSTODIA-B2-006 | P0 | EN CURSO | B2 habilitado para nuevas escrituras; Master Key y bucket validados; PUT/GET/SHA-256 y archivado E2E demostrados |
-| 2 | CUSTODIA-B2-005 | P0 | EN CURSO | Diagnóstico residual y E2E de captura, partes, manifiesto, archivado y recuperación; confirmar qué fallos permanecen |
-| 3 | CUSTODIA-B2-007 | P1 | PROPUESTA | Implementación slim y estable, sin retirar integridad ni lectura legacy |
-| 4 | CUSTODIA-B2-002 | P1 | EN CURSO · DIFERIDA | Inventario exhaustivo y copia de todo el Blob a B2; read-back, SHA/bytes, KHC1 y reconciliación de referencias; conservar fuentes |
-| 5 | CUSTODIA-RES-001 | P2 | DIFERIDA | Evaluar más proveedores solo después de completar la prioridad B2/Blob |
+| 1 | CUSTODIA-B2-006 | P0 | EN CURSO · CAPTURA REAL PASS PARCIAL | Nuevas escrituras en B2 demostradas con una captura real y 191/191 partes reportadas verificadas; falta read-back independiente de recuperación tras recarga |
+| 2 | CUSTODIA-B2-002 | P0 | EN CURSO · SIGUIENTE EJECUCIÓN INMEDIATA | Inventario físico paginado y copia de todo Blob→B2, read-back/SHA/bytes/KHC1; después reconciliación transaccional SQL/JSONB, sin borrar originales |
+| 3 | CUSTODIA-B2-005 | P1 | EN CURSO · DIAGNÓSTICO RESIDUAL | Confirmar estado/cuota actual de Blob y clasificar otros fallos; no bloquea inventario ni copia física no destructiva |
+| 4 | CUSTODIA-B2-007 | P2 | DIFERIDA | Pulido posterior solo si resulta necesario para la integridad o estabilidad de la migración |
+| 5 | CUSTODIA-RES-001 | P2 | DIFERIDA | Evaluar más proveedores después de cerrar B2/Blob |
 | 6 | CUSTODIA-RES-002 | P2 | DIFERIDA | Implementar proveedor adicional únicamente si se vuelve a priorizar |
 
-**Estado técnico observado en esta retoma:** autenticación Master Key, bucket privado y prueba física B2 PUT/GET/SHA-256/bytes/SSE-B2 aprobados desde PC-7. Vercel Production ya selecciona B2 y tiene el bucket configurado, pero carece de los nombres canónicos de las dos variables maestras. El despliegue con esas variables y el archivado E2E siguen pendientes.
+**Estado técnico observado al 2026-11-10:** las dos variables maestras canónicas constan como Secrets `sensitive` de Vercel Production; preflight B2 PASS; deployment `dpl_6hUVD7LBXqtmnaMw2nfH2wwyrHUp` READY (commit `dd9527a223f65e7af834b042d51f716296151bf2`). La última sesión reportó una captura real de 10,052 caracteres, SHA-256 con prefijo `d69033c4` (hash completo reportado: `d69033c4876d82a64aa6adc5182c51dab0cd2d02f83a79155de35b970c4704ce`), 191/191 partes de audio asociadas a B2 y marcadas verificadas, 15,617,130 bytes y 0 faltantes; registro `en_revision`. Se registra como PASS de una captura real, con alcance limitado: no sustituye la verificación de recuperación tras recarga ni demuestra la migración del histórico Blob.
 
 **Identidad operativa:** PC-7 es la única terminal RDC disponible; identidad comprobada PC-7\\PC 7. No exigir ni asumir otra terminal o cuenta; referencias históricas a PC-14, PSK14 y CENTRAL\\fila4 quedan supersedidas.
 
@@ -353,3 +353,11 @@ La propuesta continúa sin comprobar los bytes actuales de los objetos remotos n
 - Para este build se aisló temporalmente el comando y se omitió `migrate-runtime.mjs`; el Build Command original se restauró en la configuración del proyecto después de iniciarse el build. No se ejecutó SQL ni backfill de Neon en este ciclo.
 - La ruta de código de nuevas escrituras usa `putEncryptedObject` (B2-only y fail-closed), y quedó desplegada; el archivado E2E real con sesión propietaria, vínculo/manifiesto y recuperación tras recarga permanece pendiente. Por tanto, la capacidad productiva está preflight-validada y desplegada, pero la aceptación funcional de archivo no está certificada.
 - No se ha iniciado el backfill histórico Blob→B2 ni se ha cambiado ninguna referencia Neon. Los originales Blob siguen sin borrarse.
+
+
+### Evidencia operativa posterior · 2026-11-10 · una captura real en B2
+
+- La salida de archivado comunicada por el operador fue: 10,052 caracteres, SHA con prefijo `d69033c4`, audio con 191 partes.
+- La inspección reportada en la sesión anterior atribuyó al mismo registro el SHA-256 completo `d69033c4876d82a64aa6adc5182c51dab0cd2d02f83a79155de35b970c4704ce`, 191/191 partes con destino B2, tamaño/SHA por parte, estado verificado, 15,617,130 bytes y cero partes faltantes. Estado del registro: `en_revision`. Bucket destino: `khora-userdata-ecea4187`.
+- **Límite probatorio:** esta actualización documental conserva el resultado informado en la sesión anterior; no repitió en este ciclo un GET independiente del objeto ni una recuperación manual tras recarga. Por ello se acepta la escritura de una captura real y la verificación registrada por la aplicación, pero la recuperación posterior a recarga queda `NO VERIFICADA`.
+- **Backfill histórico:** sigue sin inventario físico ni transferencia Blob→B2; no se han modificado referencias Neon ni borrado originales.
