@@ -1,4 +1,4 @@
-<!-- LIST_VERSION=0.38; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.39; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
@@ -32,6 +32,7 @@ Las fases son subunidades internas del expediente existente, no nuevos expedient
 | CUSTODIA-01.f | PENDIENTE | Verificar cada Volcado, retirar del pendiente lo archivado y dejar solo residuales actualmente no archivables con evidencia. |
 | CUSTODIA-01.g | EN CURSO | Localizar acceso criptográfico seguro al runtime KHORA: EP Vault DPAPI/notas y la bóveda KHORA; preservar ciphertext y no revelar valores. |
 | CUSTODIA-01.h | PENDIENTE DE OPERADOR | Tras restablecimiento local del PIN KHORA (no ejecutado por CUSTODIA), leer solo metadatos de credenciales GitHub norm/ep; después probar la lectura EP autenticada sin mostrar el token. |
+| CUSTODIA-01.i | PENDIENTE DEL OPERADOR | Emitir una sesión EP nueva (invalida la anterior) y ejecutar lectura autenticada de `/api/ep/github-credential` sin imprimir el token; registrar solo OK/código. No ejecutar bootstrap. |
 
 ## 3. Estados de salida
 
@@ -110,3 +111,10 @@ La UI muestra la bóveda KHORA cerrada y el panel de capacidad local sin capacid
 El código confirma que Restablecer PIN solo actualiza el hash Scrypt/sal en boveda_pin y abre una cookie de 30 minutos; no modifica X_KHORA_KEY ni ciphertext. La UI de GitHub solo revela metadatos configured/updatedAt para las credenciales norm y ep. El read real de ep requiere una sesión EP autenticada con ep:bootstrap y ep:github:read.
 
 Siguiente paso: operador restablece el PIN en la UI (no compartirlo), luego copia solo metadatos norm/ep. No revelar tokens ni emitir/revocar tokens MCP. Evidencia: evidencias/ESTADO-BOVEDA-WEB-KHORA-20261110.md.
+
+
+## 11. Prueba EP de credencial sin exposición
+
+La fuente actual de tokens nuevos incluye ep:github:read. POST /api/ep/github-credential requiere ep:bootstrap + ep:github:read, valida el propietario y devuelve la credencial ep al proceso cliente. Puede verificar si la bóveda de servidor aún descifra con X_KHORA_KEY.
+
+La siguiente prueba es de solo lectura: emitir un token EP nuevo (la UI revoca el anterior), consumirlo en memoria local y reportar solo GITHUB_EP_CREDENTIAL_READBACK_OK o un código de fallo. No pegar el token en chat y no ejecutar el bootstrap largo. No afecta los Bearer Tokens MCP. Ver OCP §22.
