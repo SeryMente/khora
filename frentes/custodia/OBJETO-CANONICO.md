@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.41; OBJECT_SEAL=CUSTODIA-v0.41; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.42; OBJECT_SEAL=CUSTODIA-v0.42; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01/03/04 ABIERTAS · PERSISTENCIA NUEVA B2-ONLY · READ-BACK FÍSICO SHA-256/LONGITUD INCORPORADO EN RAMA, VALIDACIÓN PENDIENTE · BLOB HISTÓRICO CONSERVADO · INDICADOR LEGACY POR ARCHIVO EN RAMA · MIGRACIÓN HISTÓRICA DIFERIDA · SIN BACKFILL, CAMBIO DE REFERENCIAS NI BORRADO DE ORIGINALES.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.41. Metacanon: 1.29. La decisión operativa más reciente fija el modelo híbrido: conservar en su origen los objetos Blob históricos y escribir exclusivamente lo nuevo en Backblaze B2.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01/03/04 ABIERTAS · PERSISTENCIA NUEVA B2-ONLY · READ-BACK FÍSICO SHA-256/LONGITUD INCORPORADO EN RAMA, VALIDACIÓN PENDIENTE · BLOB HISTÓRICO CONSERVADO · INDICADOR LEGACY POR ARCHIVO EN RAMA · MIGRACIÓN HISTÓRICA DIFERIDA · SIN BACKFILL, CAMBIO DE REFERENCIAS NI BORRADO DE ORIGINALES.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.42. Metacanon: 1.29. La decisión operativa más reciente fija el modelo híbrido: conservar en su origen los objetos Blob históricos y escribir exclusivamente lo nuevo en Backblaze B2.
  
 ## Decisión operativa vigente · 2026-11-10
 
