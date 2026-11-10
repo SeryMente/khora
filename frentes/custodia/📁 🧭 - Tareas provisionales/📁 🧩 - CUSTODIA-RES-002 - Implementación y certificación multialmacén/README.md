@@ -1,6 +1,6 @@
 # CUSTODIA-RES-002 · Implementación y certificación multialmacén
 
-> **Estado:** propuesta_pendiente_aprobacion · **Prioridad:** P2 · **Hito:** 5 de 5.
+> **Estado:** RESUELTA POR REENFOQUE · propuesta archivada; no implementar ni certificar resiliencia en el alcance actual.
 > **Depende de:** CUSTODIA-RES-001 aprobada; criterios de diseño ratificados. **Desbloquea:** garantía de producto candidata, sujeta a aceptación.
 > **OCP padre:** frentes/custodia/OBJETO-CANONICO.md. **Control heredado:** CONTROL-RESPONSABILIDAD.json.
 
@@ -51,3 +51,12 @@ Implementar en una rama aislada la arquitectura aprobada de persistencia local-f
 ## 5. Salida
 
 Código, pruebas, evidencias físicas de escritura/lectura/restauración y decisión explícita de liberación. El merge o despliegue productivo no se deriva de la aprobación del diseño; requiere su compuerta correspondiente.
+
+
+## Disposición de cierre · 2026-11-10 · reenfoque de CUSTODIA
+
+**Estado de gestión:** RESUELTA POR REENFOQUE. El único objetivo actual del frente es el inventario forense de dictados/archivos conservados y la conciliación del panel «Recuperar capturas» (CUSTODIA-01).
+
+Este cierre es administrativo y de alcance. No significa que el objetivo técnico histórico de este expediente se haya ejecutado, probado o aceptado. Se conserva todo el contenido y evidencia histórica de este README.
+
+No reabrir ni ejecutar este expediente dentro del alcance actual. No se ha modificado código, Neon, B2, Blob, configuración ni producción.
