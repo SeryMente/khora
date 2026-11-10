@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.53; OBJECT_SEAL=CUSTODIA-v0.53; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.54; OBJECT_SEAL=CUSTODIA-v0.54; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.53. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.54. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -26,7 +26,7 @@ La implementación está integrada en `main` (commit `f0224c1368fb15a3452335a443
 - **Único núcleo operativo:** este OBJETO-CANONICO.md.
 - **Control único de responsabilidad:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json). Titularidad documental/operativa transferida de generación 10 a 11 y leída de vuelta. Titular actual: chatgpt-custodia-INSTANCE-20261109-01A1C125; alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59; UUIDv7 local de conversación 01a1c125-af13-79b1-87cc-f1e5fe4b0b59; UUIDv7 local del evento 01a1c125-af13-7825-8af1-0ff35ad87b0e; control blob c29349fc4d2e07d40cd6efe583171482578db6d3. ID nativo de plataforma no expuesto. Titular previo gen. 10 y generaciones anteriores preservados. Folio PENDIENTE/NO ASIGNADO; FOL1 no está ACTIVO/verificado.
 - **Propósito literal aprobado:** [originales/PROPOSITO-OPERADOR-2026-10-28.md](originales/PROPOSITO-OPERADOR-2026-10-28.md). La sección 4 también conserva el texto aprobado íntegro para que el propósito sea visible en el núcleo.
-- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional v0.41. Contiene un solo objetivo activo: CUSTODIA-01, archivo de todos los registros que puedan archivarse y documentación de los residuales actualmente bloqueados. Las demás tareas provisionales quedaron resueltas administrativamente por reenfoque, sin atribuirles aprobación técnica. CUSTODIA-02 continúa retirada y su identificador no se reutiliza.
+- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional v0.42. Contiene un solo objetivo activo: CUSTODIA-01, archivo de todos los registros que puedan archivarse y documentación de los residuales actualmente bloqueados. Las demás tareas provisionales quedaron resueltas administrativamente por reenfoque, sin atribuirles aprobación técnica. CUSTODIA-02 continúa retirada y su identificador no se reutiliza.
 - **Inventario provisional de hallazgos:** [evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md](evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md), materialización de evidencia para CUSTODIA-01; no es un segundo estado vivo.
 - **Versión y sello vigentes:** CUSTODIA-v0.53. Es una versión documental del objeto; no es una versión del producto.
 - **Registro de la retoma anterior:** [originales/ChatGPT-CUSTODIA-20261106-1424.txt](originales/ChatGPT-CUSTODIA-20261106-1424.txt), instrucción textual parcial original y diagnóstico estático del límite de archivado.
@@ -1093,3 +1093,61 @@ No ampliar la búsqueda fuera de las dos bóvedas. No probar contraseñas, fuerz
 La búsqueda de la copia queda cerrada al universo de dos bóvedas. La única prueba adicional admisible es una comprobación operacional separada, autenticada y sin revelar secretos, para determinar si la clave ya configurada en Vercel Production todavía descifra la credencial EP existente. Emitir una sesión EP nueva invalida la anterior y requiere acción del operador; no ejecutar bootstrap. El resultado se registrará solo como éxito o código de error.
 
 Esta sección sustituye cualquier invitación previa a ampliar la búsqueda a DPAPI, notas, LastPass u otras ubicaciones; los hechos históricos de esas inspecciones permanecen conservados como contexto, no como nuevas vías activas.
+
+## 24. Backlog · dependencia de X_KHORA_KEY en Recuperar capturas y archivo · 2026-11-10 · CUSTODIA-v0.54
+
+**Entrada e instrucción:** [originales/INSTRUCCION-BACKLOG-DEPENDENCIA-X-KHORA-KEY-20261110.md](originales/INSTRUCCION-BACKLOG-DEPENDENCIA-X-KHORA-KEY-20261110.md).  
+**Evidencia de código:** [evidencias/DEPENDENCIA-X-KHORA-KEY-CATALOGO-RECUPERACION-20261110.md](evidencias/DEPENDENCIA-X-KHORA-KEY-CATALOGO-RECUPERACION-20261110.md).
+
+### 24.1 Dictamen
+
+La ausencia o divergencia de `X_KHORA_KEY` es una causa técnica **adicional e independiente** de la suspensión de Vercel Blob. Está confirmada por inspección estática como posible bloqueo tanto de la construcción del catálogo del panel Recuperar capturas como de la lectura/recuperación de registros que permanezcan cifrados. No se ha probado que Production carezca actualmente de la llave ni que esta sea la causa de un registro concreto que no aparece.
+
+### 24.2 Función criptográfica verificada
+
+En `khora-web/lib/server/cripto.ts`, blob `92427a1cacf745142a760802247105726373faf6`:
+- `llave()` lee `process.env.X_KHORA_KEY`, exige al menos 16 caracteres y deriva 32 bytes: valor de 64 caracteres hexadecimales se decodifica directamente; cualquier otro valor pasa por Scrypt con la sal fija `khora-boveda-v09`.
+- Los helpers usan AES-256-GCM. Los textos llevan marca `khc1.` y los bytes `KHC1`; se generan IV y etiqueta de autenticación.
+- La misma llave debe permanecer disponible para descifrar los payloads existentes. Una llave distinta no valida la etiqueta GCM del ciphertext previo.
+- Compatibilidad: el helper deja pasar valores que no tengan la marca cifrada. Por ello no se presume que cada campo de Neon o todo el histórico esté cifrado con esta variable.
+
+### 24.3 Dependencia concreta del panel
+
+`GET /api/dictado/checkpoint?catalog=1` delega en `catalogoRecuperacion()`, archivo `khora-web/lib/server/custodia-recuperacion.ts`, blob `278a479db46e6f2bed72ea7d31f88cc373fa67d1`. La consulta obtiene las sesiones del propietario y sus snapshots; al formar las tarjetas descifra cada snapshot para recuperar título, vista previa, caracteres, duración y partes de audio.
+
+El catálogo contiene un `try/catch` alrededor de la construcción de resultados. Si un snapshot cifrado no puede descifrarse por llave ausente o divergente, la llamada puede terminar en **503 `catalogo_no_disponible`**. En consecuencia, las filas y ciphertext pueden permanecer en Neon pero el panel no consigue cargar la página. La operación de catálogo no necesita leer Vercel Blob; este es un bloqueo distinto.
+
+También dependen del descifrado de snapshots:
+- la paginación de revisiones `?revisions=1&sessionId=...`;
+- la lectura de una captura `?sessionId=...`, que descifra snapshot y `checkpoint_text`;
+- la recuperación `POST ?recover=1`, que descifra la revisión elegida antes de crear la captura hija.
+
+### 24.4 Alcance sobre datos y registros nuevos
+
+La clave se requiere en toda ruta que use `cifrarTexto/descifrarTexto` o `cifrarBytes/descifrarBytes`. Se verificaron estos call sites:
+- checkpoints, snapshots y `checkpoint_text`;
+- partes de audio y MP3 derivados;
+- texto y versiones de Volcados;
+- credenciales GitHub almacenadas por KHORA.
+
+Por tanto, **los registros posteriores que escriban esos payloads cifrados requieren que Production conserve la misma `X_KHORA_KEY` en el momento de escribir y leer**. Si falta, los flujos que invocan los helpers fallan; si se sustituye por otra, los datos cifrados con la anterior no se descifran con la nueva. No significa que cada fila ni metadato de Neon esté cifrado con la llave: IDs, propietario, fechas, referencias, estados, bytes y hashes pueden seguir consultables. Los formatos históricos sin marca también tienen compatibilidad pass-through.
+
+Uso secundario condicionado: `khora-web/lib/server/boveda.ts` usa `AUTH_SECRET || X_KHORA_KEY` para firmar la cookie de desbloqueo web cuando `AUTH_SECRET` no está configurada. Esto no cambia la función criptográfica principal ni convierte la llave en el PIN de la bóveda.
+
+### 24.5 Distinción obligatoria respecto de Vercel Blob
+
+- **Blob suspendido:** el servidor no consigue obtener bytes históricos desde ese proveedor. Tener la llave correcta no sustituye un GET físico que el proveedor no permite.
+- **Llave ausente/divergente:** puede impedir que el catálogo descifre snapshots de Neon antes de presentar las tarjetas; también impide descifrar objetos KHC1 recuperados desde B2 o Blob.
+- **Ambas condiciones:** catálogo y audio pueden quedar bloqueados por motivos distintos. Resolver una no resuelve automáticamente la otra.
+
+La llave tampoco crea revisiones inexistentes ni demuestra titularidad. Las sesiones sin revisión y las sesiones sin propietario conservan sus bloqueos propios; no se reclasifican como fallos criptográficos solo por este hallazgo.
+
+### 24.6 Backlog CUSTODIA-01.j · no activo
+
+1. Verificar sin revelar secretos si Production conserva la misma llave que cifra los payloads existentes. La prueba EP propuesta comprueba un ciphertext de credencial concreto; no revela el valor ni certifica cada registro.
+2. Reintentar catálogo y revisiones por páginas después de validar el descifrado, y reconciliar tarjetas esperadas con sesiones/checkpoints reales en Neon.
+3. Clasificar cada bloqueo por separado: llave ausente/divergente, revisión inexistente, titularidad, GET Blob, GET B2, descifrado KHC1 y verificación SHA/longitud.
+4. Si el fallo de un snapshot individual hace que toda una página devuelva 503, preparar una propuesta separada para aislar el error por tarjeta y hacer visible un estado no descifrable sin ocultar los demás registros. No cambiar el código sin autorización específica.
+5. Mantener la llave actual y preservar ciphertext: no rotar, sustituir, regenerar, reinicializar ni re-cifrar.
+
+**Estado:** BACKLOG · NO ACTIVO · NO IMPLEMENTADO. La investigación de código es estática; no se consultó Production ni se ejecutó catálogo/recuperación, no se leyeron objetos B2/Blob y no se modificaron datos o secretos.
