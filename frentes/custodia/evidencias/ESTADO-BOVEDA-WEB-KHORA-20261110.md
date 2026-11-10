@@ -49,3 +49,10 @@ No revocar tokens MCP existentes; no emitir tokens alternos; no copiar secretos 
 El operador puede usar la acción **Restablecer PIN olvidado** de la bóveda web KHORA, eligiendo el PIN nuevo directamente en la interfaz y sin comunicarlo a ChatGPT. Esto reemplaza el PIN, no la llave. Después, copiar solo el estado del panel Secretos de GitHub para los usos `norm` y `ep` (configurado/ausente y fecha). No revelar ni copiar ningún valor.
 
 Con esos metadatos se determina si hay una credencial `ep` que merezca una lectura autenticada de prueba. Si el estado es configurado pero el endpoint no puede descifrarla, preservar el ciphertext y tratar la llave criptográfica como bloqueo aparte. El objetivo primario sigue siendo el archivo de registros en CUSTODIA-01.
+
+
+## 7. Nueva sesión EP y prueba de lectura
+
+Fuente `khora-web/lib/server/ep.ts`, blob `ff1f345a1745a0488317a94fe0a0d5232d090568`: las sesiones nuevas incluyen `ep:github:read`. `POST /api/ep/github-credential`, blob `22019d14a59aa2c10007af8e5eaba0c6fae9e766`, exige scopes `ep:bootstrap` y `ep:github:read`, valida propietario y recupera la credencial ep. No requiere PIN de bóveda web; sí X_KHORA_KEY válida para descifrar.
+
+Prueba propuesta: token EP nuevo generado en UI (revoca sesión EP anterior), consumido localmente y en memoria. Solo reportar OK o código, sin imprimir la credencial. No ejecutar bootstrap, no desplegar ni crear VHDX. Aún pendiente; no se emitió sesión.
