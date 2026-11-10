@@ -45,7 +45,7 @@ test.describe('Dictado por partes contract test', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          url: 'https://blob.vercel-storage.com/dictado/mock-part-url.webm.khc',
+          url: 'https://s3.us-east-005.backblazeb2.com/khora-userdata-ecea4187/khora/dictado/mock-part-url.webm.khc',
           bytes: audioBytes.length,
           cifrado: true,
           sha256: createHash('sha256').update(audioBytes).digest('hex'),
@@ -148,7 +148,7 @@ test.describe('Dictado por partes contract test', () => {
     }
 
     // Now test saving with /api/dictado returning a mock error.
-    // The spec requests: "with several parts uploaded and /api/dictado returning error, the parts still exist in Blob"
+    // The spec requests: "with several parts uploaded and /api/dictado returning error, the parts still exist in Backblaze B2"
     // Also: "and a response no-JSON of /api/audio no impide que el texto se guarde"
     // Let's mock /api/dictado to return a failure status to verify saving handles it.
     let dictadoPayload: any = null;
@@ -169,7 +169,7 @@ test.describe('Dictado por partes contract test', () => {
     expect(dictadoPayload).not.toBeNull();
     expect(dictadoPayload.audioPartes).toBeInstanceOf(Array);
     expect(dictadoPayload.audioPartes.length).toBeGreaterThan(0);
-    expect(dictadoPayload.audioUrl).toBe('https://blob.vercel-storage.com/dictado/mock-part-url.webm.khc');
+    expect(dictadoPayload.audioUrl).toBe('https://s3.us-east-005.backblazeb2.com/khora-userdata-ecea4187/khora/dictado/mock-part-url.webm.khc');
     expect(dictadoPayload.audioBytes).toBeGreaterThan(0);
 
     // Since /api/dictado failed with 500, we should see error in the UI
@@ -213,7 +213,7 @@ test.describe('Dictado por partes contract test', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          url: 'https://blob.vercel-storage.com/dictado/retry-success-part.webm.khc',
+          url: 'https://s3.us-east-005.backblazeb2.com/khora-userdata-ecea4187/khora/dictado/retry-success-part.webm.khc',
           bytes: audioBytes.length,
           cifrado: true,
           sha256: createHash('sha256').update(audioBytes).digest('hex'),
