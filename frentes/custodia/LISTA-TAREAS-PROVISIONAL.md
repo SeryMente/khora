@@ -1,4 +1,4 @@
-<!-- LIST_VERSION=0.37; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.38; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
@@ -31,6 +31,7 @@ Las fases son subunidades internas del expediente existente, no nuevos expedient
 | CUSTODIA-01.e | EN CURSO | Registrar como bloqueados los Blob suspendidos, referencias sin read-back y registros sin titularidad demostrada; no declarar pérdida. |
 | CUSTODIA-01.f | PENDIENTE | Verificar cada Volcado, retirar del pendiente lo archivado y dejar solo residuales actualmente no archivables con evidencia. |
 | CUSTODIA-01.g | EN CURSO | Localizar acceso criptográfico seguro al runtime KHORA: EP Vault DPAPI/notas y la bóveda KHORA; preservar ciphertext y no revelar valores. |
+| CUSTODIA-01.h | PENDIENTE DE OPERADOR | Tras restablecimiento local del PIN KHORA (no ejecutado por CUSTODIA), leer solo metadatos de credenciales GitHub norm/ep; después probar la lectura EP autenticada sin mostrar el token. |
 
 ## 3. Estados de salida
 
@@ -100,3 +101,12 @@ Se documentó que X_KHORA_KEY protege checkpoints, snapshots, Volcados y audio; 
 Se localizaron ciphertext de EP Vault en la ruta local y en respaldos R1/R2. No hay DPAPI/session activa ni notas recuperables localizadas; la GUI EP Vault permanece sellada. No probar contraseñas ni sobrescribir bóvedas.
 
 Siguiente paso autorizado: si el operador recuerda la contraseña EP, introducirla localmente en la GUI; listar nombres sin revelar valores y utilizar KHORA_API_KEY mediante proceso hijo con allowlist exacta; si no, mantener ciphertext y respaldos intactos. Evidencia: evidencias/LOCALIZACION-CLAVE-KHORA-EPVAULT-20261110.md.
+
+
+## 10. Bóveda web KHORA y PIN
+
+La UI muestra la bóveda KHORA cerrada y el panel de capacidad local sin capacidad activa. Hay dos Bearer Tokens manuales MCP activos, solo runtime:read / volcados:read / norm:turn, último uso Nunca. No se usarán ni revocarán.
+
+El código confirma que Restablecer PIN solo actualiza el hash Scrypt/sal en boveda_pin y abre una cookie de 30 minutos; no modifica X_KHORA_KEY ni ciphertext. La UI de GitHub solo revela metadatos configured/updatedAt para las credenciales norm y ep. El read real de ep requiere una sesión EP autenticada con ep:bootstrap y ep:github:read.
+
+Siguiente paso: operador restablece el PIN en la UI (no compartirlo), luego copia solo metadatos norm/ep. No revelar tokens ni emitir/revocar tokens MCP. Evidencia: evidencias/ESTADO-BOVEDA-WEB-KHORA-20261110.md.
