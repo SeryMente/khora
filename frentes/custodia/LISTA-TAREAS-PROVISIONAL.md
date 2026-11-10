@@ -1,11 +1,11 @@
-<!-- LIST_VERSION=0.29; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.30; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Lista provisional de tareas · Frente Custodia
 
 > **ESTADO: PROVISIONAL · NO CERTIFICADA CONTRA EL DISEÑO METODOLÓGICO FINAL.** Se conserva aquí por instrucción expresa del operador. CUSTODIA-02 fue retirada de las tareas activas por instrucción del operador; no se reutiliza su identificador. Esa retirada no certifica metodológicamente esta materialización. Este archivo no crea un segundo objeto canónico ni otro control de responsabilidad; el núcleo único del frente sigue siendo [OBJETO-CANONICO.md](OBJETO-CANONICO.md).
 
 - **Frente:** Custodia.
-- **Versión de esta lista provisional:** 0.29.
-- **Última actualización:** 2026-11-10 (una captura real de Production fue reportada archivada con texto y 191/191 partes de audio apuntando a B2 y marcadas verificadas; recuperación tras recarga aún NO VERIFICADA; backfill histórico Blob→B2 no iniciado).
+- **Versión de esta lista provisional:** 0.30.
+- **Última actualización:** 2026-11-10 (store Vercel Blob khora-audio suspendido por cuota; inventario físico 636/636 completado; descargas SDK y CDN bloqueadas 5/5 cada una; backfill histórico detenido hasta reactivación temporal de lectura; Production B2 sigue READY).
 - **Metodología en la primera redacción:** Samantha v348 · NX-348m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `a4c90bd8ff1cd360b1f1662ff55371bd1b56b4cd`.
 - **Revalidación antes del cierre (intermedia):** Samantha v351 · NX-351m; Metacanon 1.21 · METACANON-OBJETOS-v1.21; GOW v2.3; fuente `f069d2385f47731ac9d0f0ca76bfd3cef859cdd2`.
 - **Última lectura de metodología del ciclo 2 (referencia histórica):** Samantha v352 · NX-352m; Metacanon 1.21; GOW v2.3; blob `94473eccb6fa71303d5908ce678f7efeb191c215`.
@@ -48,14 +48,14 @@ Secuencia histórica (C006; antecedente conservado y supersedido por la secuenci
 
 | Orden | ID | Prioridad | Estado | Resultado que cierra |
 |---:|---|---|---|---|
-| 1 | CUSTODIA-B2-006 | P0 | EN CURSO · CAPTURA REAL PASS PARCIAL | Nuevas escrituras en B2 demostradas con una captura real y 191/191 partes reportadas verificadas; falta read-back independiente de recuperación tras recarga |
-| 2 | CUSTODIA-B2-002 | P0 | EN CURSO · SIGUIENTE EJECUCIÓN INMEDIATA | Inventario físico paginado y copia de todo Blob→B2, read-back/SHA/bytes/KHC1; después reconciliación transaccional SQL/JSONB, sin borrar originales |
-| 3 | CUSTODIA-B2-005 | P1 | EN CURSO · DIAGNÓSTICO RESIDUAL | Confirmar estado/cuota actual de Blob y clasificar otros fallos; no bloquea inventario ni copia física no destructiva |
+| 1 | CUSTODIA-B2-005 | P0 | BLOQUEO EXTERNO CONFIRMADO · REACTIVAR LECTURA VERCEL | Conseguir GET/exportación temporal del store Vercel khora-audio; estado limits-exceeded-suspended, 636 objetos enumerados, GET SDK/CDN 403 en 5/5 muestras |
+| 2 | CUSTODIA-B2-002 | P0 | BLOQUEADA · INVENTARIO PASS / DESCARGA FAIL | Tras la reactivación, copiar 636/636 objetos a B2 con bytes/SHA/read-back; mantener originales y luego reconciliar referencias |
+| 3 | CUSTODIA-B2-006 | P1 | EN CURSO · CAPTURA REAL PASS PARCIAL | Nuevas escrituras en B2 demostradas con una captura real y 191/191 partes verificadas; falta recuperación independiente tras recarga |
 | 4 | CUSTODIA-B2-007 | P2 | DIFERIDA | Pulido posterior solo si resulta necesario para la integridad o estabilidad de la migración |
 | 5 | CUSTODIA-RES-001 | P2 | DIFERIDA | Evaluar más proveedores después de cerrar B2/Blob |
 | 6 | CUSTODIA-RES-002 | P2 | DIFERIDA | Implementar proveedor adicional únicamente si se vuelve a priorizar |
 
-**Estado técnico observado al 2026-11-10:** las dos variables maestras canónicas constan como Secrets `sensitive` de Vercel Production; preflight B2 PASS; deployment `dpl_6hUVD7LBXqtmnaMw2nfH2wwyrHUp` READY (commit `dd9527a223f65e7af834b042d51f716296151bf2`). La última sesión reportó una captura real de 10,052 caracteres, SHA-256 con prefijo `d69033c4` (hash completo reportado: `d69033c4876d82a64aa6adc5182c51dab0cd2d02f83a79155de35b970c4704ce`), 191/191 partes de audio asociadas a B2 y marcadas verificadas, 15,617,130 bytes y 0 faltantes; registro `en_revision`. Se registra como PASS de una captura real, con alcance limitado: no sustituye la verificación de recuperación tras recarga ni demuestra la migración del histórico Blob.
+**Estado técnico observado al 2026-11-10:** las dos variables maestras canónicas constan como Secrets `sensitive` de Vercel Production; preflight B2 PASS; deployment `dpl_6hUVD7LBXqtmnaMw2nfH2wwyrHUp` READY (commit `dd9527a223f65e7af834b042d51f716296151bf2`). El store Vercel `khora-audio` (`store_VyX9EI8q6DKhp4RV`) está suspendido por cuota (`limits-exceeded-suspended`, 636 objetos, 1,010,497,194 bytes); el listado físico se completa 636/636, pero las descargas SDK y CDN fallan 5/5 con `blob_read_forbidden`. Historial físico copiado a B2: 0. Referencias Neon cambiadas: 0. Originales eliminados: 0. La última sesión reportó una captura real de 10,052 caracteres, SHA-256 con prefijo `d69033c4` (hash completo reportado: `d69033c4876d82a64aa6adc5182c51dab0cd2d02f83a79155de35b970c4704ce`), 191/191 partes de audio asociadas a B2 y marcadas verificadas, 15,617,130 bytes y 0 faltantes; registro `en_revision`. Se registra como PASS de una captura real, con alcance limitado: no sustituye la verificación de recuperación tras recarga ni demuestra la migración del histórico Blob.
 
 **Identidad operativa:** PC-7 es la única terminal RDC disponible; identidad comprobada PC-7\\PC 7. No exigir ni asumir otra terminal o cuenta; referencias históricas a PC-14, PSK14 y CENTRAL\\fila4 quedan supersedidas.
 
@@ -361,3 +361,15 @@ La propuesta continúa sin comprobar los bytes actuales de los objetos remotos n
 - La inspección reportada en la sesión anterior atribuyó al mismo registro el SHA-256 completo `d69033c4876d82a64aa6adc5182c51dab0cd2d02f83a79155de35b970c4704ce`, 191/191 partes con destino B2, tamaño/SHA por parte, estado verificado, 15,617,130 bytes y cero partes faltantes. Estado del registro: `en_revision`. Bucket destino: `khora-userdata-ecea4187`.
 - **Límite probatorio:** esta actualización documental conserva el resultado informado en la sesión anterior; no repitió en este ciclo un GET independiente del objeto ni una recuperación manual tras recarga. Por ello se acepta la escritura de una captura real y la verificación registrada por la aplicación, pero la recuperación posterior a recarga queda `NO VERIFICADA`.
 - **Backfill histórico:** sigue sin inventario físico ni transferencia Blob→B2; no se han modificado referencias Neon ni borrado originales.
+
+
+## Corte de migración histórica · 2026-11-10
+
+- Store origen: Vercel Blob `khora-audio`, ID `store_VyX9EI8q6DKhp4RV`, acceso público, región iad1, estado `limits-exceeded-suspended`, `billingState=suspended`, `usageQuotaExceeded=true`.
+- Inventario físico: 636 objetos en una página paginada, 1,010,497,194 bytes. El universo físico del store conectado está enumerado completamente.
+- Lectura de contenido: 0/5 por SDK y 0/5 por URL directa/CDN; ambas rutas reportan `blob_read_forbidden`. Bytes descargados: 0.
+- Transferencia: 0 objetos históricos copiados a B2; 0 read-back B2; 0 punteros Neon cambiados; 0 originales Blob eliminados o sobrescritos.
+- Requisito externo para reanudar: reactivación temporal de GET/exportación del store existente o vía oficial de exportación. No hay dato `blockedUntil`; no se inventa fecha de desbloqueo. No crear un store sustituto ni eliminar el origen.
+- Los deployments Preview de diagnóstico fueron cancelados tras capturar métricas. Production sigue READY y conserva la configuración de build original.
+
+**Identidad de materialización vigente (2026-11-10):** `CENTRAL\\MantenimientoRCI` es la cuenta de elevación/operación RDC; `CENTRAL\\fila4` es el usuario propietario. Todo repositorio y artefacto se materializa bajo `C:\\Users\\fila4`. La conexión RDC accesible se utiliza como canal de operación; no se requiere una terminal fija ni se suplanta la identidad de fila4.
