@@ -1,11 +1,11 @@
-<!-- TASKS_README_VERSION=0.25; TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
+<!-- TASKS_README_VERSION=0.26; TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
 <!-- TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
 # 📁 Tareas provisionales · Frente Custodia
 
-**Estado:** PROVISIONAL · materialización de ejecución y continuidad; no es canon normativo ni segundo OCP. CUSTODIA-B2-006 permanece EN CURSO: Master Key, bucket, variables canónicas, preflight y deployment Production READY están comprobados; la última sesión reportó una captura real de 10,052 caracteres y 191/191 partes de audio en B2, todas marcadas verificadas. La recuperación tras recarga aún no se ha verificado de forma independiente.  
+**Estado:** PROVISIONAL · materialización de ejecución y continuidad; no es canon normativo ni segundo OCP. CUSTODIA-B2-006 permanece EN CURSO: una captura real quedó registrada con 191/191 partes verificadas en B2, pero falta recuperación tras recarga. CUSTODIA-B2-002 permanece P0 y está BLOQUEADA por suspensión del store Vercel Blob: los 636 objetos se enumeran, pero 5/5 lecturas por SDK y 5/5 lecturas CDN devuelven blob_read_forbidden. Se requiere reactivación temporal de lectura/exportación por Vercel.  
 **OCP único:** [OBJETO-CANONICO.md](../OBJETO-CANONICO.md).  
 **Control único:** [CONTROL-RESPONSABILIDAD.json](../CONTROL-RESPONSABILIDAD.json).  
-**Titularidad observada:** generación 11 · alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59 · control blob `c29349fc4d2e07d40cd6efe583171482578db6d3`. ID nativo no expuesto.  
+**Titularidad observada:** generación 11 · alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59 · control blob `cf7dc1a19ce2738e23b1e620bca49e03429bf28f`. ID nativo no expuesto.  
 **Folio:** PENDIENTE/NO ASIGNADO · FOL1 no está ACTIVO.  
 **Instrucción arquitectónica original:** [INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md](../originales/INSTRUCCION-ARQUITECTURA-MULTIALMACEN-20261109.md). La decisión operativa posterior B2-first y backfill Blob→B2 está preservada en [INSTRUCCION-B2-KHORA-Y-BACKFILL-BLOB-20261109.md](../originales/INSTRUCCION-B2-KHORA-Y-BACKFILL-BLOB-20261109.md).  
 **Retoma actual:** [INSTRUCCION-RETOMA-CUSTODIA-20261109.md](../originales/INSTRUCCION-RETOMA-CUSTODIA-20261109.md) · A local `01a1c193-eccc-78ad-bcb1-a7f102ff4733`.  
@@ -48,8 +48,8 @@ Se conservan los identificadores, criterios y evidencia existentes. No se duplic
 | Orden | ID local | Prioridad | Estado | Dependencia | Resultado |
 |---:|---|---|---|---|---|
 | 1 | CUSTODIA-B2-006 | P0 | EN CURSO · CAPTURA REAL PASS PARCIAL | Persistencia nueva de una captura real reportada; falta prueba independiente de recuperación tras recarga | Cerrar recuperación de texto/audio, recibo y aceptación del flujo nuevo |
-| 2 | CUSTODIA-B2-002 | P0 | EN CURSO · SIGUIENTE EJECUCIÓN INMEDIATA | La escritura nueva B2 ya está habilitada; inventario/copia física pueden avanzar sin tocar referencias | Inventario exhaustivo y copia de todo Blob→B2 con read-back/SHA/bytes/KHC1; reconciliar referencias después de corregir el reconciliador |
-| 3 | CUSTODIA-B2-005 | P1 | EN CURSO · DIAGNÓSTICO RESIDUAL | No bloquea inventario/copia no destructivos | Confirmar estado actual de Blob y clasificar fallos restantes |
+| 2 | CUSTODIA-B2-002 | P0 | BLOQUEADA · LECTURAS VERCEL SUSPENDIDAS | Inventario físico PASS (636/636); Vercel impide descargar bytes por SDK y CDN; requiere reactivación temporal de lectura | Descargar y copiar todos los objetos a B2 con SHA/bytes/read-back; después reconciliar referencias con ledger y reconciliador corregidos |
+| 3 | CUSTODIA-B2-005 | P0 | BLOQUEO EXTERNO CONFIRMADO | Store khora-audio en estado limits-exceeded-suspended; Vercel niega 403 en 5/5 descargas de SDK y 5/5 CDN | Obtener de Vercel una vía temporal de GET/exportación; luego repetir lectura real |
 | 4 | CUSTODIA-B2-007 | P2 | DIFERIDA | Solo si aparece un defecto que exija estabilización previa | Pulido de implementación, sin retirar integridad ni lectura legacy |
 | 5 | CUSTODIA-RES-001 | P2 | DIFERIDA | Después del objetivo B2/Blob | Evaluar segundo proveedor |
 | 6 | CUSTODIA-RES-002 | P2 | DIFERIDA | RES-001 aprobado | Implementar proveedor adicional únicamente si se vuelve a priorizar |
@@ -141,3 +141,14 @@ La plantilla no exige fechas objetivo ni responsables por tarea: se añaden solo
 **Backfill histórico:** la migración de objetos Blob no ha iniciado. Neon main tiene los conteos lógicos reportados: 624 referencias en `dictado_audio_parte`, 15 en `dictado_mp3`, 15 en `dictado_mp3_historial`, 37 en `volcado.audio_url` y 248 referencias JSONB individuales. No son conteos de objetos físicos únicos. El ledger `custodia_blob_b2_migration` no existe en main; falta el archivo SQL 035 y debe corregirse el conteo/posestado de referencias JSONB de `updateReferences()` antes de actualizar referencias. La copia física de Blob a B2 puede iniciarse de forma idempotente y no destructiva antes de cambiar referencias.
 
 **Invariante:** no borrar, sobrescribir ni retirar Blob durante la migración; conservar originales hasta cierre con inventario completo, read-back y reconciliación aceptados. No hacer APPLY de Neon Production en el estado actual.
+
+
+## Corte operativo · 2026-11-10 · suspensión del origen Vercel Blob
+
+- El store KHORA Web khora-audio (store_VyX9EI8q6DKhp4RV) está en limits-exceeded-suspended; billingState=suspended; usageQuotaExceeded=true; acceso public; región iad1.
+- Vercel devuelve 636 objetos en el inventario completo paginado (1 página) y tamaño total 1,010,497,194 bytes.
+- Lecturas SDK: 0/5; lecturas directas CDN: 0/5. Ambas fallan con blob_read_forbidden. Inventariar metadatos no equivale a descargar datos.
+- Backfill físico histórico: 0 objetos copiados y 0 objetos con read-back B2. Neon Production: 0 punteros cambiados, sin SQL aplicado. Blob: 0 originales borrados/sobrescritos.
+- Acción que desbloquea: conseguir reactivación temporal de solo lectura/exportación desde Vercel para el store existente. No crear un store sustituto ni eliminar fuentes.
+- El deployment Production dpl_6hUVD7LBXqtmnaMw2nfH2wwyrHUp permanece READY y los Secrets maestros B2 siguen como sensitive. Los Preview usados para probes se cancelaron tras capturar resultados; el Build Command normal fue restaurado.
+- Corrección de identidad operativa: MantenimientoRCI es la cuenta de elevación y operación RDC; fila4 es el usuario/perfil propietario. Todos los artefactos se materializan en C:\\Users\\fila4; la única conexión RDC accesible se utiliza como canal operativo, sin suplantar procesos.
