@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.47; OBJECT_SEAL=CUSTODIA-v0.47; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.48; OBJECT_SEAL=CUSTODIA-v0.48; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.47. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.48. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -932,3 +932,35 @@ La instrucción literal y su contexto se conservan en [INSTRUCCION-AUTORIZACION-
 La autorización queda registrada; la ejecución no se presume. Cada lote debe terminar con cantidades de entrada, éxito, fallo y residuales; los fallos individuales no detienen el resto del trabajo. La tarea CUSTODIA-01 permanece EN CURSO hasta completar el archivo y dejar únicamente los impedimentos actuales documentados.
 
 La sección 17 queda preservada como antecedente inmediato; esta sección 18 gobierna la autorización y la eficiencia actuales.
+
+
+## 19. Primer intento de archivo autorizado · resultado y bloqueo actual · 2026-11-10 · CUSTODIA-v0.48
+
+### 19.1 Objetivo reiterado
+Archivar todos los registros de dictado/captura que puedan archivarse con el contenido existente y la titularidad demostrada. Al cierre solo quedarán unidades que no puedan archivarse ahora por un bloqueo concreto. No ampliar el trabajo a reparación general ni a pruebas de resiliencia.
+
+### 19.2 Revalidación mínima de la cuenta y los candidatos
+Consulta de solo lectura sobre Neon Production (proyecto `still-sunset-02412999`, rama principal `br-gentle-band-ah23rczb`):
+
+- 78 sesiones pendientes de la cuenta confirmada.
+- 44 tienen audio remoto: 1.039 partes en total (785 referencias B2 y 254 referencias Vercel Blob).
+- 34 no tienen partes remotas. Dos son las sesiones con audio local autorizado (216 fragmentos cifrados y dos snapshots). Las otras 32 no tienen audio remoto ni audio local localizado en el perfil autorizado.
+- De esas 32, 31 tienen historial de revisiones y una no. La comparación de SHA de checkpoint/revisiones identifica 27 sesiones con al menos una huella de texto no vacía ni compuesta únicamente por salto de línea; son candidatas a archivo de texto, pendientes de descifrado y validación del contenido. Las otras cinco presentan únicamente hashes de texto vacío o salto de línea; no se archivan como transcripciones sin comprobar más contenido.
+- Los conteos anteriores no exponen ni leen el texto descifrado. La comparación de SHA es evidencia de metadatos, no una validación visual del texto.
+
+### 19.3 Proveedores y secretos de runtime
+- Vercel Blob `khora-audio` continúa suspendido por cuota excedida; el objeto store devuelve `billingState=suspended` y `usageQuotaExceeded=true`. Los 254 localizadores Blob de la cuenta no pueden darse por perdidos; permanecen bloqueados hasta que el proveedor permita GET.
+- Las variables de producción `X_KHORA_KEY`, `KHORA_B2_MASTER_APPLICATION_KEY_ID` y `KHORA_B2_MASTER_APPLICATION_KEY` existen como registros sensibles en Vercel, pero las herramientas conectadas devuelven `decrypted=false` y no exponen sus valores. No se exportaron ni imprimieron secretos.
+- El código vigente realiza descifrado de checkpoint con `X_KHORA_KEY`, subida B2 con la Master Application Key, y archivo mediante `guardarDictado()` autenticado. Las rutas canónicas requieren sesión autenticada. La herramienta Neon disponible permite consultas SQL, pero no sustituye la ejecución del flujo canónico ni proporciona los secretos/runtime autenticado.
+- No se ejecutó SQL de escritura para crear Volcados manualmente: hacerlo al margen de `guardarDictado()` omitiría el sellado, la idempotencia, la creación de versión inicial y el encolado de custodia. No se fuerza una vía de persistencia distinta.
+
+### 19.4 Resultado real de este ciclo
+- **Ejecutado:** persistencia y lectura de vuelta de OCP v0.47→v0.48, lista provisional y expediente; consultas SELECT de revalidación; lectura del estado del Blob store; lectura de código fuente; verificación de que los secretos están redacted/no accesibles mediante el conector.
+- **No ejecutado:** ningún Volcado nuevo; ninguna escritura en Neon Production; ningún GET de objeto B2; ninguna transferencia B2; ningún descifrado de texto/audio; ninguna eliminación o modificación de originales.
+- **Bloqueo actual:** falta un canal autenticado del runtime KHORA o acceso operativo seguro a los secretos en el contexto autorizado. Es un bloqueo de herramienta/ejecución, no falta de autorización del operador.
+- **Equipo/perfil:** PC10RCIF4EI4 sigue siendo el único equipo activo válido. Solo se considera autorizado Chrome `Profile` vinculado a `the.willfreeman@gmail.com`; el perfil alterno continúa excluido. La sesión Chrome activa se observó bajo el propietario fila4; el proceso remoto opera como MantenimientoRCI y no se suplantó al usuario fila4.
+
+### 19.5 Próxima acción directa
+Reanudar desde el runtime KHORA autenticado para ejecutar el flujo existente, sin extraer secretos al chat: (1) archivar las 27 sesiones con texto candidato y sin audio, registrando `Audio: No localizado` y `Procedencia: No verificada`; (2) transferir las dos sesiones locales a B2 y verificar cada parte; (3) leer y archivar las partes B2 elegibles; (4) dejar Blob temporalmente bloqueado y los titulares no demostrados fuera de la cuenta; (5) leer de vuelta cada Volcado y vínculo. Procesar en lotes y aislar fallos por unidad.
+
+La sección 18 conserva la autorización y política de eficiencia; esta sección 19 registra el estado real del primer intento de ejecución.
