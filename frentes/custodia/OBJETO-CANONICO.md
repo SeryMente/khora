@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.43; OBJECT_SEAL=CUSTODIA-v0.43; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.45; OBJECT_SEAL=CUSTODIA-v0.45; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · CUSTODIA-03/04 RESUELTAS POR REENFOQUE · NUEVAS ESCRITURAS B2-ONLY · READ-BACK FÍSICO Y SHA-256 IMPLEMENTADOS · PREVIEW FOCAL VALIDADO · PRODUCTION READY · PREFLIGHT B2 READ-ONLY PASS · E2E AUTENTICADO PENDIENTE · BLOB HISTÓRICO CONSERVADO · MIGRACIÓN DIFERIDA · SIN BACKFILL, CAMBIOS DE REFERENCIAS NI BORRADO.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.45. Metacanon: 1.29. La decisión operativa vigente conserva los objetos históricos Blob en sus localizadores y dirige todo contenido nuevo exclusivamente a Backblaze B2. La publicación no equivale a aceptación E2E: falta una captura autenticada, recarga y read-back de bytes.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · INVENTARIO FORENSE DE DICTADOS RECUPERABLES · TAREAS PROVISIONALES ANTERIORES CERRADAS POR REENFOQUE · SIN REPARACIÓN, RESTAURACIÓN, MIGRACIÓN NI BORRADO EN EL ALCANCE ACTUAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.45. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -12,7 +12,7 @@ Esta decisión sustituye, para la ejecución actual, toda instrucción anterior 
 3. **Aislamiento funcional:** el bloqueo de objetos Blob históricos no debe bloquear nuevas capturas, texto, checkpoints, versiones ni edición textual. Una sesión mixta conserva el estado individual de cada parte.
 4. **Lectura histórica:** permanecerá desactivada mientras Vercel Blob esté suspendido. Solo se habilitará después de reactivar el almacén y confirmar GET; esa activación no implica migración.
 5. **Migración histórica:** CUSTODIA-B2-002 y el diagnóstico previo CUSTODIA-B2-005 quedan DIFERIDOS. No copiar bytes, cambiar referencias SQL/JSONB, aplicar ledger/backfill ni borrar fuentes hasta que el operador reactive/pague Blob, se confirme acceso físico y autorice explícitamente la fase de migración.
-6. **Trabajo activo único de esta entrega:** CUSTODIA-B2-006. CUSTODIA-B2-007 y RES-001/002 permanecen diferidos. Los expedientes CUSTODIA-01/03/04 conservan su identidad y estado independiente.
+6. **Trabajo activo único del frente tras el reenfoque del 2026-11-10:** CUSTODIA-01, inventario forense de dictados recuperables y conciliación del panel. CUSTODIA-B2-006 y las demás tareas provisionales anteriores se cerraron administrativamente por reenfoque; su historia y evidencia se conservan, sin declarar aprobaciones técnicas.
 
 La implementación está integrada en `main` (commit `f0224c1368fb15a3452335a44305c6efa85eef79`) y publicada en Vercel Production. El preflight B2 de solo lectura y el build de producción pasaron; la aceptación E2E autenticada permanece pendiente. Esta anotación distingue código integrado, deployment READY y prueba de persistencia en sesión real: no son estados equivalentes.
 
