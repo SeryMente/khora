@@ -60,6 +60,18 @@ Todas las rutas anteriores son relativas a `khora-web/`. Leer el código vigente
 
 ## 4. Modelo de persistencia
 
+### Selección de proveedor de objetos · decisión vigente 2026-11-10
+
+KHORA utiliza un modelo híbrido por generación de objeto; el proveedor no se infiere de la sesión completa:
+
+- **Histórico Vercel Blob:** los localizadores existentes se conservan sin reescritura. Cuando el almacén legacy no permite lectura, cada archivo/parte se identifica como `vercel_blob_legacy`, `legacy`, `temporarily_unavailable` y `migration_status=pending`. Ese estado no significa que el objeto esté perdido, borrado o corrupto.
+- **Contenido nuevo:** toda nueva captura, parte, importación y derivado se escribe exclusivamente en Backblaze B2. Se conserva KHC1 y el bucket privado. El adaptador debe completar GET/read-back físico autenticado y cotejar longitud y SHA-256 de los bytes almacenados antes de devolver el localizador o permitir registrar la parte como verificada. Si B2 falla, se falla cerrado; nunca se intenta escribir ese objeto en Vercel Blob.
+- **Aislamiento:** la indisponibilidad de una parte Blob no impide guardar texto, checkpoints, versiones, editar texto ni escribir contenido nuevo en B2. Las sesiones mixtas conservan estado por parte; se pueden usar las partes B2 accesibles, pero no se presenta como completo un audio/MP3 que necesite bytes legacy ausentes.
+- **Lectura legacy:** permanece pausada mientras Blob esté suspendido (`KHORA_LEGACY_BLOB_READS_ENABLED` no habilitado). Se reactivará solo después de recuperar el servicio y confirmar GET; reactivar lectura no autoriza migración.
+- **Migración histórica:** queda diferida. No ejecutar ahora copias/backfill, cambios de referencias SQL/JSONB, ledger de migración ni eliminación/sobrescritura de originales. Se abrirá una fase separada cuando el operador reactive Blob, se confirme lectura física y autorice expresamente la transferencia.
+
+El contrato de proveedor se aplica por localizador y objeto; nunca se reclasifica una referencia legacy solo porque el contenido de la misma sesión tenga partes B2.
+
 ### Navegador
 
 IndexedDB `khora-custodia-v1`, almacenes `records` y `keys`. Los snapshots y fragmentos se cifran con AES-GCM usando una CryptoKey no exportable por identidad. El texto de la captura y los bytes de audio no se guardan en claro en `localStorage`.
@@ -103,7 +115,7 @@ Para micrófono, se solicita la grabadora antes de empezar el reconocedor. El na
 
 Cada subida usa la misma sesión e índice al reintentar, con un máximo de tres intentos y esperas de 1 y 2 segundos; timeout de red de 30 segundos por intento. Errores no recuperables no se repiten indiscriminadamente. Un fallo no permite archivar audio parcial como completo.
 
-Servidor: recibir → calcular SHA-256 → cifrar → Blob → releer → descifrar → contrastar tamaño/huella → registrar parte. El registro de partes y el cierre serializan sobre la fila de sesión. Una sesión sellada no permite añadir ni sustituir partes.
+Servidor: recibir → calcular SHA-256 → cifrar KHC1 → Backblaze B2 → GET/read-back físico autenticado → contrastar longitud y SHA-256 del objeto cifrado leído → registrar la parte como verificada. El localizador se devuelve solo después del cotejo. No existe fallback de escritura hacia Vercel Blob. El registro de partes y el cierre serializan sobre la fila de sesión. Una sesión sellada no permite añadir ni sustituir partes.
 
 El evaluador de manifiesto rechaza vacío, duplicados, índices extra/fuera de rango, huecos, cantidades distintas, tamaños vacíos, huellas inválidas o partes no verificadas. El texto manual se clasifica como texto y no requiere audio por tener un identificador de sesión.
 
