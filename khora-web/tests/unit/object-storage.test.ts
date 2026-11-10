@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { b2Endpoint,b2ObjectUrl,parseB2ObjectUrl,legacyBlobUrl,safeObjectKey,stagingKeyForSession } from '../../lib/storage/object-reference';
-import { fetchStoredObject,putEncryptedObject,deleteStagedObject,createStagingUploadId,STAGING_CHUNK_BYTES,putStagingChunk,finalizeStagingUpload,inspectB2ReadOnly,describeStoredObject } from '../../lib/server/object-storage';
+import { fetchStoredObject,putEncryptedObject,deleteStagedObject,createStagingUploadId,STAGING_CHUNK_BYTES,putStagingChunk,finalizeStagingUpload,inspectB2ReadOnly,describeStoredObject,isStagingObject } from '../../lib/server/object-storage';
 const c={bucket:'khora-test-private',region:'us-east-005'};
 const session='12345678-1234-1234-1234-123456789012';
 test('B2 region cannot become an SSRF host',()=>assert.throws(()=>b2Endpoint('us-east-005.evil.invalid')));
@@ -12,7 +12,7 @@ for(const path of ['outside/file','khora/../file','khora//file','khora/user@emai
 test('legacy Blob URLs stay restricted to explicit HTTPS Blob hosts',()=>{assert.equal(legacyBlobUrl('https://store.public.blob.vercel-storage.com/dictado/a.khc'),true);assert.equal(legacyBlobUrl('https://blob.vercel-storage.com.evil.invalid/a'),false);assert.equal(legacyBlobUrl('http://store.blob.vercel-storage.com/a'),false);assert.equal(legacyBlobUrl('https://u:p@store.blob.vercel-storage.com/a'),false);});
 test('staging refs cannot cross sessions',()=>{const key=`khora/staging/audio/${session}/1234.khstaging`;assert.equal(stagingKeyForSession(key,session),true);assert.equal(stagingKeyForSession(key,'99999999-9999-9999-9999-999999999999'),false);});
 test('new staging ID is opaque and valid UUIDv4',()=>assert.match(createStagingUploadId(),/^[0-9a-f-]{36}$/i));
-test('chunk size remains below Vercel 4.5 MB request limit',()=>assert.equal(STAGING_CHUNK_BYTES,4*1024*1024));
+test('staging chunks use the fixed 4 MiB B2 transport size',()=>assert.equal(STAGING_CHUNK_BYTES,4*1024*1024));
 test('transport rejects cleartext before network access',async()=>{await assert.rejects(()=>putEncryptedObject('dictado/test.khc',Buffer.from('not-an-envelope'),{access:'public'}),/encrypted_envelope/);});
 test('new B2 writes fail closed when provider flag is not enabled; no Blob fallback',async()=>{const previous=process.env.KHORA_OBJECT_STORAGE;delete process.env.KHORA_OBJECT_STORAGE;const encrypted=Buffer.concat([Buffer.from('KHC1'),Buffer.alloc(32)]);try{await assert.rejects(()=>putEncryptedObject('dictado/test.khc',encrypted,{access:'public'}),/storage_b2_not_enabled/);await assert.rejects(()=>putStagingChunk(session,createStagingUploadId(),0,Buffer.alloc(100)),/storage_b2_not_enabled/);}finally{if(previous===undefined)delete process.env.KHORA_OBJECT_STORAGE;else process.env.KHORA_OBJECT_STORAGE=previous;}});
 test('chunk size and total hash bounds are enforced before network access',async()=>{const previous=process.env.KHORA_OBJECT_STORAGE;process.env.KHORA_OBJECT_STORAGE='b2';try{await assert.rejects(()=>putStagingChunk(session,createStagingUploadId(),0,Buffer.alloc(STAGING_CHUNK_BYTES+1)),/storage_staging_chunk_invalid/);await assert.rejects(()=>finalizeStagingUpload(session,createStagingUploadId(),1024,1,'bad'),/storage_staging_invalid/);}finally{if(previous===undefined)delete process.env.KHORA_OBJECT_STORAGE;else process.env.KHORA_OBJECT_STORAGE=previous;}});
@@ -27,8 +27,25 @@ test('legacy Blob objects are classified as pending and reads are paused without
  } finally {if(previous===undefined)delete process.env.KHORA_LEGACY_BLOB_READS_ENABLED;else process.env.KHORA_LEGACY_BLOB_READS_ENABLED=previous;}
 });
 test('B2 locators are classified independently from legacy Blob',()=>{
- const url=b2ObjectUrl('khora/dictado/new.khc',c);
- assert.deepEqual(describeStoredObject(url),{storage_provider:'backblaze_b2',storage_generation:'new',availability:'not_checked',migration_status:'not_required'});
+ const names=['KHORA_B2_BUCKET_NAME','KHORA_B2_REGION'];
+ const before=Object.fromEntries(names.map(k=>[k,process.env[k]]));
+ try {
+  process.env.KHORA_B2_BUCKET_NAME=c.bucket;process.env.KHORA_B2_REGION=c.region;
+  const url=b2ObjectUrl('khora/dictado/new.khc',c);
+  assert.deepEqual(describeStoredObject(url),{storage_provider:'backblaze_b2',storage_generation:'new',availability:'not_checked',migration_status:'not_required'});
+ } finally { for(const k of names){if(before[k]===undefined)delete process.env[k];else process.env[k]=before[k];} }
+});
+test('B2 staging objects are scoped to the owning session',()=>{
+ const names=['KHORA_B2_BUCKET_NAME','KHORA_B2_REGION'];
+ const before=Object.fromEntries(names.map(k=>[k,process.env[k]]));
+ try {
+  process.env.KHORA_B2_BUCKET_NAME=c.bucket;process.env.KHORA_B2_REGION=c.region;
+  const key=`khora/staging/audio/${session}/upload.khstaging`;
+  const url=b2ObjectUrl(key,c);
+  assert.equal(isStagingObject(url,session),true);
+  assert.equal(isStagingObject(url,'99999999-9999-9999-9999-999999999999'),false);
+  assert.equal(isStagingObject(b2ObjectUrl('khora/dictado/audio.khc',c),session),false);
+ } finally { for(const k of names){if(before[k]===undefined)delete process.env[k];else process.env[k]=before[k];} }
 });
 test('read-only preflight proves Master Key identity and exact private bucket',async()=>{
  const names=['KHORA_B2_MASTER_APPLICATION_KEY_ID','KHORA_B2_MASTER_APPLICATION_KEY','KHORA_B2_BUCKET_NAME','KHORA_B2_BUCKET_ID','KHORA_B2_REGION'];
