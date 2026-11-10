@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.45; OBJECT_SEAL=CUSTODIA-v0.45; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.46; OBJECT_SEAL=CUSTODIA-v0.46; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · INVENTARIO FORENSE DE DICTADOS RECUPERABLES · TAREAS PROVISIONALES ANTERIORES CERRADAS POR REENFOQUE · SIN REPARACIÓN, RESTAURACIÓN, MIGRACIÓN NI BORRADO EN EL ALCANCE ACTUAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.45. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.46. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -12,7 +12,7 @@ Esta decisión sustituye, para la ejecución actual, toda instrucción anterior 
 3. **Aislamiento funcional:** el bloqueo de objetos Blob históricos no debe bloquear nuevas capturas, texto, checkpoints, versiones ni edición textual. Una sesión mixta conserva el estado individual de cada parte.
 4. **Lectura histórica:** permanecerá desactivada mientras Vercel Blob esté suspendido. Solo se habilitará después de reactivar el almacén y confirmar GET; esa activación no implica migración.
 5. **Migración histórica:** sigue fuera del alcance y no se ejecutará. No copiar bytes, cambiar referencias SQL/JSONB, aplicar ledger/backfill ni borrar fuentes. CUSTODIA-B2-002 y el diagnóstico previo CUSTODIA-B2-005 conservan sus antecedentes, pero quedaron cerrados administrativamente por reenfoque; cualquier migración requeriría otra instrucción expresa y específica.
-6. **Trabajo activo único del frente tras el reenfoque del 2026-11-10:** CUSTODIA-01, inventario forense de dictados recuperables y conciliación del panel. CUSTODIA-B2-006 y las demás tareas provisionales anteriores se cerraron administrativamente por reenfoque; su historia y evidencia se conservan, sin declarar aprobaciones técnicas.
+6. **Trabajo activo único del frente tras la instrucción del 2026-11-10:** CUSTODIA-01, archivar todos los registros históricos que puedan archivarse y dejar pendientes únicamente los que tengan un impedimento actual, concreto y documentado. El inventario forense y la conciliación del panel son fases instrumentales de ese archivo. CUSTODIA-B2-006 y las demás tareas provisionales anteriores permanecen cerradas administrativamente por reenfoque; su historia y evidencia se conservan, sin declarar aprobaciones técnicas.
 
 La implementación está integrada en `main` (commit `f0224c1368fb15a3452335a44305c6efa85eef79`) y publicada en Vercel Production. El preflight B2 de solo lectura y el build de producción pasaron; la aceptación E2E autenticada permanece pendiente. Esta anotación distingue código integrado, deployment READY y prueba de persistencia en sesión real: no son estados equivalentes.
 
@@ -26,9 +26,9 @@ La implementación está integrada en `main` (commit `f0224c1368fb15a3452335a443
 - **Único núcleo operativo:** este OBJETO-CANONICO.md.
 - **Control único de responsabilidad:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json). Titularidad documental/operativa transferida de generación 10 a 11 y leída de vuelta. Titular actual: chatgpt-custodia-INSTANCE-20261109-01A1C125; alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59; UUIDv7 local de conversación 01a1c125-af13-79b1-87cc-f1e5fe4b0b59; UUIDv7 local del evento 01a1c125-af13-7825-8af1-0ff35ad87b0e; control blob c29349fc4d2e07d40cd6efe583171482578db6d3. ID nativo de plataforma no expuesto. Titular previo gen. 10 y generaciones anteriores preservados. Folio PENDIENTE/NO ASIGNADO; FOL1 no está ACTIVO/verificado.
 - **Propósito literal aprobado:** [originales/PROPOSITO-OPERADOR-2026-10-28.md](originales/PROPOSITO-OPERADOR-2026-10-28.md). La sección 4 también conserva el texto aprobado íntegro para que el propósito sea visible en el núcleo.
-- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional v0.33. Contiene un solo objetivo activo: CUSTODIA-01, inventario forense de dictados recuperables y conciliación del panel. Las demás tareas provisionales quedaron resueltas administrativamente por reenfoque, sin atribuirles aprobación técnica. CUSTODIA-02 continúa retirada y su identificador no se reutiliza.
+- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional v0.34. Contiene un solo objetivo activo: CUSTODIA-01, archivo de todos los registros que puedan archivarse y documentación de los residuales actualmente bloqueados. Las demás tareas provisionales quedaron resueltas administrativamente por reenfoque, sin atribuirles aprobación técnica. CUSTODIA-02 continúa retirada y su identificador no se reutiliza.
 - **Inventario provisional de hallazgos:** [evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md](evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md), materialización de evidencia para CUSTODIA-01; no es un segundo estado vivo.
-- **Versión y sello vigentes:** CUSTODIA-v0.45. Es una versión documental del objeto; no es una versión del producto.
+- **Versión y sello vigentes:** CUSTODIA-v0.46. Es una versión documental del objeto; no es una versión del producto.
 - **Registro de la retoma anterior:** [originales/ChatGPT-CUSTODIA-20261106-1424.txt](originales/ChatGPT-CUSTODIA-20261106-1424.txt), instrucción textual parcial original y diagnóstico estático del límite de archivado.
 - **Original de esta retoma:** [originales/ChatGPT-CUSTODIA-20261107-1157.txt](originales/ChatGPT-CUSTODIA-20261107-1157.txt), exportación preservada en main; SHA-256 `7E256B9888F2A0227632D39D22B98E9BD1316548E057E83514ADE61376A93CC5`, 42,629 bytes; lectura de vuelta exacta.
 - **Original de esta retoma (2026-11-08 11:21):** [originales/ChatGPT-CUSTODIA-20261108-1121.md](originales/ChatGPT-CUSTODIA-20261108-1121.md), 39,896 bytes; SHA-256 `CB264E5979AA545F082B5CC9C59DEDA30CE9547100DB29B138A520C3592A866A`; Git blob `b7e13e3fe9fed70873535640e1124577f5b037e4`; commit `5d6cf7055f2ab5f0020bde220d078ffe077512a6`; lectura de vuelta idéntica.
@@ -60,7 +60,7 @@ La implementación está integrada en `main` (commit `f0224c1368fb15a3452335a443
 - **Fuente normativa revalidada en C013 (histórica):** Samantha v373 · NX-373m; Metacanon 1.26; GOW 2.14; blob `cac4525de77d4f47a8a59c25201968ecf2056b90`.
 - **Gobierno vigente leído en la retoma 2026-11-06:** Samantha v377 · NX-377m; Metacanon 1.28; GOW 2.17; blob DUG `54064c8fe00f872023a455f06596061ed69062ae`; commit main `8ee2482866b3dd085e58e05006727256d0274376`. Se leyó §ARR como secuencia de adquisición, la cascada y P001/P004/P005/P037/P038/P039/P041/P042/P043, Metacanon §§4, 28, 29, 38, 41, 42, 44, 46–47 y entradas GOW de Persistencia documental, OCP, SPDF y ciclo. MCP-NORMATIVO: DESACTIVADO. No se modificó el DUG.
 - **Gobierno de la retoma anterior (histórico):** Samantha v379 · NX-379m; Metacanon 1.29; GOW v2.18; DUG blob `cad464717c43733aa84b49f8c9c3af0875597fbd`. Su nota de adquisición y sus límites se conservan como antecedente histórico.
-- **Gobierno vigente adquirido en la retoma actual (2026-11-09):** Samantha v384 · NX-384m; Metacanon 1.29; GOW v2.18; DUG blob `2f320e5e6e4768e9a77bc34d24b0639b47f2128d`. Se leyó §ARR completo como vocabulario de entrada; se revisaron la cascada, el CNP (P001/P004/P005/P038/P043), P012/P013, P035/P036/P039/P041/P042 y P043. MCP-NORMATIVO: DESACTIVADO.
+- **Gobierno adquirido para este ciclo (2026-11-10):** DUG Samantha v388 · NX-388m; Metacanon 1.29; GOW 2.18; blob SHA `4db0ebadfd1e48b2bdec9236ba7f344921e4a865` de `SeryMente/metodologia/main:gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`. Se leyó el formato de ciclo Metacanon §4, el registro de ciclo §28, la unidad OCP §46 y la reinstanciación §§47–48; revisión manual de P001, P004, P005, P038 y P043; GOW: OCP, SPDF, persistencia documental y folios. MCP-NORMATIVO: DESACTIVADO. No se modificó el DUG.
 - Esta adquisición identifica la versión del canon central al momento de la lectura; no equivale a una auditoría integral de todos sus principios o anexos ni a una declaración de conformidad definitiva del diseño de lista.
 
 ## 4. Propósito y alcance
@@ -826,3 +826,63 @@ Se incorpora [GUIA-PERSISTENCIA-B2-MASTER.md](GUIA-PERSISTENCIA-B2-MASTER.md), p
 - **Fuera de alcance:** resiliencia/arquitectura, pruebas de nuevas capturas o de escenarios de fallo, reparación de código/datos, recuperación de contenido, reclamación de propietarios, migración/backfill, actualización de referencias y eliminación/sobrescritura de objetos.
 - **Cierre de CUSTODIA-01:** inventario de todas las fuentes pertinentes, clasificación documentada por archivo/parte, deduplicación y exclusión de archivados, identificación expresa de fuentes bloqueadas/no inspeccionadas e igualdad demostrada entre el conjunto esperado y las tarjetas/páginas observadas. No se requiere reparar producto para cerrar el objetivo documental.
 - **Estado de gestión:** CUSTODIA-01 EN CURSO; todas las tareas provisionales anteriores quedan fuera del conjunto activo. No se crean nuevos IDs maestros, CUSTODIA-05 ni folios globales.
+
+
+## 17. Cambio de objetivo · archivo máximo de registros recuperables · 2026-11-10 · CUSTODIA-v0.46
+
+### 17.1 Instrucción y objetivo vigente
+
+El operador establece como objetivo único del frente: **archivar todos los registros que se puedan archivar; solo deben quedar aquellos que tengan problemas irresolubles en este momento.** Esto sustituye el criterio anterior de limitar CUSTODIA-01 a un inventario documental sin ejecutar archivo.
+
+El alcance operativo se limita a los registros históricos que KHORA alcanzó a conservar y a las acciones de archivo necesarias para cerrar cada unidad elegible. No se audita la resiliencia general del sistema, no se prueban nuevas capturas ni escenarios sintéticos de fallo, no se rediseña arquitectura y no se emprende una reparación general del producto.
+
+### 17.2 Originales y salida literal
+
+- **Instrucción del operador:** [INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md), blob SHA `829929da20a6dd7efc03d580c80a95b5f1d2cca1`; commit `d7257c69b6264afc6ccca6eb909dc4fa0c9b589c`; lectura de vuelta exacta.
+- **Última salida literal del modelo anterior:** [SALIDA-MODELO-CUSTODIA-ARCHIVO-REGISTROS-20261110.md](originales/SALIDA-MODELO-CUSTODIA-ARCHIVO-REGISTROS-20261110.md), blob SHA `9fb2980b138a9d0b4bdf765937c65abb380d4057`; commit `c19b4c10f2789d13e9ef6e98f6fe11e11a375358`; lectura de vuelta exacta. Se preserva como salida anterior, no como respuesta recién generada.
+- **Estado base reportado:** [ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md](evidencias/ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md), blob SHA `676cac06a1f439668284130987b1a8c0ed4e7766`; commit `043028bbe2b1b879894b70aa4dcdc5a9dfe2c08a`; lectura de vuelta exacta.
+- **Expediente CUSTODIA-01:** README v0.2, blob SHA `8af6660f3a02eaa7649b4a2d209f98c120095259`; commit `59ea1acfb0bd5dd1c6075bbfcee1fb1f5a5cf0f1`; lectura de vuelta exacta.
+- **Lista provisional:** v0.34, blob SHA `727df6ce53d9b95ab3b8966030031f1a6963ab1c`; commit `ee4c023b40075331e10bc0837a4b0d1c1bbd4cf4`; lectura de vuelta exacta.
+
+### 17.3 Perfil local y autorización C
+
+- **Equipo válido:** `PC10RCIF4EI4`, única sesión activa del operador. Las conexiones remotas previas identifican el mismo equipo y no deben contarse como equipos/sesiones distintas.
+- **Único perfil Chrome autorizado para la fuente local:** `Profile`, asociado a `the.willfreeman@gmail.com`. El otro perfil queda expresamente excluido; no abrirlo, inspeccionarlo ni usarlo como fuente alternativa.
+- **Autorización C del operador:** respuesta literal «C. Si autorizo», referida al procesamiento de los 216 fragmentos cifrados de dos sesiones, mediante el mecanismo KHORA, transferencia a B2, verificación de bytes/longitud/SHA y vínculo a las sesiones, preservando los originales locales. Esta autorización no acredita que se haya ejecutado ninguna de esas operaciones.
+- Para transcripciones sin audio localizado, se aplica la instrucción previa del operador: archivar el texto sin audio; marcar `Audio: No localizado` y `Procedencia: No verificada`; no afirmar que el origen fue copy/paste. Un objeto Blob localizado pero temporalmente ilegible es `EXISTE_BLOQUEADO`, no `No localizado`.
+
+### 17.4 Línea base heredada del último ciclo
+
+Las cantidades siguientes son hallazgos reportados por el ciclo anterior y preservados en la conversación; esta actualización documental no volvió a consultar las fuentes de producción, por lo que no se elevan a verificación nueva:
+
+- Cuenta propietaria de Chrome: 78 sesiones pendientes reportadas; 44 con audio remoto (1.039 partes: 785 B2 y 254 Vercel Blob); 32 con texto pero sin audio localizado de forma remota ni local; 2 sesiones adicionales con audio exclusivamente local (216 fragmentos y 2 snapshots).
+- Las 191 revisiones locales cotejaron exactamente con revisiones de una sesión ya archivada; excluirlas de cualquier segundo archivo.
+- 6 sesiones pertenecen a otros titulares y 81 sesiones carecen de titular demostrado; no atribuirlas ni archivarlas bajo la cuenta del operador por inferencia.
+- 22 sesiones figuraban ya archivadas; 54 Volcados históricos sin `session_id` también deben excluirse de duplicación.
+- Vercel Blob `khora-audio` fue reportado como `limits-exceeded-suspended`, 636 objetos y 1.010.497.194 bytes. Sus localizadores se conservan; el bloqueo de GET no demuestra pérdida.
+- Las 785 partes B2 de las sesiones de la cuenta tienen marcas históricas de verificación, SHA y bytes en Neon; falta read-back físico actual para certificar el contenido antes de archivar las sesiones correspondientes.
+
+### 17.5 Secuencia y resultados por unidad
+
+1. Conciliar sesiones, texto/checkpoints, audio/partes, MP3, snapshots, objetos y Volcados; confirmar titularidad y excluir lo que ya está archivado.
+2. Archivar las transcripciones sin audio localizado como texto, con `Audio: No localizado` y `Procedencia: No verificada`.
+3. Para audio B2 elegible, leer físicamente cada objeto y cotejar bytes, longitud y SHA-256 antes de crear o completar el archivo.
+4. Procesar las dos sesiones de audio local autorizadas bajo C, transferir a B2, verificar lectura de vuelta y vincularlas, conservando los originales.
+5. Mantener Blob localizado pero suspendido como bloqueo actual; no declarar su contenido inexistente. Mantener aparte los casos de titularidad no probada.
+6. Registrar por unidad los componentes archivados, los vínculos, la evidencia de lectura de vuelta y cualquier componente pendiente. No asignar IDs o resultados antes de que el sistema los devuelva.
+
+Estados de salida: `ARCHIVADO_VERIFICADO`, `PARCIAL_ARCHIVADO`, `BLOQUEADO_AHORA`, `PENDIENTE_TITULARIDAD`, `PENDIENTE_INTEGRIDAD`, `SIN_CONTENIDO_LOCALIZADO` e `IRRESOLUBLE_EN_ESTE_MOMENTO`. El estado se determina por registro y componente; un texto archivado no convierte en archivado el audio bloqueado.
+
+### 17.6 Autoridad, compuertas y acciones de este ciclo
+
+- El control [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json) permanece en generación 11; no se transfirió titularidad ni se alteró su SHA durante este ciclo.
+- La instrucción de objetivo cambia el resultado solicitado y la lista de tareas. No borra las compuertas técnicas aún vigentes para escrituras en Neon Production, idempotencia, integridad y lectura de vuelta. La autorización C sí queda registrada para las dos sesiones locales, pero no se presume que todos los controles de producción estén superados.
+- La salida literal previa preguntó por una ampliación formal del OCP para archivar los registros de la cuenta. En el tramo suministrado no aparece una respuesta afirmativa explícita a esa pregunta completa; por tanto, no se declara concedida esa ampliación adicional ni se eluden las compuertas del control.
+- **Acciones ejecutadas en este ciclo:** persistencia documental y actualización de la lista/expediente/OCP en la rama de trabajo, con lectura de vuelta exacta.
+- **Acciones no ejecutadas en este ciclo:** no se archivó ningún Volcado, no se hicieron escrituras en Neon Production/B2/Vercel Blob, no se descifró audio, no se modificaron código, credenciales, despliegue ni perfiles locales.
+
+### 17.7 Criterio de cierre actualizado
+
+CUSTODIA-01 se resolverá cuando todos los registros archivables con los medios y permisos vigentes hayan quedado archivados y verificados, y únicamente permanezcan registros que en el momento del cierre no puedan archivarse por bloqueos concretos, ausencia de titularidad demostrable o ausencia confirmada de contenido. Todo residual debe identificar el registro/componente, causa actual, evidencia, fuente consultada y condición necesaria para reabrirlo.
+
+La sección 16 y el objetivo exclusivamente inventarial de CUSTODIA-v0.45 quedan preservados como antecedente histórico; esta sección 17 gobierna el objetivo operativo actual.
