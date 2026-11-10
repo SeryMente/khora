@@ -99,7 +99,7 @@
   },
   "session_folio_status": "PENDIENTE/NO ASIGNADO",
   "folio_status_note": "FOL1 no está ACTIVO/verificado en el registro maestro. No se asigna folio SES/CV/CY/A/B.",
-  "transfer_scope": "TRANSFER_RESPONSIBILITY: asumir la responsabilidad documental/operativa del frente para diagnosticar el bloqueo del archivado de Cora/Khora, mantener y mejorar las tareas provisionales, preparar la recuperación de servicio con B2, y diseñar la futura arquitectura multialmacén. La escritura de producto queda limitada a ramas y entornos no productivos hasta aprobación del plan y de sus compuertas. No amplía las exclusiones registradas.",
+  "transfer_scope": "TRANSFER_RESPONSIBILITY: asumir la responsabilidad documental/operativa del frente para diagnosticar el bloqueo del archivado de Cora/Khora, mantener y mejorar las tareas provisionales, preparar la recuperación de servicio con B2, y diseñar la futura arquitectura multialmacén. La escritura de producto queda limitada a ramas y entornos no productivos hasta aprobación del plan y de sus compuertas. No amplía las exclusiones registradas. Adenda posterior CUSTODIA-ARCHIVE-AUTH-20261110: el operador autoriza el archivo de los registros elegibles de su cuenta en Neon Production, el read-back B2 y el procesamiento verificable de las dos sesiones de audio local, conservando exclusiones y controles de integridad.",
   "previous_owner_generation_4": {
     "status": "assigned",
     "owner_thread": null,
@@ -262,6 +262,26 @@
         "No depender de una terminal fija cuando la única conexión RDC accesible haya cambiado."
       ],
       "supersedes": "Esta aclaración sustituye las suposiciones operativas anteriores sobre una terminal RDC fija y cualquier interpretación de MantenimientoRCI como usuario/raíz de materialización. Los addenda históricos se conservan sin reescribir su literal."
+    },
+    {
+      "event": "CUSTODIA-ARCHIVE-AUTH-20261110",
+      "acquired_at": "2026-11-10",
+      "authorization_source": "Respuesta literal del operador a la pregunta explícita que solicitó autorización para procesar 216 fragmentos locales, leer B2/Blob cuando sea posible y crear/vincular Volcados en Neon Production: «Si tienes las autorizaciones que necesias.» Se interpreta como afirmativa en el contexto inmediato y se conserva en originales/INSTRUCCION-AUTORIZACION-ARCHIVO-PRODUCTION-20261110.md.",
+      "original": {
+        "path": "frentes/custodia/originales/INSTRUCCION-AUTORIZACION-ARCHIVO-PRODUCTION-20261110.md",
+        "commit": "071126aa7ff17d8c42ef1345d51bc932b00e0222"
+      },
+      "scope": "Autoriza ejecutar CUSTODIA-01 para archivar los registros elegibles de la cuenta del operador: consulta de checkpoints necesarios, archivo de texto sin audio localizado con procedencia no verificada, lectura física/read-back de objetos B2, procesamiento de 216 fragmentos locales de dos sesiones y copia verificable a B2, creación/vinculación idempotente de Volcados y sesiones en Neon Production, y lectura de Vercel Blob cuando vuelva a ser accesible.",
+      "exclusions": [
+        "No borrar ni sobrescribir originales locales, B2, Blob o Neon.",
+        "No atribuir ni archivar bajo la cuenta del operador registros de otros titulares o sin titularidad demostrada.",
+        "No inspeccionar el perfil Chrome alterno excluido; solo Profile/the.willfreeman@gmail.com en PC10RCIF4EI4.",
+        "No crear Application Keys adicionales ni usar credenciales/cuentas EP.",
+        "No modificar producto, configuración, credenciales o arquitectura fuera de lo indispensable para el archivo autorizado.",
+        "No declarar Blob perdido por suspensión; mantener bloqueado hasta lectura física."
+      ],
+      "native_thread_id": "NOT_EXPOSED",
+      "local_event_uuidv7": "PENDIENTE/NO ASIGNADO"
     }
   ],
   "previous_control_snapshot": {
@@ -405,7 +425,7 @@
     "No modificar credenciales ni variables ajenas a KHORA B2.",
     "No modificar CORS, lifecycle ni políticas de seguridad del bucket salvo necesidad técnica demostrada y autorización específica.",
     "No realizar merge/deploy de producción antes de superar preflight B2, build y pruebas requeridas.",
-    "No ejecutar backfill ni actualización de referencias en Neon Production hasta corregir updateReferences(), demostrar dry-run, transacción, idempotencia y validación del posestado.",
+    "Restricción original de generación 11 sobre SQL/backfill en Neon Production: SUPERADA SOLO PARA EL ARCHIVO DE REGISTROS DE CUSTODIA-01 por la adenda CUSTODIA-ARCHIVE-AUTH-20261110; no se autoriza backfill general ni migración masiva fuera de las unidades elegibles.",
     "No borrar ni sobrescribir objetos originales de Vercel Blob; conservar fuentes hasta aceptación explícita e independiente.",
     "CENTRAL\\\\MantenimientoRCI se utiliza únicamente para elevación y operación RDC; CENTRAL\\\\fila4 es el usuario propietario del entorno. Repositorios, archivos, temporales, logs y demás artefactos se materializan exclusivamente bajo C:\\\\Users\\\\fila4. No suplantar la identidad de fila4, modificar USERPROFILE para fingirla ni usar el perfil elevado como workspace."
   ],
