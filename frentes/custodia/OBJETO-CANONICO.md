@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.38; OBJECT_SEAL=CUSTODIA-v0.38; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.39; OBJECT_SEAL=CUSTODIA-v0.39; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · RESPONSABILIDAD DOCUMENTAL EN GENERACIÓN 11 · CUSTODIA-03/01/04 SIGUEN ABIERTAS · B2 MASTER AUTH + PUT/GET/SHA-256 FÍSICO CONFIRMADOS · VARIABLES CANÓNICAS EN VERCEL PRODUCTION VERIFICADAS · PREFLIGHT B2 PASS · DEPLOYMENT PRODUCTION READY · ARCHIVADO E2E PENDIENTE · SECUENCIA: B2-006 → B2-005 → B2-007 → B2-002 (BACKFILL BLOB→B2) · RES-001/002 DIFERIDAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.38. Metacanon: 1.29. Gobierno metodológico vigente leído: Samantha v386 · NX-386m; GOW 2.18. Fuente central SeryMente/metodologia/main: blob 22dca684830a36dff019b47811d9b800cc9bea0a. La instrucción directa más reciente del operador fija B2 como destino único de nuevas escrituras y ordena copiar posteriormente todo Vercel Blob a B2 sin borrar originales.
+> **ESTADO · VIVO · RESPONSABILIDAD DOCUMENTAL EN GENERACIÓN 11 · CUSTODIA-03/01/04 SIGUEN ABIERTAS · B2 MASTER AUTH + PUT/GET/SHA-256 FÍSICO CONFIRMADOS · VARIABLES CANÓNICAS EN VERCEL PRODUCTION VERIFICADAS · PREFLIGHT B2 PASS · DEPLOYMENT PRODUCTION READY · UNA CAPTURA REAL REPORTADA EN B2 (191/191 PARTES VERIFICADAS) · RECUPERACIÓN TRAS RECARGA NO VERIFICADA · BACKFILL HISTÓRICO BLOB→B2 PENDIENTE Y PRIORIZADO P0 · SECUENCIA: B2-006 (CIERRE DE RECUPERACIÓN) → B2-002 (MIGRACIÓN HISTÓRICA) → B2-005 (DIAGNÓSTICO RESIDUAL) · B2-007/RES-001/002 DIFERIDAS.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.39. Metacanon: 1.29. Gobierno metodológico vigente leído: Samantha v386 · NX-386m; GOW 2.18. Fuente central SeryMente/metodologia/main: blob 22dca684830a36dff019b47811d9b800cc9bea0a. La instrucción directa más reciente del operador fija B2 como destino único de nuevas escrituras y ordena copiar posteriormente todo Vercel Blob a B2 sin borrar originales.
 
 ## 1. Control e identidad
 
@@ -110,7 +110,7 @@ Custodia es el frente transversal que define, verifica y gobierna las garantías
 
 ## 8. Estado vivo
 
-**Estado del frente: CUSTODIA-03 ABIERTA · CUSTODIA-01 EN CURSO · CUSTODIA-04 EN CURSO · CUSTODIA-B2-006 EN CURSO (PRIMER HITO) · CUSTODIA-B2-005 EN CURSO (VERIFICACIÓN RESIDUAL) · CUSTODIA-B2-007/RES-001/RES-002 PENDIENTES. CUSTODIA-02 RETIRADA. GARANTÍAS DE PRODUCTO NO CERTIFICADAS. RESPONSABILIDAD DOCUMENTAL/OPERATIVA EN GENERACIÓN 11.** La secuencia fue aprobada por el operador; el producto no se declara recuperado hasta demostrar archivado y lectura de vuelta.
+**Estado del frente: CUSTODIA-03 ABIERTA · CUSTODIA-01 EN CURSO · CUSTODIA-04 EN CURSO · CUSTODIA-B2-006 EN CURSO (NUEVA ESCRITURA B2 CONFIRMADA EN UNA CAPTURA REAL; RECUPERACIÓN TRAS RECARGA PENDIENTE) · CUSTODIA-B2-002 EN CURSO (P0; SIGUIENTE PRIORIDAD PARA BACKFILL HISTÓRICO) · CUSTODIA-B2-005 EN CURSO (DIAGNÓSTICO RESIDUAL; NO BLOQUEA INVENTARIO/COPIA FÍSICA) · CUSTODIA-B2-007/RES-001/RES-002 DIFERIDAS. CUSTODIA-02 RETIRADA. GARANTÍA DE RECUPERACIÓN COMPLETA Y MIGRACIÓN HISTÓRICA AÚN NO CERTIFICADAS. RESPONSABILIDAD DOCUMENTAL/OPERATIVA EN GENERACIÓN 11.**
 
 ### Autorización B2 Production · 2026-11-09
 
@@ -742,3 +742,18 @@ Se incorpora [GUIA-PERSISTENCIA-B2-MASTER.md](GUIA-PERSISTENCIA-B2-MASTER.md), p
 - Para este build se aisló temporalmente el comando y se omitió `migrate-runtime.mjs`; el Build Command original se restauró en la configuración del proyecto después de iniciarse el build. No se ejecutó SQL ni backfill de Neon en este ciclo.
 - La ruta de código de nuevas escrituras usa `putEncryptedObject` (B2-only y fail-closed), y quedó desplegada; el archivado E2E real con sesión propietaria, vínculo/manifiesto y recuperación tras recarga permanece pendiente. Por tanto, la capacidad productiva está preflight-validada y desplegada, pero la aceptación funcional de archivo no está certificada.
 - No se ha iniciado el backfill histórico Blob→B2 ni se ha cambiado ninguna referencia Neon. Los originales Blob siguen sin borrarse.
+
+
+### Retoma operativa · 2026-11-10 · persistencia nueva B2 y backfill histórico
+
+**Resultado positivo, limitado a una captura real:** la última sesión reportó un registro de 10,052 caracteres, SHA-256 con prefijo `d69033c4` (hash completo informado: `d69033c4876d82a64aa6adc5182c51dab0cd2d02f83a79155de35b970c4704ce`), con 191 partes de audio. La inspección de base de datos comunicada en esa sesión reportó 191/191 partes con destino al bucket `khora-userdata-ecea4187`, metadatos de tamaño/SHA y marca de verificación, 15,617,130 bytes y cero faltantes; estado de registro `en_revision`. Esto constituye evidencia reportada de que la ruta de nuevas escrituras ya archivó una captura real en B2.
+
+**Límites de aceptación:** no se repitió en este ciclo un GET manual independiente ni se verificó la recuperación desde la aplicación tras recarga. No elevar el resultado a certificación general del producto ni cerrar CUSTODIA-B2-006 hasta obtener ese read-back de recuperación. La inspección y los datos descritos proceden de la sesión anterior, no de una nueva consulta de producción en esta actualización.
+
+**Prioridad inmediata siguiente: CUSTODIA-B2-002 (Blob histórico → B2).** La migración física sigue sin comenzar. Línea base read-only reportada en Neon main: 624 URLs Blob en `dictado_audio_parte`, 15 en `dictado_mp3`, 15 en `dictado_mp3_historial`, 37 en `volcado.audio_url`, y 248 referencias individuales dentro de JSONB; 186 sesiones. Estos son conteos de referencias, no cantidad de objetos físicos únicos. También se reportaron 1,360 filas de audio, 1,158 sin `volcado_id`; no clasificarlas como huérfanas por ese solo dato.
+
+**Bloqueos de backfill:** no hay inventario físico paginado completo de Blob ni copia histórica verificada; el ledger `custodia_blob_b2_migration` no existe en Neon main y no se encontró `035_custodia_blob_b2_migration.sql` en main. La función `updateReferences()` revisada en PR #348 no cuenta cada referencia individual de JSONB y no acredita el posestado completo. Corregir y probar ese defecto antes de cualquier actualización de referencias; el inventario read-only y la copia física no destructiva pueden avanzar por separado. No aplicar SQL ni backfill de referencias a Neon Production en este estado.
+
+**Custodia de origen:** Vercel Blob se mantiene intacto. No se ha copiado ningún objeto histórico físico en este corte, no se han cambiado referencias Neon y no se han eliminado originales.
+
+**Secuencia actual:** (1) terminar la prueba de recuperación tras recarga de B2-006; (2) ejecutar inmediatamente inventario y copia física no destructiva de B2-002; (3) corregir/testear ledger y reconciliador antes del cutover de referencias; (4) cerrar diagnóstico residual B2-005 sin bloquear los pasos no destructivos; (5) B2-007 y RES-001/002 permanecen diferidos.
