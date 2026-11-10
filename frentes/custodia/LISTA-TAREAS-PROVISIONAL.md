@@ -1,47 +1,75 @@
-<!-- LIST_VERSION=0.32; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.33; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
-> **Estado:** PROVISIONAL. El único objeto canónico es [OBJETO-CANONICO.md](OBJETO-CANONICO.md); este archivo es el índice ejecutivo de trabajo. Se eliminan de la ejecución activa los planes ya supersedidos. Los registros históricos e instrucciones originales se conservan en sus rutas de evidencia.
+> **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
+> **Actualización:** 2026-11-10 · reenfoque expreso del operador.
+> **Único objetivo activo:** determinar qué dictados/archivos históricos existen y cuáles son recuperables, están bloqueados temporalmente, tienen solo referencia pendiente, son señales sin contenido o son irrecuperables después de agotar las fuentes pertinentes; conciliar ese universo con «Recuperar capturas».
 
-- **Actualización:** 2026-11-10.
-- **Decisión vigente:** persistencia híbrida por generación de objeto.
-- **Instrucción actual:** los objetos históricos que ya residen en Vercel Blob permanecen allí. Cuando Blob no permita leerlos, se muestran individualmente como temporalmente no disponibles y con recuperación/migración pendiente. Toda nueva escritura va exclusivamente a Backblaze B2. La indisponibilidad del legado no bloquea la creación, guardado de texto, checkpoints, edición ni persistencia de contenido nuevo.
-- **Migración histórica:** DIFERIDA. No copiar objetos Blob, no reescribir referencias SQL/JSONB, no ejecutar backfill ni borrar originales hasta que el operador reactive/pague Vercel Blob, se compruebe lectura física y autorice expresamente esa fase.
+**Instrucción literal:** [INSTRUCCION-REENFOQUE-INVENTARIO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-REENFOQUE-INVENTARIO-RECUPERABILIDAD-20261110.md).  
+**Evidencia inicial ya preservada:** [DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md](evidencias/DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md).  
+**Salida literal del ciclo anterior:** [SALIDA-MODELO-CUSTODIA-RECUPERAR-CAPTURAS-CORA-20261110.md](originales/SALIDA-MODELO-CUSTODIA-RECUPERAR-CAPTURAS-CORA-20261110.md).
 
-## 1. Trabajo activo
+## 1. Único trabajo activo
 
-| Orden | ID existente | Prioridad | Estado | Trabajo que sí se ejecutará |
+| Orden | ID existente | Prioridad | Estado | Objetivo |
 |---:|---|---|---|---|
-| 1 | CUSTODIA-B2-006 | P0 | EN CURSO | Cerrar la aceptación E2E autenticada que queda pendiente: crear una captura nueva con sesión KHORA autorizada; verificar que cada parte se escribe en B2 y que la aplicación la recupera después de recarga con longitud y SHA-256 cotejados; demostrar que texto/checkpoints y una sesión mixta con partes Blob legacy temporalmente no disponibles siguen operativos. Production ya está publicada y el preflight B2 de solo lectura pasó; falta esta prueba en navegador autenticado. |
+| 1 | CUSTODIA-01 | P0 | EN CURSO | Inventario forense de dictados recuperables y conciliación del conjunto que debe mostrarse en «Recuperar capturas». |
 
-## 2. Trabajo diferido y condiciones de reanudación
+Detalle: [CUSTODIA-01 · Inventario forense de recuperabilidad](./📁%20🧩%20-%20CUSTODIA-01%20-%20Inventario%20forense%20de%20recuperabilidad/README.md).
 
-| ID existente | Estado | Se reanuda únicamente cuando | Alcance al reanudar |
-|---|---|---|---|
-| CUSTODIA-B2-005 | DIFERIDA | Vercel Blob vuelva a estar activo y el operador pida comprobar el acceso | Verificar lectura/exportación física del legado y documentar su disponibilidad real. |
-| CUSTODIA-B2-002 | DIFERIDA | Blob permita GET, el inventario fuente pueda leerse y el operador autorice expresamente la migración | Diseñar/ejecutar la copia histórica no destructiva a B2, verificar cada objeto y reconciliar referencias en una fase separada. |
-| CUSTODIA-B2-007 | DIFERIDA | Surja deuda técnica concreta después de aceptar el flujo híbrido | Pulido acotado sin reducir controles de integridad. |
-| CUSTODIA-RES-001/002 | DIFERIDAS | Se solicite volver a evaluar resiliencia multiproveedor | Evaluar o implementar un proveedor adicional; no forman parte de esta entrega. |
+## 2. Desglose de fases de CUSTODIA-01
 
-## 3. Otros expedientes existentes
+Las siguientes fases son subunidades internas del expediente existente CUSTODIA-01. No son nuevos expedientes maestros ni folios.
 
-- **CUSTODIA-01, CUSTODIA-03 y CUSTODIA-04:** permanecen con sus estados, identificadores y evidencia existentes. No forman parte del alcance de esta entrega y no se cierran por esta actualización.
-- **CUSTODIA-02:** retirada. Su identificador no se reutiliza.
-- No se crean identificadores nuevos ni se duplican expedientes.
+| Fase | Estado | Alcance |
+|---|---|---|
+| CUSTODIA-01.a | PENDIENTE | Inventario relacional: sesiones, checkpoint_text, revisiones, partes de audio, MP3 actuales/históricos, manifiestos y vínculos a Volcados. |
+| CUSTODIA-01.b | PENDIENTE | Inventario físico remoto: B2, Vercel Blob, objetos huérfanos y prefijos staging; registrar existencia y accesibilidad por objeto. |
+| CUSTODIA-01.c | PENDIENTE | Fuentes locales: IndexedDB del navegador/perfil original, snapshots, revisiones, audios y evidencia local de Aisthesis/Chrome. |
+| CUSTODIA-01.d | PENDIENTE | Conciliación de identidad, hashes, URL, manifiestos, propietarios y exclusión de todo lo ya archivado; deduplicación documentada. |
+| CUSTODIA-01.e | PENDIENTE | Clasificación individual: recuperable ahora, existe bloqueado, referencia sin cotejo físico, señal sin contenido, irrecuperable confirmado o fuente no inspeccionada. |
+| CUSTODIA-01.f | PENDIENTE | Comparar el universo consolidado contra todas las tarjetas/páginas del panel y documentar omisiones, duplicados y conjunto esperado. |
 
-## 4. Criterios de aceptación de CUSTODIA-B2-006
+## 3. Definiciones de estado
 
-1. Toda nueva escritura de contenido de audio usa B2; si B2 falla, falla cerrada y nunca escribe el objeto nuevo en Blob.
-2. Ninguna escritura se registra como verificada hasta completar GET/read-back de B2 y comparar longitud y SHA-256 de los bytes almacenados.
-3. Los objetos Blob antiguos se clasifican por objeto como vercel_blob_legacy, legacy y migration_status=pending; con lecturas suspendidas, muestran temporarily_unavailable y un mensaje que no los declara perdidos ni corruptos.
-4. Una parte B2 nueva sigue siendo utilizable aunque otras partes históricas Blob estén temporalmente no disponibles. La reproducción/descarga que requiera un conjunto incompleto no se presenta como completa.
-5. La indisponibilidad Blob no bloquea texto, checkpoints, nuevas capturas ni edición de texto.
-6. La prueba negativa confirma que un fallo de B2 no produce fallback de escritura a Blob.
-7. Una captura autenticada se archiva en B2, se recarga y se recupera desde B2 con sus referencias, partes, bytes y SHA-256 cotejados. **Estado: PENDIENTE — falta una sesión de navegador KHORA autenticada autorizada.**
-8. **Publicación y build:** PASS. Production `dpl_6M6ebaAvNPpAtRspfX5QhffEJvVJ`, `READY`, `main` SHA `f0224c1368fb15a3452335a44305c6efa85eef79`; preflight B2 de solo lectura PASS; Next build y TypeScript PASS; 78/78 páginas. Preview del mismo código de aplicación SHA `9c171f798c03a24246b6fcff55c3f68a5d073cec`: cuatro suites focales 40 PASS/0 FAIL según el registro de validación, UI Contract y build PASS. **El E2E autenticado no se da por aprobado.**
+- **RECUPERABLE_AHORA:** el contenido existe y una lectura actual autorizada permite obtenerlo.
+- **EXISTE_BLOQUEADO:** existe evidencia del objeto conservado, pero una restricción temporal/proveedor impide leerlo ahora; por ejemplo, Blob suspendido por cuota.
+- **REFERENCIA_SIN_COTEJO_FISICO:** existe una referencia o manifiesto, pero la persistencia física actual aún no está demostrada.
+- **SOLO_SEÑAL_SIN_CONTENIDO:** únicamente hay telemetría o metadatos de captura; no se localizó archivo/contenido.
+- **IRRECUPERABLE_CONFIRMADO:** todas las fuentes pertinentes fueron inspeccionadas y no queda copia recuperable; exige evidencia de búsqueda y descarte.
+- **NO_INSPECCIONADO:** la fuente no se consultó o no fue accesible. Nunca equivale a perdido.
 
-## 5. Exclusiones vigentes
+El estado se determina por componente: texto/checkpoint y cada parte de audio/MP3. En capturas mixtas no se extrapola el estado de un componente al resto. Los objetos bloqueados no se declaran irrecuperables por esa sola causa.
 
-No realizar ahora migración histórica, backfill, actualización de punteros Neon, escrituras SQL de custodia, borrado/sobrescritura de Blob, doble escritura, fallback de escritura a Blob, incorporación de claves nuevas ni cambio de CORS/políticas del bucket. Reactivar lecturas Blob será un cambio operativo separado y explícito; la bandera de lectura legacy permanece desactivada hasta confirmar acceso.
+## 4. Cierre de tareas provisionales anteriores
 
-El estado de una tarea solo avanza con evidencia de la versión exacta probada. Un build READY no equivale a persistencia física ni a aceptación E2E.
+**Disposición:** RESUELTAS ADMINISTRATIVAMENTE POR REENFOQUE. El cierre retira esos trabajos del conjunto activo del frente; no afirma que cada objetivo técnico haya sido ejecutado, probado o aceptado. Sus documentos, código, resultados y límites históricos se conservan sin borrado.
+
+| ID existente | Estado anterior | Disposición actual |
+|---|---|---|
+| CUSTODIA-03 | ABIERTA | RESUELTA POR REENFOQUE; el rescate/restauración de contenido queda fuera. Los candidatos históricos se inventarían como artefactos. |
+| CUSTODIA-04 | EN CURSO | RESUELTA POR REENFOQUE; reparación/certificación del archivado queda fuera. No se declara E2E aprobado. |
+| CUSTODIA-B2-001 | EN CURSO | RESUELTA POR REENFOQUE; la evidencia histórica de implementación se conserva. |
+| CUSTODIA-B2-002 | DIFERIDA | RESUELTA POR REENFOQUE; no se hará migración ni backfill Blob→B2. |
+| CUSTODIA-B2-003 | EN CURSO | RESUELTA POR REENFOQUE; no se ejecutará preflight ni trabajo de seguridad de proveedor como tarea independiente. |
+| CUSTODIA-B2-004 | SUPERSEDIDA | RESUELTA POR REENFOQUE; conserva su condición histórica de supersedida. |
+| CUSTODIA-B2-005 | DIFERIDA | RESUELTA POR REENFOQUE; se conserva el diagnóstico histórico de acceso Blob. |
+| CUSTODIA-B2-006 | EN CURSO | RESUELTA POR REENFOQUE; la aceptación E2E autenticada sigue técnicamente pendiente y no se declara PASS. |
+| CUSTODIA-B2-007 | DIFERIDA | RESUELTA POR REENFOQUE; no se realizará pulido de implementación. |
+| CUSTODIA-RES-001 | PROPUESTA PENDIENTE | RESUELTA POR REENFOQUE; no se diseñará resiliencia multialmacén en este alcance. |
+| CUSTODIA-RES-002 | PROPUESTA PENDIENTE | RESUELTA POR REENFOQUE; no se implementará ni certificará resiliencia multialmacén en este alcance. |
+
+**CUSTODIA-02:** continúa RETIRADA; no se reactiva ni se reutiliza su identificador.  
+**CUSTODIA-01:** único expediente activo. No se crea CUSTODIA-05 ni se generan nuevos identificadores maestros.
+
+## 5. Exclusiones y límites del trabajo activo
+
+No auditar la resiliencia general del producto; no probar nuevos dictados, escenarios de fallo ni flujos E2E; no reparar código, interfaz, datos o proveedor; no recuperar/restaurar contenido; no reclamar propietarios; no migrar/backfill; no actualizar referencias; no borrar ni sobrescribir objetos.
+
+Se permiten únicamente lecturas e inventarios necesarios para determinar la existencia y recuperabilidad actuales de artefactos históricos, dentro de las autorizaciones disponibles. Si una fuente o un objeto no puede inspeccionarse, quedará expresamente NO_INSPECCIONADO o EXISTE_BLOQUEADO, nunca se supondrá su ausencia.
+
+## 6. Criterio único de cierre de CUSTODIA-01
+
+El frente se considerará resuelto cuando el inventario de todas las fuentes pertinentes esté cotejado, cada unidad de contenido tenga clasificación justificada, los archivos ya archivados estén excluidos sin duplicación y la lista esperada del panel coincida con sus tarjetas/páginas observadas. Las fuentes inaccesibles deben seguir identificadas como pendientes/bloqueadas; no se inventa un cierre de irrecuperabilidad.
+
+La resolución de CUSTODIA-01 no requiere reparar ni modificar el producto. El resultado es documental: saber qué archivos sobreviven y cuáles pueden recuperarse hoy.
