@@ -1,4 +1,4 @@
-<!-- LIST_VERSION=0.36; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.37; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
@@ -30,6 +30,7 @@ Las fases son subunidades internas del expediente existente, no nuevos expedient
 | CUSTODIA-01.d | BLOQUEADA POR ACCESO AL RUNTIME AUTENTICADO | Procesar las 216 partes locales de dos sesiones conforme a autorización C, copiarlas a B2 con read-back y preservar originales. |
 | CUSTODIA-01.e | EN CURSO | Registrar como bloqueados los Blob suspendidos, referencias sin read-back y registros sin titularidad demostrada; no declarar pérdida. |
 | CUSTODIA-01.f | PENDIENTE | Verificar cada Volcado, retirar del pendiente lo archivado y dejar solo residuales actualmente no archivables con evidencia. |
+| CUSTODIA-01.g | EN CURSO | Localizar acceso criptográfico seguro al runtime KHORA: EP Vault DPAPI/notas y la bóveda KHORA; preservar ciphertext y no revelar valores. |
 
 ## 3. Estados de salida
 
@@ -90,3 +91,12 @@ Revalidación de solo lectura: 78 sesiones pendientes de la cuenta; 44 con audio
 Bloqueo: el conector Vercel redacciona `X_KHORA_KEY` y las dos variables maestras B2 (`decrypted=false`); las rutas canónicas exigen sesión autenticada. No se hicieron escrituras manuales en Neon porque omitirían `guardarDictado()` y su sellado/idempotencia. Vercel Blob sigue suspendido. No se archivó ningún Volcado en este intento.
 
 La autorización está concedida; el impedimento actual es el acceso seguro al runtime KHORA autenticado/secretos. Continuar desde ese contexto sin pedir una nueva autorización al operador.
+
+
+## 9. Recuperación segura de la llave de KHORA · 2026-11-10
+
+Se documentó que X_KHORA_KEY protege checkpoints, snapshots, Volcados y audio; no es la contraseña maestra EP. El runbook histórico vincula KHORA_API_KEY como alias de X_KHORA_KEY, pero no se verificó que el valor cifrado de la bóveda KHORA coincida con producción.
+
+Se localizaron ciphertext de EP Vault en la ruta local y en respaldos R1/R2. No hay DPAPI/session activa ni notas recuperables localizadas; la GUI EP Vault permanece sellada. No probar contraseñas ni sobrescribir bóvedas.
+
+Siguiente paso autorizado: si el operador recuerda la contraseña EP, introducirla localmente en la GUI; listar nombres sin revelar valores y utilizar KHORA_API_KEY mediante proceso hijo con allowlist exacta; si no, mantener ciphertext y respaldos intactos. Evidencia: evidencias/LOCALIZACION-CLAVE-KHORA-EPVAULT-20261110.md.
