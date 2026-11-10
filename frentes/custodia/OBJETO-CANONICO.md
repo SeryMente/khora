@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.48; OBJECT_SEAL=CUSTODIA-v0.48; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.49; OBJECT_SEAL=CUSTODIA-v0.49; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.48. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.49. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -964,3 +964,40 @@ Consulta de solo lectura sobre Neon Production (proyecto `still-sunset-02412999`
 Reanudar desde el runtime KHORA autenticado para ejecutar el flujo existente, sin extraer secretos al chat: (1) archivar las 27 sesiones con texto candidato y sin audio, registrando `Audio: No localizado` y `Procedencia: No verificada`; (2) transferir las dos sesiones locales a B2 y verificar cada parte; (3) leer y archivar las partes B2 elegibles; (4) dejar Blob temporalmente bloqueado y los titulares no demostrados fuera de la cuenta; (5) leer de vuelta cada Volcado y vínculo. Procesar en lotes y aislar fallos por unidad.
 
 La sección 18 conserva la autorización y política de eficiencia; esta sección 19 registra el estado real del primer intento de ejecución.
+
+
+## 20. Recuperación de llave KHORA y búsqueda de bóveda EP · 2026-11-10 · CUSTODIA-v0.49
+
+### 20.1 Instrucción y marco
+El operador pidió localizar X_KHORA_KEY, comprobar si la bóveda anterior de EP o sus reconstrucciones podían dar acceso, consultar EP-ARCHITECTURE.md y continuar sin perder tiempo. La instrucción literal se conserva en originales/INSTRUCCION-LOCALIZACION-CLAVE-KHORA-EPVAULT-20261110.md; la evidencia de búsqueda sin secretos está en evidencias/LOCALIZACION-CLAVE-KHORA-EPVAULT-20261110.md.
+
+### 20.2 Identidad y función de la variable
+X_KHORA_KEY es la raíz criptográfica de KHORA Web que cifra/descifra checkpoints, snapshots, textos de Volcado y envelopes de audio/bytes (AES-256-GCM, módulo khora-web/lib/server/cripto.ts). No es la contraseña maestra EP ni la contraseña de LastPass.
+
+El runbook histórico docs/deploy-01-runbook.md documenta que KHORA_API_KEY se ingresa como alias X_KHORA_KEY en Vercel. La bóveda KHORA local conserva una entrada cifrada con nombre KHORA_API_KEY; no se ha descifrado ni se ha comprobado que su valor coincida con producción. La equivalencia es una hipótesis de procedencia documentada por el runbook, no una verificación criptográfica actual.
+
+### 20.3 Arquitectura EP canónica
+EP-ARCHITECTURE.md es una redirección de compatibilidad (blob a906f57f7eab5bd948ec7272cad3d2e2d3ce9b18). La fuente normativa real es ep-medio-architectura.md, consultada como Entorno Persistente Medio v1.0.4 · NX-326m, blob 382e4a929a984a96926fd6f9080f80bedd109a0b. La mención v1.0.1 del archivo redirección está obsoleta. El contrato separa llave de bóveda EP, token de sesión KHORA, PAT GitHub y VERCEL_TOKEN; no deben intercambiarse.
+
+### 20.4 Bóveda KHORA y sus límites
+El archivo local secrets/env-vault.enc.json está presente (3.607 bytes) y la historia GitHub consultada conserva nueve nombres de entrada, incluidos KHORA_API_KEY, VERCEL_TOKEN y credenciales Neo4j. No contiene una entrada llamada X_KHORA_KEY. El archivo sigue cifrado con el esquema KHORA y no se ha descifrado. No se presume que contenga una llave vigente.
+
+### 20.5 EP Vault reconstruida y copias
+- La bóveda EP actual está en C:\Users\fila4\Desktop\SeryMente\EP-Vault\ep-env-vault.enc.json (2.048 bytes).
+- Los respaldos EP R1 y R2 del 10-nov conservan ciphertext: R1 24.151.023 bytes / 442 entradas; R2 119.076.640 bytes / 3.289 entradas. Incluyen la bóveda base de 2.048 bytes y snapshots locales de 2.156 bytes (R1) y 2.200 bytes (R2).
+- Las copias consultadas comparten el esquema ep-env-vault/1, PBKDF2-HMAC-SHA256 de 600.000 iteraciones y la misma huella abreviada de sal 86DC60D97AA6. Los respaldos declaran secretValuesRead=false; no se inspeccionó el plaintext.
+- R2 excluyó los respaldos históricos .pre-*.bak, journals, locks y archivos de sesión DPAPI. No se encontraron esos respaldos ni archivos DPAPI en las rutas actuales consultadas; su exclusión del ZIP no prueba destrucción global.
+
+### 20.6 Acceso DPAPI y estado operativo
+La implementación EP espera una sesión local DPAPI CurrentUser, con TTL limitado, asociada al usuario Windows y ruta de la bóveda. El diagnóstico de 10-nov 21:18Z reportó sessionFileExists=false, sessionActive=false, VAULT_SESSION_NOT_OPEN. No se localizaron vault-key.dpapi, vault-key.guardian.dpapi, vault-agent-master.dpapi.json, sesión compartida vigente ni notas locales *.note.json en las rutas inspeccionadas.
+
+La GUI EP Vault permanece disponible, bajo CENTRAL\fila4, pero en estado SELLADA. Una lectura anterior de 10-nov 15:57Z mostró acceso temporal a 18 nombres durante una sesión ya expirada; no acredita disponibilidad presente.
+
+### 20.7 Decisión y siguiente paso seguro
+- No hacer fuerza bruta ni adivinar contraseñas; no solicitar ni recibir la contraseña maestra en el chat.
+- No reinicializar, rotar, sustituir ni sobrescribir ninguna de las dos bóvedas, ciphertext o respaldos.
+- Si el operador recuerda la contraseña maestra EP, introducirla exclusivamente en la GUI local. Después, listar nombres/metadata sin revelar valores y usar KHORA_API_KEY solo a través de un proceso hijo con allowlist exacta, sin argumentos/logs/salida que contengan secretos.
+- Si no recuerda la contraseña EP, mantener las copias cifradas preservadas. La búsqueda local no halló sesión DPAPI utilizable. La recuperación de LastPass queda fuera de las herramientas/repositorios consultados.
+- Esta búsqueda no archivó ningún Volcado ni transfirió B2; el bloqueo de ejecución CUSTODIA-01 sigue siendo el acceso autenticado y seguro al runtime KHORA.
+
+La sección 19 preserva el resultado del primer intento de archivo; esta sección 20 incorpora la búsqueda de bóvedas y el estado de recuperación de credenciales sin alterar la autorización ni el objetivo principal del frente.
