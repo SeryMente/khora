@@ -1,4 +1,4 @@
-<!-- TASK_VERSION=0.4; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
+<!-- TASK_VERSION=0.5; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
 # CUSTODIA-01 · Archivo de todos los registros recuperables
 
 > **Estado:** EN CURSO · **Prioridad:** P0 · **Único expediente activo del frente CUSTODIA.**  
@@ -113,3 +113,14 @@ Revalidación Neon: 78 sesiones pendientes; 44 con audio remoto (1.039 partes: 7
 **Bloqueo:** el conector Vercel oculta los valores sensibles de `X_KHORA_KEY` y de la Master Application Key B2 (`decrypted=false`); las rutas canónicas requieren sesión autenticada. No se hicieron inserciones manuales en Neon porque eludirían el flujo de `guardarDictado()`. Blob sigue suspendido. Ningún Volcado nuevo fue creado en este intento.
 
 La autorización del operador está registrada y no necesita repetirse. La próxima acción es ejecutar el archivo desde el runtime KHORA autenticado, manteniendo los controles mínimos y agrupando lotes.
+
+
+## 9. Localización de la clave KHORA y bóvedas EP
+
+X_KHORA_KEY es la clave criptográfica de KHORA Web, independiente de la contraseña maestra de EP Vault y LastPass. El runbook histórico indica que KHORA_API_KEY se provisiona como alias X_KHORA_KEY; la bóveda KHORA contiene ese nombre, pero sigue cifrada y no se verificó que el valor coincida con producción.
+
+Se localizaron la bóveda EP y copias cifradas R1/R2. La arquitectura efectiva es ep-medio-architectura.md v1.0.4 / NX-326m; EP-ARCHITECTURE.md es solo una redirección. No se localizó sesión DPAPI vigente ni notas DPAPI en las rutas inspeccionadas; la GUI EP Vault está disponible pero SELLADA. No se realizó fuerza bruta ni se sobrescribió ciphertext.
+
+Siguiente paso seguro: si el operador recuerda la contraseña EP, introducirla en la GUI local; después consultar nombres de variables sin revelar valores y usar KHORA_API_KEY en un proceso hijo de allowlist exacta. Nunca copiar la contraseña maestra al chat ni imprimir los valores. La evidencia está en evidencias/LOCALIZACION-CLAVE-KHORA-EPVAULT-20261110.md.
+
+Esta búsqueda no constituye archivo de datos CUSTODIA ni elimina el bloqueo de ejecución del objetivo principal.
