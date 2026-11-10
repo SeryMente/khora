@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.49; OBJECT_SEAL=CUSTODIA-v0.49; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.50; OBJECT_SEAL=CUSTODIA-v0.50; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.49. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.50. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1001,3 +1001,39 @@ La GUI EP Vault permanece disponible, bajo CENTRAL\fila4, pero en estado SELLADA
 - Esta búsqueda no archivó ningún Volcado ni transfirió B2; el bloqueo de ejecución CUSTODIA-01 sigue siendo el acceso autenticado y seguro al runtime KHORA.
 
 La sección 19 preserva el resultado del primer intento de archivo; esta sección 20 incorpora la búsqueda de bóvedas y el estado de recuperación de credenciales sin alterar la autorización ni el objetivo principal del frente.
+
+
+## 21. Interfaz Seguridad KHORA, restablecimiento de PIN y acceso delegado · 2026-11-10 · CUSTODIA-v0.50
+
+### 21.1 Estado observado
+El operador compartió la salida de Seguridad → Control MCP / Bóveda / Entorno Persistente. Copia saneada: originales/SALIDA-INTERFAZ-SEGURIDAD-BOVEDA-20261110.md. Evidencia técnica: evidencias/ESTADO-BOVEDA-WEB-KHORA-20261110.md.
+
+- Control MCP generación #1; refresh OAuth visible 20/10/2026. Dos Bearer Tokens manuales activos con scopes efectivos runtime:read, volcados:read, norm:turn; último uso Nunca. No son credenciales EP y no se utilizarán ni revocarán.
+- Bóveda web KHORA CERRADA, sesión 30 minutos.
+- Capacidad local canonical-vault: 1 emitida, 0 activas, 1 expirada. No hay capacidad vigente observada; no se emitió una nueva.
+- Entorno Persistente muestra catálogo no cargado y dos repositorios seleccionados. No se pulsó Preparar Entorno Persistente ni se ejecutó el bootstrap.
+
+### 21.2 Semántica de Restablecer PIN
+Se verificó el código de main:
+- PaginaBoveda.tsx blob 10f435f666076bca494f81bda2cf89e66e59ff12.
+- API boveda route blob afb2f6e7e400792a4d8233e9fd0cdc5b0c3ce1ab.
+- boveda.ts blob e7d904d1376e717bb4fdcf65907c68ccad3c8184.
+
+Restablecer PIN envía POST /api/boveda con reset=true. El servidor define un hash Scrypt y sal nuevos en boveda_pin y entrega cookie temporal por 30 minutos. Esto sustituye el PIN, pero no rota X_KHORA_KEY, no re-cifra credenciales, no cambia ciphertext ni crea llave EP. Puede recuperar la sesión web; no puede recuperar por sí solo la llave criptográfica. La operación no fue ejecutada por este frente.
+
+### 21.3 Credenciales GitHub y X_KHORA_KEY
+El panel GithubSecretsPanel.tsx blob 8fb93fc6d3c3ea832fd25e80f3aabb61340433f separa los usos norm y ep. GET /api/security/github-credentials devuelve solo configured y updatedAt; no muestra tokens.
+
+La lectura real del secreto ep requiere POST /api/ep/github-credential con sesión EP scopes ep:bootstrap y ep:github:read, y sujeto igual al propietario. Los Bearer Tokens manuales observados no incluyen esos scopes y no deben reutilizarse como tokens EP.
+
+El servidor cifra y descifra github_credentials usando X_KHORA_KEY vía cripto.ts. Por ello, un reset de PIN puede abrir la UI pero no corrige una clave ausente o divergente. No probar rotación ni re-cifrado sin procedimiento autorizado y backup validado.
+
+### 21.4 Decisiones operativas
+1. No revocar los dos Bearer Tokens manuales MCP ni el refresh OAuth.
+2. No pulsar revocación global, no emitir tokens MCP nuevos y no confundirlos con capacidad canonical-vault.
+3. El operador puede restablecer el PIN desde la UI web, eligiendo el nuevo PIN localmente y sin comunicarlo al chat. El cambio solo reemplaza el PIN; es una operación de usuario, no ejecutada desde el frente.
+4. Después, consultar únicamente el estado de los usos norm y ep (configurado/ausente y fecha). No revelar ni copiar valores.
+5. Si ep está configurado, intentar su flujo de lectura autenticado y registrar solo éxito/error. Si falla GITHUB_VAULT_UNAVAILABLE, conservar ciphertext y tratar X_KHORA_KEY como bloqueo.
+6. El objetivo primario sigue siendo archivar registros por las rutas KHORA autenticadas. No considerar el panel MCP como sustituto.
+
+La sección 20 conserva la localización de bóvedas EP y KHORA; esta sección 21 añade la semántica de PIN y la vía de lectura de metadatos sin alterar la autorización de archivo ni las exclusiones.
