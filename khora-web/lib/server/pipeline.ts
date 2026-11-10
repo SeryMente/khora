@@ -296,7 +296,7 @@ export async function obtenerPipelineAggregated(usuario?: string): Promise<Pipel
       audioBytes = audioPartesJson.reduce((sum: number, p: any) => sum + (p.bytes || 0), 0);
     }
 
-    let audioStatus: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable" | "no_aplica" = "no_aplica";
+    let audioStatus: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable" | "no_aplica" | "temporalmente_no_disponible" = "no_aplica";
     if (hasAudio) {
       if (sessionId || v.audio_url) {
         if (sesionObj?.total_partes && partesCount < sesionObj.total_partes) {
