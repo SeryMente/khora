@@ -221,12 +221,16 @@ Antes de declarar cumplido, ejecutar con identidad y almacenes de prueba:
 | Chrome sin confirmación final | No sellar integridad desconocida | Pendiente extensión |
 | Copia y restauración | Restaurar objetos, filas, versiones y claves | Pendiente ensayo real |
 | Producción | SHA exacto desplegado y flujo completo | NO CERTIFICADO |
+| Nueva escritura de audio | PUT B2 + GET/read-back autenticado; longitud y SHA-256 idénticos | Pendiente de validación sobre el commit publicado |
+| Blob histórico inaccesible | Estado por archivo `temporarily_unavailable`/`migration_status=pending`; sin declararlo perdido/corrupto | Pendiente de smoke test de interfaz/API |
+| Sesión mixta Blob+B2 | Partes B2 utilizables; no fingir audio completo si falta una parte Blob; texto/checkpoints continúan | Pendiente de E2E autenticado |
+| Fallo de B2 | Fallo cerrado, sin fallback de escritura a Blob | Pendiente de prueba negativa E2E |
 
 ## 15. Registro de brechas y siguiente trabajo
 
 Inventario histórico del primer corte (conservado para trazabilidad). El estado vigente fila por fila está en §21; no interpretar como pendientes intactos los puntos implementados después. La rama no se considera cierre universal mientras sus compuertas materiales permanezcan abiertas:
 
-1. Certificación con PostgreSQL/Blob/navegador y commit productivo identificado.
+1. Certificación con PostgreSQL/Backblaze B2/navegador y commit productivo identificado; los fixtures legacy Blob solo comprueban clasificación/indisponibilidad mientras el origen siga suspendido.
 2. Cola automática durable de títulos y ejecución eventual verificable.
 3. Reconciliación programada de trabajos MP3 estancados y reconstrucción del catálogo histórico sin trabajo registrado.
 4. Conversión de capturas mayores al límite actual sin perder originales ni truncar audio.
@@ -352,14 +356,14 @@ El MP3 puede representar un prefijo verificado. Listado, lectura y cabeceras deb
 
 | Fila original de §15 | Cambio de este ciclo | Qué falta para certificación universal |
 | --- | --- | --- |
-| 1 · Integración y producción | Suite ampliada y ensayos aislados separados por frontera | PostgreSQL/Blob/Notion reales, identidad de commit desplegado y recuperación extremo a extremo |
+| 1 · Integración y producción | Suite ampliada y ensayos aislados separados por frontera | PostgreSQL/B2/Notion reales, identidad del commit desplegado y recuperación E2E; Blob legacy solo se vuelve a leer tras reactivación y autorización |
 | 2 · Títulos durables | Cola transaccional, reintentos y protección de título humano | Proveedor real y ejecutor supervisado activo |
 | 3 · MP3/histórico | Descubrimiento de sesiones verificadas sin trabajo, backoff e historial inmutable | Certificar catálogo real, excluir dueños indeterminados y activar ejecutor |
 | 4 · Capturas largas | Se conservan originales; error explícito y límite documentado | Proceso largo/streaming medido para >128 MiB y límites del proveedor |
 | 5 · Chrome/Aisthesis | Compuerta exige cierre con sesión, cuenta final y todas las partes verificadas | Persistencia propia de extensión, manifiesto final con cuenta exacta y ACK estricto; la extensión actual no emite el manifiesto final: el cierre queda bloqueado explícitamente, no se finge compatibilidad |
 | 6 · Autorización heredada | Guardas de propietario en principales rutas de custodia y pipeline | Barrido completo de herramientas textuales y demás endpoints heredados |
 | 7 · Espejo | Cola durable, identidad exacta, texto sin pérdida, paginación y relectura | Integración Notion real, presupuesto para textos extraordinarios y garantía operativa del ejecutor |
-| 8 · Respaldo | Ensayo aislado de restauración de datos cifrados y necesidad de clave | Restaurar base, Blob y claves de un entorno real independiente; definir retención y supervisión |
+| 8 · Respaldo | Ensayo aislado de restauración de datos cifrados y necesidad de clave | Restaurar base, B2, Blob histórico y claves en un entorno real independiente; definir retención y supervisión |
 | 9 · Fallos del navegador | IndexedDB real, carreras de clave y pruebas de recarga/red sintéticas | Cuota agotada, perfil privado, cierre forzado y conflictos semánticos entre pestañas soportadas |
 | 10 · Revisión humana | Catálogo/contratos estáticos y prueba de interacción automatizada | Operador presente: interfaz, seguridad y decisión de liberación |
 | 11 · No pulsar Archivar | Reconciliador genera MP3 de prefijos abiertos y reconstruye completo al sellar | Ejecutor activo, verificación física continua y catálogo manual de todas las sesiones abiertas |
