@@ -1,4 +1,4 @@
-<!-- TASK_VERSION=0.3; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
+<!-- TASK_VERSION=0.4; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
 # CUSTODIA-01 · Archivo de todos los registros recuperables
 
 > **Estado:** EN CURSO · **Prioridad:** P0 · **Único expediente activo del frente CUSTODIA.**  
@@ -104,3 +104,12 @@ CUSTODIA-01 se resuelve cuando todos los registros elegibles están archivados y
 La autorización específica de ejecución quedó confirmada por el operador en respuesta a la pregunta formal previa. Se conserva el literal y contexto en el OCP-v0.47 y en el original vinculado. La tarea puede avanzar con escrituras de archivo en Neon Production para registros elegibles, procesamiento de los 216 fragmentos locales y operaciones B2 incluidas en el alcance.
 
 La optimización solicitada consiste en minimizar llamadas y rondas redundantes, agrupar lecturas y lotes, reutilizar evidencia de integridad cuando corresponda al mismo objeto inmutable y aislar fallos por registro. La calidad se conserva mediante controles críticos: titularidad, deduplicación, integridad de copias, idempotencia, lectura de vuelta y preservación de originales. No se realizan reparaciones generales ni pruebas de resiliencia.
+
+
+## 8. Ejecución autorizada · resultado del primer intento
+
+Revalidación Neon: 78 sesiones pendientes; 44 con audio remoto (1.039 partes: 785 B2 y 254 Blob); 34 sin partes remotas, de las que dos tienen audio local (216 fragmentos) y 32 no tienen audio local/remoto localizado. En estas 32, 27 tienen SHA de texto no vacío/no compuesto solo por salto de línea y son candidatas a archivo textual; cinco no muestran texto significativo por SHA. No se descifró contenido.
+
+**Bloqueo:** el conector Vercel oculta los valores sensibles de `X_KHORA_KEY` y de la Master Application Key B2 (`decrypted=false`); las rutas canónicas requieren sesión autenticada. No se hicieron inserciones manuales en Neon porque eludirían el flujo de `guardarDictado()`. Blob sigue suspendido. Ningún Volcado nuevo fue creado en este intento.
+
+La autorización del operador está registrada y no necesita repetirse. La próxima acción es ejecutar el archivo desde el runtime KHORA autenticado, manteniendo los controles mínimos y agrupando lotes.
