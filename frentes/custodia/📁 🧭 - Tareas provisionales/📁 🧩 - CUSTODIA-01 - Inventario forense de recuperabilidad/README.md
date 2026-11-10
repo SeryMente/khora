@@ -1,4 +1,4 @@
-<!-- TASK_VERSION=0.2; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
+<!-- TASK_VERSION=0.3; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
 # CUSTODIA-01 · Archivo de todos los registros recuperables
 
 > **Estado:** EN CURSO · **Prioridad:** P0 · **Único expediente activo del frente CUSTODIA.**  
@@ -89,11 +89,18 @@ Los estados se asignan por registro y por componente; no se infiere el estado de
 - No reparar código, UI, proveedor o datos como parte de este objetivo. Si el archivo requiere una modificación de producto no comprendida en el control vigente, documentar el bloqueo y no implementarla por inferencia.
 - No migrar el histórico Vercel Blob a B2 como tarea de proveedor independiente; el objetivo es archivar registros elegibles. Los objetos Blob bloqueados permanecen intactos.
 - No borrar ni sobrescribir fuentes locales, B2, Blob o Neon.
-- El control generación 11 y sus compuertas de producción siguen vigentes. Esta actualización cambia el objetivo del expediente, pero no elimina gates de escritura en Neon Production, idempotencia, integridad ni read-back.
-- La decisión C del operador autoriza procesar las dos sesiones de audio local y su copia verificable; la ejecución sigue sujeta a las compuertas técnicas y de producción registradas.
+- La respuesta afirmativa del operador a la ampliación de autorización se registra en el OCP-v0.47 y en `CONTROL-RESPONSABILIDAD.json`, generación 11. Autoriza ejecutar el archivo de las sesiones elegibles de su cuenta, incluidas las escrituras de archivo en Neon Production, los read-back B2 y el procesamiento de las dos sesiones locales, dentro de este expediente.
+- La autorización no permite borrar/sobrescribir originales, atribuir otros titulares, inspeccionar el perfil Chrome excluido, crear claves B2 adicionales ni mezclar credenciales EP.
+- Eficiencia: agrupar consultas y lotes; reutilizar cotejos trazables de objetos inmutables; continuar ante fallos individuales. No omitir titularidad, no duplicación, SHA/longitud/bytes al copiar, idempotencia, read-back del archivo y preservación de fuentes.
 
 ## 6. Criterio de cierre
 
 CUSTODIA-01 se resuelve cuando todos los registros elegibles están archivados y verificados, los ya archivados/duplicados están excluidos y solo quedan registros imposibles de archivar en el momento del cierre por bloqueos concretos y documentados, falta de titularidad o ausencia confirmada de contenido. Los bloqueos temporales se describen como actuales, no como pérdidas definitivas.
 
 **Resultado final requerido:** archivo máximo no destructivo de todo lo recuperable con los medios y permisos vigentes, acompañado de una relación exacta de los únicos residuales que no se pueden archivar ahora.
+
+## 7. Autorización operativa y eficiencia
+
+La autorización específica de ejecución quedó confirmada por el operador en respuesta a la pregunta formal previa. Se conserva el literal y contexto en el OCP-v0.47 y en el original vinculado. La tarea puede avanzar con escrituras de archivo en Neon Production para registros elegibles, procesamiento de los 216 fragmentos locales y operaciones B2 incluidas en el alcance.
+
+La optimización solicitada consiste en minimizar llamadas y rondas redundantes, agrupar lecturas y lotes, reutilizar evidencia de integridad cuando corresponda al mismo objeto inmutable y aislar fallos por registro. La calidad se conserva mediante controles críticos: titularidad, deduplicación, integridad de copias, idempotencia, lectura de vuelta y preservación de originales. No se realizan reparaciones generales ni pruebas de resiliencia.
