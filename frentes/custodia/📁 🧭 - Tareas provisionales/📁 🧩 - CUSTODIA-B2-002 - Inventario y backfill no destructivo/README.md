@@ -114,3 +114,48 @@ Se reportaron también 1,360 filas en `dictado_audio_parte`, 76 filas `volcado`,
 La captura de 10,052 caracteres con 191 partes reportada en la última sesión quedó asociada al bucket `khora-userdata-ecea4187`; sirve como evidencia de que la nueva ruta B2 persiste una captura, pero no demuestra que los objetos históricos Blob se hayan inventariado o copiado. El backfill de esta tarea sigue en cero objetos copiados/verificados hasta que exista manifest físico y read-back comprobable.
 
 **Bloqueo real:** hoy falta el inventario físico Blob y no existe la estructura de ledger 035 en main; además debe corregirse/testearse el reconciliador JSONB. Ningún original se retira durante este proceso.
+
+## Corte operativo verificado · 2026-11-10 · inventario completo, descargas bloqueadas
+
+### Evidencia del almacén Vercel Blob
+
+- Store conectado a khora-web: khora-audio · ID store_VyX9EI8q6DKhp4RV · región iad1 · acceso public.
+- Estado Vercel: limits-exceeded-suspended · billingState=suspended · usageQuotaExceeded=true.
+- Metadatos Vercel: 636 objetos físicos y 1,010,497,194 bytes.
+- El listado paginado terminó correctamente en una sola página: 636/636 objetos, sin cursor pendiente. Es inventario físico del store conectado al proyecto, no un conteo deducido de Neon.
+- Descarga por SDK: 5/5 muestras fallidas con blob_read_forbidden.
+- Descarga alternativa por URL pública/CDN: 5/5 muestras fallidas con blob_read_forbidden.
+- No se leyeron bytes: sourceRead=0 y sourceBytes=0. No es posible calcular SHA-256 de origen ni transferir estos objetos mientras Vercel niegue GET.
+
+### Estado de transferencia
+
+| Control | Resultado |
+|---|---:|
+| Objetos físicos inventariados | 636 |
+| Bytes inventariados | 1,010,497,194 |
+| Objetos descargados | 0 |
+| Objetos copiados a B2 | 0 |
+| Objetos con read-back B2 | 0 |
+| Referencias Neon actualizadas | 0 |
+| Originales Blob eliminados/sobrescritos | 0 |
+
+La ruta nueva de transferencia física está en la rama feat/custodia-blob-physical-b2-backfill-20261110. putMigratedBlobObject() crea claves deterministas en khora/legacy/vercel-blob/, rechaza conflictos, conserva bytes arbitrarios y verifica el destino mediante GET B2, tamaño y SHA-256. migrate_blob_physical_to_b2.ts pagina objetos, cruza referencias SQL/JSONB y prepara manifiesto; no modifica punteros Neon. La implementación aún no está fusionada y la suite unitaria completa no tiene resultado PASS en este corte.
+
+### Bloqueo externo y acción requerida
+
+El store público también devuelve 403 al solicitar URLs directas; cambiar de SDK no evita el bloqueo. La documentación oficial de Vercel indica que, en Hobby, al exceder límites de Blob se pierde el acceso y debe transcurrir el periodo de restablecimiento de 30 días. No se obtuvo blockedUntil para este store y no se asigna fecha de reactivación. Solicitar a Vercel una reactivación temporal de solo lectura o una vía de exportación del contenido existente. No crear un store nuevo como sustituto del origen ni borrar el original.
+
+Datos para la solicitud a Vercel:
+- Proyecto KHORA khora-web, ID prj_hRN86BKITXYKTnNlp0ygVhaMwFfx.
+- Store khora-audio, ID store_VyX9EI8q6DKhp4RV.
+- Estado limits-exceeded-suspended; cuota excedida; acceso público.
+- Inventario: 636 objetos, 1,010,497,194 bytes.
+- Solicitud: habilitar temporalmente GET/exportación de solo lectura para copiar objetos a Backblaze B2 y verificar SHA-256. No se solicita escritura, borrado ni continuidad de nuevas cargas en Blob.
+
+### Neon y Production
+
+- Neon main, consultado en solo lectura: 188 sesiones, 1,935 filas de partes, 624 URLs Blob en dictado_audio_parte, 15 en dictado_mp3, 15 en dictado_mp3_historial, 37 en volcado.audio_url y 172 ocurrencias JSONB individuales. Son referencias lógicas, no objetos físicos.
+- Rama aislada: custodia-blob-b2-migration-20261110 (br-proud-sunset-ahyr9w0p). El ledger 035 existe allí y tiene 0 filas; no equivale a aplicar la migración en Production.
+- Neon Production no tiene custodia_blob_b2_migration; no se han ejecutado SQL/backfill de referencias ni cambios de punteros productivos.
+- Deployment Production dpl_6hUVD7LBXqtmnaMw2nfH2wwyrHUp sigue READY; los Secrets B2 permanecen configurados. Los Preview de diagnóstico fueron cancelados tras emitir el probe y no se promovieron a Production.
+- No borrar, sobrescribir ni eliminar versiones del store Blob. Reanudar la transferencia solo cuando Vercel permita leer los bytes. Tras copiar y verificar todos los objetos, seguir con ledger y reconciliación JSONB en rama aislada antes de cambiar referencias productivas.
