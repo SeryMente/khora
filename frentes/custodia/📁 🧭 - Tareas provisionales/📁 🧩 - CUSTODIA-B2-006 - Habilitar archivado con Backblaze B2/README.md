@@ -1,6 +1,6 @@
 # CUSTODIA-B2-006 · Persistencia nueva B2 y disponibilidad por archivo legacy
 
-> **Estado:** EN CURSO · **Prioridad:** P0 · **Hito:** persistencia híbrida publicada; falta aceptación E2E autenticada.  
+> **Estado:** RESUELTA POR REENFOQUE · la aceptación E2E autenticada sigue técnicamente pendiente y queda fuera del objetivo activo.  
 > **OCP padre:** [frentes/custodia/OBJETO-CANONICO.md](../../../OBJETO-CANONICO.md).  
 > **Control heredado:** [CONTROL-RESPONSABILIDAD.json](../../../CONTROL-RESPONSABILIDAD.json).
 
@@ -65,3 +65,12 @@ Los cambios están integrados en `main` (commit `f0224c1368fb15a3452335a44305c6e
 El endpoint público `https://khora-web.vercel.app/` respondió al lector de comprobación con `login_required` por la protección SSO; los perfiles de navegador conectados no tienen una sesión KHORA registrada. Por tanto no se completó la prueba autenticada de captura/recarga/read-back. No afirmar aceptación E2E ni cierre de B2-006 hasta realizarla.
 
 No se ejecutó migración histórica, backfill, actualización de referencias Neon ni borrado de originales Blob. Los objetos históricos siguen en sus localizadores; la recuperación/migración continúa pendiente de reactivación de Blob y nueva autorización.
+
+
+## Disposición de cierre · 2026-11-10 · reenfoque de CUSTODIA
+
+**Estado de gestión:** RESUELTA POR REENFOQUE. El operador definió que el único objetivo actual del frente es el inventario forense de dictados/archivos conservados y la conciliación del panel «Recuperar capturas» (CUSTODIA-01).
+
+Este cierre es administrativo y de alcance. No significa que el objetivo técnico histórico de este expediente se haya ejecutado, probado o aceptado; en particular, no convierte builds, preflights, E2E pendientes, migraciones diferidas o propuestas en PASS. Se conserva todo el contenido y evidencia histórica de este README.
+
+No reabrir ni ejecutar este expediente dentro del alcance actual. Sus referencias a objetos, localizadores o diagnósticos podrán consultarse como fuentes de evidencia subordinadas a CUSTODIA-01, sin reactivar el objetivo anterior. No se ha modificado código, Neon, B2, Blob, configuración ni producción.
