@@ -1,59 +1,45 @@
-<!-- TASKS_README_VERSION=0.30; TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
+<!-- TASKS_README_VERSION=0.31; TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
 # Tareas vigentes · Frente Custodia
 
-**Estado:** PROVISIONAL · índice de ejecución subordinado al [OCP único](../OBJETO-CANONICO.md).  
-**Control único:** [CONTROL-RESPONSABILIDAD.json](../CONTROL-RESPONSABILIDAD.json).  
-**Actualización:** 2026-11-10.
+**Estado:** PROVISIONAL · índice subordinado al [OCP único](../OBJETO-CANONICO.md).  
+**Control de responsabilidad:** [CONTROL-RESPONSABILIDAD.json](../CONTROL-RESPONSABILIDAD.json).  
+**Actualización:** 2026-11-10 · reenfoque expreso del operador.
 
-## Decisión vigente
+## Único objetivo activo
 
-- Los objetos históricos existentes en Vercel Blob permanecen en Blob.
-- Mientras el almacén no permita lectura, cada archivo legacy se identifica individualmente como temporalmente no disponible y con recuperación/migración pendiente. No se marca como perdido o corrupto solo por la suspensión del proveedor.
-- Todo contenido nuevo se escribe exclusivamente en Backblaze B2.
-- Las nuevas escrituras B2 deben superar GET/read-back físico y cotejo de longitud/SHA-256 antes de registrarse como verificadas.
-- La indisponibilidad de objetos Blob antiguos no debe impedir guardar nuevas capturas, texto, checkpoints o ediciones de texto.
-- La migración histórica Blob→B2 queda DIFERIDA hasta reactivar el servicio Blob, comprobar GET y recibir autorización expresa para esa fase.
+**CUSTODIA-01 — Inventario forense de dictados recuperables y conciliación del panel «Recuperar capturas».**
 
-## Trabajo que se ejecutará ahora
+Se busca conocer qué archivos históricos existen, dónde están y su recuperabilidad actual. Se distinguen archivos que pueden obtenerse hoy, archivos existentes pero temporalmente bloqueados (por ejemplo, Vercel Blob bajo límite/suspensión), referencias aún no cotejadas físicamente, señales sin contenido, irrecuperables confirmados y fuentes no inspeccionadas.
 
-| ID | Estado | Alcance único |
-|---|---|---|
-| CUSTODIA-B2-006 | EN CURSO · P0 | Ejecutar la aceptación E2E autenticada pendiente: captura nueva, recuperación tras recarga y cotejo de bytes/longitud/SHA-256; comprobar aislamiento de texto/checkpoints y comportamiento de sesión mixta. Production ya está publicada. |
+No se audita la resiliencia general del sistema, no se prueban nuevos flujos de captura, no se repara nada y no se recuperan, migran ni eliminan archivos.
 
-## Trabajo diferido · no ejecutar en este hito
+**Detalle de fases:** [CUSTODIA-01 · Inventario forense](./📁%20🧩%20-%20CUSTODIA-01%20-%20Inventario%20forense%20de%20recuperabilidad/README.md).  
+**Instrucción literal:** [INSTRUCCION-REENFOQUE-INVENTARIO-RECUPERABILIDAD-20261110.md](../originales/INSTRUCCION-REENFOQUE-INVENTARIO-RECUPERABILIDAD-20261110.md).  
+**Diagnóstico inicial:** [DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md](../evidencias/DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md).
 
-| ID | Estado | Condición para reabrir |
-|---|---|---|
-| CUSTODIA-B2-005 | DIFERIDA | Vercel Blob reactivado y petición expresa para volver a comprobar el acceso. |
-| CUSTODIA-B2-002 | DIFERIDA | Vercel Blob reactivado, GET físico confirmado y nueva autorización expresa para migrar el histórico. |
-| CUSTODIA-B2-007 | DIFERIDA | CUSTODIA-B2-006 aceptada y deuda técnica concreta priorizada. |
-| CUSTODIA-RES-001/002 | DIFERIDAS | Nueva decisión expresa de evaluar resiliencia multiproveedor. |
+## Estado de tareas provisionales anteriores
 
-No hay una secuencia posterior automática: reactivar Blob no autoriza por sí mismo la migración.
+Todas las tareas provisionales anteriores distintas de CUSTODIA-01 quedan **RESUELTAS POR REENFOQUE** y fuera del trabajo activo. Es un cierre administrativo de alcance, no una declaración de que sus pruebas/implementaciones se hayan completado ni aceptado.
 
-## Expedientes de detalle
-
-| ID | Detalle |
+| ID | Disposición |
 |---|---|
-| CUSTODIA-B2-006 | [Persistencia nueva B2 y disponibilidad por archivo legacy](./📁%20🧩%20-%20CUSTODIA-B2-006%20-%20Habilitar%20archivado%20con%20Backblaze%20B2/README.md) |
-| CUSTODIA-B2-005 | [Comprobación futura del acceso al legado Blob](./📁%20🧩%20-%20CUSTODIA-B2-005%20-%20Diagnóstico%20verificable%20del%20bloqueo%20de%20archivado/README.md) |
-| CUSTODIA-B2-007 | [Pulido técnico diferido](./📁%20🧩%20-%20CUSTODIA-B2-007%20-%20Pulido%20de%20la%20implementación%20B2/README.md) |
-| CUSTODIA-RES-001/002 | Evaluación e implementación de resiliencia multiproveedor; ambas diferidas. |
+| CUSTODIA-03 / CUSTODIA-04 | RESUELTAS POR REENFOQUE |
+| CUSTODIA-B2-001 a CUSTODIA-B2-007 | RESUELTAS POR REENFOQUE; B2-004 ya constaba supersedida |
+| CUSTODIA-RES-001 / RES-002 | RESUELTAS POR REENFOQUE |
 
-CUSTODIA-01, CUSTODIA-03 y CUSTODIA-04 conservan sus identidades y estados previos fuera de esta entrega. CUSTODIA-02 permanece retirada; no reutilizar el ID.
+CUSTODIA-02 permanece RETIRADA. No se crean nuevos identificadores maestros ni se reutilizan los retirados.
 
-## Gates de aceptación y estado
+## Expedientes históricos
 
-| Gate | Estado verificable |
-|---|---|
-| 1. Nuevas escrituras solo B2, fail-closed y sin escritura secundaria Blob | PASS en el adaptador y suite focal |
-| 2. GET/read-back y cotejo SHA-256/longitud antes de registrar verificado | PASS en prueba sintética del adaptador; captura real autenticada pendiente |
-| 3. Estado individual Blob legacy temporalmente no disponible / recuperación pendiente | Implementado y publicado; smoke UI autenticado pendiente por SSO |
-| 4. Texto, checkpoints y edición no dependen de Blob legacy | Implementado por separación de rutas; demostración autenticada pendiente |
-| 5. Captura autenticada, recarga y read-back B2 | PENDIENTE — requiere sesión KHORA autorizada en navegador |
-| 6. Typecheck, UI Contract, cuatro suites focales y build | PASS en Preview del código de aplicación; Production build y TypeScript PASS |
-| 7. Preflight y publicación Production | PASS — deployment `dpl_6M6ebaAvNPpAtRspfX5QhffEJvVJ` READY; SHA `f0224c1`; preflight B2 read-only PASS |
+Los directorios y evidencias de tareas anteriores permanecen disponibles como antecedentes, con el cierre administrativo señalado en cada README. No se borran ni se reinterpretan como pruebas de aceptación técnica.
 
-La suite unitaria global no se declara PASS. El fetch anónimo del alias canónico devolvió `login_required` por SSO y los perfiles de navegador conectados no tienen sesión KHORA registrada; no se ha simulado login ni captura.
+## Regla de clasificación
 
-No ejecutar migración histórica, backfill, actualización de referencias SQL/JSONB, borrado de originales ni reactivación de lectura Blob dentro de este hito.
+- RECUPERABLE_AHORA.
+- EXISTE_BLOQUEADO.
+- REFERENCIA_SIN_COTEJO_FISICO.
+- SOLO_SEÑAL_SIN_CONTENIDO.
+- IRRECUPERABLE_CONFIRMADO.
+- NO_INSPECCIONADO.
+
+Una referencia no demuestra por sí sola la existencia física; una indisponibilidad temporal no demuestra pérdida. La irrecuperabilidad solo se concluye tras agotar las fuentes pertinentes.
