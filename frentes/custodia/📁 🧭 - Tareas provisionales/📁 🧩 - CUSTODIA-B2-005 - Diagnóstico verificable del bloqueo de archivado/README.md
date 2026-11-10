@@ -176,3 +176,22 @@ La lectura controlada de KHORA_B2_KEY_ID desde Vercel Production, sin imprimir e
 - **Alcance diagnóstico pendiente:** no se ha demostrado ausencia de otros fallos. Mantener la matriz de escenarios y versiones; no atribuir los errores OIDC/PostgreSQL al archivado sin correlación.
 - **Relación con B2-002:** este diagnóstico residual no debe retrasar el inventario read-only ni la copia física Blob→B2. Las referencias productivas solo se actualizan después de reparar el reconciliador, validar ledger, transacción, idempotencia y read-back.
 - **Fuentes históricas conservadas:** los estados de deployment de 2026-11-09 y los fallos previos se mantienen como antecedentes, no se reescriben como si hubieran sido exitosos.
+
+## Diagnóstico de origen Blob · 2026-11-10 · bloqueo confirmado
+
+- Store Vercel conectado a KHORA Web: khora-audio; ID store_VyX9EI8q6DKhp4RV; región iad1; access public.
+- Estado del store: limits-exceeded-suspended; billingState=suspended; usageQuotaExceeded=true.
+- Conteo físico de Vercel: 636 objetos; 1,010,497,194 bytes. list() llegó a cursor final en 1 página sin error.
+- Lectura con SDK: 5/5 objetos de muestra rechazados como blob_read_forbidden.
+- Lectura directa de las URL públicas/CDN: 5/5 rechazadas como blob_read_forbidden.
+- Resultado: el inventario de metadatos funciona; el origen no entrega bytes en este estado. Cero bytes descargados y cero objetos históricos copiados.
+- La ruta de nuevas escrituras no se ve afectada; el deployment Production dpl_6hUVD7LBXqtmnaMw2nfH2wwyrHUp continúa READY y los Secrets B2 permanecen configurados.
+- No se borraron ni sobrescribieron objetos. No hubo escritura en Blob, B2 o Neon durante los probes.
+
+### Acción externa necesaria
+
+Solicitar a Vercel una reactivación temporal/one-time read-only de khora-audio o una vía de exportación. La ayuda oficial de precios de Blob dice que los equipos Hobby pierden acceso al exceder el límite y deben esperar 30 días para volver a usar Blob; no se obtuvo la fecha blockedUntil específica de KHORA. La reactivación debe habilitar GET, no escritura ni borrado. Después se repetirá source-probe y, si pasa, se ejecutará el backfill físico byte-preserving hacia el bucket B2 privado.
+
+### Dictamen
+
+CUSTODIA-B2-005 diagnostica ahora un bloqueo externo del proveedor, no un error de autenticación B2. CUSTODIA-B2-002 queda bloqueada en la fase de lectura del origen; el inventario de los 636 objetos ya está acreditado, pero la descarga, la copia B2 y la reconciliación de referencias siguen pendientes. No marcar el frente ni la migración como completados.
