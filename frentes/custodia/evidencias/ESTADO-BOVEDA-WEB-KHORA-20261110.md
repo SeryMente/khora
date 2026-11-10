@@ -46,7 +46,7 @@ No revocar tokens MCP existentes; no emitir tokens alternos; no copiar secretos 
 
 ## 6. Próxima acción
 
-El operador puede usar la acción **Restablecer PIN olvidado** de la bóveda web KHORA, eligiendo el PIN nuevo directamente en la interfaz y sin comunicarlo a ChatGPT. Esto reemplaza el PIN, no la llave. Después, copiar solo el estado del panel Secretos de GitHub para los usos `norm` y `ep` (configurado/ausente y fecha). No revelar ni copiar ningún valor.
+Restablecer el PIN es una alternativa de interfaz: reemplaza solo el hash del PIN y crea cookie temporal, pero no recupera X_KHORA_KEY. No es necesario para la prueba EP del apartado 7; se posterga para evitar una mutación no requerida. No se ha ejecutado.
 
 Con esos metadatos se determina si hay una credencial `ep` que merezca una lectura autenticada de prueba. Si el estado es configurado pero el endpoint no puede descifrarla, preservar el ciphertext y tratar la llave criptográfica como bloqueo aparte. El objetivo primario sigue siendo el archivo de registros en CUSTODIA-01.
 
