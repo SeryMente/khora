@@ -44,13 +44,14 @@ async function uploadUrl(auth:B2Auth) {
   if (!c.bucketId) throw new Error('storage_b2_bucket_config_missing');
   return b2Json<{bucketId:string;uploadUrl:string;authorizationToken:string}>(auth,'b2_get_upload_url',{bucketId:c.bucketId});
 }
-async function uploadFile(url:string,token:string,key:string,data:Buffer) {
+async function uploadFile(url:string,token:string,key:string,data:Buffer,contentType='application/octet-stream') {
+  if(!contentType||contentType.length>200||/[\\r\\n]/.test(contentType))throw new Error('storage_content_type_invalid');
   const response=await fetch(url,{
     method:'POST',
     headers:{
       Authorization:token,
       'X-Bz-File-Name':encodeURIComponent(key),
-      'Content-Type':'application/octet-stream',
+      'Content-Type':contentType,
       'Content-Length':String(data.length),
       'X-Bz-Content-Sha1':createHash('sha1').update(data).digest('hex'),
       'X-Bz-Server-Side-Encryption':'AES256',
@@ -59,6 +60,64 @@ async function uploadFile(url:string,token:string,key:string,data:Buffer) {
     cache:'no-store',redirect:'error',signal:AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   return jsonResponse<{fileId:string;fileName:string;contentLength:number;serverSideEncryption?:{mode:string;algorithm:string}}>(response,'storage_b2_upload_failed');
+}
+
+type MigrationPutResult={url:string;pathname:string;bytes:number;sha256:string;reused:boolean};
+
+/** Byte-preserving, deterministic and non-overwriting B2 write used by the Blob archive migrator. */
+async function putCustodiaMigrationObject(key:string,data:Buffer,contentType:string):Promise<MigrationPutResult>{
+  if(data.length===0||data.length>512*1024*1024)throw new Error('migration_object_size_unsupported');
+  const c=storageLocation();
+  if(!c.bucket||!c.bucketId)throw new Error('storage_b2_bucket_config_missing');
+  safeObjectKey(key);
+  const auth=await authorize();
+  const expectedSha256=createHash('sha256').update(data).digest('hex');
+  const versions=await b2Json<{files:Array<{fileName:string;fileId:string;action:string;contentLength:number;uploadTimestamp:number}>;nextFileName?:string|null;nextFileId?:string|null}>(
+    auth,'b2_list_file_versions',{bucketId:c.bucketId,prefix:key,maxFileCount:100});
+  if(versions.nextFileName||versions.nextFileId)throw new Error('migration_destination_versions_exceeded');
+  const existing=(versions.files||[]).filter(file=>file.fileName===key)
+    .sort((a,b)=>Number(b.uploadTimestamp||0)-Number(a.uploadTimestamp||0))[0];
+  if(existing){
+    if(existing.action!=='upload'||!existing.fileId)throw new Error('migration_destination_hidden');
+    if(Number(existing.contentLength)!==data.length)throw new Error('migration_destination_conflict');
+    const response=await fetch(fileDownloadUrl(auth,c.bucket,key),{
+      headers:{Authorization:auth.authorizationToken},cache:'no-store',redirect:'error',
+      signal:AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
+    if(!response.ok)throw new Error('migration_destination_readback_failed');
+    const readback=Buffer.from(await response.arrayBuffer());
+    const readbackSha=createHash('sha256').update(readback).digest('hex');
+    if(readback.length!==data.length||readbackSha!==expectedSha256)throw new Error('migration_destination_conflict');
+    return {url:b2ObjectUrl(key,c),pathname:key.slice('khora/'.length),bytes:readback.length,sha256:readbackSha,reused:true};
+  }
+  const target=await uploadUrl(auth);
+  const uploaded=await uploadFile(target.uploadUrl,target.authorizationToken,key,data,contentType);
+  if(uploaded.fileName!==key||Number(uploaded.contentLength)!==data.length)throw new Error('migration_destination_upload_mismatch');
+  const response=await fetch(fileDownloadUrl(auth,c.bucket,key),{
+    headers:{Authorization:auth.authorizationToken},cache:'no-store',redirect:'error',
+    signal:AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  });
+  if(!response.ok)throw new Error('migration_destination_readback_failed');
+  const readback=Buffer.from(await response.arrayBuffer());
+  const readbackSha=createHash('sha256').update(readback).digest('hex');
+  if(readback.length!==data.length||readbackSha!==expectedSha256)throw new Error('migration_destination_integrity_failed');
+  return {url:b2ObjectUrl(key,c),pathname:key.slice('khora/'.length),bytes:readback.length,sha256:readbackSha,reused:false};
+}
+
+/** Copies any Vercel Blob payload byte-for-byte; unlike audio backfills this does not require KHC1. */
+export async function putMigratedBlobObject(sourceUrlSha256:string,data:Buffer,contentType='application/octet-stream'){
+  if(!b2Enabled())throw new Error('storage_b2_not_enabled');
+  if(!/^[a-f0-9]{64}$/i.test(sourceUrlSha256))throw new Error('migration_source_identity_invalid');
+  const key=safeObjectKey('khora/legacy/vercel-blob/'+sourceUrlSha256.toLowerCase()+'.blob');
+  return putCustodiaMigrationObject(key,data,contentType);
+}
+
+/** Stores the private physical-inventory receipt inside the KHORA bucket; no source object is changed. */
+export async function putBlobMigrationManifest(runId:string,data:Buffer){
+  if(!b2Enabled())throw new Error('storage_b2_not_enabled');
+  if(!/^[0-9]{8}T[0-9]{6}Z-[0-9a-f-]{36}$/i.test(runId))throw new Error('migration_run_id_invalid');
+  const key=safeObjectKey('khora/custodia/blob-b2-manifests/'+runId+'.json');
+  return putCustodiaMigrationObject(key,data,'application/json');
 }async function authorize():Promise<B2Auth> {
   if (authCache && authCache.expiresAt > Date.now() + 60000) return authCache.auth;
   const { keyId, applicationKey } = credentials();
