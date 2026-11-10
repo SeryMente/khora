@@ -1,4 +1,4 @@
-<!-- LIST_VERSION=0.40; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.41; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
@@ -30,9 +30,9 @@ Las fases son subunidades internas del expediente existente, no nuevos expedient
 | CUSTODIA-01.d | BLOQUEADA POR ACCESO AL RUNTIME AUTENTICADO | Procesar las 216 partes locales de dos sesiones conforme a autorización C, copiarlas a B2 con read-back y preservar originales. |
 | CUSTODIA-01.e | EN CURSO | Registrar como bloqueados los Blob suspendidos, referencias sin read-back y registros sin titularidad demostrada; no declarar pérdida. |
 | CUSTODIA-01.f | PENDIENTE | Verificar cada Volcado, retirar del pendiente lo archivado y dejar solo residuales actualmente no archivables con evidencia. |
-| CUSTODIA-01.g | EN CURSO | Localizar acceso criptográfico seguro al runtime KHORA: EP Vault DPAPI/notas y la bóveda KHORA; preservar ciphertext y no revelar valores. |
-| CUSTODIA-01.h | PENDIENTE DE OPERADOR | Tras restablecimiento local del PIN KHORA (no ejecutado por CUSTODIA), leer solo metadatos de credenciales GitHub norm/ep; después probar la lectura EP autenticada sin mostrar el token. |
-| CUSTODIA-01.i | PENDIENTE DEL OPERADOR | Emitir una sesión EP nueva (invalida la anterior) y ejecutar lectura autenticada de `/api/ep/github-credential` sin imprimir el token; registrar solo OK/código. No ejecutar bootstrap. |
+| CUSTODIA-01.g | EN CURSO · ALCANCE CERRADO | Limitar la búsqueda de la copia de X_KHORA_KEY a las dos bóvedas indicadas por el operador (primera y reconstruida); no ampliar a LastPass, perfiles alternos ni otros almacenes. Preservar ciphertext. |
+| CUSTODIA-01.h | NO APLICABLE PARA RECUPERAR LA LLAVE | No restablecer PIN como intento de recuperar X_KHORA_KEY: solo abre la bóveda web y no recupera ni rota la llave criptográfica. |
+| CUSTODIA-01.i | PENDIENTE DEL OPERADOR | Si se necesita distinguir pérdida de la copia en bóvedas frente a clave aún operativa en producción, emitir una sesión EP nueva (invalida la anterior) y ejecutar una sola lectura autenticada de `/api/ep/github-credential`; registrar solo OK/código, sin imprimir token. No ejecutar bootstrap. |
 
 ## 3. Estados de salida
 
@@ -118,3 +118,19 @@ El restablecimiento de PIN queda como alternativa de inspección visual, no como
 La fuente actual de tokens nuevos incluye ep:github:read. POST /api/ep/github-credential requiere ep:bootstrap + ep:github:read, valida el propietario y devuelve la credencial ep al proceso cliente. Puede verificar si la bóveda de servidor aún descifra con X_KHORA_KEY.
 
 La siguiente prueba es de solo lectura: emitir un token EP nuevo (la UI revoca el anterior), consumirlo en memoria local y reportar solo GITHUB_EP_CREDENTIAL_READBACK_OK o un código de fallo. No pegar el token en chat y no ejecutar el bootstrap largo. No afecta los Bearer Tokens MCP. Ver OCP §22.
+
+
+## 9. Límite de recuperación de X_KHORA_KEY · 2026-11-10
+
+**Instrucción original:** [INSTRUCCION-LIMITE-RECUPERACION-X-KHORA-KEY-20261110.md](originales/INSTRUCCION-LIMITE-RECUPERACION-X-KHORA-KEY-20261110.md).
+
+La pesquisa de la copia recuperable queda restringida a las dos bóvedas identificadas por el operador: primera bóveda y bóveda reconstruida. No ampliar a LastPass, otros perfiles, DPAPI/notas externas ni ubicaciones adicionales. Buscar el nombre literal `X_KHORA_KEY` y considerar `KHORA_API_KEY` solo como alias si existe evidencia de equivalencia.
+
+- Ambas bóvedas abiertas y enumeradas, sin variable ni alias acreditado: **NO LOCALIZADA EN LAS DOS BÓVEDAS; PRESUNTA PÉRDIDA DEFINITIVA DE LA COPIA RECUPERABLE DENTRO DEL ALCANCE AUTORIZADO**.
+- Alguna bóveda sellada o sin enumeración verificable: **NO VERIFICADO**, no ausencia.
+- La variable aún configurada en Vercel Production puede seguir operativa aunque la copia de recuperación haya desaparecido. El test autenticado de descifrado EP solo demuestra operatividad para el ciphertext probado; no recupera ni revela la llave.
+- No rotar, sustituir, re-inicializar ni re-cifrar con otra llave. No hacer fuerza bruta ni probar contraseñas. No alterar ciphertext ni respaldos. Restablecer PIN web no recupera X_KHORA_KEY.
+
+**Consecuencias:** si la clave activa sigue funcionando en producción, el runtime podría permitir continuar operaciones autenticadas, pero la pérdida de la copia crea un punto único de fallo ante pérdida/cambio de la variable de entorno o del entorno productivo. Si la clave ya no está disponible ni en las bóvedas ni en el runtime, los datos cifrados con ella conservan sus bytes pero no pueden descifrarse con los medios actuales; no deben clasificarse como borrados, pero su recuperación práctica queda bloqueada. Los registros de texto legible y con titularidad demostrada pueden seguir siendo candidatos a archivo textual, respetando las marcas de audio/procedencia y la verificación correspondiente.
+
+El alcance se cierra aquí: no se emprenden nuevas rutas de búsqueda de la clave fuera de las dos bóvedas indicadas. La prueba de producción, si se ejecuta, se clasifica aparte de la recuperación de su copia.
