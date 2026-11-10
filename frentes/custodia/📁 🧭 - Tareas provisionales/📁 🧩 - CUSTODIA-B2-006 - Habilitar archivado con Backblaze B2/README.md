@@ -50,12 +50,12 @@ La verificación/corrección B2 Production está autorizada dentro del alcance d
 
 | Criterio | Evidencia exigida | Resultado |
 |---|---|---|
-| B2 autentica y el bucket es el correcto/privado | Preflight real con recibo saneado | PENDIENTE |
-| Objeto sintético se conserva físicamente | PUT/GET y SHA-256/longitud coincidentes | PENDIENTE |
-| Cada parte queda vinculada y verificada | Registro de parte más read-back físico | PENDIENTE |
-| El archivado concluye sin omitir partes | E2E con múltiples partes y manifiesto íntegro | PENDIENTE |
-| Se recupera tras recarga | Read-back de texto/audio desde el flujo de recuperación | PENDIENTE |
-| No hay fallback silencioso | Pruebas de error y revisión de rutas | PENDIENTE |
+| B2 autentica y el bucket es el correcto/privado | Preflight de Production: native_auth, master_key, bucket_identity, bucket_private y sse_b2_default | PASS · 2026-11-09 |
+| Objeto sintético se conserva físicamente | PUT/GET y SHA-256/longitud coincidentes | PASS · 150 bytes; SHA-256 coincidente; SSE-B2/AES256 |
+| Cada parte queda vinculada y verificada | Registro de parte más read-back físico | PASS REPORTADO · captura real, 191/191 partes marcadas verificadas; pendiente revalidación independiente en este ciclo |
+| El archivado concluye sin omitir partes | Captura Production con texto, 191 partes y ausencia de faltantes | PASS REPORTADO · 10,052 caracteres; 15,617,130 bytes de audio; 0 faltantes; estado en_revision |
+| Se recupera tras recarga | Read-back de texto/audio desde el flujo de recuperación | NO VERIFICADO · pendiente |
+| No hay fallback silencioso | Prueba negativa de fallo B2 + revisión de rutas B2-only/fail-closed | PENDIENTE · revisión de código favorable; falta prueba negativa registrada |
 
 ## 6. Estado de bloqueo observado · 2026-11-09
 
@@ -193,3 +193,14 @@ La lectura controlada de KHORA_B2_KEY_ID desde Vercel Production, sin imprimir e
 - Para este build se aisló temporalmente el comando y se omitió `migrate-runtime.mjs`; el Build Command original se restauró en la configuración del proyecto después de iniciarse el build. No se ejecutó SQL ni backfill de Neon en este ciclo.
 - La ruta de código de nuevas escrituras usa `putEncryptedObject` (B2-only y fail-closed), y quedó desplegada; el archivado E2E real con sesión propietaria, vínculo/manifiesto y recuperación tras recarga permanece pendiente. Por tanto, la capacidad productiva está preflight-validada y desplegada, pero la aceptación funcional de archivo no está certificada.
 - No se ha iniciado el backfill histórico Blob→B2 ni se ha cambiado ninguna referencia Neon. Los originales Blob siguen sin borrarse.
+
+
+### Resultado de producción · 2026-11-10 · una captura real reportada
+
+El operador recibió al archivar una captura la salida «archivado 10052 caracteres, sha d69033c4, con audio (191 partes)». La sesión anterior reportó lectura de Neon del mismo registro con SHA-256 completo `d69033c4876d82a64aa6adc5182c51dab0cd2d02f83a79155de35b970c4704ce`, 191/191 filas de partes apuntando a B2 y marcadas `verified`, metadatos de tamaño/SHA por parte, 15,617,130 bytes y cero faltantes. Bucket informado: `khora-userdata-ecea4187`. Estado del registro: `en_revision`.
+
+**Dictamen acotado:** se acepta como evidencia positiva reportada de una captura real archivada en B2; no equivale a recuperar toda la captura desde la interfaz después de recargar, ni certifica todos los tipos de archivo o todas las sesiones. En esta actualización no se hizo un GET independiente ni una recarga manual adicional. Por eso este hito sigue `en_curso`, con la fila «Se recupera tras recarga» abierta.
+
+**Siguiente verificación concreta:** desde la sesión propietaria, abrir el registro `en_revision` tras una recarga y recuperar texto/audio; verificar que las 191 partes se reconstruyen en orden y cotejar el manifiesto/huellas. Conservar un recibo minimizado, sin texto/audio real ni secretos.
+
+**Separación de objetivos:** la persistencia de nuevas capturas está operativa según esta captura; el backfill del histórico Vercel Blob→B2 es CUSTODIA-B2-002 y sigue sin comenzar. Ningún original Blob se ha eliminado ni sobrescrito.
