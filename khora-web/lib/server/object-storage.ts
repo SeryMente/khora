@@ -94,6 +94,26 @@ export async function inspectB2ReadOnly() {
     corsRules:bucket.corsRules||[] };
 }
 export function isStoredObjectUrl(value:string) { return legacyBlobUrl(value) || parseB2ObjectUrl(value,storageLocation())!==null; }
+export function legacyBlobReadsEnabled() { return process.env.KHORA_LEGACY_BLOB_READS_ENABLED === 'true'; }
+export function describeStoredObject(value:string) {
+  const c=storageLocation();
+  if(parseB2ObjectUrl(value,c)!==null) return {
+    storage_provider:'backblaze_b2' as const, storage_generation:'new' as const,
+    availability:'not_checked' as const, migration_status:'not_required' as const,
+  };
+  if(legacyBlobUrl(value)) return {
+    storage_provider:'vercel_blob_legacy' as const, storage_generation:'legacy' as const,
+    availability:(legacyBlobReadsEnabled()?'not_checked':'temporarily_unavailable') as 'not_checked'|'temporarily_unavailable',
+    migration_status:'pending' as const,
+  };
+  return {
+    storage_provider:'unknown' as const, storage_generation:'unknown' as const,
+    availability:'not_checked' as const, migration_status:'not_required' as const,
+  };
+}
+export function isLegacyBlobTemporarilyUnavailable(error:unknown) {
+  return error instanceof Error && error.message === 'storage_legacy_temporarily_unavailable';
+}
 export async function fetchStoredObject(value:string,_init?:RequestInit):Promise<Response> {
   const c=storageLocation(),key=parseB2ObjectUrl(value,c);
   if(key!==null) {
@@ -101,18 +121,28 @@ export async function fetchStoredObject(value:string,_init?:RequestInit):Promise
     return fetch(fileDownloadUrl(auth,c.bucket,key),{headers:{Authorization:auth.authorizationToken},cache:'no-store',redirect:'error',signal:AbortSignal.timeout(REQUEST_TIMEOUT_MS)});
   }
   if(!legacyBlobUrl(value)) throw new Error('storage_reference_not_allowed');
-  return fetch(value,{cache:'no-store',redirect:'error',signal:AbortSignal.timeout(REQUEST_TIMEOUT_MS)});
+  if(!legacyBlobReadsEnabled()) throw new Error('storage_legacy_temporarily_unavailable');
+  const response=await fetch(value,{cache:'no-store',redirect:'error',signal:AbortSignal.timeout(REQUEST_TIMEOUT_MS)});
+  if(response.status===403) throw new Error('storage_legacy_temporarily_unavailable');
+  return response;
 }
 export async function putEncryptedObject(pathname:string,data:Buffer,options:{access:'public';contentType?:string;addRandomSuffix?:boolean}) {
   if(data.length<32||data.subarray(0,4).toString('ascii')!=='KHC1') throw new Error('storage_requires_encrypted_envelope');
   if(!b2Enabled()) throw new Error('storage_b2_not_enabled');
   const c=storageLocation(),key=safeObjectKey(pathname.startsWith('khora/')?pathname:'khora/'+pathname);
-  const unique=key.replace(/(\.[^/.]+)?$/,`-${randomUUID()}$1`);
+  const unique=key.replace(/(\.[^/.]+)?$/, \`-\${randomUUID()}$1\`);
   const auth=await authorize();
   let target=await uploadUrl(auth);
   try { await uploadFile(target.uploadUrl,target.authorizationToken,unique,data); }
   catch(error) { if((error as Error & {status?:number}).status === undefined || (error as Error & {status?:number}).status! < 500) throw new Error('storage_b2_write_failed'); target=await uploadUrl(auth); await uploadFile(target.uploadUrl,target.authorizationToken,unique,data).catch(()=>{throw new Error('storage_b2_write_failed');}); }
-  return {url:b2ObjectUrl(unique,c),pathname:unique.slice('khora/'.length),contentType:'application/octet-stream'};
+  const url=b2ObjectUrl(unique,c);
+  const readbackResponse=await fetchStoredObject(url);
+  if(!readbackResponse.ok) throw new Error('storage_b2_readback_failed');
+  const readback=Buffer.from(await readbackResponse.arrayBuffer());
+  const expectedHash=createHash('sha256').update(data).digest('hex');
+  const readbackHash=createHash('sha256').update(readback).digest('hex');
+  if(readback.length!==data.length||readbackHash!==expectedHash) throw new Error('storage_b2_readback_integrity_failed');
+  return {url,pathname:unique.slice('khora/'.length),contentType:'application/octet-stream',bytes:readback.length,sha256:readbackHash,readbackVerified:true};
 }
 /** The server mints the opaque upload ID. Browser never receives B2 account/upload tokens. */
 export function createStagingUploadId() { return randomUUID(); }
