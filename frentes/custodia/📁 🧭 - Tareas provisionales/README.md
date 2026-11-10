@@ -1,4 +1,4 @@
-<!-- TASKS_README_VERSION=0.26; TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
+<!-- TASKS_README_VERSION=0.27; TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
 <!-- TASKS_STATUS=PROVISIONAL; PARENT_OCP=CUSTODIA; NO_INDEPENDENT_CONTROL=true -->
 # 📁 Tareas provisionales · Frente Custodia
 
@@ -83,7 +83,7 @@ La plantilla no exige fechas objetivo ni responsables por tarea: se añaden solo
 
 ## 6. Límites vigentes
 
-- PC-7 es la única terminal RDC disponible. Identidad observada: PC-7\\PC 7. No asumir ni solicitar CENTRAL\\fila4, PC-14 o PSK14.
+- **Identidad RDC vigente (2026-11-10):** la única conexión RDC accesible es el canal operativo de esta sesión. `CENTRAL\\MantenimientoRCI` es la cuenta de elevación/operación RDC; `CENTRAL\\fila4` es el usuario y perfil propietario. Materializar repositorios, archivos, temporales y logs exclusivamente en rutas absolutas bajo `C:\\Users\\fila4`; no suplantar la identidad de fila4 ni usar el perfil elevado como workspace.
 - Usar la Master Application Key de la cuenta Backblaze exclusiva KHORA; no crear claves adicionales ni utilizar credenciales EP.
 - B2 es el único destino de nuevas escrituras; no hacer fallback silencioso a Blob.
 - La autorización de Production permite las dos variables maestras canónicas, preflight y deployment condicionado a pruebas.
@@ -115,7 +115,7 @@ La plantilla no exige fechas objetivo ni responsables por tarea: se añaden solo
 
 ### Retoma B2-first · 2026-11-09 · versión 0.23
 
-- PC-7 es la única terminal RDC disponible; identidad real observada PC-7\\PC 7. Las referencias históricas a CENTRAL\\fila4, PC-14 y PSK14 no son requisitos.
+- **Aclaración vigente de materialización:** MantenimientoRCI opera RDC y eleva; fila4 es el propietario del entorno. La terminal no es una dependencia fija; debe utilizarse la única conexión RDC disponible y materializarse todo bajo el perfil fila4.
 - Master Application Key de KHORA aceptada por Backblaze. Bucket khora-userdata-ecea4187, ID 35b8cbd6623b54a5a9130c18, allPrivate.
 - Prueba física B2 PASS: PUT/GET sintético, 150 bytes, SHA-256 coincidente, SSE-B2/AES256. Evidencia: [PRUEBA-FISICA-B2-KHORA-20261109.md](../evidencias/PRUEBA-FISICA-B2-KHORA-20261109.md).
 - Vercel Production ya selecciona B2, pero siguen faltando los nombres canónicos KHORA_B2_MASTER_APPLICATION_KEY_ID / KHORA_B2_MASTER_APPLICATION_KEY. No hay deployment nuevo ni archivado E2E demostrado.
@@ -152,3 +152,14 @@ La plantilla no exige fechas objetivo ni responsables por tarea: se añaden solo
 - Acción que desbloquea: conseguir reactivación temporal de solo lectura/exportación desde Vercel para el store existente. No crear un store sustituto ni eliminar fuentes.
 - El deployment Production dpl_6hUVD7LBXqtmnaMw2nfH2wwyrHUp permanece READY y los Secrets maestros B2 siguen como sensitive. Los Preview usados para probes se cancelaron tras capturar resultados; el Build Command normal fue restaurado.
 - Corrección de identidad operativa: MantenimientoRCI es la cuenta de elevación y operación RDC; fila4 es el usuario/perfil propietario. Todos los artefactos se materializan en C:\\Users\\fila4; la única conexión RDC accesible se utiliza como canal operativo, sin suplantar procesos.
+
+
+## Corte de migración histórica · 2026-11-10 · Vercel Blob suspendido
+
+- Store físico conectado: `khora-audio` (`store_VyX9EI8q6DKhp4RV`), público, región iad1; estado `limits-exceeded-suspended`, `billingState=suspended`, cuota excedida.
+- Inventario del proveedor: 636/636 objetos listados en 1 página; tamaño agregado 1,010,497,194 bytes.
+- Descarga de muestra: 0/5 por SDK y 0/5 por URL pública/CDN; ambos métodos devuelven `blob_read_forbidden`. Inventariar metadatos no equivale a recuperar bytes.
+- Migración: 0 objetos históricos copiados/verificados en B2; 0 referencias Neon actualizadas; 0 originales Blob eliminados/sobrescritos.
+- Bloqueo P0: solicitar a Vercel una reactivación temporal de GET/exportación de solo lectura o vía oficial de exportación del store existente. No se obtuvo `blockedUntil`; no asignar fecha de reactivación.
+- Production deployment sigue `READY`; Secrets B2 siguen configurados; las pruebas Preview fueron canceladas tras emitir sus métricas. No se realizó promoción ni cutover.
+- La rama `feat/custodia-blob-physical-b2-backfill-20261110` contiene un primer transporte idempotente byte-preserving y un inventariador read-only con manifiesto, pero no está fusionada y su aceptación de pruebas queda pendiente. No ejecutar `--apply` hasta recuperar las lecturas de origen y validar el código completo.
