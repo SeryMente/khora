@@ -1,4 +1,4 @@
-<!-- LIST_VERSION=0.39; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.40; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
@@ -110,7 +110,7 @@ La UI muestra la bóveda KHORA cerrada y el panel de capacidad local sin capacid
 
 El código confirma que Restablecer PIN solo actualiza el hash Scrypt/sal en boveda_pin y abre una cookie de 30 minutos; no modifica X_KHORA_KEY ni ciphertext. La UI de GitHub solo revela metadatos configured/updatedAt para las credenciales norm y ep. El read real de ep requiere una sesión EP autenticada con ep:bootstrap y ep:github:read.
 
-Siguiente paso: operador restablece el PIN en la UI (no compartirlo), luego copia solo metadatos norm/ep. No revelar tokens ni emitir/revocar tokens MCP. Evidencia: evidencias/ESTADO-BOVEDA-WEB-KHORA-20261110.md.
+El restablecimiento de PIN queda como alternativa de inspección visual, no como paso inmediato: la prueba EP del §11 no lo necesita. No se ha ejecutado. Prioridad: sesión EP nueva + lectura autenticada de la credencial ep; no revelar tokens ni emitir/revocar Bearer Tokens MCP. Evidencia: evidencias/ESTADO-BOVEDA-WEB-KHORA-20261110.md.
 
 
 ## 11. Prueba EP de credencial sin exposición
