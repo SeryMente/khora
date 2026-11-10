@@ -1,4 +1,4 @@
-import { fetchStoredObject } from "@/lib/server/object-storage";
+import { fetchStoredObject, isLegacyBlobTemporarilyUnavailable, describeStoredObject } from "@/lib/server/object-storage";
 import { poseeVolcado } from "@/lib/server/custodia-acceso";
 import { auth } from "@/auth";
 // @l0 L0-002-R · @req TRACE-SESSION/010 · @req AUD-04
@@ -10,6 +10,17 @@ import { COOKIE_BOVEDA, desbloqueoVigente } from "../../../../lib/server/boveda"
 import { evaluarCustodiaAudio } from "../../../../lib/audio/custodia";
 
 export const runtime = "nodejs";
+
+function legacyUnavailableResponse() {
+  return NextResponse.json({
+    error: "storage_legacy_temporarily_unavailable",
+    storage_provider: "vercel_blob_legacy",
+    availability: "temporarily_unavailable",
+    migration_status: "pending",
+    detail: "Audio histórico en Vercel Blob: temporalmente no disponible. La recuperación queda pendiente de reactivar el almacén; el archivo no se declara perdido ni dañado.",
+  }, { status: 503, headers: { "cache-control": "no-store" } });
+}
+
 
 export async function GET(pedido: NextRequest, contexto: { params: Promise<{ id: string }> }) {
   try {
@@ -88,10 +99,13 @@ export async function GET(pedido: NextRequest, contexto: { params: Promise<{ id:
         try {
           remoto = await fetchStoredObject(url, { cache: "no-store" });
         } catch (fetchErr) {
-          return NextResponse.json({ error: "blob_inexistente", detail: `Blob inaccesible: ${url}` }, { status: 502 });
+          if (isLegacyBlobTemporarilyUnavailable(fetchErr) || describeStoredObject(url).storage_provider === "vercel_blob_legacy") return legacyUnavailableResponse();
+          return NextResponse.json({ error: "storage_object_unavailable", detail: "No fue posible recuperar una parte desde su proveedor de almacenamiento." }, { status: 502 });
         }
         if (!remoto.ok) {
-          return NextResponse.json({ error: "blob_inexistente", detail: `Blob respondió con status ${remoto.status}` }, { status: 502 });
+          if (remoto.status === 403 && describeStoredObject(url).storage_provider === "vercel_blob_legacy") return legacyUnavailableResponse();
+          if (remoto.status === 404) return NextResponse.json({ error: "storage_object_not_found", detail: "El objeto no se encuentra en el proveedor de almacenamiento." }, { status: 404 });
+          return NextResponse.json({ error: "storage_object_unavailable", detail: "No fue posible recuperar una parte desde su proveedor de almacenamiento." }, { status: 502 });
         }
 
         const cifrado = Buffer.from(await remoto.arrayBuffer());
@@ -150,10 +164,13 @@ export async function GET(pedido: NextRequest, contexto: { params: Promise<{ id:
         try {
           remoto = await fetchStoredObject(url, { cache: "no-store" });
         } catch (e) {
-          return NextResponse.json({ error: "blob_inexistente", detail: `Blob inaccesible: ${url}` }, { status: 502 });
+          if (isLegacyBlobTemporarilyUnavailable(e) || describeStoredObject(url).storage_provider === "vercel_blob_legacy") return legacyUnavailableResponse();
+          return NextResponse.json({ error: "storage_object_unavailable", detail: "No fue posible recuperar una parte desde su proveedor de almacenamiento." }, { status: 502 });
         }
         if (!remoto.ok) {
-          return NextResponse.json({ error: "blob_inexistente", detail: `Blob respondió con status ${remoto.status}` }, { status: 502 });
+          if (remoto.status === 403 && describeStoredObject(url).storage_provider === "vercel_blob_legacy") return legacyUnavailableResponse();
+          if (remoto.status === 404) return NextResponse.json({ error: "storage_object_not_found", detail: "El objeto no se encuentra en el proveedor de almacenamiento." }, { status: 404 });
+          return NextResponse.json({ error: "storage_object_unavailable", detail: "No fue posible recuperar una parte desde su proveedor de almacenamiento." }, { status: 502 });
         }
         const cifrado = Buffer.from(await remoto.arrayBuffer());
         const claro = descifrarBytes(cifrado);
@@ -180,10 +197,13 @@ export async function GET(pedido: NextRequest, contexto: { params: Promise<{ id:
       try {
         remoto = await fetchStoredObject(url, { cache: "no-store" });
       } catch (e) {
-        return NextResponse.json({ error: "blob_inexistente", detail: `Blob inaccesible: ${url}` }, { status: 502 });
+        if (isLegacyBlobTemporarilyUnavailable(e) || describeStoredObject(url).storage_provider === "vercel_blob_legacy") return legacyUnavailableResponse();
+        return NextResponse.json({ error: "storage_object_unavailable", detail: "No fue posible recuperar el objeto desde su proveedor de almacenamiento." }, { status: 502 });
       }
       if (!remoto.ok) {
-        return NextResponse.json({ error: "blob_inexistente", detail: `Blob respondió con status ${remoto.status}` }, { status: 502 });
+        if (remoto.status === 403 && describeStoredObject(url).storage_provider === "vercel_blob_legacy") return legacyUnavailableResponse();
+        if (remoto.status === 404) return NextResponse.json({ error: "storage_object_not_found", detail: "El objeto no se encuentra en el proveedor de almacenamiento." }, { status: 404 });
+        return NextResponse.json({ error: "storage_object_unavailable", detail: "No fue posible recuperar el objeto desde su proveedor de almacenamiento." }, { status: 502 });
       }
       const cifrado = Buffer.from(await remoto.arrayBuffer());
       const claro = descifrarBytes(cifrado);
