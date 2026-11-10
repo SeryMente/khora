@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { b2Endpoint,b2ObjectUrl,parseB2ObjectUrl,legacyBlobUrl,safeObjectKey,stagingKeyForSession } from '../../lib/storage/object-reference';
-import { fetchStoredObject,putEncryptedObject,deleteStagedObject,createStagingUploadId,STAGING_CHUNK_BYTES,putStagingChunk,finalizeStagingUpload,inspectB2ReadOnly } from '../../lib/server/object-storage';
+import { fetchStoredObject,putEncryptedObject,deleteStagedObject,createStagingUploadId,STAGING_CHUNK_BYTES,putStagingChunk,finalizeStagingUpload,inspectB2ReadOnly,describeStoredObject } from '../../lib/server/object-storage';
 const c={bucket:'khora-test-private',region:'us-east-005'};
 const session='12345678-1234-1234-1234-123456789012';
 test('B2 region cannot become an SSRF host',()=>assert.throws(()=>b2Endpoint('us-east-005.evil.invalid')));
@@ -18,6 +18,18 @@ test('new B2 writes fail closed when provider flag is not enabled; no Blob fallb
 test('chunk size and total hash bounds are enforced before network access',async()=>{const previous=process.env.KHORA_OBJECT_STORAGE;process.env.KHORA_OBJECT_STORAGE='b2';try{await assert.rejects(()=>putStagingChunk(session,createStagingUploadId(),0,Buffer.alloc(STAGING_CHUNK_BYTES+1)),/storage_staging_chunk_invalid/);await assert.rejects(()=>finalizeStagingUpload(session,createStagingUploadId(),1024,1,'bad'),/storage_staging_invalid/);}finally{if(previous===undefined)delete process.env.KHORA_OBJECT_STORAGE;else process.env.KHORA_OBJECT_STORAGE=previous;}});
 test('untrusted stored URLs are rejected before network access',async()=>{await assert.rejects(()=>fetchStoredObject('http://127.0.0.1/private'),/reference_not_allowed/);});
 test('staging deletion rejects original audio URLs',async()=>{await assert.rejects(()=>deleteStagedObject('https://store.public.blob.vercel-storage.com/dictado/x/1.khc',session),/not_staging/);});
+test('legacy Blob objects are classified as pending and reads are paused without contacting Blob',async()=>{
+ const previous=process.env.KHORA_LEGACY_BLOB_READS_ENABLED;delete process.env.KHORA_LEGACY_BLOB_READS_ENABLED;
+ const url='https://store.public.blob.vercel-storage.com/dictado/historical.khc';
+ try {
+  assert.deepEqual(describeStoredObject(url),{storage_provider:'vercel_blob_legacy',storage_generation:'legacy',availability:'temporarily_unavailable',migration_status:'pending'});
+  await assert.rejects(()=>fetchStoredObject(url),/storage_legacy_temporarily_unavailable/);
+ } finally {if(previous===undefined)delete process.env.KHORA_LEGACY_BLOB_READS_ENABLED;else process.env.KHORA_LEGACY_BLOB_READS_ENABLED=previous;}
+});
+test('B2 locators are classified independently from legacy Blob',()=>{
+ const url=b2ObjectUrl('khora/dictado/new.khc',c);
+ assert.deepEqual(describeStoredObject(url),{storage_provider:'backblaze_b2',storage_generation:'new',availability:'not_checked',migration_status:'not_required'});
+});
 test('read-only preflight proves Master Key identity and exact private bucket',async()=>{
  const names=['KHORA_B2_MASTER_APPLICATION_KEY_ID','KHORA_B2_MASTER_APPLICATION_KEY','KHORA_B2_BUCKET_NAME','KHORA_B2_BUCKET_ID','KHORA_B2_REGION'];
  const before=Object.fromEntries(names.map(k=>[k,process.env[k]]));const originalFetch=globalThis.fetch;const calls:string[]=[];
@@ -35,7 +47,7 @@ test('read-only preflight proves Master Key identity and exact private bucket',a
 });
 test('native B2 encrypted writes use only the server-side bucket upload token',async()=>{
  const names=['KHORA_B2_MASTER_APPLICATION_KEY_ID','KHORA_B2_MASTER_APPLICATION_KEY','KHORA_B2_BUCKET_NAME','KHORA_B2_BUCKET_ID','KHORA_B2_REGION','KHORA_OBJECT_STORAGE'];
- const before=Object.fromEntries(names.map(k=>[k,process.env[k]]));const originalFetch=globalThis.fetch;const calls:Array<{url:string;method:string;headers:Headers;body:BodyInit|null|undefined}>=[];
+ const before=Object.fromEntries(names.map(k=>[k,process.env[k]]));const originalFetch=globalThis.fetch;const calls:Array<{url:string;method:string;headers:Headers;body:BodyInit|null|undefined}>=[];let readbackPayload:Buffer|null=null;
  try{
   process.env.KHORA_B2_MASTER_APPLICATION_KEY_ID='master-id';process.env.KHORA_B2_MASTER_APPLICATION_KEY='synthetic-master-secret';
   process.env.KHORA_B2_BUCKET_NAME=c.bucket;process.env.KHORA_B2_BUCKET_ID='bucket-123';process.env.KHORA_B2_REGION=c.region;process.env.KHORA_OBJECT_STORAGE='b2';
@@ -44,9 +56,11 @@ test('native B2 encrypted writes use only the server-side bucket upload token',a
    if(url.endsWith('/b2api/v4/b2_authorize_account'))return new Response(JSON.stringify({accountId:'master-id',authorizationToken:'synthetic-account-token',apiInfo:{storageApi:{apiUrl:'https://api.test.b2',downloadUrl:'https://f001.test.b2',allowed:{capabilities:['listBuckets','listFiles','readFiles','writeFiles','deleteFiles'],buckets:null,namePrefix:null}}}}),{status:200});
    if(url.endsWith('/b2api/v4/b2_get_upload_url'))return new Response(JSON.stringify({bucketId:'bucket-123',uploadUrl:'https://pod.test.b2/b2api/v4/b2_upload_file',authorizationToken:'bucket-upload-token'}),{status:200});
    if(url==='https://pod.test.b2/b2api/v4/b2_upload_file')return new Response(JSON.stringify({fileId:'synthetic-file-id',fileName:decodeURIComponent(headers.get('X-Bz-File-Name')||''),contentLength:Number(headers.get('Content-Length'))}),{status:200});
+   if(url.startsWith('https://f001.test.b2/file/'))return new Response(readbackPayload,{status:200});
    throw new Error('unexpected fetch '+url);
   }) as typeof fetch;
   const payload=Buffer.concat([Buffer.from('KHC1'),Buffer.alloc(32,7)]);
+  readbackPayload=payload;
   const stored=await putEncryptedObject('dictado/unit-test.khc',payload,{access:'public'});
   assert.match(stored.url,/^https:\/\/s3\.us-east-005\.backblazeb2\.com\/khora-test-private\/khora\/dictado\/unit-test-/);
   const upload=calls.find(x=>x.url==='https://pod.test.b2/b2api/v4/b2_upload_file');assert.ok(upload);
@@ -54,6 +68,7 @@ test('native B2 encrypted writes use only the server-side bucket upload token',a
   assert.equal(upload.headers.get('Authorization')==='synthetic-account-token',false);
   assert.equal(upload.headers.get('Content-Length'),String(payload.length));assert.equal(upload.headers.get('X-Bz-Content-Sha1'),createHash('sha1').update(payload).digest('hex'));
   assert.equal(upload.headers.get('X-Bz-Server-Side-Encryption'),'AES256');
+  const readback=calls.find(x=>x.url.startsWith('https://f001.test.b2/file/'));assert.ok(readback);assert.equal(readback.method,'GET');assert.equal(stored.readbackVerified,true);assert.equal(stored.bytes,payload.length);assert.equal(stored.sha256,createHash('sha256').update(payload).digest('hex'));
   assert.equal(calls.some(x=>x.url.includes('amazonaws.com')||x.url.includes('s3.us-east-005')),false);
  }finally{globalThis.fetch=originalFetch;for(const k of names){if(before[k]===undefined)delete process.env[k];else process.env[k]=before[k];}}
 });
