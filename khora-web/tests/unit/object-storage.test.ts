@@ -69,6 +69,8 @@ test('native B2 encrypted writes use only the server-side bucket upload token',a
   assert.equal(upload.headers.get('Content-Length'),String(payload.length));assert.equal(upload.headers.get('X-Bz-Content-Sha1'),createHash('sha1').update(payload).digest('hex'));
   assert.equal(upload.headers.get('X-Bz-Server-Side-Encryption'),'AES256');
   const readback=calls.find(x=>x.url.startsWith('https://f001.test.b2/file/'));assert.ok(readback);assert.equal(readback.method,'GET');assert.equal(stored.readbackVerified,true);assert.equal(stored.bytes,payload.length);assert.equal(stored.sha256,createHash('sha256').update(payload).digest('hex'));
+  readbackPayload=Buffer.concat([payload,Buffer.from('different')]);
+  await assert.rejects(()=>putEncryptedObject('dictado/unit-test-mismatch.khc',payload,{access:'public'}),/storage_b2_readback_integrity_failed/);
   assert.equal(calls.some(x=>x.url.includes('amazonaws.com')||x.url.includes('s3.us-east-005')),false);
  }finally{globalThis.fetch=originalFetch;for(const k of names){if(before[k]===undefined)delete process.env[k];else process.env[k]=before[k];}}
 });
