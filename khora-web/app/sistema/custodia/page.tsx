@@ -70,8 +70,14 @@ export default function CustodiaPage({ legacyEditorEntry = false }: { legacyEdit
       resumeAfterLoadRef.current = autoplay;
       validatedAudioSourceRef.current = null;
       setCurrentPartIndex(safePosition);
-      setAudioSourceUrl(part.download_path);
-      setAudioError(null);
+      if (part.availability === "temporarily_unavailable") {
+        setAudioSourceUrl("");
+        setIsPlaying(false);
+        setAudioError("Parte histórica en Vercel Blob: temporalmente no disponible. Recuperación/migración pendiente; el archivo no se considera perdido ni dañado.");
+      } else {
+        setAudioSourceUrl(part.download_path);
+        setAudioError(null);
+      }
     },
     [manifiestoPartes],
   );
@@ -121,14 +127,14 @@ export default function CustodiaPage({ legacyEditorEntry = false }: { legacyEdit
       const seek = resolveGlobalSeek(manifiestoPartes, targetMs);
       const audio = audioRef.current;
       const samePart = seek.position === currentPartIndex;
-      if (samePart && audio) {
+      if (samePart && audio && audioSourceUrl) {
         audio.currentTime = seek.localSeconds;
         setCurrentTimeMs(targetMs);
         return;
       }
       loadAudioPosition(seek.position, seek.localSeconds, isPlaying);
     },
-    [currentPartIndex, isPlaying, loadAudioPosition, manifiestoPartes],
+    [audioSourceUrl, currentPartIndex, isPlaying, loadAudioPosition, manifiestoPartes],
   );
 
   const [hallazgos, setHallazgos] = useState<any[]>([]);
@@ -200,8 +206,17 @@ export default function CustodiaPage({ legacyEditorEntry = false }: { legacyEdit
       if (resManif.ok) {
         setManifiestoPartes(dataManif.partes || []);
         if (dataManif.partes && dataManif.partes.length > 0) {
-          setCurrentPartIndex(1);
-          setAudioSourceUrl(dataManif.partes[0].download_path);
+          const firstPlayableIndex = dataManif.partes.findIndex(
+            (part: any) => part.availability !== "temporarily_unavailable",
+          );
+          if (firstPlayableIndex >= 0) {
+            setCurrentPartIndex(firstPlayableIndex + 1);
+            setAudioSourceUrl(dataManif.partes[firstPlayableIndex].download_path);
+          } else {
+            setCurrentPartIndex(1);
+            setAudioSourceUrl("");
+            setAudioError("Todo el audio de esta captura está en Vercel Blob histórico y permanece temporalmente no disponible. La recuperación/migración está pendiente; el texto y sus revisiones siguen disponibles.");
+          }
         } else {
           setAudioError(
             "El manifiesto no contiene partes de audio reproducibles.",
@@ -353,6 +368,10 @@ export default function CustodiaPage({ legacyEditorEntry = false }: { legacyEdit
 
   const handleExportMp3 = useCallback(async () => {
     if (!selectedId || exportingMp3) return;
+    if (Number(selectedItem?.storage_summary?.legacy_pending_count || 0) > 0) {
+      setAudioError("No se puede reconstruir el MP3 completo mientras haya partes históricas de Vercel Blob pendientes de recuperación.");
+      return;
+    }
     setExportingMp3(true); setAudioError(null);
     try {
       const result = await downloadCustodiaMp3({ id: selectedId,
@@ -368,7 +387,7 @@ export default function CustodiaPage({ legacyEditorEntry = false }: { legacyEdit
       }
       setAudioError(err instanceof Error ? err.message : 'No se pudo descargar el MP3 conservado.');
     } finally { setExportingMp3(false); }
-  }, [exportingMp3, selectedId, selectedItem?.folio]);
+  }, [exportingMp3, selectedId, selectedItem?.folio, selectedItem?.storage_summary?.legacy_pending_count]);
 
   const handleRegenerarTitulo = async () => {
     if (!selectedId) return;

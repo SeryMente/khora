@@ -5,7 +5,6 @@ import {
   MAX_IMPORTED_AUDIO_BYTES,
   decryptStagedAudio,
   detectAudioFormat,
-  isKhoraStagingBlobUrl,
 } from "../../lib/server/importedAudio";
 
 test("detects the real MP3 signature instead of trusting the filename", () => {
@@ -33,21 +32,6 @@ test("decrypts an AES-GCM staging payload without changing bytes", () => {
       iv.toString("base64"),
     ),
     clear,
-  );
-});
-
-test("accepts only a staging URL bound to the same session", () => {
-  const session = "12345678-1234-4234-8234-123456789abc";
-  assert.equal(
-    isKhoraStagingBlobUrl(
-      `https://store.public.blob.vercel-storage.com/staging/audio/${session}/x.khstaging`,
-      session,
-    ),
-    true,
-  );
-  assert.equal(
-    isKhoraStagingBlobUrl("https://example.com/staging/audio/x", session),
-    false,
   );
 });
 

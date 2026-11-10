@@ -12,6 +12,12 @@ export function renderAudioStatusBadge(status: string) {
           🟢 Audio registrado
         </span>
       );
+    case "temporalmente_no_disponible":
+      return (
+        <span className="text-amber-300 font-semibold text-[10px] flex items-center gap-1">
+          🟡 Audio histórico · recuperación pendiente
+        </span>
+      );
     case "encontrado_no_vinculado":
       return (
         <span className="text-yellow-400 font-semibold text-[10px] flex items-center gap-1">
@@ -734,6 +740,31 @@ export function PipelineView({
                         {renderAudioStatusBadge(selectedItem.audio_status)}
                       </div>
 
+                      {manifiestoPartes.some((part: any) => part.storage_provider === "vercel_blob_legacy") && (
+                        <div data-ui-id="revision.storage-parts" className="border border-amber-500/30 bg-amber-950/10 p-3 space-y-2">
+                          <div className="text-[10px] font-mono uppercase font-bold text-amber-200">
+                            Estado de almacenamiento por archivo
+                          </div>
+                          <div className="max-h-40 overflow-y-auto space-y-1 pr-1">
+                            {manifiestoPartes.map((part: any) => (
+                              <div key={part.part_index} className="flex flex-wrap justify-between gap-x-3 gap-y-1 text-[10px] font-mono border-b border-zinc-800/70 pb-1">
+                                <span>Parte {part.part_index}</span>
+                                <span className={part.storage_provider === "vercel_blob_legacy" ? "text-amber-200" : part.storage_provider === "backblaze_b2" ? "text-sky-300" : "text-zinc-400"}>
+                                  {part.storage_provider === "vercel_blob_legacy"
+                                    ? "Vercel Blob · temporalmente no disponible · migración pendiente"
+                                    : part.storage_provider === "backblaze_b2"
+                                      ? "Backblaze B2 · referencia registrada; disponibilidad no comprobada ahora"
+                                      : "Proveedor de almacenamiento no identificado"}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                          <p className="text-[10px] text-amber-100/80">
+                            Los objetos históricos se conservan. Su indisponibilidad no invalida el texto ni bloquea la edición del registro.
+                          </p>
+                        </div>
+                      )}
+
                       {audioError && (
                         <div className="p-2 border border-red-500/50 bg-red-950/30 text-xs font-mono text-red-300">
                           ⚠️ {audioError}
@@ -765,9 +796,9 @@ export function PipelineView({
                             <button
                               data-ui-id="revision.btn-download-mp3"
                               onClick={() => actions.onExportMp3?.()}
-                              disabled={exportingMp3}
+                              disabled={exportingMp3 || Number(selectedItem.storage_summary?.legacy_pending_count || 0) > 0}
                               className="px-2 py-1 border border-emerald-500/50 bg-emerald-950/30 hover:bg-emerald-900/50 text-emerald-300 font-bold text-[10px] flex items-center gap-1 cursor-pointer shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
-                              title="Descargar el MP3 conservado"
+                              title={Number(selectedItem.storage_summary?.legacy_pending_count || 0) > 0 ? "No se puede reconstruir el audio completo mientras haya partes históricas en Vercel Blob pendientes de recuperación." : "Descargar el MP3 conservado"}
                             >
                               <Icons.Download size={13} />
                               {exportingMp3 ? "Generando MP3..." : "Descargar MP3"}

@@ -60,6 +60,18 @@ Todas las rutas anteriores son relativas a `khora-web/`. Leer el código vigente
 
 ## 4. Modelo de persistencia
 
+### Selección de proveedor de objetos · decisión vigente 2026-11-10
+
+KHORA utiliza un modelo híbrido por generación de objeto; el proveedor no se infiere de la sesión completa:
+
+- **Histórico Vercel Blob:** los localizadores existentes se conservan sin reescritura. Cuando el almacén legacy no permite lectura, cada archivo/parte se identifica como `vercel_blob_legacy`, `legacy`, `temporarily_unavailable` y `migration_status=pending`. Ese estado no significa que el objeto esté perdido, borrado o corrupto.
+- **Contenido nuevo:** toda nueva captura, parte, importación y derivado se escribe exclusivamente en Backblaze B2. Se conserva KHC1 y el bucket privado. El adaptador debe completar GET/read-back físico autenticado y cotejar longitud y SHA-256 de los bytes almacenados antes de devolver el localizador o permitir registrar la parte como verificada. Si B2 falla, se falla cerrado; nunca se intenta escribir ese objeto en Vercel Blob.
+- **Aislamiento:** la indisponibilidad de una parte Blob no impide guardar texto, checkpoints, versiones, editar texto ni escribir contenido nuevo en B2. Las sesiones mixtas conservan estado por parte; se pueden usar las partes B2 accesibles, pero no se presenta como completo un audio/MP3 que necesite bytes legacy ausentes.
+- **Lectura legacy:** permanece pausada mientras Blob esté suspendido (`KHORA_LEGACY_BLOB_READS_ENABLED` no habilitado). Se reactivará solo después de recuperar el servicio y confirmar GET; reactivar lectura no autoriza migración.
+- **Migración histórica:** queda diferida. No ejecutar ahora copias/backfill, cambios de referencias SQL/JSONB, ledger de migración ni eliminación/sobrescritura de originales. Se abrirá una fase separada cuando el operador reactive Blob, se confirme lectura física y autorice expresamente la transferencia.
+
+El contrato de proveedor se aplica por localizador y objeto; nunca se reclasifica una referencia legacy solo porque el contenido de la misma sesión tenga partes B2.
+
 ### Navegador
 
 IndexedDB `khora-custodia-v1`, almacenes `records` y `keys`. Los snapshots y fragmentos se cifran con AES-GCM usando una CryptoKey no exportable por identidad. El texto de la captura y los bytes de audio no se guardan en claro en `localStorage`.
@@ -103,7 +115,7 @@ Para micrófono, se solicita la grabadora antes de empezar el reconocedor. El na
 
 Cada subida usa la misma sesión e índice al reintentar, con un máximo de tres intentos y esperas de 1 y 2 segundos; timeout de red de 30 segundos por intento. Errores no recuperables no se repiten indiscriminadamente. Un fallo no permite archivar audio parcial como completo.
 
-Servidor: recibir → calcular SHA-256 → cifrar → Blob → releer → descifrar → contrastar tamaño/huella → registrar parte. El registro de partes y el cierre serializan sobre la fila de sesión. Una sesión sellada no permite añadir ni sustituir partes.
+Servidor: recibir → calcular SHA-256 → cifrar KHC1 → Backblaze B2 → GET/read-back físico autenticado → contrastar longitud y SHA-256 del objeto cifrado leído → registrar la parte como verificada. El localizador se devuelve solo después del cotejo. No existe fallback de escritura hacia Vercel Blob. El registro de partes y el cierre serializan sobre la fila de sesión. Una sesión sellada no permite añadir ni sustituir partes.
 
 El evaluador de manifiesto rechaza vacío, duplicados, índices extra/fuera de rango, huecos, cantidades distintas, tamaños vacíos, huellas inválidas o partes no verificadas. El texto manual se clasifica como texto y no requiere audio por tener un identificador de sesión.
 
@@ -209,12 +221,16 @@ Antes de declarar cumplido, ejecutar con identidad y almacenes de prueba:
 | Chrome sin confirmación final | No sellar integridad desconocida | Pendiente extensión |
 | Copia y restauración | Restaurar objetos, filas, versiones y claves | Pendiente ensayo real |
 | Producción | SHA exacto desplegado y flujo completo | NO CERTIFICADO |
+| Nueva escritura de audio | PUT B2 + GET/read-back autenticado; longitud y SHA-256 idénticos | Pendiente de validación sobre el commit publicado |
+| Blob histórico inaccesible | Estado por archivo `temporarily_unavailable`/`migration_status=pending`; sin declararlo perdido/corrupto | Pendiente de smoke test de interfaz/API |
+| Sesión mixta Blob+B2 | Partes B2 utilizables; no fingir audio completo si falta una parte Blob; texto/checkpoints continúan | Pendiente de E2E autenticado |
+| Fallo de B2 | Fallo cerrado, sin fallback de escritura a Blob | Pendiente de prueba negativa E2E |
 
 ## 15. Registro de brechas y siguiente trabajo
 
 Inventario histórico del primer corte (conservado para trazabilidad). El estado vigente fila por fila está en §21; no interpretar como pendientes intactos los puntos implementados después. La rama no se considera cierre universal mientras sus compuertas materiales permanezcan abiertas:
 
-1. Certificación con PostgreSQL/Blob/navegador y commit productivo identificado.
+1. Certificación con PostgreSQL/Backblaze B2/navegador y commit productivo identificado; los fixtures legacy Blob solo comprueban clasificación/indisponibilidad mientras el origen siga suspendido.
 2. Cola automática durable de títulos y ejecución eventual verificable.
 3. Reconciliación programada de trabajos MP3 estancados y reconstrucción del catálogo histórico sin trabajo registrado.
 4. Conversión de capturas mayores al límite actual sin perder originales ni truncar audio.
@@ -340,14 +356,14 @@ El MP3 puede representar un prefijo verificado. Listado, lectura y cabeceras deb
 
 | Fila original de §15 | Cambio de este ciclo | Qué falta para certificación universal |
 | --- | --- | --- |
-| 1 · Integración y producción | Suite ampliada y ensayos aislados separados por frontera | PostgreSQL/Blob/Notion reales, identidad de commit desplegado y recuperación extremo a extremo |
+| 1 · Integración y producción | Suite ampliada y ensayos aislados separados por frontera | PostgreSQL/B2/Notion reales, identidad del commit desplegado y recuperación E2E; Blob legacy solo se vuelve a leer tras reactivación y autorización |
 | 2 · Títulos durables | Cola transaccional, reintentos y protección de título humano | Proveedor real y ejecutor supervisado activo |
 | 3 · MP3/histórico | Descubrimiento de sesiones verificadas sin trabajo, backoff e historial inmutable | Certificar catálogo real, excluir dueños indeterminados y activar ejecutor |
 | 4 · Capturas largas | Se conservan originales; error explícito y límite documentado | Proceso largo/streaming medido para >128 MiB y límites del proveedor |
 | 5 · Chrome/Aisthesis | Compuerta exige cierre con sesión, cuenta final y todas las partes verificadas | Persistencia propia de extensión, manifiesto final con cuenta exacta y ACK estricto; la extensión actual no emite el manifiesto final: el cierre queda bloqueado explícitamente, no se finge compatibilidad |
 | 6 · Autorización heredada | Guardas de propietario en principales rutas de custodia y pipeline | Barrido completo de herramientas textuales y demás endpoints heredados |
 | 7 · Espejo | Cola durable, identidad exacta, texto sin pérdida, paginación y relectura | Integración Notion real, presupuesto para textos extraordinarios y garantía operativa del ejecutor |
-| 8 · Respaldo | Ensayo aislado de restauración de datos cifrados y necesidad de clave | Restaurar base, Blob y claves de un entorno real independiente; definir retención y supervisión |
+| 8 · Respaldo | Ensayo aislado de restauración de datos cifrados y necesidad de clave | Restaurar base, B2, Blob histórico y claves en un entorno real independiente; definir retención y supervisión |
 | 9 · Fallos del navegador | IndexedDB real, carreras de clave y pruebas de recarga/red sintéticas | Cuota agotada, perfil privado, cierre forzado y conflictos semánticos entre pestañas soportadas |
 | 10 · Revisión humana | Catálogo/contratos estáticos y prueba de interacción automatizada | Operador presente: interfaz, seguridad y decisión de liberación |
 | 11 · No pulsar Archivar | Reconciliador genera MP3 de prefijos abiertos y reconstruye completo al sellar | Ejecutor activo, verificación física continua y catálogo manual de todas las sesiones abiertas |
