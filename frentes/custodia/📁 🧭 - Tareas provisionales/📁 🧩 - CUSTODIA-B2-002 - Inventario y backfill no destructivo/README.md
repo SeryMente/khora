@@ -1,6 +1,6 @@
 # CUSTODIA-B2-002 · Inventario y backfill no destructivo
 
-**Estado:** `en_curso`  
+**Estado:** `en_curso` · **Prioridad:** P0 · **Próxima ejecución inmediata**  
 **Tipo:** tarea provisional subordinada al OCP Custodia.  
 **Identificador:** local y estable dentro del registro provisional de este frente; no es folio global, sesión ni control.
 
@@ -45,9 +45,9 @@
 No aplicar SQL ni backfill a Neon Production, no alterar referencias de producción ni borrar Blob. El script no se ejecutará con `--apply` hasta corregir la reconciliación y validar el procedimiento en el entorno aislado. La responsabilidad, autorización y sesión se heredan del [control único de Custodia](../../CONTROL-RESPONSABILIDAD.json), generación 6; no se crea un control por tarea.
 
 
-## Repriorización vigente · 2026-11-09
+## Repriorización vigente · 2026-11-10
 
-**Orden:** esta tarea se ejecuta después de CUSTODIA-B2-006 (nuevas escrituras B2 verificadas), CUSTODIA-B2-005 (diagnóstico E2E residual) y CUSTODIA-B2-007 (estabilización). Su resultado es que todo el histórico de Vercel Blob esté copiado y reconciliado en B2.
+**Orden actualizado por instrucción directa del operador:** con una captura real de nuevas escrituras B2 reportada como archivada, CUSTODIA-B2-002 pasa a prioridad P0 inmediata. El inventario read-only y la copia física no destructiva pueden ejecutarse sin esperar el cierre de CUSTODIA-B2-005 ni el pulido opcional de CUSTODIA-B2-007. La actualización de referencias SQL/JSONB permanece bloqueada hasta corregir y probar el reconciliador y el ledger. Resultado final: todo el histórico físico Vercel Blob inventariado, copiado, verificado y reconciliado en B2.
 
 **Alcance ampliado por instrucción directa:** no limitarse a las filas que aparecen actualmente en Neon. Primero inventariar todos los objetos físicos del store Blob y cruzarlos con referencias en tablas, JSONB, volcados, sesiones y manifests. Clasificar cada objeto como referenciado, no referenciado, duplicado, huérfano candidato, ausente o ambiguo. No descartar elementos por falta de volcado_id.
 
@@ -62,7 +62,7 @@ No aplicar SQL ni backfill a Neon Production, no alterar referencias de producci
 
 **Bloqueos técnicos conservados:** la tabla/ledger 035 no estaba presente en Neon main en el último corte leído; el backfill PR #348 contiene el defecto de conteo/posestado de referencias JSONB descrito arriba. No ejecutar APPLY productivo hasta corregirlo, probarlo en rama aislada y verificar el inventario completo. Esta limitación no bloquea el inventario read-only ni la copia física en un lote controlado sin cambiar referencias.
 
-**Estado actual:** secuenciada después de B2-006/005/007. No se ha copiado ningún objeto histórico Blob a B2 en esta retoma.
+**Estado actual al corte 2026-11-10:** P0 inmediata. No se ha inventariado el universo físico de Blob ni se ha copiado ningún objeto histórico Blob a B2. La captura reciente de 191 partes es una escritura nueva en B2 y no forma parte del backfill Blob.
 
 ## Retoma operativa verificada · 2026-11-09
 
@@ -71,3 +71,46 @@ No aplicar SQL ni backfill a Neon Production, no alterar referencias de producci
 - No se ha inventariado exhaustivamente ni copiado ningún objeto histórico físico de Vercel Blob en este ciclo; no se han actualizado referencias Neon y no se han eliminado originales.
 - Se conserva el bloqueo sobre APPLY/actualización de referencias hasta corregir `updateReferences()`, probar conteo individual de referencias JSONB, transacción, idempotencia y comprobación del posestado en un entorno no productivo.
 - Próximo avance técnico: corregir y probar el reconciliador y preparar inventario paginado/GET read-only de Blob; después copiar cada objeto a clave B2 estable, con read-back físico y SHA/bytes/KHC1. Solo tras esa prueba se podrá reconciliar referencias bajo la autorización y compuertas ya registradas.
+
+
+## Retoma de migración · 2026-11-10 · prioridad P0
+
+### Línea base lógica de Neon (lectura solamente)
+
+El corte read-only reportado en la sesión anterior registró:
+
+| Fuente de referencia | Referencias con URL Vercel Blob |
+|---|---:|
+| `dictado_audio_parte` | 624 |
+| `dictado_mp3` | 15 |
+| `dictado_mp3_historial` | 15 |
+| `volcado.audio_url` | 37 |
+| `volcado.audio_partes` | 248 referencias individuales JSONB |
+| Sesiones en `dictado_session` | 186 |
+
+Se reportaron también 1,360 filas en `dictado_audio_parte`, 76 filas `volcado`, 34 volcados con `audio_partes` y 1,158 partes sin `volcado_id`. Son relaciones lógicas, no una enumeración física de blobs ni una deduplicación de objetos. Las 1,158 filas sin `volcado_id` no son huérfanas por definición. Las referencias JSONB deben contarse individualmente, no por fila contenedora.
+
+### Estado técnico confirmado por la última sesión
+
+- Snapshot Neon previo a la migración: `custodia-blob-b2-before-migration-20261109`, referencia reportada `snap-cool-fog-ahjm3gsf`.
+- Rama aislada creada: `custodia-blob-b2-migration-20261109`, hija de main para pruebas; el nombre no implica que SQL/backfill ya se haya ejecutado.
+- El ledger `public.custodia_blob_b2_migration` no existe en Neon main (lectura de `to_regclass`: NULL).
+- No se encontró en main el archivo `035_custodia_blob_b2_migration.sql` en las rutas consultadas.
+- PR #348 contiene el defecto conocido en `updateReferences()`: contabiliza filas JSONB/contenedor en vez de cada referencia individual y no prueba por sí sola el posestado completo. Corregir antes de cualquier update de referencias.
+- No se ha aplicado SQL, ejecutado `--apply`, ni cambiado referencias en Neon Production; no se han borrado originales Blob.
+
+### Secuencia obligatoria de ejecución
+
+1. Obtener el inventario físico completo de Vercel Blob con paginación hasta cursor final; incluir objetos no referenciados, duplicados, ambiguos y candidatos huérfanos. No deducir el universo físico desde las filas Neon.
+2. Descargar cada objeto legible desde Blob, conservar URL/path/id de origen, bytes, tamaño y SHA-256; validar sobre KHC1 cuando aplique. Distinguir ausentes/no descargables de los no referenciados.
+3. Copiar cada objeto a una clave B2 determinista, privada e idempotente. Registrar en ledger/manifest la correspondencia origen→destino y el resultado.
+4. Hacer GET físico de B2 para cada destino, verificar bytes/tamaño/SHA-256 y KHC1/contenido claro según aplique. Un HTTP PUT 2xx no cierra el objeto.
+5. En paralelo, implementar la migración 035/ledger aditiva y corregir `updateReferences()` para contar cada elemento JSONB, evitar cambios concurrentes y reconciliar posestado bajo transacción, con dry-run, idempotencia y reanudación.
+6. Aplicar cambios de referencias primero en la rama aislada; leer de vuelta y reconciliar cada relación SQL/JSONB. La actualización de Neon Production queda bloqueada hasta que esa prueba pase y exista una ruta de aplicación expresamente autorizada.
+7. Volver a listar Blob y comparar inventario inicial/final; demostrar que cada objeto está migrado o en una clase de excepción documentada. Mantener todos los originales sin borrar ni sobrescribir.
+
+### Separación entre nuevo almacenamiento y backfill
+
+La captura de 10,052 caracteres con 191 partes reportada en la última sesión quedó asociada al bucket `khora-userdata-ecea4187`; sirve como evidencia de que la nueva ruta B2 persiste una captura, pero no demuestra que los objetos históricos Blob se hayan inventariado o copiado. El backfill de esta tarea sigue en cero objetos copiados/verificados hasta que exista manifest físico y read-back comprobable.
+
+**Bloqueo real:** hoy falta el inventario físico Blob y no existe la estructura de ledger 035 en main; además debe corregirse/testearse el reconciliador JSONB. Ningún original se retira durante este proceso.
