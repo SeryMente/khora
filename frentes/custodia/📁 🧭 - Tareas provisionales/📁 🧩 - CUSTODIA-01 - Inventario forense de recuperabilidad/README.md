@@ -1,4 +1,4 @@
-<!-- TASK_VERSION=0.8; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
+<!-- TASK_VERSION=0.9; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
 # CUSTODIA-01 · Archivo de todos los registros recuperables
 
 > **Estado:** EN CURSO · **Prioridad:** P0 · **Único expediente activo del frente CUSTODIA.**  
@@ -140,3 +140,33 @@ El restablecimiento de PIN queda como alternativa; no es necesario para la prueb
 La fuente actual khora-web/lib/server/ep.ts incluye ep:github:read en sesiones EP nuevas. El endpoint POST /api/ep/github-credential requiere ep:bootstrap + ep:github:read, valida el propietario y descifra exclusivamente la credencial ep almacenada. Puede comprobarse si X_KHORA_KEY aún permite abrir el ciphertext.
 
 El operador debe emitir una sesión EP nueva desde Entorno Persistente; esto revoca la sesión EP anterior, no los Bearer Tokens manuales MCP. Después se consumirá el JWT solo en memoria local contra ese endpoint y se emitirá únicamente OK/código de error. No pegar el token en el chat. No ejecutar el comando de bootstrap ni crear VHDX/deploy. OCP §22.
+
+
+## 12. CUSTODIA-01.j · Backlog de dependencia criptográfica de Recuperar capturas
+
+**Estado:** BACKLOG · NO ACTIVO · NO IMPLEMENTADO.  
+**OCP:** §24.  
+**Evidencia:** [DEPENDENCIA-X-KHORA-KEY-CATALOGO-RECUPERACION-20261110.md](../../evidencias/DEPENDENCIA-X-KHORA-KEY-CATALOGO-RECUPERACION-20261110.md).  
+**Instrucción:** [INSTRUCCION-BACKLOG-DEPENDENCIA-X-KHORA-KEY-20261110.md](../../originales/INSTRUCCION-BACKLOG-DEPENDENCIA-X-KHORA-KEY-20261110.md).
+
+### Hallazgo
+
+El catálogo de Recuperar capturas descifra los snapshots de Neon para crear título/vista previa/metadatos de las tarjetas. Si `X_KHORA_KEY` falta o no coincide, la construcción del catálogo puede terminar en `503 catalogo_no_disponible`, aunque las filas y ciphertext continúen almacenados. Revisiones, lectura de checkpoints y recuperación también necesitan descifrar snapshots.
+
+La misma llave es raíz criptográfica de los helpers AES-256-GCM de KHORA para texto y bytes. En los call sites revisados cubre checkpoints/snapshots, audio por partes, MP3, texto/versiones de Volcados y credenciales GitHub. Los registros nuevos que pasen por esas rutas requieren la llave vigente en el servidor para escribir y, más tarde, leer. No se afirma que cada metadato o fila de Neon esté cifrado.
+
+### Separación respecto de Blob
+
+- Blob suspendido: impide descargar físicamente objetos legacy.
+- X_KHORA_KEY ausente/divergente: impide descifrar snapshots y bytes cifrados KHC1, incluso cuando el objeto se obtiene desde B2.
+- Falta de revisión y falta de titularidad: causas distintas que la llave no corrige.
+
+### Acciones de backlog
+
+1. Confirmar por una prueba autenticada y sin exponer el secreto si Production conserva la misma llave de los ciphertext existentes.
+2. Recorrer el catálogo y sus revisiones por páginas, conciliando con los registros persistidos.
+3. Clasificar cada caso por causa y componente; no confundir 503 de catálogo, falta de revisión, Blob inaccesible o titularidad.
+4. Evaluar una propuesta de producto para aislar un snapshot no descifrable y evitar que una tarjeta haga fallar toda una página. No implementar sin autorización específica.
+5. Preservar la llave actual y los ciphertext; no rotar, reemplazar, regenerar ni re-cifrar.
+
+**No ejecutado:** no hubo consulta productiva, cambio de entorno, ejecución de endpoint, lectura de objetos ni modificación de código/datos.
