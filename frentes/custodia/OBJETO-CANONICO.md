@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.59; OBJECT_SEAL=CUSTODIA-v0.59; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.60; OBJECT_SEAL=CUSTODIA-v0.60; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.59. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.60. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1316,3 +1316,49 @@ Las consultas Neon de este ciclo se limitaron a metadatos del esquema y no modif
 4. Resolver el índice 317 del otro manifiesto B2 antes de intentar su archivo. Mantener Blob pendiente hasta reactivación y GET físico satisfactorio.
 
 **Cierre de este ciclo:** OCP v0.59 y lista v0.47 actualizados; la evidencia de revalidación fue persistida y leída de vuelta. Neon se consultó solo para metadatos del esquema; el store Blob se consultó solo por metadata. No hubo GET B2/Blob, escrituras de negocio, Volcados nuevos ni cambios de código/configuración/credenciales/deploy. CUSTODIA-01 permanece como única tarea activa.
+
+
+## 29. Reconciliación de registros textuales sin audio · 2026-11-11 · CUSTODIA-v0.60
+
+**Evidencia:** [RECONCILIACION-TEXTO-SIN-AUDIO-20261111.md](evidencias/RECONCILIACION-TEXTO-SIN-AUDIO-20261111.md).
+
+### 29.1 Universo textual sin audio
+
+La conciliación SELECT-only del universo propio (79 sesiones sin Volcado) separa 44 sesiones con audio (1.039 partes), 34 sesiones con checkpoint textual sin audio y una sesión sin texto ni audio.
+
+Las 34 sesiones textuales se desglosan por coincidencia SHA con Volcados del mismo titular:
+- 21 sesiones con al menos una revisión o checkpoint cuyo SHA coincide con un Volcado propio; 3.846 revisiones. Reconciliar antes de crear; no deduplicar automáticamente por texto.
+- 13 sesiones sin coincidencia SHA; 1.020 revisiones en 12 sesiones y una sesión sin revisiones.
+
+Los 34 checkpoints textuales consultados muestran marcador cifrado `khc1.` y SHA de checkpoint de 64 caracteres hexadecimales. No se leyó plaintext directamente desde Neon.
+
+### 29.2 Primer candidato de archivo textual
+
+Se identificó la sesión `48586f80-63d6-4969-9691-27e55cb5d5f5`:
+- Estado `checkpoint`, sin Volcado vinculado.
+- Creada/actualizada el 2026-10-15T17:55:00.481Z.
+- Checkpoint cifrado `khc1.`, 24.853 caracteres almacenados.
+- SHA de checkpoint de 64 caracteres hexadecimales.
+- Sin filas de revisión y sin partes de audio.
+- Sin coincidencia SHA con Volcado del mismo propietario.
+
+Es la primera unidad elegible para intentar archivo porque no depende de B2 ni Blob. Aún no se declara recuperada: el runtime autenticado debe descifrar el checkpoint y recalcular/cotejar su SHA.
+
+### 29.3 Flujo y compuertas
+
+La inspección estática de `main` confirma:
+1. `GET /api/dictado/checkpoint?sessionId=...` exige NextAuth, recupera checkpoint/snapshot, descifra texto y valida su SHA. No exige la cookie de desbloqueo de bóveda.
+2. `POST /api/dictado` exige NextAuth, reclama sesión al propietario y archiva texto sin audio por el flujo canónico.
+3. Tras el POST se requiere lectura de vuelta del Volcado, propietario, SHA y vínculo de sesión.
+
+Ninguno de esos endpoints se ejecutó: no se dispone de sesión autenticada del propietario desde el canal de ejecución. No se obtuvieron ni inspeccionaron cookies o secretos.
+
+### 29.4 Priorización vigente
+
+1. **Primero:** sesión textual `48586f80-63d6-4969-9691-27e55cb5d5f5`, tras obtener contexto NextAuth del propietario.
+2. **Después:** las otras 12 sesiones textuales sin coincidencia SHA, recuperadas y verificadas una por una.
+3. **Luego:** manifiesto B2 continuo de 77 partes, sesión `45f0cf5e-d1af-46c3-95af-e9428b8b0f90`, sujeto a GET físico, descifrado y SHA por parte.
+4. **Separado:** 21 sesiones textuales con SHA coincidente; cotejar su contenido/revisiones y audio/procedencia antes de decidir si requieren Volcado adicional.
+5. Mantener Blob pendiente mientras el proveedor siga suspendido.
+
+**Cierre:** evidencia textual nueva persistida y leída de vuelta; OCP v0.60. No hubo escrituras de negocio, descifrado, creación de Volcados ni modificaciones a infraestructura. CUSTODIA-01 permanece como única tarea activa.
