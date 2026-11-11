@@ -1190,4 +1190,4 @@ La afirmación anterior de que la llave faltaba en Production queda rectificada 
 4. Con la llave configurada, si un endpoint devuelve error criptográfico, distinguirlo de ausencia de Blob, revisión inexistente, titularidad y GET B2; no concluir fallo criptográfico solo por referencias no recuperadas.
 5. No escribir directamente en Neon para eludir el flujo canónico. Mantener fuera los registros sin titularidad demostrada y de otros titulares.
 
-**Cierre de este ciclo:** OCP y lista documental actualizados; última salida preservada; lectura de vuelta pendiente de esta escritura. No hubo cambios de código, configuración, despliegues, Neon, B2, Blob ni bóvedas. CUSTODIA-01 permanece como única tarea activa; el objetivo no cambia.
+**Cierre de este ciclo:** OCP v0.55 y lista v0.43 actualizados; instrucción, evidencia y salida literal preservadas. La lectura de vuelta de los cinco artefactos coincide con longitudes y marcadores esperados; los SHA de blob quedaron registrados en el recibo del ciclo. No hubo cambios de código, configuración, despliegues, Neon, B2, Blob ni bóvedas. CUSTODIA-01 permanece como única tarea activa; el objetivo no cambia.
