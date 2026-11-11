@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.67; OBJECT_SEAL=CUSTODIA-v0.67; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.68; OBJECT_SEAL=CUSTODIA-v0.68; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.67. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.68. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1564,3 +1564,30 @@ No se ejecutó el worker ni la ruta auxiliar. No se leyeron secretos ni plaintex
 El inventario R3 permanece sin cambio: 95 sesiones atribuibles, 16 ya enlazadas excluidas, 79 sin Volcado, 1.039 partes de audio (785 B2/254 Blob por metadata), 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados sin acceso por el canal excluido. No se creó Volcado nuevo.
 
 **Dictamen:** el ejecutor existente no es apto para el archivo primario de CUSTODIA-01. Continúa bloqueada la ejecución que requiere clave KHC1, accesos físicos de almacenamiento y contexto de titular autenticado. No se usa el rol Neon ni el worker secundario como sustituto de NextAuth. CUSTODIA-01 sigue abierta.
+
+
+## 35. Ruta genérica de Volcado y límite de credencial de servicio · R5 · 2026-11-11
+
+**Evidencia:** [RUTA-ARCHIVO-PRIMARIO-Y-LIMITE-DE-API-SERVICIO-20261111-R5.md](evidencias/RUTA-ARCHIVO-PRIMARIO-Y-LIMITE-DE-API-SERVICIO-20261111-R5.md).
+
+### 35.1 Escritores y rutas contrastados
+
+Se rastrearon los llamadores de `guardarDictado()`, `archivarVolcado()`, inserciones de `volcado`, `reclamarSesion()` y el uso de `KHORA_API_KEY`/ `X-Khora-Key` en `main`:
+
+- `POST /api/dictado` es el escritor canónico de una captura: requiere NextAuth, toma el correo de sesión, valida `reclamarSesion()` y usa `guardarDictado()` con sessionId, comprobaciones de contenido/manifiesto e idempotencia.
+- `POST /api/volcado` es un escritor genérico de texto, también requiere NextAuth. `archivarVolcado()` cifra y hashea texto, pero su contrato no admite sessionId, revisionId ni manifiesto de audio; genera un ID nuevo por llamada y no enlaza `dictado_session.volcado_id`. No sirve para rescatar checkpoints huérfanos sin perder vínculo/idempotencia.
+- `POST /api/dictado/checkpoint` y recuperación siguen exigiendo identidad NextAuth; recuperación crea un checkpoint/sesión derivado, no un Volcado.
+- `POST /api/ingesta` exige NextAuth y trabaja con un Volcado/version/SHA aprobados preexistentes.
+- El puente `POST /api/v1/ingesta` valida `X-Khora-Key`/ `KHORA_API_KEY`, la terna `volcado_id/version/sha256` y escribe en Neo4j. No inserta Volcado en Neon ni demuestra identidad de una sesión fuente.
+- `/api/eventos` no archiva dictados. El GET admite la clave para diagnóstico; el POST exige NextAuth (fuera de tests).
+- `repair_volcados.ts` y `reparar_volcados_historicos.ts` son reparadores de registros existentes; no se ejecutaron.
+
+### 35.2 Dictamen de servicio
+
+No se encontró una ruta de servicio que cree un Volcado canónico desde checkpoint huérfano con titularidad, cifrado, manifiesto, vínculo e idempotencia. No se usa la clave de API de Neo4j como identidad del titular ni el endpoint genérico para crear Volcados desligados. Tampoco se ejecuta el reparador de Volcados, cuyo modo por defecto es mutativo.
+
+### 35.3 Estado y no-acciones
+
+La línea R3 permanece sin cambios: 95 sesiones atribuibles; 16 ya enlazadas excluidas; 79 sin Volcado; 1.039 partes de audio (785 B2/254 Blob por metadata), 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados. No hubo Volcados nuevos, escrituras de negocio, llamadas POST, GET físicos B2/Blob, lectura de secretos o plaintext, cambios de código de producto, variables, configuración, buckets, deployment, merge ni acceso al monitor/Chrome/RDC.
+
+**Dictamen:** CUSTODIA-01 sigue EN CURSO. La única ruta primaria compatible con el contrato sigue requiriendo sesión NextAuth del titular y dependencias KHC1/almacenamiento en runtime autorizado. Lo demás permanece como residual concretamente bloqueado; no se declara recuperado ni perdido.
