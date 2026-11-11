@@ -1,4 +1,4 @@
-<!-- LIST_VERSION=0.44; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.45; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
@@ -192,3 +192,17 @@ La salida literal se conserva íntegra como registro histórico. Sus conteos de 
 - El clon local KHORA está en una rama de Harmonia con cambios sin publicar, sin .env.local, sin node_modules ni servidor local. Se deja intacto y no se utilizará como runtime de CUSTODIA.
 
 **Siguiente ruta:** B2 queda apto en el nivel de autenticación/bucket; falta lectura física/read-back/SHA de objetos elegibles mediante KHORA autenticado. Blob requiere reactivación/lectura temporal por Vercel; solo después de GET físico se habilitará la compuerta de aplicación. El procesamiento local requiere runtime KHORA limpio y autenticado.
+
+## 14. Conciliación Neon de 79 sesiones sin vínculo y gate B2 · 2026-11-10 · v0.45
+
+**Instrucción literal:** [INSTRUCCION-CONTINUIDAD-OPERADOR-20261110-B.md](originales/INSTRUCCION-CONTINUIDAD-OPERADOR-20261110-B.md).  
+**Salida del modelo:** [SALIDA-MODELO-RECONCILIACION-NEON-B2-20261110.md](originales/SALIDA-MODELO-RECONCILIACION-NEON-B2-20261110.md).  
+**Evidencia:** [RECONCILIACION-NEON-MANIFIESTOS-B2-20261110.md](evidencias/RECONCILIACION-NEON-MANIFIESTOS-B2-20261110.md).
+
+- Predicado de titularidad igual al backend: COALESCE(custodia_owner, checkpoint_usuario). 84 sesiones propias; 5 vinculadas a Volcados y 79 sin vínculo.
+- Las 79 pendientes suman 1.039 partes (785 B2 y 254 Blob). De 29 sesiones con algún SHA de revisión coincidente con un Volcado, cuatro tienen además el mismo manifiesto de audio (48 partes Blob) y cuatro tienen manifiesto distinto (708 partes B2); 21 son solo texto. No deduplicar automáticamente por SHA de texto.
+- Las 50 sesiones sin SHA coincidente: 35 con audio Blob (206 partes), 1 B2 con 77 partes, 12 de solo texto con 1.020 revisiones, 1 solo texto sin revisión y 1 sin texto ni audio.
+- Los cinco manifiestos B2 suman 785 partes, todas con estado almacenado verificado, SHA válido y bytes positivos. Cuatro son contiguos (464 partes); uno tiene 321 filas y falta el índice 317. El último no pasa la compuerta de índices consecutivos del código.
+- El GET/read-back físico de B2 sigue pendiente. El estado verificado en Neon no demuestra disponibilidad actual de objetos. Blob sigue suspendido.
+
+**Continuación:** localizar/reconciliar el índice 317 por el flujo autorizado; priorizar GET/read-back de los cuatro manifiestos B2 contiguos y procesar solo después mediante POST canónico autenticado. Resolver las 4 posibles duplicidades exactas mediante cotejo, no por suposición. No tocar SQL, credenciales ni configuración para forzar el archivo.
