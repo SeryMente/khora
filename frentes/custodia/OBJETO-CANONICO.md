@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.56; OBJECT_SEAL=CUSTODIA-v0.56; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.57; OBJECT_SEAL=CUSTODIA-v0.57; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.56. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.57. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -26,9 +26,9 @@ La implementación está integrada en `main` (commit `f0224c1368fb15a3452335a443
 - **Único núcleo operativo:** este OBJETO-CANONICO.md.
 - **Control único de responsabilidad:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json). Titularidad documental/operativa transferida de generación 10 a 11 y leída de vuelta. Titular actual: chatgpt-custodia-INSTANCE-20261109-01A1C125; alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59; UUIDv7 local de conversación 01a1c125-af13-79b1-87cc-f1e5fe4b0b59; UUIDv7 local del evento 01a1c125-af13-7825-8af1-0ff35ad87b0e; control blob c29349fc4d2e07d40cd6efe583171482578db6d3. ID nativo de plataforma no expuesto. Titular previo gen. 10 y generaciones anteriores preservados. Folio PENDIENTE/NO ASIGNADO; FOL1 no está ACTIVO/verificado.
 - **Propósito literal aprobado:** [originales/PROPOSITO-OPERADOR-2026-10-28.md](originales/PROPOSITO-OPERADOR-2026-10-28.md). La sección 4 también conserva el texto aprobado íntegro para que el propósito sea visible en el núcleo.
-- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional v0.44. Contiene un solo objetivo activo: CUSTODIA-01, archivo de todos los registros que puedan archivarse y documentación de los residuales actualmente bloqueados. Las demás tareas provisionales quedaron resueltas administrativamente por reenfoque, sin atribuirles aprobación técnica. CUSTODIA-02 continúa retirada y su identificador no se reutiliza.
+- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional v0.45. Contiene un solo objetivo activo: CUSTODIA-01, archivo de todos los registros que puedan archivarse y documentación de los residuales actualmente bloqueados. Las demás tareas provisionales quedaron resueltas administrativamente por reenfoque, sin atribuirles aprobación técnica. CUSTODIA-02 continúa retirada y su identificador no se reutiliza.
 - **Inventario provisional de hallazgos:** [evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md](evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md), materialización de evidencia para CUSTODIA-01; no es un segundo estado vivo.
-- **Versión y sello vigentes:** CUSTODIA-v0.56. Es una versión documental del objeto; no es una versión del producto.
+- **Versión y sello vigentes:** CUSTODIA-v0.57. Es una versión documental del objeto; no es una versión del producto.
 - **Registro de la retoma anterior:** [originales/ChatGPT-CUSTODIA-20261106-1424.txt](originales/ChatGPT-CUSTODIA-20261106-1424.txt), instrucción textual parcial original y diagnóstico estático del límite de archivado.
 - **Original de esta retoma:** [originales/ChatGPT-CUSTODIA-20261107-1157.txt](originales/ChatGPT-CUSTODIA-20261107-1157.txt), exportación preservada en main; SHA-256 `7E256B9888F2A0227632D39D22B98E9BD1316548E057E83514ADE61376A93CC5`, 42,629 bytes; lectura de vuelta exacta.
 - **Original de esta retoma (2026-11-08 11:21):** [originales/ChatGPT-CUSTODIA-20261108-1121.md](originales/ChatGPT-CUSTODIA-20261108-1121.md), 39,896 bytes; SHA-256 `CB264E5979AA545F082B5CC9C59DEDA30CE9547100DB29B138A520C3592A866A`; Git blob `b7e13e3fe9fed70873535640e1124577f5b037e4`; commit `5d6cf7055f2ab5f0020bde220d078ffe077512a6`; lectura de vuelta idéntica.
@@ -1245,3 +1245,42 @@ No se cambió de rama, no se limpiaron archivos, no se instalaron dependencias n
 4. Archivo: crear Volcados y vínculos únicamente por el flujo canónico KHORA, con titularidad, idempotencia, SHA y lectura de vuelta. No escribir directamente en Neon para evitar los controles de aplicación.
 
 **Cierre de este ciclo:** OCP v0.56 y lista v0.44 actualizados; los tres artefactos nuevos (instrucción, salidas del modelo y evidencia) y los dos objetos vivos se leyeron de vuelta. Longitudes, marcadores y SHA de blob se cotejaron; los resultados quedaron confirmados en el ciclo. No hubo cambios en código, configuración, despliegues, Neon, B2, Blob, bóvedas, datos de navegador ni originales. No se archivó ningún registro ni se procesó audio local. CUSTODIA-01 permanece como única tarea activa.
+
+## 27. Conciliación por titularidad, hashes y manifiestos B2 · 2026-11-10 · CUSTODIA-v0.57
+
+**Instrucción literal:** [originales/INSTRUCCION-CONTINUIDAD-OPERADOR-20261110-B.md](originales/INSTRUCCION-CONTINUIDAD-OPERADOR-20261110-B.md).  
+**Salida del modelo:** [originales/SALIDA-MODELO-RECONCILIACION-NEON-B2-20261110.md](originales/SALIDA-MODELO-RECONCILIACION-NEON-B2-20261110.md).  
+**Evidencia:** [evidencias/RECONCILIACION-NEON-MANIFIESTOS-B2-20261110.md](evidencias/RECONCILIACION-NEON-MANIFIESTOS-B2-20261110.md).  
+**Lista subordinada:** LISTA-TAREAS-PROVISIONAL.md v0.45.
+
+### 27.1 Reconciliación de titularidad en Neon
+
+Se ejecutaron consultas SELECT-only en el branch main de Neon usando el mismo predicado que el backend: COALESCE(custodia_owner, checkpoint_usuario) = propietario autenticado. La enumeración devuelve 84 sesiones propias: 5 ya vinculadas a Volcados y 79 sin vínculo. Hay 83 con checkpoint_text no vacío, 46 con revisiones, 49 con audio y 47 con MP3.
+
+Las 79 pendientes suman 1.039 partes: 785 B2 y 254 Blob. Las 5 ya vinculadas suman las 294 partes restantes del universo propio (267 B2 y 27 Blob), para 1.333 partes en total del propietario.
+
+### 27.2 Coincidencias de SHA sin deduplicación automática
+
+29 de las 79 sesiones tienen al menos una revisión con SHA igual al de un Volcado del mismo propietario. La comparación adicional de manifiesto, por índice/bytes/SHA, discrimina:
+- 4 sesiones: texto coincidente y manifiesto de audio idéntico, 48 partes Blob. Son candidatas fuertes a duplicado; no crear otra alta hasta cotejar.
+- 21 sesiones: SHA de texto coincidente, pero sin audio asociado a la sesión candidata.
+- 4 sesiones: texto coincidente y audio diferente, 708 partes B2. No asumir que el Volcado anterior cubre esas partes distintas.
+
+Las otras 50 sesiones no muestran coincidencia de SHA con un Volcado propio: 35 sesiones Blob con 206 partes, una sesión B2 con 77 partes, 12 sesiones de solo texto con 1.020 revisiones, una sesión de solo texto sin revisión y una sesión sin texto ni audio. El detalle completo y límites están en la evidencia enlazada.
+
+### 27.3 Gate de manifiestos B2
+
+Las cinco sesiones B2 sin vínculo tienen 785 filas, 64.166.900 bytes declarados, 785 estados `verificado`, 785 SHA-256 con formato válido y cero longitudes no positivas. Cuatro manifiestos son contiguos (464 partes). El quinto tiene 321 filas y falta el índice 317.
+
+La función `evaluarCustodiaAudio` en `khora-web/lib/audio/custodia.ts` valida que los índices sean únicos, estén dentro del total esperado y cubran todas las posiciones desde 1. `guardarDictadoConSesion` llama al validador con el número de filas persistidas. Por eso el manifiesto de 321 filas con índice 317 ausente se rechazará hasta recuperar esa parte o reconciliar el manifiesto por el flujo canónico. No se debe crear Volcado con manifiesto incompleto.
+
+Las otras cuatro sesiones contiguas tienen 464 partes y pasan la compuerta de metadatos. Esto no demuestra GET físico. El valor `estado_verificacion='verificado'` se fija al confirmar la subida; no prueba que el objeto remoto siga accesible ni que sus bytes actuales coincidan con el SHA almacenado. Se requiere GET, descifrado, cotejo de longitud y recalcular SHA de cada objeto antes de aceptar recuperabilidad actual.
+
+### 27.4 Límites de ejecución del ciclo
+
+- `POST /api/dictado` es el flujo canónico de archivo y exige sesión autenticada NextAuth; `guardarDictado` coteja el manifiesto recibido con las filas persistidas y crea el Volcado y sus vínculos de forma transaccional.
+- Las herramientas MCP manuales vigentes solo permiten lectura; no existe herramienta MCP de archivo. No se simulará el POST mediante SQL directo.
+- Las cuatro coincidencias de manifiesto exacto siguen pendientes de cotejo antes de crear registros; la coincidencia de texto aislada tampoco basta para deduplicar.
+- Blob permanece suspendido. No habilitar la compuerta de lectura histórica hasta reactivación del proveedor y GET físico satisfactorio.
+
+**Cierre de este ciclo:** OCP v0.57 y lista v0.45 actualizados; instrucción, salida y evidencia nuevas persistidas. Todas las consultas Neon fueron SELECT-only. No se leyeron plaintexts, no se descargaron ni descifraron bytes de audio, no se crearon Volcados, no se modificaron filas, objetos B2/Blob, código, variables, despliegues, bóvedas o perfiles de navegador. CUSTODIA-01 continúa como única tarea activa.
