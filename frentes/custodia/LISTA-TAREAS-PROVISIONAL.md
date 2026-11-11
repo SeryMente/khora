@@ -1,8 +1,8 @@
-<!-- LIST_VERSION=0.45; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.46; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
-> **Actualización:** 2026-11-10 · cambio expreso del objetivo del operador.
+> **Actualización:** 2026-11-11 · revalidación de los gates de archivo.
 > **Único objetivo activo:** archivar todos los registros históricos que puedan archivarse; dejar pendientes únicamente los que tengan un impedimento actual, concreto y documentado.
 
 **Instrucción literal:** [INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md).  
@@ -206,3 +206,15 @@ La salida literal se conserva íntegra como registro histórico. Sus conteos de 
 - El GET/read-back físico de B2 sigue pendiente. El estado verificado en Neon no demuestra disponibilidad actual de objetos. Blob sigue suspendido.
 
 **Continuación:** localizar/reconciliar el índice 317 por el flujo autorizado; priorizar GET/read-back de los cuatro manifiestos B2 contiguos y procesar solo después mediante POST canónico autenticado. Resolver las 4 posibles duplicidades exactas mediante cotejo, no por suposición. No tocar SQL, credenciales ni configuración para forzar el archivo.
+
+
+## 15. Revalidación del gate B2 y estado Blob · 2026-11-11 · v0.46
+
+**Evidencia:** [REVALIDACION-GATE-B2-BLOB-20261111.md](evidencias/REVALIDACION-GATE-B2-BLOB-20261111.md).  
+**Objeto canónico:** [OBJETO-CANONICO.md §28](OBJETO-CANONICO.md).
+
+- **Blob:** `khora-audio` sigue `limits-exceeded-suspended`, `billingState=suspended`, `usageQuotaExceeded=true`. Metadata actual: 636 objetos y 1.010.497.194 bytes. Sin GET/listado físico. El operador debe revisar Vercel Dashboard/soporte; no borrar ni recrear.
+- **B2:** la prioridad sigue siendo el manifiesto continuo de 77 partes. La revalidación de este ciclo confirmó tablas de esquema, no filas de negocio. No se obtuvo una sesión KHORA autenticada con bóveda desbloqueada y no se efectuó GET/read-back ni recálculo SHA.
+- **Archivo:** ningún Volcado creado o vinculado en este ciclo. No hubo escrituras de datos, cambios de credenciales/configuración, ni modificaciones de código o despliegue.
+
+**Siguiente paso único:** obtener un contexto KHORA Production autenticado como propietario y con la bóveda desbloqueada; después leer físicamente las 77 partes B2 y verificar cada SHA. Solo entonces ejecutar el POST canónico y su lectura de vuelta. Mantener el índice 317 como impedimento independiente del segundo manifiesto B2. CUSTODIA-01 sigue siendo la única tarea activa.
