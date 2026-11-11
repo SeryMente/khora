@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.69; OBJECT_SEAL=CUSTODIA-v0.69; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.70; OBJECT_SEAL=CUSTODIA-v0.70; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.69. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.70. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1616,3 +1616,26 @@ Aunque `AUTH_SECRET` aparece como variable Production, no se dispone de una sesi
 Las entradas nominales de KHC1/B2/NextAuth existen en Production, pero este canal no puede leer sus valores ni ejecutar en Production con una identidad real del titular. El secreto de disparo no corresponde a Custodia. No hubo llamadas a endpoints internos, ejecución de workflows, lectura de secretos, escrituras de negocio, Volcados nuevos, GET físicos B2/Blob, cambios de configuración/producto/deployment ni acceso al monitor/Chrome/RDC.
 
 Inventario R3/R5 inalterado: 95 sesiones atribuibles, 16 enlazadas excluidas, 79 sin Volcado, 1.039 partes de audio por metadata (785 B2/254 Blob), 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados. CUSTODIA-01 sigue EN CURSO; el bloqueo actual es la ausencia de un canal permitido que combine runtime secreto y autenticación verificable del titular.
+
+
+## 37. OAuth/MCP no ofrece scope ni actor de archivo CUSTODIA · R7 · 2026-11-11
+
+**Evidencia:** [R7 · contratos OAuth/MCP e identidad](evidencias/MCP-OAUTH-SCOPES-Y-AUSENCIA-DE-ARCHIVO-20261111-R7.md).
+
+### 37.1 Matriz activa
+
+El contrato `MCP_TOOL_SCOPES` publica 24 herramientas con scopes de lectura de Volcados, lectura runtime, ciclo normativo y Jules read/write. No contiene `custodia:metadata:read`, `custodia:integrity:verify`, `volcados:write` ni `dictado:write`. Ningún handler registra `guardarDictado()` o `archivarVolcado()` como herramienta MCP. Las herramientas de Volcados consultan mediante `getMcpReadOnlyDb()`; Production exige `KHORA_READONLY_DATABASE_URL`.
+
+Los scopes CUSTODIA aparecen en historial/propuestas documentales, pero no en la matriz activa, OAuth ni tokens manuales. No se consideran permisos desplegados.
+
+### 37.2 Sujeto OAuth y tokens manuales
+
+OAuth Authorization Code/PKCE requiere sesión NextAuth y coincidencia con `MCP_ALLOWED_EMAIL`. El endpoint de token manual también obtiene el email por `auth()` y lo usa como sujeto; no admite un actor de servicio libre. Ambos mecanismos vinculan el token a un actor, pero no conceden escritura de archivo.
+
+### 37.3 Límite normativo y dictamen
+
+MCP normativo permanece **DESACTIVADO**. Solo se inspeccionaron contratos versionados y metadatos; no se invocó MCP/OAuth, no se emitió ni consultó token, no se recuperó cookie y no hubo operaciones de negocio.
+
+No hay identidad no interactiva ni scope de archivo CUSTODIA implementado en el contrato vigente. La ruta canónica sigue siendo `POST /api/dictado` con NextAuth, `reclamarSesion()` y `guardarDictado()`. Crear un actor/worker o ampliar scopes es un diseño y autorización independiente; no se introduce en CUSTODIA-01 por inferencia.
+
+Inventario inalterado: 95 sesiones atribuibles, 16 enlazadas excluidas, 79 sin Volcado, 1.039 partes de audio por metadata, 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados. CUSTODIA-01 continúa EN CURSO.
