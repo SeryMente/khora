@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.72; OBJECT_SEAL=CUSTODIA-v0.72; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.73; OBJECT_SEAL=CUSTODIA-v0.73; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.72. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.73. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1699,3 +1699,28 @@ La sesión 36eeb04c-bbe7-4b72-bb6a-5e0d23cffce9 conserva 321 filas de partes con
 El host B2 es coherente con el contrato, pero no hay acceso físico desde este canal; Blob legacy está deshabilitado por ausencia de su bandera. Los derivados MP3 deben preservarse y podrían apoyar rescate parcial tras verificación actual, pero no permiten cerrar manifiestos de audio ni sustituir la parte 317. No hubo GET/list, descifrado, exportación, transcripción, generación MP3, carga, escritura, cambio de configuración, merge o despliegue.
 
 El inventario permanece en 79 sesiones sin Volcado, 1.039 partes por metadata (785 B2/254 Blob), 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados. CUSTODIA-01 sigue EN CURSO.
+
+
+## 40. Lector físico de audio existente y compuerta normativa · R10 · 2026-11-11
+
+**Evidencia:** [R10 · rutas read-only y compuerta MCP](evidencias/RUTAS-READONLY-Y-COMPUERTA-MCP-20261111-R10.md).
+
+### 40.1 Vía existente para originales sin Volcado
+
+La herramienta khora_leer_audio acepta una sesión/UUID/f​​olio y resuelve titularidad con el actor del bearer y el predicado completo de propietario. No exige que exista Volcado. Selecciona una parte marcada en DB como verificada y ejecuta leerBlobVerificado(): fetchStoredObject, descifrado KHC1, longitud y SHA-256 de bytes claros. Devuelve bytes por bloques Base64, con offsets, SHA y continuidad del flujo.
+
+El scope activo es volcados:read; el sujeto del token queda ligado al actor titular. La ruta MCP aplica withNormTurn() a herramientas sustantivas, por lo que también exige un turno normativo verificable. El lector es de solo lectura: no crea Volcados ni modifica manifiestos.
+
+**Compuerta:** MCP normativo permanece DESACTIVADO. No hay token bearer del titular disponible en esta ejecución y no se emitió uno; por tanto la herramienta no se invocó. La capacidad está implementada, pero la operación no está autorizada/ejecutada en este contexto.
+
+### 40.2 REST y otros lectores
+
+Las rutas REST de audio original/parte exigen NextAuth, posesión de Volcado y Bóveda desbloqueada; no resuelven las 79 sesiones huérfanas. GET de exportación original solo admite una importación audio_archivo de una parte. GET de diálogo autentica NextAuth y valida el propietario, pero solo admite pistas microphone/chrome_tab de capturas diálogo y devuelve audio; POST además transmite a Groq para transcripción.
+
+GET /api/audio/[id]/mp3 sí acepta sessionId con identidad del titular y Bóveda desbloqueada y valida físicamente un derivado disponible. No devuelve el original por partes. El POST de esa misma ruta dispara generación secundaria y escritura MP3; no se ejecutó.
+
+### 40.3 Dictamen y no-acciones
+
+Se confirma una ruta de código capaz de verificar físicamente originales sin Volcado: khora_leer_audio, siempre bajo token del titular y turno MCP normativo. No puede activarse con la instrucción vigente. Las rutas REST existentes no aportan identidad en este canal. No se creó/consumió token, no se abrió turno MCP, no hubo GET/list, descifrado, generación/transcripción, escrituras ni cambios productivos o acceso local.
+
+Inventario permanece: 79 sesiones sin Volcado, 1.039 partes por metadata (785 B2/254 Blob), 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados. B2 todavía requiere credenciales runtime válidas; Blob legacy continúa fallando cerrado al no aparecer su bandera. CUSTODIA-01 sigue EN CURSO.
