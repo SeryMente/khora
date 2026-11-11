@@ -49,6 +49,8 @@ Se encontraron tres grupos repetidos entre las 79 sesiones. El grupo de SHA vac�
 - SHA 6bfe50dbdc1cdd1419788a715f552e2dcc054d91e44296f328e23a6261754396: 2 sesiones — 3b6741b1-c1f6-4b18-af6e-d0d8cd874eab, 48586f80-63d6-4969-9691-27e55cb5d5f5. Candidato de coincidencia, no duplicado confirmado.
 - SHA 932b4f49f203a40e57987f7eff34c7c489fe95883ec5e53168b444c9b418fb25: 3 sesiones — 22f3c50d-255f-439b-af79-1aad136d4822, 0668dd82-3057-4e42-9820-50b4abc2b468, ae423b97-3ecd-4fa2-9dbf-191a99e53995. Candidato de coincidencia, no duplicado confirmado.
 
+- SHA `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`: 9 sesiones (`c250780f-f5b4-4a76-8826-0bba9ca10ee9`, `e648d9b2-6426-42d7-aaa2-0fd388d75289`, `bc6e9dc9-ba17-4152-a283-37f071662498`, `015cb3e8-a501-400a-98a8-233e6886107f`, `45ff0f87-6cbc-4b18-b87a-bc12662714b8`, `262159b7-6c3c-4874-9d43-3cbb4f8d1db1`, `9f5078ee-5c03-4fbb-95c3-57b4a45bab8c`, `31328e01-2af9-4cd8-8ade-c45a61ce746d`, `9f008c62-2c4a-40ff-8404-77f476f5be56`). Es el hash de texto vacío; incluye sesiones con audio y sin audio, por lo que no se trata como duplicado de contenido.
+
 El grupo de SHA `6bfe50dbdc1cdd1419788a715f552e2dcc054d91e44296f328e23a6261754396` es especialmente sensible: una de las sesiones pertenece al subconjunto sin audio y otra tiene audio. No se fusionan ni se descarta ninguna. El triplete `932b4f49f203a40e57987f7eff34c7c489fe95883ec5e53168b444c9b418fb25` se mantiene como tres capturas separadas hasta comprobar contenido y captura.
 
 ## 4. Hueco de audio individualizado
