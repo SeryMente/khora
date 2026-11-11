@@ -1,4 +1,4 @@
-<!-- LIST_VERSION=0.43; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.44; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
@@ -179,3 +179,16 @@ La salida literal se conserva íntegra como registro histórico. Sus conteos de 
 4. Mantener CUSTODIA-01 como única tarea activa. No modificar código, configuración ni datos de Production sin el paso/autorización específica correspondiente.
 
 **Resultado del ciclo:** persistencia documental y revalidación de metadatos completadas; archivo de registros no ejecutado. No se modificaron Production, Neon, B2, Blob, código ni bóvedas.
+
+## 13. Continuidad con B2 verificado y Blob bloqueado · 2026-11-10 · v0.44
+
+**Instrucción:** [INSTRUCCION-CONTINUIDAD-Y-AYUDA-OPERADOR-20261110.md](originales/INSTRUCCION-CONTINUIDAD-Y-AYUDA-OPERADOR-20261110.md).  
+**Salidas del modelo:** [SALIDA-MODELO-CUSTODIA-AVANCE-B2-20261110.md](originales/SALIDA-MODELO-CUSTODIA-AVANCE-B2-20261110.md).  
+**Evidencia:** [PREFLIGHT-B2-PRODUCTION-Y-ESTADO-LOCAL-20261110.md](evidencias/PREFLIGHT-B2-PRODUCTION-Y-ESTADO-LOCAL-20261110.md).
+
+- El build de Production pasó el preflight B2: autenticación nativa, Master Key, identidad de bucket, privacidad y SSE-B2 por defecto. Es una comprobación de configuración/identidad, no GET/read-back de cada objeto histórico.
+- El store Blob khora-audio permanece limits-exceeded-suspended. Requiere intervención del operador en Vercel Dashboard/soporte para restaurar lectura o solicitar exportación temporal. No borrar ni recrear el store.
+- En el perfil Chrome autorizado Profile existen archivos IndexedDB del origen khora-web.vercel.app: 251 archivos Blob y 9 archivos LevelDB. Solo se leyó metadata; no se certificó la presencia o descifrado de los 216 fragmentos.
+- El clon local KHORA está en una rama de Harmonia con cambios sin publicar, sin .env.local, sin node_modules ni servidor local. Se deja intacto y no se utilizará como runtime de CUSTODIA.
+
+**Siguiente ruta:** B2 queda apto en el nivel de autenticación/bucket; falta lectura física/read-back/SHA de objetos elegibles mediante KHORA autenticado. Blob requiere reactivación/lectura temporal por Vercel; solo después de GET físico se habilitará la compuerta de aplicación. El procesamiento local requiere runtime KHORA limpio y autenticado.
