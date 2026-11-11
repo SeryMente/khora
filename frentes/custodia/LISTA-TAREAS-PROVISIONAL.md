@@ -1,8 +1,8 @@
-<!-- LIST_VERSION=0.52; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.53; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
-> **Actualización:** 2026-11-11 · conciliación R2 de Neon y distinción de la API auxiliar de ingesta.
+> **Actualización:** 2026-11-11 · índice de checkpoints y conciliación de SHA duplicados.
 > **Único objetivo activo:** archivar todos los registros históricos que puedan archivarse; dejar pendientes únicamente los que tengan un impedimento actual, concreto y documentado.
 
 **Instrucción literal:** [INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md).  
@@ -49,7 +49,7 @@ Las fases son subunidades internas del expediente existente; no crean expediente
 
 - Universo: 84 sesiones propias; cinco ya vinculadas; 79 sin vínculo. Las 44 sesiones pendientes con audio suman 1.039 partes: 785 B2 en cinco sesiones y 254 Blob en 39 sesiones.
 - B2: 464 partes están en cuatro manifiestos contiguos; el quinto tiene 321 filas y carece del índice 317 dentro del rango 1–322. El estado `verificado` en Neon no prueba lectura física actual.
-- Texto: 29 checkpoints vigentes potencialmente significativos no tienen coincidencia SHA exacta contra el Volcado existente. De esos 29, 17 conservan coincidencias en revisiones antiguas y 12 no; ninguna coincidencia antigua autoriza descartar el checkpoint vigente. Cuatro sesiones coinciden con Volcados de texto vacío y una contiene únicamente un salto de línea.
+- Texto: 29 checkpoints vigentes potencialmente significativos, 27 SHA vigentes distintos; tres sesiones comparten el mismo SHA y quedan como grupo de posible repetición textual pendiente de conciliación por contenido/procedencia. Ninguno coincide por SHA vigente con un Volcado existente. De los 29, 17 tienen coincidencia solo en revisiones antiguas y 12 no; cuatro sesiones corresponden a checkpoints vacíos ya representados en Volcados de cero caracteres y una contiene solo un salto de línea. No deduplicar automáticamente.
 - La ruta canónica de checkpoints y el archivado requieren NextAuth del propietario. La lectura de partes de audio añade la cookie de bóveda desbloqueada y propiedad del Volcado. Se localizó `POST /api/v1/ingesta`, autenticado servicio-a-servicio, pero solo ingiere a Neo4j un Volcado ya existente con versión/SHA aprobados; no crea el Volcado canónico en Neon desde un checkpoint. Su envoltura web también exige NextAuth. No sustituye el archivado ni autoriza a saltarse su flujo.
 - Evidencia: [RECONCILIACION-NEON-SOLO-LECTURA-20261111-R2.md](evidencias/RECONCILIACION-NEON-SOLO-LECTURA-20261111-R2.md). No se leyeron plaintexts, no se ejecutaron escrituras SQL ni se creó ningún Volcado.
 
