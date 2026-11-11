@@ -1,4 +1,4 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.62; OBJECT_SEAL=CUSTODIA-v0.62; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.63; OBJECT_SEAL=CUSTODIA-v0.63; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
 > **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.62. Metacanon: 1.29.
@@ -1448,3 +1448,62 @@ La actualización es documental y de planificación. No modifica la generación 
 
 **Cierre:** OCP CUSTODIA-v0.62 y lista v0.50 alinean el trabajo con el objetivo, las dependencias actuales y la instrucción de no usar el monitor. CUSTODIA-01 continúa como único expediente activo.
 
+
+
+
+## 32. Conciliación R2 de Neon, manifests B2 y deduplicación por checkpoint vigente · 2026-11-11 · CUSTODIA-v0.63
+
+**Evidencia de solo lectura:** [RECONCILIACION-NEON-SOLO-LECTURA-20261111-R2.md](evidencias/RECONCILIACION-NEON-SOLO-LECTURA-20261111-R2.md).  
+**Lista ejecutiva:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md) · LIST_VERSION 0.51.  
+**Base consultada:** Neon Production, proyecto `still-sunset-02412999`, rama `main` (`br-gentle-band-ah23rczb`). Predicado de titularidad: `custodia_owner` / `checkpoint_usuario`, igual al usado por backend.
+
+### 32.1 Universo actualizado
+
+- 84 sesiones del propietario: 5 ya vinculadas a Volcado y 79 sin vínculo.
+- Las 79 pendientes incluyen 44 sesiones con audio y 1.039 partes; 34 sesiones solo textuales y una sesión sin texto/audio localizado.
+- Las 1.039 partes se distribuyen entre B2 (785 partes en 5 sesiones, 64.166.900 bytes) y Vercel Blob legacy (254 partes en 39 sesiones, 339.392.008 bytes). Los 1.039 registros tienen `estado_verificacion='verificado'` y SHA almacenado con formato válido. Esto sigue siendo metadata de Neon: no certifica GET físico ni hash actual de los bytes.
+
+### 32.2 Manifiestos B2 y hueco de continuidad
+
+Los cinco manifiestos B2 identificados son:
+- `754c8c26-bf25-4504-babe-59045af90d6c`: 384 partes, índices 1–384.
+- `36eeb04c-bbe7-4b72-bb6a-5e0d23cffce9`: 321 filas en el rango 1–322; falta el índice 317.
+- `31328e01-2af9-4cd8-8ade-c45a61ce746d`: 2 partes, índices 1–2.
+- `45f0cf5e-d1af-46c3-95af-e9428b8b0f90`: 77 partes, índices 1–77.
+- `b8362bce-55c2-48ed-ba06-327150ea3a61`: 1 parte, índice 1.
+
+Cuatro manifiestos son contiguos y suman 464 partes. El quinto no satisface continuidad de índices; el índice 317 debe localizarse o acreditarse como irrecuperable con evidencia propia, sin fabricar una fila ni cerrar el manifiesto como completo. El preflight Production PASS acredita autenticación/configuración y bucket, no GET histórico. No se descargó ninguna de las 785 partes y no se recalculó SHA de sus bytes.
+
+### 32.3 Texto sin audio: deduplicación afinada
+
+De las 34 sesiones sin audio:
+- Cuatro checkpoints tienen SHA del texto vacío y coinciden con Volcados de cero caracteres; no son dictados sustantivos adicionales.
+- Una contiene únicamente un salto de línea; no se promueve a dictado sustantivo sin comprobación del contenido.
+- 29 checkpoints vigentes tienen contenido potencialmente significativo y ninguno presenta coincidencia SHA exacta con un Volcado propio existente.
+- Dentro de esas 29, 17 tienen al menos una coincidencia de SHA en revisiones antiguas; el checkpoint vigente es distinto. La coincidencia de una revisión antigua no autoriza a descartar el estado vigente ni deduplicarlo automáticamente.
+- Las otras 12 no tienen coincidencia de SHA entre sus revisiones y los Volcados existentes. Una carece de filas de revisión.
+
+El candidato `48586f80-63d6-4969-9691-27e55cb5d5f5` pertenece al grupo sin coincidencia y sin revisiones: 24.853 caracteres cifrados, cero partes de audio y cero Volcados vinculados. Su ciphertext y SHA están localizados en Neon; no se leyó plaintext ni se realizó archivo. La verificación final debe comparar el texto descifrado y su SHA, no confiar solo en el tamaño del ciphertext.
+
+### 32.4 Ruta de ejecución de servidor y bloqueo comprobado
+
+Inspección de código en `main` (`c708901caa2500eb48d6723b709cee7db0d9904b`):
+- `khora-web/app/api/dictado/checkpoint/route.ts`, blob `86138d60e1a2d25d277c468dc9af90f460334243`: GET y POST requieren `auth()` y correo del titular; GET descifra/verifica checkpoint; POST recupera o conserva revisiones con propiedad.
+- `khora-web/app/api/dictado/route.ts`, blob `5371878d65ca35f4fd13601679509a6898a0dd77`: POST requiere NextAuth y pasa por `reclamarSesion()` y `guardarDictado()`.
+- `khora-web/app/api/audio/[id]/parte/[index]/route.ts`, blob `d5f633c343bf2b7974cdff32ddd5c21b55794b92`: la lectura exige bóveda desbloqueada, NextAuth y propiedad del Volcado; luego realiza GET interno, descifra y coteja SHA.
+- `khora-web/lib/server/object-storage.ts`, blob `6b923cea659ba86c82e48650411dfb7658924363`: `fetchStoredObject()` es una función interna, no un endpoint de acceso de propietario independiente.
+- `khora-web/lib/server/cripto.ts`, blob `92427a1cacf745142a760802247105726373faf6`: KHC1/AES-256-GCM depende de `X_KHORA_KEY` configurada en el runtime; no se extrajo ni reveló su valor.
+- `khora-web/auth.ts`, blob `dc87c3cfa142bd01f46c2a26577f7923c5e0f58a`, y `khora-web/middleware.ts`, blob `dbd01817872994a7229dcb329716fb9f724d1814`: identidad de usuario vía OIDC/NextAuth para las rutas ordinarias.
+
+No se encontró una ruta ya existente de archivo de dictados con identidad de servicio independiente. Las rutas EP/MCP tienen autorización propia para sus funciones, pero no sustituyen la identidad del propietario en Custodia. `KHORA_API_KEY` de telemetría no se convierte en identidad de usuario. No se eluden sesiones, no se fabrican tokens y no se crea una nueva ruta de producción dentro de CUSTODIA-01.
+
+### 32.5 Estado operativo, residual y no-acciones
+
+- **Texto:** 29 checkpoints potencialmente significativos localizados; archivo pendiente por ausencia de contexto de servidor autorizado para el titular.
+- **B2:** cinco manifiestos y 785 partes individualizados; 464 partes en cuatro manifiestos contiguos; uno con hueco 317. GET/read-back físico pendiente de todas las partes elegibles.
+- **Blob:** 254 partes en 39 sesiones localizadas por metadata; estado del store no reconsultado en esta R2; mantener pendiente hasta GET físico.
+- **Local:** 216 fragmentos de dos sesiones siguen preservados; no se usó monitor, Chrome local ni RDC y no se inspeccionó IndexedDB.
+- **Deduplicación:** las 4 capturas vacías se separan; las 17 coincidencias históricas no eliminan su checkpoint vigente. No crear copias hasta comparar plaintext/SHA y estado de Volcado.
+- **No-acciones:** todas las consultas Neon de esta R2 fueron SELECT. No hubo escrituras de negocio, cambios en B2/Blob, lectura de secretos, descifrado de datos personales, cambios de código de producto, deployments, merges ni modificaciones del control generación 11.
+
+**Dictamen:** la conciliación de metadatos y la clasificación SHA textual avanzan; no se declara ninguna nueva recuperación archivada. CUSTODIA-01 sigue como única tarea activa. La siguiente intervención debe obtener un contexto de servidor ya autorizado para el propietario o incorporar, fuera de este expediente, un mecanismo de servicio con identidad y alcance formalmente autorizados; no usar la interfaz como sustituto ni saltarse NextAuth.
