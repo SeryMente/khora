@@ -2,7 +2,7 @@
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
- > **Actualización:** 2026-11-11 · revisión de diseño y compuertas de ejecución.
+> **Actualización:** 2026-11-11 · revisión de diseño y compuertas de ejecución.
 > **Único objetivo activo:** archivar todos los registros históricos que puedan archivarse; dejar pendientes únicamente los que tengan un impedimento actual, concreto y documentado.
 
 **Instrucción literal:** [INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md).  
