@@ -1,8 +1,8 @@
-<!-- LIST_VERSION=0.54; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.55; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
-> **Actualización:** 2026-11-11 · índice de checkpoints y conciliación de SHA duplicados.
+> **Actualización:** 2026-11-11 · verificación del alcance del worker auxiliar y ruta de archivo primario.
 > **Único objetivo activo:** archivar todos los registros históricos que puedan archivarse; dejar pendientes únicamente los que tengan un impedimento actual, concreto y documentado.
 
 **Instrucción literal:** [INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md).  
@@ -13,6 +13,7 @@
 **Revisión de diseño (2026-11-11):** [REVISION-DISENO-LISTA-CUSTODIA-20261111.md](evidencias/REVISION-DISENO-LISTA-CUSTODIA-20261111.md).  
 **Reconciliación Neon R2 (2026-11-11):** [RECONCILIACION-NEON-SOLO-LECTURA-20261111-R2.md](evidencias/RECONCILIACION-NEON-SOLO-LECTURA-20261111-R2.md).  
 **Evidencia de repetición del ciclo:** [ESTADO-OPERATIVO-BLOQUEOS-20261110.md](evidencias/ESTADO-OPERATIVO-BLOQUEOS-20261110.md).  
+**Evidencia R4:** [RUTA-EJECUCION-SECUNDARIA-NO-ARCHIVADO-20261111-R4.md](evidencias/RUTA-EJECUCION-SECUNDARIA-NO-ARCHIVADO-20261111-R4.md).  
 **Instrucción de retoma:** [INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md](originales/INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md).  
 **Estado base:** [ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md](evidencias/ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md).  
 **Diagnóstico previo:** [DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md](evidencias/DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md).
@@ -325,3 +326,28 @@ Se importó con éxito el código canónico de archivo en un sandbox Vercel temp
 **Estado vigente:** 01.a EN CURSO (titularidad y 79 pendientes conciliados); 01.b BLOQUEADA por acceso a descifrado KHC1 e identidad de propietario; 01.c BLOQUEADA por falta de GET/read-back B2; 01.d BLOQUEADA por canal local excluido; 01.e EN CURSO (Blob y hueco 317 individualizados); 01.f PENDIENTE.
 
 **Dictamen:** mejora de inventario y prueba del runtime completadas; el archivo de registros aún no está completado. El cierre mantiene únicamente los residuales con su bloqueo concreto. No se cambia código, deployment, configuración, credenciales, control generación 11 ni fuentes.
+
+
+## 20. Worker auxiliar localizado; no archiva capturas huérfanas · v0.55 · 2026-11-11
+
+**Evidencia:** [R4 · ejecutor secundario](evidencias/RUTA-EJECUCION-SECUNDARIA-NO-ARCHIVADO-20261111-R4.md).  
+**OCP vigente:** [CUSTODIA-v0.67 · §34](OBJETO-CANONICO.md).  
+**Contrato de tarea:** [CUSTODIA-01 · TASK_VERSION 1.1 · §14](./📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20CUSTODIA-01%20-%20Inventario%20forense%20de%20recuperabilidad/README.md).
+
+### Resultado del ciclo
+
+Se encontró `scripts/custodia-worker.ts`, pero solo procesa MP3, títulos y espejo secundario de Volcados existentes. No usa `guardarDictado()` para convertir checkpoints huérfanos en Volcados. La ruta auxiliar HTTP requiere NextAuth y solo solicita reconciliación secundaria. El endpoint primario de archivo también exige sesión NextAuth.
+
+El worker es optativo, no se inicia por build/instalación y la documentación del producto declara que no hay worker/cron/servicio productivo activo. No hay comando npm del worker ni `vercel.json` versionado en las dos ubicaciones revisadas. No se ejecutó: podría procesar trabajos secundarios de varios titulares sin resolver CUSTODIA-01.
+
+### Estado vigente
+
+- Inventario R3 sin cambio: 95 sesiones atribuibles; 16 ya enlazadas excluidas; 79 sin Volcado.
+- Conservados 1.039 metadatos de partes de audio (785 B2/254 Blob); sin GET/read-back físico.
+- Permanecen 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados; no se accedió al canal local excluido.
+- Ningún Volcado nuevo. Cero escrituras Neon/B2/Blob y cero cambios en producto o Production.
+- CUSTODIA-01 sigue EN CURSO; 01.b continúa bloqueada por falta de contexto de titular y claves de runtime. No usar el worker auxiliar ni el rol Neon como bypass de NextAuth.
+
+### Objetivo del siguiente ciclo
+
+Encontrar un contexto de ejecución primario autorizado que conserve la identidad del propietario y permita usar la ruta canónica de archivo, cifrado y read-back físico. Si no existe, dejar cada residual bloqueado de forma individualizada, sin afirmar pérdida ni cerrar anticipadamente.
