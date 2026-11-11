@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.66; OBJECT_SEAL=CUSTODIA-v0.66; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.67; OBJECT_SEAL=CUSTODIA-v0.67; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.66. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.67. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1539,3 +1539,28 @@ El sandbox no recibió `X_KHORA_KEY`, las credenciales Master B2 ni identidad Ne
 - **No-acciones:** cero nuevos Volcados; cero escrituras Neon/B2/Blob; cero cambios de código/variables/deployment/bucket/control; sandbox detenido; sin merge/deploy.
 
 **Dictamen:** el universo y el código quedan conciliados, pero CUSTODIA-01 no está resuelto aún. El bloqueo operativo actual es acceso de runtime autorizado a la clave KHC1 y Master B2 junto con identidad de propietario, más las dependencias físicas separadas de Blob y de los fragmentos locales. No se elude NextAuth, no se escribe ciphertext/plaintext sin el cifrado canónico y no se crea una ruta de producción dentro de CUSTODIA-01.
+
+
+## 34. Verificación del ejecutor auxiliar y ausencia de archivador primario · R4 · 2026-11-11
+
+**Evidencia:** [RUTA-EJECUCION-SECUNDARIA-NO-ARCHIVADO-20261111-R4.md](evidencias/RUTA-EJECUCION-SECUNDARIA-NO-ARCHIVADO-20261111-R4.md).
+
+### 34.1 Worker localizado; alcance no equivalente al archivo
+
+Se examinó `khora-web/scripts/custodia-worker.ts` y sus dependencias. El worker es optativo; sin argumentos opera en solo lectura; `--execute --once` procesa una pasada y `--execute` repite cada 30 segundos. Consulta los propietarios registrados y llama a `reconciliarCustodia(usuario,2)`.
+
+La función solo genera/reconcilia MP3 a partir de partes ya marcadas verificadas y procesa la cola secundaria `dictado_custodia_trabajo` (título y espejo de Volcados ya existentes). No recupera un checkpoint huérfano para crear el Volcado primario ni invoca `guardarDictado()` o `reclamarSesion()`. Ejecutarlo aquí podría activar trabajos secundarios para varios titulares sin archivar las 79 sesiones pendientes; no corresponde al objetivo y no se ejecutó.
+
+### 34.2 Identidad y activación
+
+La ruta `POST /api/dictado/reconciliar` requiere NextAuth y correo del titular; su respuesta 202 solo indica solicitud de reconciliación secundaria. La ruta canónica `POST /api/dictado` exige la misma identidad autenticada, valida la sesión mediante `reclamarSesion()` y realiza el archivo con `guardarDictado()`.
+
+La documentación del producto indica que el worker no se arranca por build ni por instalación y que no estaba activo un proceso productivo, cron o servicio. El `package.json` no define un comando npm para iniciarlo y no se encontró `vercel.json` en raíz ni en `khora-web/`. La metadata Vercel consultada confirma el proyecto y su deployment Production READY, pero no expone un cron/worker; no se inspeccionó visualmente el dashboard.
+
+### 34.3 Estado y no-acciones
+
+No se ejecutó el worker ni la ruta auxiliar. No se leyeron secretos ni plaintexts, no se hizo GET/read-back B2/Blob, no hubo escrituras de negocio, cambios de código de producto, configuración, variables, bucket, deployment, merge ni cambios al CONTROL generación 11.
+
+El inventario R3 permanece sin cambio: 95 sesiones atribuibles, 16 ya enlazadas excluidas, 79 sin Volcado, 1.039 partes de audio (785 B2/254 Blob por metadata), 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados sin acceso por el canal excluido. No se creó Volcado nuevo.
+
+**Dictamen:** el ejecutor existente no es apto para el archivo primario de CUSTODIA-01. Continúa bloqueada la ejecución que requiere clave KHC1, accesos físicos de almacenamiento y contexto de titular autenticado. No se usa el rol Neon ni el worker secundario como sustituto de NextAuth. CUSTODIA-01 sigue abierta.
