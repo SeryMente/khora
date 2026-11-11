@@ -1,4 +1,4 @@
-<!-- TASK_VERSION=1.5; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
+<!-- TASK_VERSION=1.6; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
 # CUSTODIA-01 · Archivo de todos los registros recuperables
 
 > **Estado:** EN CURSO · **Prioridad:** P0 · **Único expediente activo del frente CUSTODIA.**  
@@ -410,3 +410,42 @@ CUSTODIA-01 continúa EN CURSO. Ninguna de las 79 sesiones se declara recuperada
 ### Compuerta siguiente
 
 Verificar estáticamente el formato B2/Blob y el mecanismo de referencia del objeto, así como la reconciliación del manifiesto para la parte 317. No descargar ni inspeccionar payloads en este ciclo. Identificar qué lotes de referencia pueden verificarse con la implementación server-side y mantener cualquier parte sin fuente física demostrada como bloqueada.
+
+
+## 19. B2/Blob: read-back y material secundario MP3 · 2026-11-11
+
+**Evidencia:** [R9 · localizadores y derivados MP3](../../evidencias/LOCALIZADORES-READBACK-Y-DERIVADOS-MP3-20261111-R9.md).  
+**OCP:** §39 / CUSTODIA-v0.72.  
+**Lista:** §25 / LIST_VERSION 0.60.
+
+### Objetivo del ciclo
+
+Conciliar los localizadores de las partes originales con el contrato B2/Blob, evaluar el read-back de almacenamiento y buscar evidencia secundaria de audio en dictado_mp3 e historial, sin descargar objetos.
+
+### Tareas ejecutadas
+
+1. Inspeccionar parseB2ObjectUrl, legacyBlobUrl, fetchStoredObject, leerBlobVerificado y el validador de manifiestos.
+2. Consultar solo host/proveedor de los localizadores de Neon, omitiendo URL completa y path.
+3. Consultar metadatos de entorno no secretos: selector de proveedor, región y bandera de lectura legacy.
+4. Inspeccionar el endpoint autenticado de exportación original y la ruta de staging de audio.
+5. Consultar estados/conteos de dictado_mp3 e historial para las 44 sesiones con audio.
+6. Individualizar derivados MP3 de la sesión con parte 317 ausente.
+7. Registrar los resultados y no-acciones con lectura de vuelta documental.
+
+### Resultado
+
+Los 785 localizadores B2 usan s3.us-east-005.backblazeb2.com, que coincide con KHORA_OBJECT_STORAGE=b2 y la región predeterminada us-east-005. Las variables de Master Key, Key ID y bucket existen como entradas sensibles, pero sus valores no se obtuvieron. No se verificó bucket ni objeto.
+
+Los 254 localizadores Blob usan *.blob.vercel-storage.com. La variable KHORA_LEGACY_BLOB_READS_ENABLED no aparece en el inventario Production; el código requiere el valor exacto true y por defecto falla cerrado. No se habilitó ni modificó.
+
+leerBlobVerificado() realiza GET, descifra KHC1 y verifica tamaño/SHA de los bytes claros. evaluarCustodiaAudio() solo valida datos/índices de la tabla. El endpoint de exportación original exige NextAuth, posesión de sesión, Bóveda desbloqueada y una sola parte de una importación audio_archivo; no exporta capturas multiparte de micrófono/pestaña.
+
+43 de 44 sesiones tienen fila dictado_mp3 (18 disponibles, 25 fallidas). Hay 46 historiales distribuidos en 19 sesiones; ninguno actual ni histórico está marcado captura_completa. En la sesión 36eeb04c-bbe7-4b72-bb6a-5e0d23cffce9 se conservan 13 historiales de 146 a 293 partes; la fila MP3 actual falló con source_parts=293. Son derivados secundarios; no sustituyen el original ni prueban que contengan parte 317.
+
+### No-acciones y estado
+
+No hubo GET/list B2, GET Blob, descifrado, exportación, transcripción, generación MP3, carga/copia, escritura Neon o cambio de variables. No se usaron monitor, Chrome local, RDC o IndexedDB. El inventario permanece: 79 sesiones sin Volcado; 1.039 partes originales por metadata (785 B2/254 Blob); 29 checkpoints textuales potencialmente significativos; 216 fragmentos locales preservados. CUSTODIA-01 continúa EN CURSO.
+
+### Compuerta siguiente
+
+Buscar una vía existente y autorizada para read-back físico B2 en un runtime de servidor; no crear una ruta de servicio o token. Revisar cómo preservar derivados MP3 si su disponibilidad puede verificarse posteriormente, sin etiquetarlos como originales. Para Blob legacy, solo avanzar si existe una habilitación ya autorizada; no cambiar el flag ni generar credenciales.
