@@ -1300,7 +1300,7 @@ No se ejecutó GET ni listado de objetos. No se puede distinguir por metadata si
 
 La inspección de esquema por SELECT a `information_schema` confirmó las tablas necesarias del flujo (`dictado_session`, `dictado_audio_parte`, `dictado_checkpoint`, `volcado`). No se leyeron filas de negocio en esta revalidación.
 
-El candidato B2 de 77 partes y 6.251.747 bytes conserva la prioridad establecida en §27, pero no se reconsultaron sus filas individuales en este ciclo. No se pudo verificar por el canal disponible una sesión NextAuth del propietario ni el desbloqueo de la bóveda KHORA. No se leyeron cookies, credenciales ni secretos.
+La consulta SELECT-only identificó la sesión B2 prioritaria `45f0cf5e-d1af-46c3-95af-e9428b8b0f90`, dentro de la única agrupación de titularidad con 84 sesiones bajo el predicado del backend `COALESCE(custodia_owner, checkpoint_usuario)`. El manifiesto tiene estado `checkpoint`, `total_partes=NULL`, `volcado_id=NULL`, 77 filas y 77 índices distintos del 1 al 77, 6.251.747 bytes declarados, 77 estados `verificado`, cero bytes no positivos y cero SHA con formato inválido. El endpoint agregado es `s3.us-east-005.backblazeb2.com` (Backblaze B2); `fuente_audio=microphone` identifica la captura, no el proveedor. Estos son metadatos y no prueban GET físico ni SHA actual. No se pudo verificar por el canal disponible una sesión NextAuth del propietario ni el desbloqueo de la bóveda KHORA. No se leyeron cookies, credenciales ni secretos.
 
 Por tanto, no se ejecutó GET B2, descifrado, cotejo físico de bytes/longitud ni recálculo SHA-256. El estado `verificado` registrado en Neon sigue sin demostrar recuperabilidad física actual.
 
