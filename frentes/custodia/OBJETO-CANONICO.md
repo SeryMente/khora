@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.70; OBJECT_SEAL=CUSTODIA-v0.70; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.71; OBJECT_SEAL=CUSTODIA-v0.71; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.70. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.71. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1639,3 +1639,30 @@ MCP normativo permanece **DESACTIVADO**. Solo se inspeccionaron contratos versio
 No hay identidad no interactiva ni scope de archivo CUSTODIA implementado en el contrato vigente. La ruta canónica sigue siendo `POST /api/dictado` con NextAuth, `reclamarSesion()` y `guardarDictado()`. Crear un actor/worker o ampliar scopes es un diseño y autorización independiente; no se introduce en CUSTODIA-01 por inferencia.
 
 Inventario inalterado: 95 sesiones atribuibles, 16 enlazadas excluidas, 79 sin Volcado, 1.039 partes de audio por metadata, 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados. CUSTODIA-01 continúa EN CURSO.
+
+
+## 38. Matriz individual de las 79 sesiones pendientes · R8 · 2026-11-11
+
+**Evidencia:** [MATRIZ-RECUPERACION-POR-SESION-20261111-R8.md](evidencias/MATRIZ-RECUPERACION-POR-SESION-20261111-R8.md).
+
+### 38.1 Conciliación de titularidad y clases
+
+Consulta SELECT en Neon Production con el principal del operador y el predicado completo de titularidad. La matriz contiene 79 sesiones sin Volcado: 43 atribuibles por `custodia_owner` y 36 por `checkpoint_usuario`. Dieciséis sesiones ya vinculadas permanecen fuera del conjunto y no se reprocesan.
+
+De las pendientes, 78 tienen checkpoint cifrado KHC1 y una no tiene checkpoint/audio localizado. La partición es 44 sesiones con audio, 34 sin audio pero con checkpoint y una sin checkpoint ni audio.
+
+### 38.2 Audio y continuidad de manifiesto
+
+Las 1.039 partes se distribuyen en 785 localizadores B2 (5 sesiones) y 254 Vercel Blob (39 sesiones). Todas las filas incluyen SHA y bandera DB `verificado`; esto no sustituye GET ni read-back físico. Se localizó un hueco interno único: índice 317 de la sesión `36eeb04c-bbe7-4b72-bb6a-5e0d23cffce9`. No se crea una parte ficticia. Las filas con `total_partes` nulo solo permiten afirmar continuidad dentro del intervalo observado, no ausencia de partes finales adicionales.
+
+### 38.3 Checkpoints textuales y coincidencias
+
+Entre las 34 sesiones sin audio con checkpoint: 29 SHA actuales potencialmente significativos, 4 SHA de texto vacío y 1 SHA de salto de línea; la sesión restante sin audio tampoco tiene checkpoint. Diecisiete de los 29 significativos tienen una coincidencia SHA histórica con algún Volcado del mismo titular, pero ninguno de los 29 SHA actuales coincide con un Volcado actual. Las coincidencias históricas no autorizan deduplicación.
+
+Se registran dos grupos de SHA actual no vacío repetidos: un triplete entre sesiones textuales y un par que cruza una sesión con audio y otra sin audio. Ambos quedan como candidatos que requieren comparar plaintext/procedencia. El grupo de nueve SHA de texto vacío no constituye duplicidad de contenido.
+
+### 38.4 Dictamen por registro y compuertas
+
+La matriz individualiza titularidad, estado KHC1, SHA, número de revisiones, coincidencias, proveedor de audio, número de partes, rango/continuidad y banderas de base. Ningún registro se marca recuperado ni perdido. No se leyó plaintext/checkpoint/snapshot, no se hizo GET B2/Blob, no hubo escrituras Neon ni creación de Volcados.
+
+La ruta de ejecución aún exige runtime permitido con KHC1, read-back físico de cada fuente y NextAuth del titular o mecanismo delegado ya autorizado. R4–R7 no localizaron una alternativa. CUSTODIA-01 permanece EN CURSO; la matriz se utilizará para ejecutar únicamente las unidades cuyas compuertas se puedan demostrar.
