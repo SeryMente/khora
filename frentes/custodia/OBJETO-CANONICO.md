@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.68; OBJECT_SEAL=CUSTODIA-v0.68; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.69; OBJECT_SEAL=CUSTODIA-v0.69; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.68. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.69. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1591,3 +1591,28 @@ No se encontró una ruta de servicio que cree un Volcado canónico desde checkpo
 La línea R3 permanece sin cambios: 95 sesiones atribuibles; 16 ya enlazadas excluidas; 79 sin Volcado; 1.039 partes de audio (785 B2/254 Blob por metadata), 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados. No hubo Volcados nuevos, escrituras de negocio, llamadas POST, GET físicos B2/Blob, lectura de secretos o plaintext, cambios de código de producto, variables, configuración, buckets, deployment, merge ni acceso al monitor/Chrome/RDC.
 
 **Dictamen:** CUSTODIA-01 sigue EN CURSO. La única ruta primaria compatible con el contrato sigue requiriendo sesión NextAuth del titular y dependencias KHC1/almacenamiento en runtime autorizado. Lo demás permanece como residual concretamente bloqueado; no se declara recuperado ni perdido.
+
+
+## 36. Metadatos de Production y falta de identidad de titular no interactiva · R6 · 2026-11-11
+
+**Evidencia:** [R6 · barrera runtime Production](evidencias/BARRERA-RUNTIME-PRODUCTION-IDENTIDAD-Y-SECRETOS-20261111-R6.md).
+
+### 36.1 Configuración detectada, valores no expuestos
+
+La consulta administrativa de Vercel con `decrypt=false` confirma entradas target Production para `X_KHORA_KEY`, `KHORA_B2_MASTER_APPLICATION_KEY_ID`, `KHORA_B2_MASTER_APPLICATION_KEY`, `KHORA_B2_BUCKET_NAME`, `KHORA_B2_BUCKET_ID`, `KHORA_API_KEY`, `AUTH_SECRET`, `DATABASE_URL` e `INTERNAL_TRIGGER_SECRET`. Las entradas secretas regresan `decrypted=false`, sin plaintext. Por ello se corrige el diagnóstico de ausencia nominal histórica de las dos variables canónicas B2: ahora figuran en el inventario, pero su validez/autorización física no quedó demostrada.
+
+### 36.2 Trigger interno fuera de Custodia
+
+`INTERNAL_TRIGGER_SECRET` se consume en `/api/jules/trigger`, `/api/jules/approve` y `/api/board/orchestrate/tick`. Los workflows programados de GitHub encontrados llaman a Jules y al orquestador de tablero; no a Custodia. No se usó la credencial ni se invocó alguno de esos endpoints.
+
+### 36.3 Logs e identidad
+
+En Production no se devolvieron runtime logs ni daemon logs durante la ventana consultada de 30 minutos. La ventana de siete días fue rechazada por límite de retención, así que no se interpreta como ausencia histórica de actividad. El inventario de herramientas no ofrece una operación de lectura de cron Vercel; tampoco existe `vercel.json` versionado en raíz o `khora-web/`.
+
+Aunque `AUTH_SECRET` aparece como variable Production, no se dispone de una sesión/cookie NextAuth real del titular. No se fabricará JWT/cookie, ni se inferirá propietario del rol Neon o de un secreto de servicio.
+
+### 36.4 Dictamen y estado
+
+Las entradas nominales de KHC1/B2/NextAuth existen en Production, pero este canal no puede leer sus valores ni ejecutar en Production con una identidad real del titular. El secreto de disparo no corresponde a Custodia. No hubo llamadas a endpoints internos, ejecución de workflows, lectura de secretos, escrituras de negocio, Volcados nuevos, GET físicos B2/Blob, cambios de configuración/producto/deployment ni acceso al monitor/Chrome/RDC.
+
+Inventario R3/R5 inalterado: 95 sesiones atribuibles, 16 enlazadas excluidas, 79 sin Volcado, 1.039 partes de audio por metadata (785 B2/254 Blob), 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados. CUSTODIA-01 sigue EN CURSO; el bloqueo actual es la ausencia de un canal permitido que combine runtime secreto y autenticación verificable del titular.
