@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.55; OBJECT_SEAL=CUSTODIA-v0.55; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.56; OBJECT_SEAL=CUSTODIA-v0.56; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.55. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.56. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -26,9 +26,9 @@ La implementación está integrada en `main` (commit `f0224c1368fb15a3452335a443
 - **Único núcleo operativo:** este OBJETO-CANONICO.md.
 - **Control único de responsabilidad:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json). Titularidad documental/operativa transferida de generación 10 a 11 y leída de vuelta. Titular actual: chatgpt-custodia-INSTANCE-20261109-01A1C125; alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59; UUIDv7 local de conversación 01a1c125-af13-79b1-87cc-f1e5fe4b0b59; UUIDv7 local del evento 01a1c125-af13-7825-8af1-0ff35ad87b0e; control blob c29349fc4d2e07d40cd6efe583171482578db6d3. ID nativo de plataforma no expuesto. Titular previo gen. 10 y generaciones anteriores preservados. Folio PENDIENTE/NO ASIGNADO; FOL1 no está ACTIVO/verificado.
 - **Propósito literal aprobado:** [originales/PROPOSITO-OPERADOR-2026-10-28.md](originales/PROPOSITO-OPERADOR-2026-10-28.md). La sección 4 también conserva el texto aprobado íntegro para que el propósito sea visible en el núcleo.
-- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional v0.43. Contiene un solo objetivo activo: CUSTODIA-01, archivo de todos los registros que puedan archivarse y documentación de los residuales actualmente bloqueados. Las demás tareas provisionales quedaron resueltas administrativamente por reenfoque, sin atribuirles aprobación técnica. CUSTODIA-02 continúa retirada y su identificador no se reutiliza.
+- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional v0.44. Contiene un solo objetivo activo: CUSTODIA-01, archivo de todos los registros que puedan archivarse y documentación de los residuales actualmente bloqueados. Las demás tareas provisionales quedaron resueltas administrativamente por reenfoque, sin atribuirles aprobación técnica. CUSTODIA-02 continúa retirada y su identificador no se reutiliza.
 - **Inventario provisional de hallazgos:** [evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md](evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md), materialización de evidencia para CUSTODIA-01; no es un segundo estado vivo.
-- **Versión y sello vigentes:** CUSTODIA-v0.55. Es una versión documental del objeto; no es una versión del producto.
+- **Versión y sello vigentes:** CUSTODIA-v0.56. Es una versión documental del objeto; no es una versión del producto.
 - **Registro de la retoma anterior:** [originales/ChatGPT-CUSTODIA-20261106-1424.txt](originales/ChatGPT-CUSTODIA-20261106-1424.txt), instrucción textual parcial original y diagnóstico estático del límite de archivado.
 - **Original de esta retoma:** [originales/ChatGPT-CUSTODIA-20261107-1157.txt](originales/ChatGPT-CUSTODIA-20261107-1157.txt), exportación preservada en main; SHA-256 `7E256B9888F2A0227632D39D22B98E9BD1316548E057E83514ADE61376A93CC5`, 42,629 bytes; lectura de vuelta exacta.
 - **Original de esta retoma (2026-11-08 11:21):** [originales/ChatGPT-CUSTODIA-20261108-1121.md](originales/ChatGPT-CUSTODIA-20261108-1121.md), 39,896 bytes; SHA-256 `CB264E5979AA545F082B5CC9C59DEDA30CE9547100DB29B138A520C3592A866A`; Git blob `b7e13e3fe9fed70873535640e1124577f5b037e4`; commit `5d6cf7055f2ab5f0020bde220d078ffe077512a6`; lectura de vuelta idéntica.
@@ -1191,3 +1191,57 @@ La afirmación anterior de que la llave faltaba en Production queda rectificada 
 5. No escribir directamente en Neon para eludir el flujo canónico. Mantener fuera los registros sin titularidad demostrada y de otros titulares.
 
 **Cierre de este ciclo:** OCP v0.55 y lista v0.43 actualizados; instrucción, evidencia y salida literal preservadas. La lectura de vuelta de los cinco artefactos coincide con longitudes y marcadores esperados; los SHA de blob quedaron registrados en el recibo del ciclo. No hubo cambios de código, configuración, despliegues, Neon, B2, Blob ni bóvedas. CUSTODIA-01 permanece como única tarea activa; el objetivo no cambia.
+
+## 26. Continuidad operativa · preflight B2 aprobado y ayuda del operador para Blob · 2026-11-10 · CUSTODIA-v0.56
+
+**Instrucción literal:** [originales/INSTRUCCION-CONTINUIDAD-Y-AYUDA-OPERADOR-20261110.md](originales/INSTRUCCION-CONTINUIDAD-Y-AYUDA-OPERADOR-20261110.md).  
+**Salidas visibles del modelo:** [originales/SALIDA-MODELO-CUSTODIA-AVANCE-B2-20261110.md](originales/SALIDA-MODELO-CUSTODIA-AVANCE-B2-20261110.md).  
+**Evidencia:** [evidencias/PREFLIGHT-B2-PRODUCTION-Y-ESTADO-LOCAL-20261110.md](evidencias/PREFLIGHT-B2-PRODUCTION-Y-ESTADO-LOCAL-20261110.md).  
+**Lista subordinada:** LISTA-TAREAS-PROVISIONAL.md v0.44.
+
+### 26.1 Preflight B2 de Production · aprobado
+
+Deployment dpl_6M6ebaAvNPpAtRspfX5QhffEJvVJ, estado READY, target production, commit main f0224c1368fb15a3452335a44305c6efa85eef79, build bld_2w1gnkcim, creado 2026-11-10T17:36:15.109Z.
+
+El build ejecutó node --import tsx scripts/preflight-object-storage.ts && next build --webpack y produjo:
+
+```text
+[storage-preflight] native_auth=PASS master_key=PASS bucket_identity=PASS bucket_private=PASS sse_b2_default=PASS
+[storage-preflight] read_only_gate=PASS; no objects, bucket settings, CORS rules, credentials or source data were changed
+```
+
+Esto acredita autenticación B2, validación de identidad de Master Key, reconocimiento del bucket privado y SSE-B2 por defecto en el contexto del build de Production. **No acredita GET/read-back de objetos históricos individuales, SHA por objeto, descifrado de cada payload ni archivado E2E.** B2 deja de estar bloqueado por la identidad/configuración comprobada; la lectura física de los objetos continúa pendiente.
+
+### 26.2 Vercel Blob · bloqueo actual que requiere intervención del operador
+
+El store khora-audio (store_VyX9EI8q6DKhp4RV) devuelve status=limits-exceeded-suspended, billingState=suspended y usageQuotaExceeded=true. No se ejecutó GET ni listado físico de objetos.
+
+La documentación oficial de Vercel indica que el store puede quedar pausado por alcanzar límites del plan o porque Vercel lo haya pausado; recomienda revisar el Blob Dashboard y contactar soporte si la suspensión parece incorrecta: https://vercel.com/docs/vercel-blob/blocked-store. La metadata consultada no distingue cuál causa originó la suspensión ni demuestra el plan contratado.
+
+Se requiere que el operador revise https://vercel.com/dashboard/storage, seleccione khora-audio y compruebe el motivo/acción de recuperación que muestre Vercel. Si no existe una reactivación clara o la pausa parece incorrecta, solicitar a soporte reactivación o acceso temporal de lectura/exportación. **No borrar, recrear ni vaciar el store.**
+
+La variable KHORA_LEGACY_BLOB_READS_ENABLED no aparece en la enumeración Production. Esa compuerta de aplicación es independiente del estado del proveedor y el código solo permite lectura cuando su valor es exactamente true. No debe habilitarse hasta que el proveedor permita GET y un objeto de prueba se lea físicamente con éxito. No se modificó.
+
+### 26.3 Perfil Chrome local autorizado · evidencia limitada a metadata
+
+En PC10RCIF4EI4, perfil Profile autorizado, se consultó únicamente metadata del directorio IndexedDB del origen khora-web.vercel.app:
+- Ficheros del almacén físico indexeddb.blob: 251 · 20.371.333 bytes.
+- Ficheros del almacén físico indexeddb.leveldb: 9 · 5.808.530 bytes.
+- Últimas modificaciones observadas: 2026-11-10T15:21:58.381Z (Blob) y 2026-11-10T23:07:58.509Z (LevelDB).
+
+Esta presencia confirma ficheros IndexedDB asociados al origen KHORA, pero no prueba que la base lógica khora-custodia-v1 esté presente, que los 216 fragmentos autorizados estén completos o que sean descifrables. No se abrieron registros, no se extrajo ni descifró contenido, no se copió dato y no se inspeccionó el perfil alternativo.
+
+### 26.4 Clon local KHORA · aislado para proteger Harmonia
+
+El clon C:\Users\fila4\Desktop\SeryMente\Repositorios\KHORA está en rama work/harmonia-front-workspace-20261110, HEAD 9fd5c18205e39b6db12c9152b07d8f880f6b256d, con cambios sin publicar de Harmonia. No tiene khora-web/.env.local ni khora-web/node_modules y no se observó servidor en puertos 3000–3003, 8787 o 9222.
+
+No se cambió de rama, no se limpiaron archivos, no se instalaron dependencias ni se creó .env.local. **No utilizar este clon como runtime de CUSTODIA** hasta tener un entorno KHORA limpio, aislado y autenticado; preservar el trabajo pendiente de Harmonia.
+
+### 26.5 Ruta de ejecución y no-acciones
+
+1. B2: usar el preflight aprobado como gate de identidad y ejecutar la lectura física/read-back/SHA de objetos elegibles mediante el runtime canónico KHORA autenticado. El preflight no sustituye la verificación individual.
+2. Blob: intervención del operador en Vercel Dashboard/soporte. Después de reactivación, realizar GET físico de prueba; solo entonces habilitar la compuerta histórica y desplegar/activar conforme al control aplicable.
+3. Local: preparar un runtime KHORA limpio y autenticado, sin modificar el clon Harmonia; después procesar los 216 fragmentos bajo autorización C, preservar originales y verificar bytes/longitud/SHA.
+4. Archivo: crear Volcados y vínculos únicamente por el flujo canónico KHORA, con titularidad, idempotencia, SHA y lectura de vuelta. No escribir directamente en Neon para evitar los controles de aplicación.
+
+**Cierre de este ciclo:** evidencia B2 y metadata local adquiridas; instrucción/salidas/evidencia persistidas para este ciclo. Lectura de vuelta de los artefactos documentales pendiente. No hubo cambios en código, configuración, despliegues, Neon, B2, Blob, bóvedas, datos de navegador ni originales. No se archivó ningún registro ni se procesó audio local. CUSTODIA-01 permanece como única tarea activa.
