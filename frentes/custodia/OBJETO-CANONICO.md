@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.73; OBJECT_SEAL=CUSTODIA-v0.73; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.74; OBJECT_SEAL=CUSTODIA-v0.74; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.73. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.74. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1724,3 +1724,34 @@ GET /api/audio/[id]/mp3 sí acepta sessionId con identidad del titular y Bóveda
 Se confirma una ruta de código capaz de verificar físicamente originales sin Volcado: khora_leer_audio, siempre bajo token del titular y turno MCP normativo. No puede activarse con la instrucción vigente. Las rutas REST existentes no aportan identidad en este canal. No se creó/consumió token, no se abrió turno MCP, no hubo GET/list, descifrado, generación/transcripción, escrituras ni cambios productivos o acceso local.
 
 Inventario permanece: 79 sesiones sin Volcado, 1.039 partes por metadata (785 B2/254 Blob), 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados. B2 todavía requiere credenciales runtime válidas; Blob legacy continúa fallando cerrado al no aparecer su bandera. CUSTODIA-01 sigue EN CURSO.
+
+## 41. Staging, trazas de carga y conciliación documental local · R11 · 2026-11-11
+
+**Evidencia:** [R11 · fuentes de staging y trazas de carga](evidencias/FUENTES-STAGING-Y-TRAZAS-DE-CARGA-20261111-R11.md), Git blob `eab4dd5dabc5a1790a1b548e69d1337854751a10`.  
+**Continuidad aportada:** [Registro de continuidad conversacional 2026-11-11](originales/CONTINUIDAD-OPERATIVA-CUSTODIA-20261111.md), Git blob `9c7fecfcffbabc1f6be465f9ff8db00bbbf3e720`. Es una síntesis del tramo visible aportado, no una exportación nativa exhaustiva.
+
+### 41.1 Staging e importación
+
+El catálogo público de Neon inspeccionado no contiene una tabla dedicada a staging/importación de audio. putStagingChunk() en khora-web/lib/server/object-storage.ts escribe temporalmente en B2 bajo khora/staging/audio/{sessionId}/{uploadId}.khstaging con UUIDv4; no crea por sí mismo una fila SQL que indexe el objeto. La falta de tabla no prueba que el objeto temporal exista o no exista físicamente: no se hizo listado/GET.
+
+POST /api/audio/importar/procesar requiere NextAuth, valida que stagingUrl pertenezca a la sesión, reclama la sesión, obtiene y descifra el staging con key/IV del flujo cliente y registra la parte original en dictado_audio_parte. No se invocó.
+
+### 41.2 Carga directa y parte 317
+
+POST /api/audio escribe en B2 y verifica read-back. La rama audio_no_verificable devuelve verificado=false y recuperable=true con localizador de cuarentena en la respuesta, pero no registra esa parte como confirmada en dictado_audio_parte. El cliente conserva el audio local en IndexedDB hasta recibir confirmación; la eliminación local ocurre después de PARTE_AUDIO_SUBIDA_CONFIRMADA. Este comportamiento se inspeccionó estáticamente, sin acceder a IndexedDB.
+
+Para el índice 317 de la sesión `36eeb04c-bbe7-4b72-bb6a-5e0d23cffce9`, los eventos consultados muestran un inicio con 82.195 bytes y un resultado `audio_no_verificable` con `upload_verified=false`. No aparece confirmación de la parte. Los campos ya consultados no contienen uploadId ni stagingUrl. Esto acredita intento y fallo de verificación, no una copia B2 física localizable ni su ausencia definitiva.
+
+### 41.3 Conteos locales: 216 frente a 993
+
+El estado operativo de 2026-11-10 menciona 216 partes locales pendientes de extracción/cotejo/transferencia en dos sesiones. La auditoría local histórica registra 993 registros independientes en cinco snapshots/sesiones, 993/993 descifrados AES-GCM en aquella inspección y 81.100.193 bytes. Son alcances y momentos distintos; no existe conciliación probatoria que permita declarar equivalencia o subconjunto. No se inspeccionó dispositivo ni IndexedDB.
+
+### 41.4 Reconciliación global descartada
+
+No se ejecutó ejecutarReconciliacionForense(DRY_RUN|APPLY). Su inicialización puede ejecutar DDL mediante asegurarColumnasDictado(), incluso en DRY_RUN; además abarca datos de múltiples titulares y listados globales B2/Blob. APPLY incorpora escrituras. No cumple el alcance acotado de CUSTODIA-01.
+
+### 41.5 Dictamen y estado
+
+Se identificó el mecanismo temporal y el flujo autenticado de importación; no se halló un recibo durable SQL que resuelva el localizador de la carga fallida 317. No se puede afirmar existencia ni ausencia física del staging sin una vía de lectura autorizada. La discrepancia 216/993 queda abierta. CUSTODIA-01 continúa EN CURSO; no cambian las 79 sesiones sin Volcado, las 1.039 partes por metadata ni los 29 checkpoints textuales significativos.
+
+**No-acciones:** cero endpoints de carga/importación ejecutados; cero GET/list/descifrado B2/Blob; cero escrituras de negocio, cambios de Production o secretos; cero acceso a monitor, Chrome local, RDC o IndexedDB.
