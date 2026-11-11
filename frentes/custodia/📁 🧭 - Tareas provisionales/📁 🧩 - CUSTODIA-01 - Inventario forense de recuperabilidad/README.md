@@ -1,4 +1,4 @@
-<!-- TASK_VERSION=1.4; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
+<!-- TASK_VERSION=1.5; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
 # CUSTODIA-01 · Archivo de todos los registros recuperables
 
 > **Estado:** EN CURSO · **Prioridad:** P0 · **Único expediente activo del frente CUSTODIA.**  
@@ -372,3 +372,41 @@ No hubo escrituras de negocio, Volcados nuevos, lecturas físicas B2/Blob, cambi
 ### Compuerta siguiente
 
 Individualizar las 79 sesiones pendientes según la evidencia ya disponible y el bloqueo específico: titularidad/procedencia, checkpoint/manifest, clave KHC1, objeto B2/Blob y verificación física, o contenido fuente. Solo se considerarán ejecutables las unidades con identidad y contenido demostrables y un canal de ejecución autorizado; no se completarán vacíos mediante inferencias.
+
+
+## 18. Matriz individual de las 79 sesiones pendientes · 2026-11-11
+
+**Evidencia:** [R8 · matriz de recuperación por sesión](../../evidencias/MATRIZ-RECUPERACION-POR-SESION-20261111-R8.md).  
+**OCP:** §38 / CUSTODIA-v0.71.  
+**Lista:** §24 / LIST_VERSION 0.59.
+
+### Objetivo del ciclo
+
+Individualizar las 79 sesiones sin Volcado y clasificar sus pruebas de titularidad, checkpoint, SHA, revisiones históricas, audio, proveedor y continuidad de índices, sin recuperar contenido ni leer objetos físicos.
+
+### Tareas ejecutadas
+
+1. Ejecutar SELECT sobre Neon Production con el principal de la cuenta del operador y el predicado completo de titularidad.
+2. Obtener metadatos de sesión, presencia/formato de checkpoint, SHA actual y contadores de revisiones, sin seleccionar plaintext ni snapshot.
+3. Agregar partes por sesión, proveedor declarado, bytes, índices, SHA y bandera de verificación DB, sin devolver blob_url/blob_path.
+4. Cruzar las revisiones por SHA con Volcados del mismo titular, manteniendo como candidatos todas las coincidencias.
+5. Localizar y registrar la discontinuidad de índice 317.
+6. Persistir la matriz de 79 filas y leerla de vuelta.
+
+### Resultado
+
+El universo es 79 sesiones: 43 con propietario en custodia_owner y 36 en checkpoint_usuario. Hay 78 checkpoints con envoltura KHC1, 44 sesiones con audio, 34 sesiones sin audio con checkpoint y una sin audio/checkpoint localizado.
+
+Las 1.039 partes se distribuyen en 785 B2 y 254 Blob. Todas tienen SHA y bandera DB verificado; la existencia física y la integridad del objeto aún exigen GET/read-back. Se encontró un hueco interno en el índice 317 de la sesión 36eeb04c-bbe7-4b72-bb6a-5e0d23cffce9.
+
+Los 34 checkpoints sin audio se componen de 29 hashes significativos, cuatro hashes vacíos y un hash de salto de línea; se mantiene aparte una sesión adicional sin checkpoint. De los 29 significativos, 17 tienen alguna coincidencia histórica de revisión con un Volcado del mismo titular; ninguno tiene coincidencia por SHA actual. Se identifican dos grupos de SHA actual no vacío repetidos, que siguen siendo candidatos pendientes de comparación de plaintext/procedencia, no duplicados confirmados.
+
+### Estado y no-acciones
+
+No se leyó texto, snapshot, plaintext, URLs ni secretos. No se descifró KHC1, no se hizo GET B2/Blob, no hubo escrituras Neon, Volcados nuevos, claims o cambios de Production. No se usaron monitor, Chrome local, RDC ni IndexedDB. La matriz solo incorpora metadatos derivados de SELECT.
+
+CUSTODIA-01 continúa EN CURSO. Ninguna de las 79 sesiones se declara recuperada ni perdida. La ejecución queda condicionada a identidad titular, runtime KHC1, procedencia y read-back físico por objeto.
+
+### Compuerta siguiente
+
+Verificar estáticamente el formato B2/Blob y el mecanismo de referencia del objeto, así como la reconciliación del manifiesto para la parte 317. No descargar ni inspeccionar payloads en este ciclo. Identificar qué lotes de referencia pueden verificarse con la implementación server-side y mantener cualquier parte sin fuente física demostrada como bloqueada.
