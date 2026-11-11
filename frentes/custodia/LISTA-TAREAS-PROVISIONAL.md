@@ -208,7 +208,7 @@ La salida literal se conserva íntegra como registro histórico. Sus conteos de 
 **Continuación:** localizar/reconciliar el índice 317 por el flujo autorizado; priorizar GET/read-back de los cuatro manifiestos B2 contiguos y procesar solo después mediante POST canónico autenticado. Resolver las 4 posibles duplicidades exactas mediante cotejo, no por suposición. No tocar SQL, credenciales ni configuración para forzar el archivo.
 
 
-## 15. Revalidación del gate B2 y estado Blob · 2026-11-11 · versión de evidencia
+## 15. Revalidación del gate B2 y estado Blob · 2026-11-11 · v0.47
 
 **Evidencia:** [REVALIDACION-GATE-B2-BLOB-20261111.md](evidencias/REVALIDACION-GATE-B2-BLOB-20261111.md).  
 **Objeto canónico:** [OBJETO-CANONICO.md §§28–29](OBJETO-CANONICO.md) · CUSTODIA-v0.60.
