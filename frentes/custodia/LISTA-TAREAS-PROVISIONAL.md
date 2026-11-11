@@ -1,8 +1,8 @@
-<!-- LIST_VERSION=0.60; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.61; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
-> **Actualización:** 2026-11-11 · contrato B2/Blob, read-back y derivados MP3 históricos.
+> **Actualización:** 2026-11-11 · rutas de lectura física para capturas pendientes y compuerta normativa MCP.
 > **Único objetivo activo:** archivar todos los registros históricos que puedan archivarse; dejar pendientes únicamente los que tengan un impedimento actual, concreto y documentado.
 
 **Instrucción literal:** [INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md).  
@@ -19,6 +19,7 @@
 **Evidencia R7:** [MCP-OAUTH-SCOPES-Y-AUSENCIA-DE-ARCHIVO-20261111-R7.md](evidencias/MCP-OAUTH-SCOPES-Y-AUSENCIA-DE-ARCHIVO-20261111-R7.md).  
 **Evidencia R8:** [MATRIZ-RECUPERACION-POR-SESION-20261111-R8.md](evidencias/MATRIZ-RECUPERACION-POR-SESION-20261111-R8.md).  
 **Evidencia R9:** [LOCALIZADORES-READBACK-Y-DERIVADOS-MP3-20261111-R9.md](evidencias/LOCALIZADORES-READBACK-Y-DERIVADOS-MP3-20261111-R9.md).  
+**Evidencia R10:** [RUTAS-READONLY-Y-COMPUERTA-MCP-20261111-R10.md](evidencias/RUTAS-READONLY-Y-COMPUERTA-MCP-20261111-R10.md).  
 **Instrucción de retoma:** [INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md](originales/INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md).  
 **Estado base:** [ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md](evidencias/ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md).  
 **Diagnóstico previo:** [DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md](evidencias/DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md).
@@ -484,3 +485,28 @@ CUSTODIA-01 sigue EN CURSO; los 79 Volcados pendientes no cambian y ninguna capt
 ### Objetivo del siguiente ciclo
 
 Determinar si hay un camino no interactivo permitido para hacer read-back de B2 y si existe una activación de lectura Blob ya autorizada; en paralelo, evaluar qué significado probatorio tiene el historial MP3 por sesión y qué material secundario podría preservar el proceso de recuperación sin convertirlo en original. No habilitar flags, no ejecutar workers y no cambiar variables.
+
+
+## 26. Lector de audio original por sesión y compuerta MCP · v0.61 · 2026-11-11
+
+**Evidencia:** [R10 · rutas read-only y compuerta MCP](evidencias/RUTAS-READONLY-Y-COMPUERTA-MCP-20261111-R10.md).  
+**OCP:** [CUSTODIA-v0.73 · §40](OBJETO-CANONICO.md).  
+**Contrato:** [CUSTODIA-01 · TASK_VERSION 1.7 · §20](./📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20CUSTODIA-01%20-%20Inventario%20forense%20de%20recuperabilidad/README.md).
+
+### Hallazgo
+
+Existe khora_leer_audio: herramienta de solo lectura con scope volcados:read que acepta sessionId aunque la sesión aún no tenga Volcado. Usa el actor del Bearer para filtrar titularidad y ejecuta leerBlobVerificado (GET, KHC1, longitud y SHA de bytes claros). Devuelve audio en Base64 por bloques. Las herramientas MCP sustantivas requieren turno normativo.
+
+La ruta es técnicamente adecuada para read-back de originales bajo el titular; no crea Volcados. Sin embargo, MCP normativo sigue DESACTIVADO y no hay Bearer del titular en el contexto. No se invocó. No se genera token por inferencia.
+
+### Rutas REST
+
+Las rutas de audio original/parte requieren NextAuth, posesión de Volcado y Bóveda; por ello no cubren las 79 sesiones aún sin Volcado. Exportación original solo permite una importación de una parte. GET de diálogo comprueba titularidad y lee pistas concretas, pero requiere NextAuth y devuelve audio; POST envía las pistas a Groq. GET de MP3 derivado admite sessionId y titular/Bóveda, pero solo devuelve derivados, no originales. POST MP3 puede escribir y disparar generación; no se ejecutó.
+
+### No-acciones y estado
+
+No se llamó a MCP, REST, transcripción o worker. No se obtuvo token, no se abrió turno normativo, no hubo GET físico B2/Blob, descifrado ni escritura. No se usaron monitor, Chrome local, RDC o IndexedDB. CUSTODIA-01 sigue EN CURSO, 79 Volcados pendientes y el inventario de R8/R9 sin cambios.
+
+### Objetivo del siguiente ciclo
+
+Inspeccionar fuentes alternativas ya persistidas para la parte 317 y los 216 fragmentos locales autorizados: staging B2, sesiones de importación, registros de carga y tablas de fragmentos. No acceder al sistema de archivos local ni al navegador. Determinar si hay una copia server-side del índice faltante o un recibo que permita localizarla, sin invocar lecturas de objeto ni escribir.
