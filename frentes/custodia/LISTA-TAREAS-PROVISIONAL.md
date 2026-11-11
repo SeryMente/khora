@@ -1,8 +1,8 @@
-<!-- LIST_VERSION=0.49; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.50; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
-> **Actualización:** 2026-11-11 · revalidación de los gates de archivo.
+ > **Actualización:** 2026-11-11 · revisión de diseño y compuertas de ejecución.
 > **Único objetivo activo:** archivar todos los registros históricos que puedan archivarse; dejar pendientes únicamente los que tengan un impedimento actual, concreto y documentado.
 
 **Instrucción literal:** [INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md).  
@@ -10,6 +10,7 @@
 **Última salida literal (ciclo repetido):** [SALIDA-MODELO-CUSTODIA-BLOQUEOS-ULTIMO-CICLO-20261110.md](originales/SALIDA-MODELO-CUSTODIA-BLOQUEOS-ULTIMO-CICLO-20261110.md).  
 **Último tramo literal (2026-11-11):** [SALIDA-MODELO-CUSTODIA-ULTIMO-TRAMO-20261111.md](originales/SALIDA-MODELO-CUSTODIA-ULTIMO-TRAMO-20261111.md).  
 **Repetición B2 Production (2026-11-11):** [REPETICION-CICLO-B2-PREFLIGHT-20261111.md](evidencias/REPETICION-CICLO-B2-PREFLIGHT-20261111.md).  
+**Revisión de diseño (2026-11-11):** [REVISION-DISENO-LISTA-CUSTODIA-20261111.md](evidencias/REVISION-DISENO-LISTA-CUSTODIA-20261111.md).  
 **Evidencia de repetición del ciclo:** [ESTADO-OPERATIVO-BLOQUEOS-20261110.md](evidencias/ESTADO-OPERATIVO-BLOQUEOS-20261110.md).  
 **Instrucción de retoma:** [INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md](originales/INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md).  
 **Estado base:** [ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md](evidencias/ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md).  
@@ -25,20 +26,32 @@ Detalle: [CUSTODIA-01 · Archivo de todos los registros recuperables](./📁%20�
 
 ## 2. Desglose de fases de CUSTODIA-01
 
-Las fases son subunidades internas del expediente existente, no nuevos expedientes maestros ni folios.
+Las fases son subunidades internas del expediente existente; no crean expedientes maestros ni folios. Se separan las compuertas de autenticación, lectura física del proveedor y acceso a fuentes locales.
 
-| Fase | Estado | Alcance |
+| Fase | Estado actualizado | Alcance y criterio de salida |
 |---|---|---|
-| CUSTODIA-01.a | EN CURSO | Conciliar candidatos, propietarios, Volcados/archivados y duplicados; Chrome solo en el perfil autorizado `Profile` de `the.willfreeman@gmail.com` en `PC10RCIF4EI4`. |
-| CUSTODIA-01.b | BLOQUEADA POR ACCESO AL RUNTIME | Archivar transcripciones sin audio localizado como texto; marcar `Audio: No localizado` y `Procedencia: No verificada`, sin inferir copy/paste. |
-| CUSTODIA-01.c | BLOQUEADA POR ACCESO B2/RUNTIME | Leer y cotejar físicamente las partes B2 elegibles; archivar solo tras comprobar bytes, longitud y SHA-256. |
-| CUSTODIA-01.d | BLOQUEADA POR ACCESO AL RUNTIME AUTENTICADO | Procesar las 216 partes locales de dos sesiones conforme a autorización C, copiarlas a B2 con read-back y preservar originales. |
-| CUSTODIA-01.e | EN CURSO | Registrar como bloqueados los Blob suspendidos, referencias sin read-back y registros sin titularidad demostrada; no declarar pérdida. |
-| CUSTODIA-01.f | PENDIENTE | Verificar cada Volcado, retirar del pendiente lo archivado y dejar solo residuales actualmente no archivables con evidencia. |
-| CUSTODIA-01.g | EN CURSO · ALCANCE CERRADO | Limitar la búsqueda de la copia de X_KHORA_KEY a las dos bóvedas indicadas por el operador (primera y reconstruida); no ampliar a LastPass, perfiles alternos ni otros almacenes. Preservar ciphertext. |
-| CUSTODIA-01.h | NO APLICABLE PARA RECUPERAR LA LLAVE | No restablecer PIN como intento de recuperar X_KHORA_KEY: solo abre la bóveda web y no recupera ni rota la llave criptográfica. |
-| CUSTODIA-01.i | PENDIENTE DEL OPERADOR | Si se necesita distinguir pérdida de la copia en bóvedas frente a clave aún operativa en producción, emitir una sesión EP nueva (invalida la anterior) y ejecutar una sola lectura autenticada de `/api/ep/github-credential`; registrar solo OK/código, sin imprimir token. No ejecutar bootstrap. |
-| CUSTODIA-01.j | BACKLOG · NO ACTIVO | Verificar la dependencia de `X_KHORA_KEY` en el catálogo y recuperación; separar el fallo de descifrado de Blob, revisión ausente y titularidad. No rotar ni cambiar la llave; cualquier cambio de código requiere autorización específica. |
+| CUSTODIA-01.a | EN CURSO | Conciliar candidatos, titularidad, Volcados, componentes y duplicados con fuentes remotas autorizadas. No utilizar monitor, Chrome local ni RDC. |
+| CUSTODIA-01.b | BLOQUEADA · CONTEXTO NEXTAUTH INDEPENDIENTE | Archivar texto sin audio localizado solo después de GET canónico, descifrado, cotejo SHA, POST y lectura de vuelta de Volcado/titular/vínculo. Primer candidato ya individualizado en §16. |
+| CUSTODIA-01.c | PREVALIDADA · GET HISTÓRICO PENDIENTE | Preflight Production B2 PASS en autenticación/configuración; falta GET físico de cada parte elegible y cotejo de bytes, longitud y SHA-256 antes del archivo. |
+| CUSTODIA-01.d | BLOQUEADA · CANAL LOCAL EXCLUIDO | Procesar las 216 partes locales de dos sesiones con la autorización C ya registrada; no acceder por monitor, Chrome local ni RDC. Requiere un canal independiente permitido; preservar originales y verificar read-back B2. |
+| CUSTODIA-01.e | EN CURSO | Registrar residuales por registro y componente: proveedor/localizador, contenido existente, titularidad, integridad, causa actual y acción para desbloquear. Blob bloqueado no equivale a inexistente. |
+| CUSTODIA-01.f | PENDIENTE · GATE FINAL | Verificar cada Volcado/vínculo y reconciliar el inventario completo; retirar del pendiente solo lo leído de vuelta y dejar residuales con impedimento concreto probado. |
+
+### Estado de ejecución y compuertas
+
+- **Texto sin audio:** falta contexto NextAuth del propietario por un canal independiente; la sesión candidata está identificada y la ruta canónica inspeccionada. No se ha creado Volcado.
+- **B2:** el log del deployment Production registra autenticación/configuración PASS. No se ha hecho GET de las 77 partes históricas ni recálculo SHA actual.
+- **Audio local:** la autorización anterior se conserva, pero la instrucción posterior de no usar monitor/Chrome/RDC impide ese canal. No se inspeccionará IndexedDB hasta disponer de alternativa permitida.
+- **Blob:** la evidencia de suspensión es histórica respecto de esta repetición; no se reconsultó el estado del store en el último ciclo. No habilitar lecturas ni borrar/recrear el store.
+
+### Dependencias y guardrails — no son fases activas
+
+- **X_KHORA_KEY:** activar la búsqueda limitada a las dos bóvedas indicadas solo si un objeto elegible presenta un fallo de descifrado atribuible a esa llave. No rotar ni reemplazar.
+- **PIN:** guardrail, no tarea; restablecerlo no recupera X_KHORA_KEY.
+- **Credencial GitHub/EP:** la lectura de `/api/ep/github-credential` no es necesaria para archivar dictados ni bloquea CUSTODIA-01; queda fuera del sprint salvo prueba de dependencia directa.
+- **Catálogo/X_KHORA_KEY:** backlog de producto separado y no activo; no implementar cambios de código dentro de CUSTODIA-01.
+
+**Contrato de ejecución:** [CUSTODIA-01 · README v1.0](./📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20CUSTODIA-01%20-%20Inventario%20forense%20de%20recuperabilidad/README.md).
 
 ## 3. Estados de salida
 
@@ -258,4 +271,21 @@ La salida literal se conserva íntegra como registro histórico. Sus conteos de 
 - Blob legacy permanece pendiente.
 
 **Estado:** CUSTODIA-01 sigue como única tarea activa. Autenticación/configuración B2 PASS en preflight; lectura física histórica PENDIENTE; archivo nuevo PENDIENTE.
+
+
+## 18. Revisión de diseño y compuertas de ejecución · 2026-11-11 · v0.50
+
+**Evidencia:** [REVISION-DISENO-LISTA-CUSTODIA-20261111.md](evidencias/REVISION-DISENO-LISTA-CUSTODIA-20261111.md).  
+**Objeto canónico:** [CUSTODIA-v0.62 · §31](OBJETO-CANONICO.md).  
+**Contrato ejecutable:** [CUSTODIA-01 · TASK_VERSION 1.0](./📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20CUSTODIA-01%20-%20Inventario%20forense%20de%20recuperabilidad/README.md).
+
+**Dictamen:** el objetivo único CUSTODIA-01 era correcto; el diseño anterior mezclaba fases, dependencias y guardrails y conservaba una vía Chrome/RDC incompatible con la instrucción posterior del operador. La tabla de §2 queda normalizada y cada fase tiene criterio de salida.
+
+**Estado vigente:** 01.a y 01.e EN CURSO; 01.b BLOQUEADA por falta de contexto NextAuth independiente; 01.c PREVALIDADA por el preflight B2 pero pendiente de GET histórico; 01.d BLOQUEADA por exclusión del canal local; 01.f PENDIENTE como gate final.
+
+La búsqueda de X_KHORA_KEY pasa a dependencia condicional; PIN es guardrail; EP/GitHub se excluye por no ser necesario para archivar dictados; el catálogo permanece en backlog separado. No se cambia autorización, CONTROL-RESPONSABILIDAD.json, ni generación 11.
+
+**No-acciones:** no se usó monitor, Chrome local ni RDC; no se leyeron datos personales/secretos; no hubo escrituras de negocio, cambios de configuración o despliegues.
+
+**Cierre:** Lista provisional v0.50; OCP CUSTODIA-v0.62; contrato de tarea v1.0. CUSTODIA-01 sigue como único expediente activo.
 
