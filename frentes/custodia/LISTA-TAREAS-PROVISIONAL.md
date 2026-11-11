@@ -1,8 +1,8 @@
-<!-- LIST_VERSION=0.50; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.51; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
-> **Actualización:** 2026-11-11 · revisión de diseño y compuertas de ejecución.
+> **Actualización:** 2026-11-11 · conciliación R2 de Neon, deduplicación y compuertas de ejecución.
 > **Único objetivo activo:** archivar todos los registros históricos que puedan archivarse; dejar pendientes únicamente los que tengan un impedimento actual, concreto y documentado.
 
 **Instrucción literal:** [INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md).  
@@ -11,6 +11,7 @@
 **Último tramo literal (2026-11-11):** [SALIDA-MODELO-CUSTODIA-ULTIMO-TRAMO-20261111.md](originales/SALIDA-MODELO-CUSTODIA-ULTIMO-TRAMO-20261111.md).  
 **Repetición B2 Production (2026-11-11):** [REPETICION-CICLO-B2-PREFLIGHT-20261111.md](evidencias/REPETICION-CICLO-B2-PREFLIGHT-20261111.md).  
 **Revisión de diseño (2026-11-11):** [REVISION-DISENO-LISTA-CUSTODIA-20261111.md](evidencias/REVISION-DISENO-LISTA-CUSTODIA-20261111.md).  
+**Reconciliación Neon R2 (2026-11-11):** [RECONCILIACION-NEON-SOLO-LECTURA-20261111-R2.md](evidencias/RECONCILIACION-NEON-SOLO-LECTURA-20261111-R2.md).  
 **Evidencia de repetición del ciclo:** [ESTADO-OPERATIVO-BLOQUEOS-20261110.md](evidencias/ESTADO-OPERATIVO-BLOQUEOS-20261110.md).  
 **Instrucción de retoma:** [INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md](originales/INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md).  
 **Estado base:** [ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md](evidencias/ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md).  
@@ -32,17 +33,25 @@ Las fases son subunidades internas del expediente existente; no crean expediente
 |---|---|---|
 | CUSTODIA-01.a | EN CURSO | Conciliar candidatos, titularidad, Volcados, componentes y duplicados con fuentes remotas autorizadas. No utilizar monitor, Chrome local ni RDC. |
 | CUSTODIA-01.b | BLOQUEADA · CONTEXTO NEXTAUTH INDEPENDIENTE | Archivar texto sin audio localizado solo después de GET canónico, descifrado, cotejo SHA, POST y lectura de vuelta de Volcado/titular/vínculo. Primer candidato ya individualizado en §16. |
-| CUSTODIA-01.c | PREVALIDADA · GET HISTÓRICO PENDIENTE | Preflight Production B2 PASS en autenticación/configuración; falta GET físico de cada parte elegible y cotejo de bytes, longitud y SHA-256 antes del archivo. |
+| CUSTODIA-01.c | PREVALIDADA · GET HISTÓRICO PENDIENTE | Cinco manifiestos B2: 785 partes/64.166.900 bytes en total; cuatro son contiguos (464 partes) y uno tiene el índice 317 ausente. Preflight acredita configuración, no GET físico. GET, bytes, longitud y SHA-256 de cada objeto antes del archivo. |
 | CUSTODIA-01.d | BLOQUEADA · CANAL LOCAL EXCLUIDO | Procesar las 216 partes locales de dos sesiones con la autorización C ya registrada; no acceder por monitor, Chrome local ni RDC. Requiere un canal independiente permitido; preservar originales y verificar read-back B2. |
 | CUSTODIA-01.e | EN CURSO | Registrar residuales por registro y componente: proveedor/localizador, contenido existente, titularidad, integridad, causa actual y acción para desbloquear. Blob bloqueado no equivale a inexistente. |
 | CUSTODIA-01.f | PENDIENTE · GATE FINAL | Verificar cada Volcado/vínculo y reconciliar el inventario completo; retirar del pendiente solo lo leído de vuelta y dejar residuales con impedimento concreto probado. |
 
 ### Estado de ejecución y compuertas
 
-- **Texto sin audio:** falta contexto NextAuth del propietario por un canal independiente; la sesión candidata está identificada y la ruta canónica inspeccionada. No se ha creado Volcado.
-- **B2:** el log del deployment Production registra autenticación/configuración PASS. No se ha hecho GET de las 77 partes históricas ni recálculo SHA actual.
+- **Texto sin audio:** falta un contexto de servidor autorizado para el propietario. De las 34 sesiones: cuatro checkpoints vacíos ya coinciden con Volcados de cero caracteres; una contiene solo un salto de línea; 29 tienen checkpoint vigente potencialmente significativo. En 17 hay coincidencia SHA solo en revisiones antiguas, no en el checkpoint vigente; 12 no tienen coincidencia histórica, incluida la sesión candidata sin revisiones. No se ha creado Volcado.
+- **B2:** preflight Production PASS para autenticación/configuración. El universo real pendiente es de cinco manifiestos y 785 partes; no se ha hecho GET físico ni recálculo SHA de ninguna de ellas. El manifiesto de 321 filas tiene un hueco en el índice 317.
 - **Audio local:** la autorización anterior se conserva, pero la instrucción posterior de no usar monitor/Chrome/RDC impide ese canal. No se inspeccionará IndexedDB hasta disponer de alternativa permitida.
-- **Blob:** la evidencia de suspensión es histórica respecto de esta repetición; no se reconsultó el estado del store en el último ciclo. No habilitar lecturas ni borrar/recrear el store.
+- **Blob legacy:** 254 partes en 39 sesiones, localizadas por metadata. En la conciliación R2 no se reconsultó el estado actual del store ni se hizo GET físico; mantenerlas pendientes sin declarar pérdida ni habilitar lecturas.
+
+### Reconciliación R2 de Neon · 2026-11-11
+
+- Universo: 84 sesiones propias; cinco ya vinculadas; 79 sin vínculo. Las 44 sesiones pendientes con audio suman 1.039 partes: 785 B2 en cinco sesiones y 254 Blob en 39 sesiones.
+- B2: 464 partes están en cuatro manifiestos contiguos; el quinto tiene 321 filas y carece del índice 317 dentro del rango 1–322. El estado `verificado` en Neon no prueba lectura física actual.
+- Texto: 29 checkpoints vigentes potencialmente significativos no tienen coincidencia SHA exacta contra el Volcado existente. De esos 29, 17 conservan coincidencias en revisiones antiguas y 12 no; ninguna coincidencia antigua autoriza descartar el checkpoint vigente. Cuatro sesiones coinciden con Volcados de texto vacío y una contiene únicamente un salto de línea.
+- La ruta canónica de checkpoints y el archivado requieren NextAuth del propietario. La lectura de partes de audio añade la cookie de bóveda desbloqueada y propiedad del Volcado. No se identificó en el código consultado una ruta de servicio independiente autorizada para sustituir esa identidad. No crear credenciales ficticias ni saltarse el flujo canónico.
+- Evidencia: [RECONCILIACION-NEON-SOLO-LECTURA-20261111-R2.md](evidencias/RECONCILIACION-NEON-SOLO-LECTURA-20261111-R2.md). No se leyeron plaintexts, no se ejecutaron escrituras SQL ni se creó ningún Volcado.
 
 ### Dependencias y guardrails — no son fases activas
 
