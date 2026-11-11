@@ -85,4 +85,4 @@ Esto confirma que el bloqueo del proveedor sigue activo en el momento de la cons
 - No se creó ningún Volcado ni se modificaron vínculos de sesiones.
 - No se ejecutó GET ni se transfirió ningún objeto.
 - Esta evidencia no reemplaza el inventario base ni acepta el archivo de ninguna sesión.
-- La última salida visible del modelo se conserva literalmente en `../originales/SALIDA-MODELO-CUSTODIA-BLOQUEOS-20261110-LITERAL.md`. Sus afirmaciones y cifras se preservan como salida histórica, pero no se elevan a evidencia verificada.
+- La última salida visible del modelo se conserva literalmente en `../originales/SALIDA-MODELO-CUSTODIA-BLOQUEOS-ULTIMO-CICLO-20261110.md`. Sus afirmaciones y cifras se preservan como salida histórica, pero no se elevan a evidencia verificada.
