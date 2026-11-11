@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.60; OBJECT_SEAL=CUSTODIA-v0.60; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.61; OBJECT_SEAL=CUSTODIA-v0.61; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.60. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.61. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1362,3 +1362,46 @@ Ninguno de esos endpoints se ejecutó: no se dispone de sesión autenticada del 
 5. Mantener Blob pendiente mientras el proveedor siga suspendido.
 
 **Cierre:** evidencia textual nueva persistida y leída de vuelta; OCP v0.60. No hubo escrituras de negocio, descifrado, creación de Volcados ni modificaciones a infraestructura. CUSTODIA-01 permanece como única tarea activa.
+
+
+## 30. Persistencia del último tramo y repetición del ciclo B2 · 2026-11-11 · CUSTODIA-v0.61
+
+**Salida literal conservada:** [SALIDA-MODELO-CUSTODIA-ULTIMO-TRAMO-20261111.md](originales/SALIDA-MODELO-CUSTODIA-ULTIMO-TRAMO-20261111.md). Incluye literalmente las dos últimas respuestas aportadas en el tramo: «Siguiente paso: validar el candidato B2 de 77 partes» y «Propósito del sprint CUSTODIA-01». Los estados y referencias v0.57 incluidos en la salida pertenecen al original histórico; no sustituyen este OCP v0.61.
+
+**Evidencia de repetición:** [REPETICION-CICLO-B2-PREFLIGHT-20261111.md](evidencias/REPETICION-CICLO-B2-PREFLIGHT-20261111.md).
+
+### 30.1 Revalidación de Production
+
+Se consultó el proyecto Vercel khora-web y su último deployment Production observado:
+- Deployment: dpl_6M6ebaAvNPpAtRspfX5QhffEJvVJ · READY.
+- Commit desplegado: f0224c1368fb15a3452335a44305c6efa85eef79.
+- Commit main consultado durante esta actualización: c708901caa2500eb48d6723b709cee7db0d9904b; está 8 commits por delante del commit desplegado.
+- La rama de custodia sigue 90 commits por delante de main y 0 por detrás. No se integra ni se despliega por esta actualización.
+
+Los logs del build del deployment contienen native_auth=PASS, master_key=PASS, bucket_identity=PASS, bucket_private=PASS, sse_b2_default=PASS y read_only_gate=PASS. La comprobación de lectura de configuración fue de solo lectura y declara que no alteró objetos, bucket, CORS, credenciales ni datos fuente. En este turno se releyeron los logs existentes; no se lanzó un nuevo build ni un nuevo deployment.
+
+La enumeración completa de nombres de variables Production con decrypt=false confirma KHORA_B2_PREFLIGHT=1 y KHORA_OBJECT_STORAGE=b2; aparecen los nombres de variables sensibles de Master Application Key, bucket y credenciales B2. No se solicitaron ni leyeron sus valores. KHORA_LEGACY_BLOB_READS_ENABLED no aparece y hiddenProductionEnvCount=0. La presencia del token Blob no prueba que el almacén esté operativo; su estado no fue reconsultado en este ciclo.
+
+### 30.2 Límite de la repetición B2
+
+El gate PASS acredita autenticación/configuración B2 en el preflight del build, no lectura física de los objetos históricos. No se descargó ninguna de las 77 partes del manifiesto de la sesión 45f0cf5e-d1af-46c3-95af-e9428b8b0f90. No se descifró audio, no se cotejó longitud/bytes actuales ni se recalculó SHA-256 por parte. El manifiesto y sus 77 filas siguen siendo metadatos históricos hasta completar GET físico.
+
+No se dispuso de un contexto NextAuth del propietario por un canal remoto independiente. Por instrucción del operador, no se utilizó el monitor, navegador local ni RDC. No se intentó sortear SSO/NextAuth ni extraer secretos para fabricar una sesión.
+
+### 30.3 No-acciones y resultado
+
+No se creó ni vinculó ningún Volcado. No hubo escrituras de negocio en Neon, B2 o Blob; no hubo cambios de variables, credenciales, CORS, bucket, código, despliegues, perfiles ni dispositivos.
+
+**Resultado del ciclo repetido:** autenticación/configuración del proveedor B2 PASS en el preflight observado; lectura física histórica PENDIENTE; archivo PENDIENTE. La prueba anterior no permite declarar recuperables las 77 partes.
+
+### 30.4 Continuidad y prioridad vigente
+
+La repetición del preflight no altera la prioridad canónica de §29.4:
+1. Primero, recuperar y verificar el checkpoint textual 48586f80-63d6-4969-9691-27e55cb5d5f5 mediante el flujo autenticado.
+2. Después, procesar las otras 12 sesiones textuales sin coincidencia SHA.
+3. Luego, ejecutar GET físico y cotejo de longitud/bytes/SHA-256 de las 77 partes B2 de 45f0cf5e-d1af-46c3-95af-e9428b8b0f90.
+4. Reconciliar por separado las 21 sesiones textuales con coincidencia SHA, sin deduplicación automática.
+5. Mantener Blob legacy bloqueado hasta recuperación del proveedor y GET físico satisfactorio.
+
+**Cierre:** OCP CUSTODIA-v0.61 actualizado. Salida literal y evidencia de repetición persistidas. La rama sigue sin merge ni deployment. CUSTODIA-01 continúa como única tarea activa; ningún Volcado nuevo fue creado.
+
