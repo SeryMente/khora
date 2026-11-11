@@ -1,4 +1,4 @@
-<!-- LIST_VERSION=0.42; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.43; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
@@ -6,7 +6,10 @@
 > **Único objetivo activo:** archivar todos los registros históricos que puedan archivarse; dejar pendientes únicamente los que tengan un impedimento actual, concreto y documentado.
 
 **Instrucción literal:** [INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md).  
-**Salida literal preservada:** [SALIDA-MODELO-CUSTODIA-ARCHIVO-REGISTROS-20261110.md](originales/SALIDA-MODELO-CUSTODIA-ARCHIVO-REGISTROS-20261110.md).  
+**Salida literal preservada (ciclo anterior):** [SALIDA-MODELO-CUSTODIA-ARCHIVO-REGISTROS-20261110.md](originales/SALIDA-MODELO-CUSTODIA-ARCHIVO-REGISTROS-20261110.md).  
+**Última salida literal (ciclo repetido):** [SALIDA-MODELO-CUSTODIA-BLOQUEOS-ULTIMO-CICLO-20261110.md](originales/SALIDA-MODELO-CUSTODIA-BLOQUEOS-ULTIMO-CICLO-20261110.md).  
+**Evidencia de repetición del ciclo:** [ESTADO-OPERATIVO-BLOQUEOS-20261110.md](evidencias/ESTADO-OPERATIVO-BLOQUEOS-20261110.md).  
+**Instrucción de retoma:** [INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md](originales/INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md).  
 **Estado base:** [ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md](evidencias/ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md).  
 **Diagnóstico previo:** [DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md](evidencias/DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md).
 
@@ -149,3 +152,30 @@ La inspección de código confirma AES-256-GCM para payloads marcados `khc1.`/`K
 **Separación de causas:** Blob suspendido impide el GET físico del objeto histórico; llave ausente/divergente impide descifrar payloads. B2 tampoco elimina la necesidad de descifrar KHC1. Falta de revisión y falta de titularidad son bloqueos separados.
 
 **Siguiente trabajo .j (backlog, no activo):** comprobar de forma autenticada y sin exponer secretos la disponibilidad funcional de la llave en Production; recorrer catálogo/revisiones por páginas; reconciliar cada registro y separar error criptográfico, ausencia de revisión, titularidad y proveedor; proponer aislamiento de error por tarjeta si una sola snapshot fallida provoca 503 global. No tocar código ni configuración sin autorización expresa y no rotar, sustituir o re-cifrar.
+
+
+## 12. Último tramo y repetición del ciclo · 2026-11-10 · v0.43
+
+**Salida literal:** [SALIDA-MODELO-CUSTODIA-BLOQUEOS-ULTIMO-CICLO-20261110.md](originales/SALIDA-MODELO-CUSTODIA-BLOQUEOS-ULTIMO-CICLO-20261110.md).  
+**Evidencia revalidada:** [ESTADO-OPERATIVO-BLOQUEOS-20261110.md](evidencias/ESTADO-OPERATIVO-BLOQUEOS-20261110.md).
+
+### Resultado revalidado
+
+- `X_KHORA_KEY` figura en la configuración Production de `khora-web`; `KHORA_API_KEY` también figura. Se consultaron solo nombres y metadatos (`decrypt=false`), no valores. La presencia no demuestra igualdad de las dos variables ni prueba un descifrado E2E, pero la ausencia de `X_KHORA_KEY` ya no es un bloqueo demostrado.
+- `KHORA_LEGACY_BLOB_READS_ENABLED` no figura en la enumeración completa de variables Production (`hiddenProductionEnvCount=0`). El código solo habilita lecturas si el valor es exactamente `true`.
+- El almacén Vercel Blob `khora-audio` continúa `billingState=suspended` y `usageQuotaExceeded=true`. El proveedor está bloqueado además de la compuerta de aplicación.
+- Los nombres de las credenciales B2 y `BLOB_READ_WRITE_TOKEN` figuran en Production; no se realizó GET físico de objetos.
+- `NOTION_DB_VOLCADOS` no figura en Production; esto afecta el espejo Notion, no crea un bloqueo demostrado para el Volcado canónico en Neon.
+
+### Estado de afirmaciones de la salida literal
+
+La salida literal se conserva íntegra como registro histórico. Sus conteos de 95/79/16/87 sesiones y 1.311 partes, y sus afirmaciones sobre los cuatro trabajos Notion, no se elevan al inventario canónico: no fueron reproducidos en este ciclo y no deben sustituir el estado base anterior hasta contar con consulta y evidencia correspondientes.
+
+### Próxima acción operativa
+
+1. No rotar, sustituir ni buscar fuera de las dos bóvedas autorizadas `X_KHORA_KEY`.
+2. No activar aún `KHORA_LEGACY_BLOB_READS_ENABLED`: el store continúa suspendido. Reactivar el proveedor y comprobar GET físico antes de abrir la compuerta.
+3. Avanzar en paralelo con la verificación física B2 y el procesamiento de los fragmentos locales autorizados, mediante KHORA y con read-back/SHA; nada de ello se ejecutó en este ciclo.
+4. Mantener CUSTODIA-01 como única tarea activa. No modificar código, configuración ni datos de Production sin el paso/autorización específica correspondiente.
+
+**Resultado del ciclo:** persistencia documental y revalidación de metadatos completadas; archivo de registros no ejecutado. No se modificaron Production, Neon, B2, Blob, código ni bóvedas.
