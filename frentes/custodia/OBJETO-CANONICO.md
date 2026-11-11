@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.65; OBJECT_SEAL=CUSTODIA-v0.65; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.66; OBJECT_SEAL=CUSTODIA-v0.66; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.62. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.66. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1508,3 +1508,34 @@ Se localizó una ruta auxiliar de servicio en `api/main.py`, blob `bae368f07159b
 - **No-acciones:** todas las consultas Neon de esta R2 fueron SELECT. No hubo escrituras de negocio, cambios en B2/Blob, lectura de secretos, descifrado de datos personales, cambios de código de producto, deployments, merges ni modificaciones del control generación 11.
 
 **Dictamen:** la conciliación de metadatos y la clasificación SHA textual avanzan; no se declara ninguna nueva recuperación archivada. CUSTODIA-01 sigue como única tarea activa. La siguiente intervención debe obtener un contexto de servidor ya autorizado para el propietario o incorporar, fuera de este expediente, un mecanismo de servicio con identidad y alcance formalmente autorizados; no usar la interfaz como sustituto ni saltarse NextAuth.
+
+
+## 33. Reconciliación completa de titularidad y prueba de runtime servidor · R3 · 2026-11-11
+
+**Evidencia:** [RECONCILIACION-NEON-Y-RUNTIME-SERVIDOR-20261111-R3.md](evidencias/RECONCILIACION-NEON-Y-RUNTIME-SERVIDOR-20261111-R3.md). Esta sección corrige el alcance de los conteos de §32 sin reescribir la evidencia histórica R2.
+
+### 33.1 Universo completo atribuible
+
+La consulta R3 aplica el predicado completo `COALESCE(dictado_session.custodia_owner, dictado_session.checkpoint_usuario, volcado.usuario)`. Resultado: 95 sesiones atribuibles; 84 con propietario directo en la sesión/checkpoint y 11 sesiones históricas adicionales cuya titularidad se demuestra por el Volcado enlazado. De las 95, 16 ya están enlazadas (13 `archivado`, 3 `en_revision`) y 79 siguen sin Volcado. Las 11 adicionales ya enlazadas no se vuelven a procesar. La cifra 84 de §32/R2 era un subconjunto, no el universo total.
+
+Las 79 pendientes conservan 1.039 partes de audio: 785 B2 en cinco sesiones (64.166.900 bytes) y 254 Vercel Blob en 39 sesiones (339.392.008 bytes). Las 1.039 filas están marcadas `verificado` en Neon; no se ha producido GET físico ni read-back de esos bytes. El manifiesto B2 de 321 partes conserva el hueco del índice 317; los otros cuatro manifiestos B2 suman 464 partes contiguas.
+
+En las 79 pendientes permanecen 44 sesiones con audio, 34 textuales sin audio y una sin checkpoint/texto ni audio localizado. De las 34 textuales: 29 checkpoints vigentes potencialmente significativos, cuatro vacíos y uno compuesto por un salto de línea. Entre los 29 hay 27 SHA vigentes distintos; el grupo de tres sesiones con una misma SHA sigue requiriendo comparación de plaintext y procedencia antes de deduplicar. No se creó Volcado nuevo.
+
+### 33.2 Prueba de runtime aislado
+
+Se creó y detuvo el sandbox Vercel temporal no persistente `custodia-archive-20261111` (sesión `sbx_yhFmt9uCAZucoj7X9c7r7bwTH697`). Se cargaron los módulos principales de archivo de la versión de Production (commit `f0224c1368fb15a3452335a44305c6efa85eef79`), cotejando SHA con el código de `main` (`c708901caa2500eb48d6723b709cee7db0d9904b`). La importación de las funciones canónicas de archivo, cifrado, almacenamiento y custodia pasó.
+
+El sandbox no recibió `X_KHORA_KEY`, las credenciales Master B2 ni identidad NextAuth. La enumeración/lectura de variables Vercel con solicitud de descifrado dejó los secretos como `decrypted=false` y valores ocultos. La conexión temporal Neon se usó únicamente para consulta SELECT y confirmación de esquema/conteos; no se mantuvo ni se usó para escribir. No se invocaron `guardarDictado()` ni `reclamarSesion()`, ni se hizo GET/read-back B2/Blob.
+
+### 33.3 Estado y compuertas
+
+- **Titularidad/inventario:** reconciliados con el predicado completo; 16 enlazados excluidos de reproceso, 79 pendientes.
+- **Texto sin audio:** 29 candidatos sustantivos localizados; el ciphertext permanece cifrado y el archivo requiere la clave KHC1 y el flujo canónico.
+- **B2:** cinco manifiestos localizados; GET/read-back físico de 785 partes pendiente; hueco 317 sin resolver.
+- **Blob:** 254 partes localizadas por metadata; GET físico pendiente; no declarar inexistencia/pérdida.
+- **Local:** 216 fragmentos de dos sesiones preservados; no se accedió a monitor, Chrome local ni RDC.
+- **Identidad:** no existe en el sandbox un contexto NextAuth del propietario ni un endpoint independiente existente que archive un checkpoint huérfano bajo identidad de servicio aprobada. No usar el rol de BD como sustituto de identidad.
+- **No-acciones:** cero nuevos Volcados; cero escrituras Neon/B2/Blob; cero cambios de código/variables/deployment/bucket/control; sandbox detenido; sin merge/deploy.
+
+**Dictamen:** el universo y el código quedan conciliados, pero CUSTODIA-01 no está resuelto aún. El bloqueo operativo actual es acceso de runtime autorizado a la clave KHC1 y Master B2 junto con identidad de propietario, más las dependencias físicas separadas de Blob y de los fragmentos locales. No se elude NextAuth, no se escribe ciphertext/plaintext sin el cifrado canónico y no se crea una ruta de producción dentro de CUSTODIA-01.
