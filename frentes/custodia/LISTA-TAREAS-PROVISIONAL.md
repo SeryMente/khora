@@ -1,8 +1,8 @@
-<!-- LIST_VERSION=0.56; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.57; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
-> **Actualización:** 2026-11-11 · contraste de endpoint genérico, escritor canónico y API key de servicio.
+> **Actualización:** 2026-11-11 · metadatos de Production, identidad NextAuth y alcance del trigger interno.
 > **Único objetivo activo:** archivar todos los registros históricos que puedan archivarse; dejar pendientes únicamente los que tengan un impedimento actual, concreto y documentado.
 
 **Instrucción literal:** [INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md).  
@@ -15,6 +15,7 @@
 **Evidencia de repetición del ciclo:** [ESTADO-OPERATIVO-BLOQUEOS-20261110.md](evidencias/ESTADO-OPERATIVO-BLOQUEOS-20261110.md).  
 **Evidencia R4:** [RUTA-EJECUCION-SECUNDARIA-NO-ARCHIVADO-20261111-R4.md](evidencias/RUTA-EJECUCION-SECUNDARIA-NO-ARCHIVADO-20261111-R4.md).  
 **Evidencia R5:** [RUTA-ARCHIVO-PRIMARIO-Y-LIMITE-DE-API-SERVICIO-20261111-R5.md](evidencias/RUTA-ARCHIVO-PRIMARIO-Y-LIMITE-DE-API-SERVICIO-20261111-R5.md).  
+**Evidencia R6:** [BARRERA-RUNTIME-PRODUCTION-IDENTIDAD-Y-SECRETOS-20261111-R6.md](evidencias/BARRERA-RUNTIME-PRODUCTION-IDENTIDAD-Y-SECRETOS-20261111-R6.md).  
 **Instrucción de retoma:** [INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md](originales/INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md).  
 **Estado base:** [ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md](evidencias/ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md).  
 **Diagnóstico previo:** [DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md](evidencias/DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md).
@@ -375,3 +376,28 @@ CUSTODIA-01 continúa EN CURSO. Inventario sin cambio: 95 atribuibles; 16 enlaza
 ### Objetivo del siguiente ciclo
 
 Determinar si el runtime Production expone una identidad de titular utilizable por un canal de ejecución no interactivo y una vía server-side aprobada para obtener KHC1/almacenamiento sin revelar secretos. Si no existe ese canal, cerrar el diagnóstico de acceso y mantener las unidades residuales individualizadas, sin crear credenciales ni modificar Production.
+
+
+## 22. Barrera Production: variables nominales, secreto interno ajeno e identidad no disponible · v0.57 · 2026-11-11
+
+**Evidencia:** [R6 · barrera runtime Production](evidencias/BARRERA-RUNTIME-PRODUCTION-IDENTIDAD-Y-SECRETOS-20261111-R6.md).  
+**OCP:** [CUSTODIA-v0.69 · §36](OBJETO-CANONICO.md).  
+**Contrato:** [CUSTODIA-01 · TASK_VERSION 1.3 · §16](./📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20CUSTODIA-01%20-%20Inventario%20forense%20de%20recuperabilidad/README.md).
+
+### Resultado del ciclo
+
+El inventario administrativo Vercel (sin descifrado) muestra variables de Production para KHC1, B2, API de servicio, NextAuth, base de datos e `INTERNAL_TRIGGER_SECRET`. Los secretos aparecen como no descifrados; esto demuestra la existencia de entradas, no que sus valores sean válidos o que la herramienta los pueda entregar.
+
+`INTERNAL_TRIGGER_SECRET` se utiliza para endpoints de Jules y el orquestador del tablero, no para Custodia. Los workflows de GitHub observados programan esos procesos externos, no un worker de archivo.
+
+Runtime logs Production y daemon logs: sin registros en la última ventana de 30 minutos. La consulta de 7 días fue rechazada por retención; no se afirma ausencia histórica de logs. No hay una operación de herramientas para listar cron Vercel ni `vercel.json` versionado en los dos directorios de la app.
+
+### Dictamen operativo
+
+Existe configuración nominal en Production, pero no un canal permitido para ejecutar con secretos en contexto y una identidad NextAuth real del titular. No se emite/fabrica cookie o JWT ni se usa la identidad del rol Neon. No se invoca el trigger Jules ni se aprovechan sus secretos.
+
+Inventario sin cambio: 95 sesiones atribuibles, 16 enlazadas excluidas, 79 sin Volcado, 1.039 partes de audio por metadata, 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados. Cero Volcados nuevos, cero escrituras y cero cambios productivos.
+
+### Objetivo del siguiente ciclo
+
+Investigar exclusivamente los mecanismos de identidad y ejecución server-side ya documentados por KHORA/EP para confirmar si alguno permite un contexto propietario autorizado en un worker de producción, sin emitir credenciales, leer secretos, reutilizar el trigger de Jules ni modificar Production. Si no hay un mecanismo de archivo con titularidad acreditable, cerrar el diagnóstico de acceso y mantener los residuos bloqueados por causa concreta.
