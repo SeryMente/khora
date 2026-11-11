@@ -1,4 +1,4 @@
-<!-- TASK_VERSION=1.0; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
+<!-- TASK_VERSION=1.1; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
 # CUSTODIA-01 · Archivo de todos los registros recuperables
 
 > **Estado:** EN CURSO · **Prioridad:** P0 · **Único expediente activo del frente CUSTODIA.**  
@@ -231,3 +231,35 @@ No se pudieron ejecutar las operaciones: los secretos de Production (KHC1 y Mast
 No hubo cambios de código, deployment, credenciales, variables, configuración B2, tablas, datos productivos, Volcados, Blob ni objetos B2. No hubo merge. El control de responsabilidad generación 11 permanece intacto. El sandbox fue detenido.
 
 La tarea **no está archivada ni cerrada**. El inventario completo y la ruta de código están conciliados, pero el acceso a las claves sensibles y la identidad del titular no estuvieron disponibles para ejecutar el archivado canónico. Las partes B2/Blob y el audio local conservan sus estados residuales por separado. No se sustituye autorización de propietario por el rol de Neon ni se omiten los controles canónicos.
+
+
+## 14. Verificación del worker secundario y bloqueo del archivo primario · 2026-11-11
+
+**Evidencia:** [R4 · ruta de ejecución secundaria](../../evidencias/RUTA-EJECUCION-SECUNDARIA-NO-ARCHIVADO-20261111-R4.md).  
+**OCP:** §34 / CUSTODIA-v0.67.  
+**Lista:** §20 / LIST_VERSION 0.55.
+
+### Objetivo del ciclo
+
+Identificar si un ejecutor de servidor ya existente podía archivar los checkpoints huérfanos respetando la identidad del propietario, el cifrado canónico y la procedencia.
+
+### Tareas verificadas
+
+1. Revisar el worker CLI y sus funciones llamadas.
+2. Contrastar la ruta auxiliar autenticada y la ruta primaria de archivo.
+3. Verificar el estado de activación versionado y metadata Vercel disponible.
+4. Registrar la conclusión y las no-acciones con lectura de vuelta documental.
+
+### Resultado
+
+El worker `scripts/custodia-worker.ts` no es un archivador primario: llama a `reconciliarCustodia()`, que genera/reconcilia MP3 a partir de audio ya verificado y procesa tareas secundarias de título/espejo para Volcados existentes. No invoca `guardarDictado()` ni `reclamarSesion()`. La ruta `POST /api/dictado/reconciliar` también requiere NextAuth y solo activa esa reconciliación secundaria.
+
+El archivo primario continúa pasando por `POST /api/dictado`, que obtiene el correo de NextAuth, valida la pertenencia con `reclamarSesion()` y persiste con `guardarDictado()`. No se sustituye esa identidad por el rol de Neon, por el correo leído de forma aislada ni por la identidad genérica de un proceso.
+
+La documentación declara que el worker no se arranca con build/instalación y que no hay servicio/cron productivo activado. No se encontró comando npm para iniciarlo ni `vercel.json` en la raíz o en `khora-web/`. No se ejecutó el worker porque su modo de ejecución puede procesar MP3, títulos y espejos de varios titulares sin archivar los checkpoints de CUSTODIA-01.
+
+### Estado y límite
+
+CUSTODIA-01 sigue EN CURSO. El inventario R3 permanece: 95 sesiones atribuibles, 16 enlazadas, 79 sin Volcado, 1.039 metadatos de partes de audio, 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados. No hubo Volcados nuevos, lecturas físicas B2/Blob ni escrituras productivas. Tampoco hubo acceso a monitor, Chrome local o RDC.
+
+El siguiente paso requiere un contexto de ejecución de archivo primario formalmente autorizado, con clave KHC1, credenciales de almacenamiento necesarias y acreditación del titular. Si ese contexto no está disponible, no se fuerza la ejecución ni se marca como completado el registro.
