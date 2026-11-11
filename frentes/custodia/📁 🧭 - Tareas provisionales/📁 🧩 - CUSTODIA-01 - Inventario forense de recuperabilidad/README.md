@@ -1,4 +1,4 @@
-<!-- TASK_VERSION=0.9; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
+<!-- TASK_VERSION=1.0; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
 # CUSTODIA-01 · Archivo de todos los registros recuperables
 
 > **Estado:** EN CURSO · **Prioridad:** P0 · **Único expediente activo del frente CUSTODIA.**  
@@ -28,46 +28,59 @@ El alcance es operativo y acotado al archivo de los registros que el sistema alc
 
 Las siguientes fases son subunidades del expediente existente. No crean IDs maestros adicionales ni folios.
 
-### CUSTODIA-01.a · Conciliación de candidatos y exclusiones
+### CUSTODIA-01.a · Conciliación de candidatos y exclusiones · EN CURSO
 
 - Reunir sesiones, texto, revisiones, partes, MP3, localizadores, snapshots y Volcados.
 - Confirmar propietario y excluir archivados/duplicados.
-- Usar como única fuente local Chrome autorizada el perfil `Profile` vinculado a `the.willfreeman@gmail.com` en el equipo `PC10RCIF4EI4`; ignorar el otro perfil.
+- No utilizar el monitor, Chrome local ni RDC para esta retoma, por instrucción posterior expresa del operador. La evidencia local ya identificada se preserva sin inspeccionarla por esos canales; solo se retomará con una vía independiente expresamente permitida.
 - Tratar los conteos heredados como línea base reportada hasta su nueva lectura.
 
-### CUSTODIA-01.b · Archivo de texto sin audio localizado
+### CUSTODIA-01.b · Archivo de texto sin audio localizado · BLOQUEADA POR CONTEXTO NEXTAUTH INDEPENDIENTE
 
 - Archivar las transcripciones elegibles aunque no se localice audio, conforme a la instrucción del operador.
 - Marcar audio como `No localizado` y procedencia como `No verificada`.
 - No atribuirles origen copy/paste, voz ni otro canal sin evidencia.
 
-### CUSTODIA-01.c · Archivo de audio B2
+### CUSTODIA-01.c · Archivo de audio B2 · PREVALIDADA, GET HISTÓRICO PENDIENTE
 
 - Leer los objetos B2 de las sesiones elegibles.
 - Cotejar bytes, longitud y SHA-256 del objeto leído frente al manifiesto y los datos de Neon.
 - Archivar y vincular cada sesión/parte solo después del cotejo requerido.
 - Si un objeto no se puede leer o no coincide, conservarlo como pendiente con el motivo preciso.
 
-### CUSTODIA-01.d · Archivo de audio local autorizado (decisión C)
+### CUSTODIA-01.d · Archivo de audio local autorizado (decisión C) · BLOQUEADA POR CANAL LOCAL EXCLUIDO
 
 - Procesar los 216 fragmentos cifrados de dos sesiones con el mecanismo de descifrado propio de KHORA.
 - No exponer claves ni texto/audio en logs o documentación.
 - Escribir los objetos en B2 y validar la copia con read-back, longitud y SHA-256.
 - Vincularlos a las sesiones correspondientes y preservar todos los registros/bytes locales originales.
 
-### CUSTODIA-01.e · Casos con bloqueo actual
+### CUSTODIA-01.e · Casos con bloqueo actual · EN CURSO
 
 - Mantener identificados los objetos Vercel Blob que existen por referencia/listado pero no se pueden leer por suspensión/cuota.
 - Mantener pendientes los registros con referencias B2 no cotejadas físicamente.
 - Mantener separados los registros sin propietario demostrado y los que pertenecen a otros titulares.
 - No convertir un bloqueo temporal en irrecuperabilidad ni borrar evidencia.
 
-### CUSTODIA-01.f · Cierre de archivo y residuales
+### CUSTODIA-01.f · Cierre de archivo y residuales · PENDIENTE
 
 - Para cada registro, consignar estado final de archivo, componentes incluidos/faltantes, vínculos, prueba de lectura de vuelta y fecha.
 - Retirar del conjunto pendiente solo los registros cuyo archivo haya sido verificado.
 - Dejar como residuales únicamente los registros con impedimento actual, individualizado y sustentado, o sin contenido/titularidad demostrables.
 - Conciliar el resultado con «Recuperar capturas»: archivados fuera, parciales/bloqueados visibles con el estado real y sin duplicaciones.
+
+### Estado operativo vigente · 2026-11-11
+
+| Fase | Estado actual | Dependencia/criterio inmediato |
+|---|---|---|
+| 01.a | EN CURSO | Conciliación remota de fuentes y titularidad; sin acceso a Chrome/monitor/RDC. |
+| 01.b | BLOQUEADA | Falta un contexto NextAuth del propietario por un canal independiente permitido. El candidato textual ya está individualizado; requiere GET/descifrado/SHA, POST canónico y read-back. |
+| 01.c | PREVALIDADA · GET PENDIENTE | El preflight Production mostró PASS de autenticación/configuración B2; falta GET físico por objeto y cotejo de bytes, longitud y SHA histórico. |
+| 01.d | BLOQUEADA | Los 216 fragmentos locales están identificados y la autorización previa se conserva, pero no se accederá a ellos mediante monitor, Chrome local o RDC. Falta un canal alternativo permitido. |
+| 01.e | EN CURSO | Consolidar impedimentos actuales por registro y componente, sin llamar perdido a Blob bloqueado. |
+| 01.f | PENDIENTE | Cierre tras verificar Volcados, vínculos y residuales del inventario completo. |
+
+La autenticación de usuario, el GET físico B2 y el acceso a IndexedDB local son compuertas distintas. No se agrupan como un único bloqueo de «runtime».
 
 ## 4. Estados de salida
 
@@ -101,7 +114,7 @@ CUSTODIA-01 se resuelve cuando todos los registros elegibles están archivados y
 
 ## 7. Autorización operativa y eficiencia
 
-La autorización específica de ejecución quedó confirmada por el operador en respuesta a la pregunta formal previa. Se conserva el literal y contexto en el OCP-v0.47 y en el original vinculado. La tarea puede avanzar con escrituras de archivo en Neon Production para registros elegibles, procesamiento de los 216 fragmentos locales y operaciones B2 incluidas en el alcance.
+La autorización específica de ejecución quedó confirmada por el operador en respuesta a la pregunta formal previa. Se conserva el literal y contexto en el OCP-v0.47 y en el original vinculado. La tarea puede avanzar con escrituras de archivo en Neon Production para registros elegibles, procesamiento de los 216 fragmentos locales y operaciones B2 incluidas en el alcance. La instrucción posterior del operador excluye expresamente el uso de su monitor, Chrome local y RDC; por ello, la autorización sobre los 216 fragmentos no se ejecutará a través de esos canales. La fase 01.d permanece bloqueada hasta disponer de un medio alternativo permitido, sin que esto revoque la autorización de preservación/archivo.
 
 La optimización solicitada consiste en minimizar llamadas y rondas redundantes, agrupar lecturas y lotes, reutilizar evidencia de integridad cuando corresponda al mismo objeto inmutable y aislar fallos por registro. La calidad se conserva mediante controles críticos: titularidad, deduplicación, integridad de copias, idempotencia, lectura de vuelta y preservación de originales. No se realizan reparaciones generales ni pruebas de resiliencia.
 
@@ -170,3 +183,13 @@ La misma llave es raíz criptográfica de los helpers AES-256-GCM de KHORA para 
 5. Preservar la llave actual y los ciphertext; no rotar, reemplazar, regenerar ni re-cifrar.
 
 **No ejecutado:** no hubo consulta productiva, cambio de entorno, ejecución de endpoint, lectura de objetos ni modificación de código/datos.
+
+
+## 8. Dependencias condicionales y guardrails
+
+- La búsqueda de X_KHORA_KEY en las dos bóvedas autorizadas no es una fase independiente. Solo se activa si una unidad elegible demuestra un fallo de descifrado atribuible a esa llave. No rotar ni reemplazar la llave.
+- Restablecer el PIN no recupera X_KHORA_KEY y no es una tarea de CUSTODIA-01.
+- La lectura de credencial GitHub/EP no es necesaria para archivar registros de dictado y no bloquea el sprint; se retira de la secuencia activa.
+- El backlog de dependencia del catálogo respecto de X_KHORA_KEY queda separado y no activo; no implementar cambios de producto dentro de CUSTODIA-01.
+
+
