@@ -1,4 +1,4 @@
-<!-- LIST_VERSION=0.53; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.54; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
@@ -298,3 +298,30 @@ La búsqueda de X_KHORA_KEY pasa a dependencia condicional; PIN es guardrail; EP
 
 **Cierre:** Lista provisional v0.50; OCP CUSTODIA-v0.62; contrato de tarea v1.0. CUSTODIA-01 sigue como único expediente activo.
 
+
+
+## 19. Reconciliación completa de titularidad y prueba de runtime servidor · v0.54 · 2026-11-11
+
+**Evidencia R3:** [RECONCILIACION-NEON-Y-RUNTIME-SERVIDOR-20261111-R3.md](evidencias/RECONCILIACION-NEON-Y-RUNTIME-SERVIDOR-20261111-R3.md).  
+**OCP vigente:** [CUSTODIA-v0.66 · §33](OBJETO-CANONICO.md).  
+**Contrato:** [CUSTODIA-01 · TASK_VERSION 1.0 · §13](./📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20CUSTODIA-01%20-%20Inventario%20forense%20de%20recuperabilidad/README.md).
+
+### Universo corregido
+
+El predicado completo de titularidad incluye `custodia_owner`, `checkpoint_usuario` y, cuando hay vínculo, `volcado.usuario`. Resultado: 95 sesiones; 84 con propietario directo de sesión/checkpoint y 11 adicionales por Volcado vinculado. Hay 16 ya enlazadas (13 `archivado`, 3 `en_revision`), que no se reprocesan, y 79 sin Volcado.
+
+### Estado por componente
+
+- 79 sesiones pendientes; 44 con audio (1.039 partes): 785 B2 en cinco sesiones y 254 Blob en 39 sesiones.
+- Todas las filas conservan marca DB `verificado`; GET/read-back físico sigue pendiente.
+- B2: cuatro manifiestos contiguos (464 partes); uno con 321 filas en 1–322 y hueco 317.
+- Texto: 34 sin audio; 29 checkpoints vigentes potencialmente significativos, cuatro vacíos y uno solo con salto de línea; una sesión adicional no conserva checkpoint/texto ni audio localizado.
+- 216 fragmentos locales de dos sesiones quedan preservados y no fueron inspeccionados por el canal local excluido.
+
+### Resultado del intento de ejecución
+
+Se importó con éxito el código canónico de archivo en un sandbox Vercel temporal no persistente, cotejado con el commit de Production. No se pudo invocar porque las variables sensibles de Production se devolvieron ocultas (`decrypted=false`) y el sandbox no obtuvo `X_KHORA_KEY`, Master B2 ni identidad NextAuth del titular. La conexión Neon se usó solo para SELECT. Sandbox detenido. No hubo Volcados nuevos, GET B2/Blob ni escrituras.
+
+**Estado vigente:** 01.a EN CURSO (titularidad y 79 pendientes conciliados); 01.b BLOQUEADA por acceso a descifrado KHC1 e identidad de propietario; 01.c BLOQUEADA por falta de GET/read-back B2; 01.d BLOQUEADA por canal local excluido; 01.e EN CURSO (Blob y hueco 317 individualizados); 01.f PENDIENTE.
+
+**Dictamen:** mejora de inventario y prueba del runtime completadas; el archivo de registros aún no está completado. El cierre mantiene únicamente los residuales con su bloqueo concreto. No se cambia código, deployment, configuración, credenciales, control generación 11 ni fuentes.
