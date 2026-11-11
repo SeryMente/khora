@@ -1,4 +1,4 @@
-<!-- TASK_VERSION=1.2; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
+<!-- TASK_VERSION=1.3; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
 # CUSTODIA-01 · Archivo de todos los registros recuperables
 
 > **Estado:** EN CURSO · **Prioridad:** P0 · **Único expediente activo del frente CUSTODIA.**  
@@ -298,3 +298,40 @@ El inventario no cambia: 95 sesiones atribuibles, 16 enlazadas excluidas, 79 sin
 ### Compuerta siguiente
 
 Comprobar si el runtime Production dispone de identidad de titular y acceso server-side aprobado a KHC1/almacenamiento desde un canal no interactivo. No crear una credencial, token o ruta de servicio nueva por inferencia; no exponer secretos al chat; no utilizar el rol Neon como identidad de usuario. Si esa ruta no existe, conservar el bloqueo individualizado.
+
+
+## 16. Identidad y secretos server-side en Production · 2026-11-11
+
+**Evidencia:** [R6 · barrera de runtime Production](../../evidencias/BARRERA-RUNTIME-PRODUCTION-IDENTIDAD-Y-SECRETOS-20261111-R6.md).  
+**OCP:** §36 / CUSTODIA-v0.69.  
+**Lista:** §22 / LIST_VERSION 0.57.
+
+### Objetivo del ciclo
+
+Comprobar, sin revelar secretos ni utilizar la interfaz local, si Production ofrece una identidad no interactiva del titular junto con acceso autorizado a KHC1 y almacenamiento.
+
+### Tareas ejecutadas
+
+1. Leer solo metadatos de variables Vercel Production con `decrypt=false`.
+2. Rastrear el uso en código de `INTERNAL_TRIGGER_SECRET`.
+3. Verificar los workflows programados asociados al secreto.
+4. Consultar logs runtime/daemon en la ventana admitida por la retención.
+5. Registrar qué prueba y qué no prueba cada resultado.
+
+### Resultado
+
+Las variables nominales de KHC1, B2, `AUTH_SECRET`, `DATABASE_URL`, `KHORA_API_KEY`, `X_KHORA_KEY` e `INTERNAL_TRIGGER_SECRET` están registradas en Production. Sus valores secretos no son legibles por el conector (`decrypted=false`). La presencia nominal no demuestra validez del par de credenciales o acceso físico al objeto.
+
+El trigger interno se limita a Jules y al orquestador del tablero. Los workflows programados hallados llaman esos endpoints, no Custodia. En los últimos 30 minutos no se devolvieron runtime logs ni daemon logs; la consulta de 7 días fue rechazada por límite de retención. Esto no se interpreta como ausencia histórica de procesos.
+
+No se obtuvo identidad NextAuth del titular ni existe un canal de ejecución autorizado que combine esa identidad con KHC1 y el almacenamiento. No se intentó emitir o fabricar una sesión, reutilizar el trigger interno o extraer secretos.
+
+### No-acciones y estado
+
+No se descifraron/mostraron secretos, no se invocaron endpoints ni workflows, no hubo escrituras, lecturas físicas B2/Blob, Volcados nuevos, cambios de producto, configuración o deployment. No se usaron monitor, Chrome local ni RDC.
+
+El inventario permanece en 95 sesiones atribuibles, 16 enlazadas excluidas, 79 sin Volcado, 1.039 partes de audio por metadata, 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados. CUSTODIA-01 continúa EN CURSO.
+
+### Compuerta siguiente
+
+Revisar mecanismos de identidad/ejecución server-side ya documentados por KHORA/EP para determinar si alguno proporciona titularidad verificable en runtime productivo. No crear ni activar credenciales o rutas por inferencia. Si no existe, cerrar el diagnóstico de acceso y mantener los residuales individualizados, bloqueados por causa concreta.
