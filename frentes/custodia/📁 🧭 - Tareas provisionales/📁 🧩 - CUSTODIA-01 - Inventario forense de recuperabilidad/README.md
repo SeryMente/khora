@@ -193,3 +193,41 @@ La misma llave es raíz criptográfica de los helpers AES-256-GCM de KHORA para 
 - El backlog de dependencia del catálogo respecto de X_KHORA_KEY queda separado y no activo; no implementar cambios de producto dentro de CUSTODIA-01.
 
 
+
+
+## 13. Reconciliación R3 y prueba de ejecución por servidor · 2026-11-11
+
+**Evidencia:** [RECONCILIACION-NEON-Y-RUNTIME-SERVIDOR-20261111-R3.md](../../evidencias/RECONCILIACION-NEON-Y-RUNTIME-SERVIDOR-20261111-R3.md).  
+**OCP vigente:** §33 / CUSTODIA-v0.66.  
+**Índice ejecutivo:** [LIST_VERSION 0.54](../../LISTA-TAREAS-PROVISIONAL.md).
+
+Este apartado actualiza el estado operativo; los conteos en apartados anteriores se conservan como historia, no como corte vigente.
+
+### 13.1 Titularidad e inventario
+
+Se aplicó el predicado completo `COALESCE(custodia_owner, checkpoint_usuario, volcado.usuario)`. El universo comprende 95 sesiones: 84 con propietario directo en sesión/checkpoint y 11 ya enlazadas cuyo titular se demuestra por `volcado.usuario`. Hay 16 sesiones enlazadas a Volcado (13 `archivado`, 3 `en_revision`) y 79 sin vínculo. No se reprocesan las 16 enlazadas.
+
+Las 79 pendientes conservan 1.039 partes: 785 B2 en cinco sesiones y 254 Blob en 39 sesiones. Hay 34 sesiones textuales sin audio (29 checkpoints vigentes potencialmente significativos, cuatro vacíos y uno solo con salto de línea) y una sin checkpoint/texto ni audio localizado.
+
+### 13.2 Prueba de runtime
+
+Se transfirieron al sandbox Vercel efímero los módulos canónicos de Production y se cotejaron sus SHA con `main`. La importación de las funciones de archivo, almacenamiento, cifrado y custodia pasó. El sandbox se detuvo al terminar.
+
+No se pudieron ejecutar las operaciones: los secretos de Production (KHC1 y Master B2) no fueron entregados por la conexión Vercel (`decrypted=false`), y el sandbox no poseía identidad NextAuth del titular. Se usó una conexión temporal Neon únicamente para SELECT; se confirmaron 36 columnas requeridas y el inventario. No se llamó a `guardarDictado()` ni a `reclamarSesion()`; no se ejecutó GET/read-back B2/Blob; no se escribieron datos.
+
+### 13.3 Estado actualizado por fase
+
+| Fase | Estado R3 | Criterio pendiente |
+|---|---|---|
+| 01.a Conciliación de candidatos | EN CURSO | 95 atribuibles; 16 enlazados excluidos; 79 pendientes individualizados |
+| 01.b Texto sin audio | BLOQUEADA | Acceso de runtime a X_KHORA_KEY y contexto de propietario; ejecutar guardarDictado/read-back |
+| 01.c Audio B2 | BLOQUEADA POR ACCESO | GET físico de 785 partes, descifrado y cotejo bytes/longitud/SHA; resolver índice 317 |
+| 01.d Audio local autorizado | BLOQUEADA POR CANAL EXCLUIDO | 216 fragmentos preservados; no usar monitor, Chrome local ni RDC |
+| 01.e Residuales | EN CURSO | GET Blob de 254 partes; no marcar como perdido por bloqueo actual |
+| 01.f Cierre | PENDIENTE | Solo cerrar tras Volcados, vínculos y read-back verificados |
+
+### 13.4 No-acciones y dictamen
+
+No hubo cambios de código, deployment, credenciales, variables, configuración B2, tablas, datos productivos, Volcados, Blob ni objetos B2. No hubo merge. El control de responsabilidad generación 11 permanece intacto. El sandbox fue detenido.
+
+La tarea **no está archivada ni cerrada**. El inventario completo y la ruta de código están conciliados, pero el acceso a las claves sensibles y la identidad del titular no estuvieron disponibles para ejecutar el archivado canónico. Las partes B2/Blob y el audio local conservan sus estados residuales por separado. No se sustituye autorización de propietario por el rol de Neon ni se omiten los controles canónicos.
