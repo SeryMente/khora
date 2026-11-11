@@ -1,8 +1,8 @@
-<!-- LIST_VERSION=0.61; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.62; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
-> **Actualización:** 2026-11-11 · rutas de lectura física para capturas pendientes y compuerta normativa MCP.
+> **Actualización:** 2026-11-11 · continuidad conversacional y evidencia R11 de staging/trazas.
 > **Único objetivo activo:** archivar todos los registros históricos que puedan archivarse; dejar pendientes únicamente los que tengan un impedimento actual, concreto y documentado.
 
 **Instrucción literal:** [INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md).  
@@ -20,6 +20,8 @@
 **Evidencia R8:** [MATRIZ-RECUPERACION-POR-SESION-20261111-R8.md](evidencias/MATRIZ-RECUPERACION-POR-SESION-20261111-R8.md).  
 **Evidencia R9:** [LOCALIZADORES-READBACK-Y-DERIVADOS-MP3-20261111-R9.md](evidencias/LOCALIZADORES-READBACK-Y-DERIVADOS-MP3-20261111-R9.md).  
 **Evidencia R10:** [RUTAS-READONLY-Y-COMPUERTA-MCP-20261111-R10.md](evidencias/RUTAS-READONLY-Y-COMPUERTA-MCP-20261111-R10.md).  
+**Evidencia R11:** [FUENTES-STAGING-Y-TRAZAS-DE-CARGA-20261111-R11.md](evidencias/FUENTES-STAGING-Y-TRAZAS-DE-CARGA-20261111-R11.md).  
+**Continuidad conversacional aportada:** [CONTINUIDAD-OPERATIVA-CUSTODIA-20261111.md](originales/CONTINUIDAD-OPERATIVA-CUSTODIA-20261111.md).  
 **Instrucción de retoma:** [INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md](originales/INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md).  
 **Estado base:** [ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md](evidencias/ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md).  
 **Diagnóstico previo:** [DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md](evidencias/DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md).
@@ -510,3 +512,39 @@ No se llamó a MCP, REST, transcripción o worker. No se obtuvo token, no se abr
 ### Objetivo del siguiente ciclo
 
 Inspeccionar fuentes alternativas ya persistidas para la parte 317 y los 216 fragmentos locales autorizados: staging B2, sesiones de importación, registros de carga y tablas de fragmentos. No acceder al sistema de archivos local ni al navegador. Determinar si hay una copia server-side del índice faltante o un recibo que permita localizarla, sin invocar lecturas de objeto ni escribir.
+
+## 27. Staging, recibos de carga y conciliación de fuentes locales · v0.62 · 2026-11-11
+
+**Evidencia:** [R11 · fuentes de staging y trazas de carga](evidencias/FUENTES-STAGING-Y-TRAZAS-DE-CARGA-20261111-R11.md).  
+**OCP:** [CUSTODIA-v0.74 · §41](OBJETO-CANONICO.md).  
+**Continuidad:** [registro conversacional visible 2026-11-11](originales/CONTINUIDAD-OPERATIVA-CUSTODIA-20261111.md).  
+**Contrato:** [CUSTODIA-01 · TASK_VERSION 1.8 · §21](./📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20CUSTODIA-01%20-%20Inventario%20forense%20de%20recuperabilidad/README.md).
+
+### Objetivo y tareas del ciclo
+
+Determinar si staging/importación deja una copia server-side o recibo persistido para el índice 317 y aclarar la discrepancia de los fragmentos locales sin usar el dispositivo.
+
+1. Revisar el catálogo público de Neon en busca de tablas de staging/importación.
+2. Inspeccionar el helper putStagingChunk() y la ruta autenticada de procesamiento de importaciones.
+3. Contrastar el flujo de carga directa, el estado audio_no_verificable y la conservación local hasta confirmación.
+4. Correlacionar los eventos disponibles de la parte 317.
+5. Comparar el alcance documental de 216 fragmentos frente a la auditoría histórica de 993 registros.
+6. Descartar cualquier reconciliación global que no sea estrictamente read-only y acotada.
+7. Persistir evidencia y hacer lectura de vuelta.
+
+### Resultado
+
+- No se encontró tabla SQL dedicada a staging/importaciones. El helper escribe objetos temporales en B2 bajo khora/staging/audio/{sessionId}/{uploadId}.khstaging, sin un índice SQL específico. Esto no acredita la presencia o ausencia física de un objeto temporal.
+- El procesamiento de staging exige NextAuth, propietario de sesión y validación de localizador; obtiene/descifra el objeto y registra la parte original. No se ejecutó.
+- La carga directa verifica read-back; si falla, informa audio_no_verificable y recuperable=true, pero no registra la parte como confirmada. El cliente conserva su copia local hasta la confirmación. La lógica se inspeccionó por código, no mediante IndexedDB.
+- La parte 317 tiene evento de inicio de 82.195 bytes y evento posterior audio_no_verificable/upload_verified=false; no hay confirmación ni uploadId/stagingUrl en los campos consultados. No se demuestra un objeto físico recuperable ni su inexistencia.
+- Los 216 fragmentos pendientes en dos sesiones y los 993 registros de una auditoría histórica de cinco snapshots/sesiones no están conciliados; no se equiparan.
+- Se descartó ejecutar la reconciliación forense global porque su preámbulo puede hacer DDL aun en DRY_RUN y su alcance lista/recorre datos y objetos globales.
+
+### No-acciones y estado
+
+No hubo GET/list/descifrado B2/Blob, llamadas a rutas de importación/carga, escrituras de negocio, cambios de secretos/Production, ni acceso al monitor, Chrome local, RDC o IndexedDB. No se modificó CONTROL-RESPONSABILIDAD.json. CUSTODIA-01 continúa EN CURSO; 79 sesiones sin Volcado.
+
+### Compuerta siguiente
+
+Comprobar de forma limitada la presencia de claves de recibo/localizador en el JSON de los eventos de la parte 317, sin revelar valores sensibles. Mantener separados los universos 216 y 993 hasta disponer de un manifiesto de origen y una conciliación autorizada.
