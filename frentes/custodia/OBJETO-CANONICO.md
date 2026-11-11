@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.71; OBJECT_SEAL=CUSTODIA-v0.71; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.72; OBJECT_SEAL=CUSTODIA-v0.72; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.71. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.72. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1666,3 +1666,36 @@ Se registran dos grupos de SHA actual no vacío repetidos: un triplete entre ses
 La matriz individualiza titularidad, estado KHC1, SHA, número de revisiones, coincidencias, proveedor de audio, número de partes, rango/continuidad y banderas de base. Ningún registro se marca recuperado ni perdido. No se leyó plaintext/checkpoint/snapshot, no se hizo GET B2/Blob, no hubo escrituras Neon ni creación de Volcados.
 
 La ruta de ejecución aún exige runtime permitido con KHC1, read-back físico de cada fuente y NextAuth del titular o mecanismo delegado ya autorizado. R4–R7 no localizaron una alternativa. CUSTODIA-01 permanece EN CURSO; la matriz se utilizará para ejecutar únicamente las unidades cuyas compuertas se puedan demostrar.
+
+
+## 39. Read-back físico B2/Blob y derivados MP3 históricos · R9 · 2026-11-11
+
+**Evidencia:** [R9 · localizadores, read-back y derivados MP3](evidencias/LOCALIZADORES-READBACK-Y-DERIVADOS-MP3-20261111-R9.md).
+
+### 39.1 Referencias de almacenamiento
+
+Los 785 localizadores B2 están en el host s3.us-east-005.backblazeb2.com, coherente con el selector KHORA_OBJECT_STORAGE=b2 y la región predeterminada us-east-005 del código. Las entradas sensibles de Master Application Key/ID y bucket existen en Production, pero sus valores siguen ocultos; no se validó cuenta, bucket, objeto ni disponibilidad.
+
+Los 254 localizadores Blob están en un hostname *.blob.vercel-storage.com. KHORA_LEGACY_BLOB_READS_ENABLED no aparece en el inventario de Production, por lo que el lector actual falla cerrado para Blob legacy. No se alteró la configuración.
+
+### 39.2 Read-back real frente a bandera DB
+
+leerBlobVerificado() valida host, obtiene objeto mediante fetchStoredObject(), descifra KHC1 y compara tamaño/SHA de los bytes claros. evaluarCustodiaAudio() solo valida metadatos e índices; no hace GET. Las 1.039 filas marcadas verificado no sustituyen read-back físico.
+
+La ruta de exportación original exige sesión NextAuth, posesión de sesión y Bóveda desbloqueada; además se limita a una única importación audio_archivo en índice 1. No es un endpoint general de recuperación multiparte y no se invocó.
+
+### 39.3 MP3 derivados
+
+En 44 sesiones con audio existen 43 filas actuales de dictado_mp3: 18 disponibles y 25 fallidas. Hay localizador/manifiesto actual para 19 sesiones. Se registran 46 filas de historial MP3 en 19 sesiones. Ningún registro actual ni histórico tiene captura_completa=true.
+
+El código actual de generación lee cada objeto fuente mediante leerBlobVerificado(), produce un MP3 cifrado y vuelve a verificar el derivado antes de registrar historial. Sin embargo, source_manifest se persiste como digest y source_parts como contador; no se conserva la lista íntegra de índices ni la revisión de código que creó cada fila histórica. Por eso estas filas son evidencia secundaria y candidatas a material recuperable, no prueba de disponibilidad actual ni sustituto de los originales.
+
+### 39.4 Parte 317
+
+La sesión 36eeb04c-bbe7-4b72-bb6a-5e0d23cffce9 conserva 321 filas de partes con el hueco 317. Tiene 13 derivados históricos con contadores de 146 a 293 partes, todos incompletos; su MP3 actual está fallido con source_parts=293. Ningún digest manifiesto demuestra que una derivación incluya o repare el índice 317.
+
+### 39.5 Dictamen y no-acciones
+
+El host B2 es coherente con el contrato, pero no hay acceso físico desde este canal; Blob legacy está deshabilitado por ausencia de su bandera. Los derivados MP3 deben preservarse y podrían apoyar rescate parcial tras verificación actual, pero no permiten cerrar manifiestos de audio ni sustituir la parte 317. No hubo GET/list, descifrado, exportación, transcripción, generación MP3, carga, escritura, cambio de configuración, merge o despliegue.
+
+El inventario permanece en 79 sesiones sin Volcado, 1.039 partes por metadata (785 B2/254 Blob), 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados. CUSTODIA-01 sigue EN CURSO.
