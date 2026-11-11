@@ -1,8 +1,8 @@
-<!-- LIST_VERSION=0.58; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.59; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
-> **Actualización:** 2026-11-11 · contratos OAuth/MCP, scopes activos y actor de token.
+> **Actualización:** 2026-11-11 · matriz individual por sesión, hueco 317 y clasificación de SHA.
 > **Único objetivo activo:** archivar todos los registros históricos que puedan archivarse; dejar pendientes únicamente los que tengan un impedimento actual, concreto y documentado.
 
 **Instrucción literal:** [INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md).  
@@ -17,6 +17,7 @@
 **Evidencia R5:** [RUTA-ARCHIVO-PRIMARIO-Y-LIMITE-DE-API-SERVICIO-20261111-R5.md](evidencias/RUTA-ARCHIVO-PRIMARIO-Y-LIMITE-DE-API-SERVICIO-20261111-R5.md).  
 **Evidencia R6:** [BARRERA-RUNTIME-PRODUCTION-IDENTIDAD-Y-SECRETOS-20261111-R6.md](evidencias/BARRERA-RUNTIME-PRODUCTION-IDENTIDAD-Y-SECRETOS-20261111-R6.md).  
 **Evidencia R7:** [MCP-OAUTH-SCOPES-Y-AUSENCIA-DE-ARCHIVO-20261111-R7.md](evidencias/MCP-OAUTH-SCOPES-Y-AUSENCIA-DE-ARCHIVO-20261111-R7.md).  
+**Evidencia R8:** [MATRIZ-RECUPERACION-POR-SESION-20261111-R8.md](evidencias/MATRIZ-RECUPERACION-POR-SESION-20261111-R8.md).  
 **Instrucción de retoma:** [INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md](originales/INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md).  
 **Estado base:** [ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md](evidencias/ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md).  
 **Diagnóstico previo:** [DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md](evidencias/DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md).
@@ -425,3 +426,33 @@ Inventario sin cambio: 95 sesiones atribuibles; 16 enlazadas excluidas; 79 sin V
 ### Objetivo del siguiente ciclo
 
 Consolidar el bloqueo por unidad de recuperación: identificar para las 79 sesiones qué evidencia ya es suficiente, cuál depende de una clave de runtime, cuál exige read-back B2/Blob y cuáles requieren contenido de origen. No reabrir canales excluidos ni alterar datos; generar una matriz operativa de residuos que permita ejecutar solo unidades que tengan identidad, contenido y acceso verificables.
+
+
+## 24. Matriz de 79 sesiones y bloqueos individualizados · v0.59 · 2026-11-11
+
+**Evidencia:** [R8 · matriz individual por sesión](evidencias/MATRIZ-RECUPERACION-POR-SESION-20261111-R8.md).  
+**OCP:** [CUSTODIA-v0.71 · §38](OBJETO-CANONICO.md).  
+**Contrato:** [CUSTODIA-01 · TASK_VERSION 1.5 · §18](./📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20CUSTODIA-01%20-%20Inventario%20forense%20de%20recuperabilidad/README.md).
+
+### Resultado del ciclo
+
+La selección read-only de Neon individualizó 79 sesiones sin Volcado:
+- 43 atribuibles por custodia_owner y 36 por checkpoint_usuario.
+- 78 con checkpoint KHC1 y 1 sin checkpoint ni audio localizado.
+- 44 con audio (785 partes B2 en 5 sesiones; 254 partes Blob en 39 sesiones).
+- 34 text-only con checkpoint (29 hashes significativos, 4 vacíos y 1 salto de línea).
+- Una sesión sin audio ni checkpoint.
+- 1.039 partes con SHA y bandera DB verificado; cero read-back físico todavía.
+- Un único hueco interno de índice: parte 317 de la sesión 36eeb04c-bbe7-4b72-bb6a-5e0d23cffce9.
+
+En los 29 checkpoints textuales significativos, 17 tienen SHA de revisión histórica coincidente con un Volcado del mismo titular; ninguno de sus SHA actuales coincide con un Volcado actual. Las colisiones no vacías (un triplete y un par entre una sesión con audio y otra sin audio) son candidatas, no duplicados confirmados.
+
+### No-acciones y estado
+
+La consulta no leyó plaintext/snapshot/URLs, no descifró KHC1, no hizo GET/read-back B2/Blob ni escribió en Neon. No hubo Volcados nuevos, cambios de producto/configuración/Production o uso de interfaz local, Chrome o RDC.
+
+CUSTODIA-01 permanece EN CURSO. La matriz no declara ningún registro recuperado o perdido; cada fila conserva sus compuertas de identidad, KHC1, procedencia y read-back físico.
+
+### Objetivo del siguiente ciclo
+
+Cruzar las 44 sesiones con audio con la implementación de almacenamiento y manifiestos para distinguir qué grupo es materialmente verificable desde el runtime disponible, sin descargar objetos ni usar secretos. Determinar si el marcador B2/Blob permite formar lotes de read-back y si la parte 317 tiene fuente alternativa en los registros autorizados; dejar por separado los 29 checkpoints textuales y el registro sin contenido localizado.
