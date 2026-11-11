@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.61; OBJECT_SEAL=CUSTODIA-v0.61; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.62; OBJECT_SEAL=CUSTODIA-v0.62; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.61. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.62. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1404,4 +1404,47 @@ La repetición del preflight no altera la prioridad canónica de §29.4:
 5. Mantener Blob legacy bloqueado hasta recuperación del proveedor y GET físico satisfactorio.
 
 **Cierre:** OCP CUSTODIA-v0.61 actualizado. Salida literal y evidencia de repetición persistidas. La rama sigue sin merge ni deployment. CUSTODIA-01 continúa como única tarea activa; ningún Volcado nuevo fue creado.
+
+
+## 31. Revisión de diseño de la lista provisional y separación de compuertas · 2026-11-11 · CUSTODIA-v0.62
+
+**Evidencia:** [REVISION-DISENO-LISTA-CUSTODIA-20261111.md](evidencias/REVISION-DISENO-LISTA-CUSTODIA-20261111.md).  
+**Lista actualizada:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md) · v0.50.  
+**Contrato operativo de CUSTODIA-01:** [README de CUSTODIA-01](./📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20CUSTODIA-01%20-%20Inventario%20forense%20de%20recuperabilidad/README.md) · TASK_VERSION 1.0.
+
+### 31.1 Dictamen
+
+El objetivo maestro CUSTODIA-01 y su criterio de cierre se consideran correctos. La lista v0.49 no estaba suficientemente bien diseñada para ejecución porque mezclaba fases del archivo, guardrails, dependencias condicionales y un backlog fuera del sprint. Además, conservaba una instrucción de acceso por Chrome/RDC incompatible con la instrucción posterior del operador de no utilizar su monitor.
+
+Se corrige la descomposición sin crear nuevos expedientes maestros, sin cambiar la autorización de archivo y sin ampliar alcance.
+
+### 31.2 Descomposición operativa vigente
+
+| Fase | Estado actual | Criterio de salida |
+|---|---|---|
+| CUSTODIA-01.a · Conciliación | EN CURSO | Cada unidad identificada por fuente, titularidad, componentes, vínculos y estado; exclusiones basadas en evidencia. No utilizar navegador local. |
+| CUSTODIA-01.b · Texto sin audio | BLOQUEADA POR CONTEXTO NEXTAUTH INDEPENDIENTE | GET canónico, descifrado y SHA correctos; POST de archivo; lectura de vuelta del Volcado, titular y vínculo. |
+| CUSTODIA-01.c · Audio B2 | PREVALIDADA · GET HISTÓRICO PENDIENTE | GET de cada objeto, longitud/bytes/SHA-256 cotejados; descifrado y archivo solo después; read-back del Volcado. |
+| CUSTODIA-01.d · Audio local autorizado | BLOQUEADA POR CANAL LOCAL EXCLUIDO | Disponer de una vía independiente permitida que no use monitor, Chrome local ni RDC; procesar 216 fragmentos y verificar read-back B2 preservando originales. |
+| CUSTODIA-01.e · Residuales | EN CURSO | Bloqueos concretos por registro/componente, con fuente, causa actual y acción necesaria; no inferir pérdida. |
+| CUSTODIA-01.f · Cierre | PENDIENTE · GATE FINAL | Inventario completo conciliado; retirar pendientes solo tras verificación; dejar únicamente residuales con causa demostrada. |
+
+Las compuertas de NextAuth, GET físico B2 y acceso a IndexedDB local son independientes. No se agrupan bajo un bloqueo genérico de runtime.
+
+### 31.3 Dependencias y guardrails
+
+- La recuperación de X_KHORA_KEY en las dos bóvedas delimitadas no se ejecutará como tarea independiente. Solo se activa si una unidad elegible demuestra un fallo de descifrado atribuible a esa llave. Se prohíbe rotar/reemplazar la llave.
+- El PIN es un guardrail; restablecerlo no recupera la llave y no constituye una fase.
+- La lectura de credencial GitHub/EP no es necesaria para archivar dictados ni bloquea CUSTODIA-01; se retira de la secuencia de ejecución de este sprint.
+- El backlog de dependencia del catálogo respecto de X_KHORA_KEY queda separado y no activo; no implementar cambios de producto dentro de CUSTODIA-01.
+
+### 31.4 Restricción de canal local
+
+La instrucción posterior del operador excluye el uso de su monitor, Chrome local y RDC. Esta limitación prevalece sobre la selección de perfil local descrita en instrucciones anteriores. La autorización previa sobre los 216 fragmentos permanece registrada, pero no se ejecutará por un canal ahora excluido. La fase local queda bloqueada hasta disponer de un medio alternativo permitido; no se inspecciona ni modifica IndexedDB mientras tanto.
+
+### 31.5 Estado y no-acciones de esta revisión
+
+La actualización es documental y de planificación. No modifica la generación 11 ni CONTROL-RESPONSABILIDAD.json. No cambia la autorización de archivo en Neon Production ni habilita nuevas operaciones. No hubo lecturas de contenido personal, descifrado, GET de objetos históricos, escrituras de negocio, cambios de credenciales/configuración, despliegues ni merge.
+
+**Cierre:** OCP CUSTODIA-v0.62 y lista v0.50 alinean el trabajo con el objetivo, las dependencias actuales y la instrucción de no usar el monitor. CUSTODIA-01 continúa como único expediente activo.
 
