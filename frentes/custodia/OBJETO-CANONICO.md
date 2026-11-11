@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.54; OBJECT_SEAL=CUSTODIA-v0.54; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.55; OBJECT_SEAL=CUSTODIA-v0.55; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.54. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.55. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -26,9 +26,9 @@ La implementación está integrada en `main` (commit `f0224c1368fb15a3452335a443
 - **Único núcleo operativo:** este OBJETO-CANONICO.md.
 - **Control único de responsabilidad:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json). Titularidad documental/operativa transferida de generación 10 a 11 y leída de vuelta. Titular actual: chatgpt-custodia-INSTANCE-20261109-01A1C125; alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59; UUIDv7 local de conversación 01a1c125-af13-79b1-87cc-f1e5fe4b0b59; UUIDv7 local del evento 01a1c125-af13-7825-8af1-0ff35ad87b0e; control blob c29349fc4d2e07d40cd6efe583171482578db6d3. ID nativo de plataforma no expuesto. Titular previo gen. 10 y generaciones anteriores preservados. Folio PENDIENTE/NO ASIGNADO; FOL1 no está ACTIVO/verificado.
 - **Propósito literal aprobado:** [originales/PROPOSITO-OPERADOR-2026-10-28.md](originales/PROPOSITO-OPERADOR-2026-10-28.md). La sección 4 también conserva el texto aprobado íntegro para que el propósito sea visible en el núcleo.
-- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional v0.42. Contiene un solo objetivo activo: CUSTODIA-01, archivo de todos los registros que puedan archivarse y documentación de los residuales actualmente bloqueados. Las demás tareas provisionales quedaron resueltas administrativamente por reenfoque, sin atribuirles aprobación técnica. CUSTODIA-02 continúa retirada y su identificador no se reutiliza.
+- **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional v0.43. Contiene un solo objetivo activo: CUSTODIA-01, archivo de todos los registros que puedan archivarse y documentación de los residuales actualmente bloqueados. Las demás tareas provisionales quedaron resueltas administrativamente por reenfoque, sin atribuirles aprobación técnica. CUSTODIA-02 continúa retirada y su identificador no se reutiliza.
 - **Inventario provisional de hallazgos:** [evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md](evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md), materialización de evidencia para CUSTODIA-01; no es un segundo estado vivo.
-- **Versión y sello vigentes:** CUSTODIA-v0.53. Es una versión documental del objeto; no es una versión del producto.
+- **Versión y sello vigentes:** CUSTODIA-v0.55. Es una versión documental del objeto; no es una versión del producto.
 - **Registro de la retoma anterior:** [originales/ChatGPT-CUSTODIA-20261106-1424.txt](originales/ChatGPT-CUSTODIA-20261106-1424.txt), instrucción textual parcial original y diagnóstico estático del límite de archivado.
 - **Original de esta retoma:** [originales/ChatGPT-CUSTODIA-20261107-1157.txt](originales/ChatGPT-CUSTODIA-20261107-1157.txt), exportación preservada en main; SHA-256 `7E256B9888F2A0227632D39D22B98E9BD1316548E057E83514ADE61376A93CC5`, 42,629 bytes; lectura de vuelta exacta.
 - **Original de esta retoma (2026-11-08 11:21):** [originales/ChatGPT-CUSTODIA-20261108-1121.md](originales/ChatGPT-CUSTODIA-20261108-1121.md), 39,896 bytes; SHA-256 `CB264E5979AA545F082B5CC9C59DEDA30CE9547100DB29B138A520C3592A866A`; Git blob `b7e13e3fe9fed70873535640e1124577f5b037e4`; commit `5d6cf7055f2ab5f0020bde220d078ffe077512a6`; lectura de vuelta idéntica.
@@ -1151,3 +1151,43 @@ La llave tampoco crea revisiones inexistentes ni demuestra titularidad. Las sesi
 5. Mantener la llave actual y preservar ciphertext: no rotar, sustituir, regenerar, reinicializar ni re-cifrar.
 
 **Estado:** BACKLOG · NO ACTIVO · NO IMPLEMENTADO. La investigación de código es estática; no se consultó Production ni se ejecutó catálogo/recuperación, no se leyeron objetos B2/Blob y no se modificaron datos o secretos.
+
+
+## 25. Último tramo conversacional y repetición del ciclo · 2026-11-10 · CUSTODIA-v0.55
+
+**Instrucción original:** [originales/INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md](originales/INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md).  
+**Última salida visible del modelo, preservada literalmente:** [originales/SALIDA-MODELO-CUSTODIA-BLOQUEOS-ULTIMO-CICLO-20261110.md](originales/SALIDA-MODELO-CUSTODIA-BLOQUEOS-ULTIMO-CICLO-20261110.md).  
+**Evidencia de la repetición:** [evidencias/ESTADO-OPERATIVO-BLOQUEOS-20261110.md](evidencias/ESTADO-OPERATIVO-BLOQUEOS-20261110.md).  
+**Lista provisional subordinada:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), v0.43.
+
+### 25.1 Adquisición de gobierno para este ciclo
+
+Se leyó `SeryMente/metodologia/main:gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`, blob `4db0ebadfd1e48b2bdec9236ba7f344921e4a865`. La envolvente declara Samantha v388 · NX-388m, Metacanon 1.29 y GOW 2.18. Se consultaron Metacanon §§4, 28 y 46–48: salida obligatoria de ciclo; preservación literal de instrucciones/salidas; núcleo OCP único; reinstanciación y salida previa. MCP-NORMATIVO: DESACTIVADO.
+
+**Discrepancias de la fuente, no corregidas en este frente:** `INICIO.md` todavía menciona DUG v377; el encabezado humano de la sección Sam dentro del HTML declara v379/NX-379m mientras el manifiesto/portada declara v388/NX-388m; el encabezado GOW §F declara v2.17 mientras el manifiesto declara GOW 2.18. La fuente HTML de `main` y su blob actual fueron leídos; las discrepancias internas se conservan como advertencia y no se resuelven por inferencia. No se modificó el repositorio de Metodología.
+
+### 25.2 Repetición del diagnóstico de bloqueos
+
+La revisión se limitó a metadatos de Vercel, sin solicitar valores descifrados, y a lectura estática del código:
+
+1. **`X_KHORA_KEY`: presente en Production.** La enumeración de variables del proyecto `khora-web` con `decrypt=false` muestra la entrada sensible dirigida a `production`; `KHORA_API_KEY` también existe. No se leyeron sus valores. La presencia elimina la hipótesis de ausencia de variable, pero no acredita que coincida con la llave histórica ni constituye una prueba de descifrado de un ciphertext.
+2. **Compuerta Blob de aplicación: ausente.** La enumeración completa no contiene `KHORA_LEGACY_BLOB_READS_ENABLED` y reporta `hiddenProductionEnvCount=0`. El código `khora-web/lib/server/object-storage.ts`, blob `6b923cea659ba86c82e48650411dfb7658924363`, compara la variable exactamente con la cadena `true`; si no está habilitada, el lector de Blob histórico rechaza el GET con `storage_legacy_temporarily_unavailable` y `describeStoredObject()` marca temporalmente no disponible.
+3. **Proveedor Blob: suspendido.** El almacén `khora-audio` devuelve `billingState=suspended` y `usageQuotaExceeded=true`. Este es un segundo bloqueo independiente. No se ejecutó GET de objetos.
+4. **B2: configuración presente, contenido no revalidado.** Los nombres de credenciales B2 y `BLOB_READ_WRITE_TOKEN` figuran en Production. Esto no sustituye GET/read-back físico y cotejo de bytes, longitud y SHA de cada objeto.
+5. **Notion:** `NOTION_TOKEN` figura en Production, pero `NOTION_DB_VOLCADOS` no. El espejo a esa base carece de destino configurado; no es bloqueo demostrado del archivo canónico en Neon.
+
+### 25.3 Reconciliación con el estado anterior
+
+La salida literal conservada enumera 95 sesiones con titularidad, 79 sin vínculo a Volcados, 16 vinculadas, 87 sin titularidad y 1.311 partes B2. Esas cifras **no se promueven a inventario canónico**: no se reprodujeron en esta consulta y no deben sustituir el estado base/evidencia previos. Del mismo modo, sus cuatro trabajos Notion fallidos se preservan como afirmación literal previa, no como resultado revalidado.
+
+La afirmación anterior de que la llave faltaba en Production queda rectificada por la lectura actual de metadatos: la variable sí figura. No se afirma que el valor almacenado sea correcto para todo ciphertext histórico hasta que una prueba funcional segura lo demuestre.
+
+### 25.4 Secuencia operativa resultante
+
+1. No continuar buscando la llave fuera de las dos bóvedas autorizadas; no rotar ni sustituir `X_KHORA_KEY`.
+2. Mantener apagada la lectura histórica Blob mientras `khora-audio` permanezca suspendido. Primero debe reactivarse el store y comprobarse GET físico; solo entonces procede habilitar la compuerta en Production y efectuar la activación/despliegue que corresponda. No se modifica ahora.
+3. En paralelo, continuar la verificación física de partes B2 y el procesamiento de los 216 fragmentos locales autorizados, usando las rutas canónicas de KHORA y cotejo/read-back. No se ejecutó en este ciclo.
+4. Con la llave configurada, si un endpoint devuelve error criptográfico, distinguirlo de ausencia de Blob, revisión inexistente, titularidad y GET B2; no concluir fallo criptográfico solo por referencias no recuperadas.
+5. No escribir directamente en Neon para eludir el flujo canónico. Mantener fuera los registros sin titularidad demostrada y de otros titulares.
+
+**Cierre de este ciclo:** OCP y lista documental actualizados; última salida preservada; lectura de vuelta pendiente de esta escritura. No hubo cambios de código, configuración, despliegues, Neon, B2, Blob ni bóvedas. CUSTODIA-01 permanece como única tarea activa; el objetivo no cambia.
