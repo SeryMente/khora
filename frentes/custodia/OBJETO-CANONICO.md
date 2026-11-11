@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.57; OBJECT_SEAL=CUSTODIA-v0.57; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.58; OBJECT_SEAL=CUSTODIA-v0.58; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.57. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.58. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1284,3 +1284,35 @@ Las otras cuatro sesiones contiguas tienen 464 partes y pasan la compuerta de me
 - Blob permanece suspendido. No habilitar la compuerta de lectura histórica hasta reactivación del proveedor y GET físico satisfactorio.
 
 **Cierre de este ciclo:** OCP v0.57 y lista v0.45 actualizados; instrucción, salida y evidencia nuevas persistidas. Todas las consultas Neon fueron SELECT-only. No se leyeron plaintexts, no se descargaron ni descifraron bytes de audio, no se crearon Volcados, no se modificaron filas, objetos B2/Blob, código, variables, despliegues, bóvedas o perfiles de navegador. CUSTODIA-01 continúa como única tarea activa.
+
+## 28. Revalidación del gate B2 y estado Blob · 2026-11-11 · CUSTODIA-v0.58
+
+**Evidencia:** [REVALIDACION-GATE-B2-BLOB-20261111.md](evidencias/REVALIDACION-GATE-B2-BLOB-20261111.md).  
+**Lista subordinada:** LISTA-TAREAS-PROVISIONAL.md v0.46.
+
+### 28.1 Estado del proveedor Blob
+
+La consulta actual de metadata confirma que `khora-audio` continúa en `limits-exceeded-suspended`, con `billingState=suspended` y `usageQuotaExceeded=true`. Metadata declara 1.010.497.194 bytes y 636 objetos; su última actualización es 2026-11-11T05:41:45.504Z. Esto no demuestra disponibilidad ni integridad de objetos individuales.
+
+No se ejecutó GET ni listado de objetos. No se puede distinguir por metadata si el proveedor pausó el store por límites del plan o por decisión propia. El operador debe revisar Vercel Dashboard/soporte. Prohibido borrar, recrear, vaciar o sobrescribir el store. La compuerta `KHORA_LEGACY_BLOB_READS_ENABLED` continúa sin modificación y no se habilita antes de un GET físico satisfactorio.
+
+### 28.2 Estado de la ruta B2
+
+La inspección de esquema por SELECT a `information_schema` confirmó las tablas necesarias del flujo (`dictado_session`, `dictado_audio_parte`, `dictado_checkpoint`, `volcado`). No se leyeron filas de negocio en esta revalidación.
+
+El candidato B2 de 77 partes y 6.251.747 bytes conserva la prioridad establecida en §27, pero no se reconsultaron sus filas individuales en este ciclo. No se pudo verificar por el canal disponible una sesión NextAuth del propietario ni el desbloqueo de la bóveda KHORA. No se leyeron cookies, credenciales ni secretos.
+
+Por tanto, no se ejecutó GET B2, descifrado, cotejo físico de bytes/longitud ni recálculo SHA-256. El estado `verificado` registrado en Neon sigue sin demostrar recuperabilidad física actual.
+
+### 28.3 No-acciones y estado del archivo
+
+Las consultas Neon de este ciclo se limitaron a metadatos del esquema y no modificaron filas. No se modificaron B2, Blob, variables, llaves, código, despliegues, bóvedas, perfiles de navegador ni el clon local. No se creó ni vinculó ningún Volcado. No se declaró recuperado, duplicado, perdido ni corrupto ningún registro.
+
+### 28.4 Próxima operación
+
+1. Disponer de un canal KHORA Production autenticado como el propietario y con la bóveda desbloqueada, sin compartir cookies ni secretos.
+2. Leer físicamente el manifiesto B2 continuo de 77 partes mediante el runtime canónico y verificar respuesta, bytes, longitud y SHA-256 por parte.
+3. Solo después, archivar mediante `POST /api/dictado` y verificar el Volcado y el vínculo de sesión por lectura de vuelta.
+4. Resolver el índice 317 del otro manifiesto B2 antes de intentar su archivo. Mantener Blob pendiente hasta reactivación y GET físico satisfactorio.
+
+**Cierre de este ciclo:** OCP v0.58 y lista v0.46 actualizados; la evidencia de revalidación fue persistida y leída de vuelta. Neon se consultó solo para metadatos del esquema; el store Blob se consultó solo por metadata. No hubo GET B2/Blob, escrituras de negocio, Volcados nuevos ni cambios de código/configuración/credenciales/deploy. CUSTODIA-01 permanece como única tarea activa.
