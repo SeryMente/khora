@@ -1,4 +1,4 @@
-<!-- LIST_VERSION=0.48; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.49; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
@@ -8,6 +8,8 @@
 **Instrucción literal:** [INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md).  
 **Salida literal preservada (ciclo anterior):** [SALIDA-MODELO-CUSTODIA-ARCHIVO-REGISTROS-20261110.md](originales/SALIDA-MODELO-CUSTODIA-ARCHIVO-REGISTROS-20261110.md).  
 **Última salida literal (ciclo repetido):** [SALIDA-MODELO-CUSTODIA-BLOQUEOS-ULTIMO-CICLO-20261110.md](originales/SALIDA-MODELO-CUSTODIA-BLOQUEOS-ULTIMO-CICLO-20261110.md).  
+**Último tramo literal (2026-11-11):** [SALIDA-MODELO-CUSTODIA-ULTIMO-TRAMO-20261111.md](originales/SALIDA-MODELO-CUSTODIA-ULTIMO-TRAMO-20261111.md).  
+**Repetición B2 Production (2026-11-11):** [REPETICION-CICLO-B2-PREFLIGHT-20261111.md](evidencias/REPETICION-CICLO-B2-PREFLIGHT-20261111.md).  
 **Evidencia de repetición del ciclo:** [ESTADO-OPERATIVO-BLOQUEOS-20261110.md](evidencias/ESTADO-OPERATIVO-BLOQUEOS-20261110.md).  
 **Instrucción de retoma:** [INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md](originales/INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md).  
 **Estado base:** [ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md](evidencias/ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md).  
@@ -231,3 +233,29 @@ La salida literal se conserva íntegra como registro histórico. Sus conteos de 
 - No se ejecutó el endpoint por falta de sesión NextAuth del propietario desde el canal disponible. No se leyeron plaintexts ni secretos y no se creó ningún Volcado.
 
 **Orden operativo:** 1) archivar el candidato textual sin audio tras autenticación; 2) procesar las otras 12 sesiones textuales sin coincidencia SHA; 3) GET físico y archivo de la sesión B2 de 77 partes; 4) reconciliar las 21 coincidencias SHA sin deduplicación automática. Blob continúa suspendido.
+
+
+## 17. Último tramo literal y repetición B2 Production · 2026-11-11 · v0.49
+
+**Salida original:** [SALIDA-MODELO-CUSTODIA-ULTIMO-TRAMO-20261111.md](originales/SALIDA-MODELO-CUSTODIA-ULTIMO-TRAMO-20261111.md). Se conservaron literalmente las dos salidas finales: el paso de validación B2 de 77 partes y el propósito del sprint. Las referencias v0.57 que aparecen dentro del original no sustituyen el OCP vigente v0.61.
+
+**Evidencia:** [REPETICION-CICLO-B2-PREFLIGHT-20261111.md](evidencias/REPETICION-CICLO-B2-PREFLIGHT-20261111.md) · [OCP §30](OBJETO-CANONICO.md).
+
+### Resultado revalidado
+
+- Production: deployment dpl_6M6ebaAvNPpAtRspfX5QhffEJvVJ, READY, commit f0224c1368fb15a3452335a44305c6efa85eef79.
+- El commit desplegado antecede al main consultado en 8 commits. La rama de custodia conserva 90 commits ahead / 0 behind; no hubo merge ni deployment desde esta rama.
+- Los logs del preflight observado registran native_auth, master_key, bucket_identity, bucket_private y sse_b2_default en PASS, además de read_only_gate=PASS.
+- KHORA_B2_PREFLIGHT=1 y KHORA_OBJECT_STORAGE=b2 están configurados para Production. Los nombres de variables sensibles B2 aparecen presentes, sin lectura de valores. KHORA_LEGACY_BLOB_READS_ENABLED no aparece en la enumeración completa.
+- El PASS acredita configuración/autenticación del proveedor, no descarga de las 77 partes históricas.
+
+### Pendientes y orden
+
+- No hubo GET físico, descifrado ni recálculo SHA-256 de las 77 partes de la sesión 45f0cf5e-d1af-46c3-95af-e9428b8b0f90. No se creó Volcado.
+- No hubo escrituras en Neon, B2 o Blob; no se modificaron secretos, variables, código o despliegues.
+- No se usó el monitor, navegador local ni RDC.
+- Se conserva el orden del OCP §29.4: primero la sesión textual 48586f80-63d6-4969-9691-27e55cb5d5f5; después las otras 12 textuales sin coincidencia; luego el manifiesto B2 de 77 partes; por separado, reconciliar las 21 coincidencias SHA sin deduplicación automática.
+- Blob legacy permanece pendiente.
+
+**Estado:** CUSTODIA-01 sigue como única tarea activa. Autenticación/configuración B2 PASS en preflight; lectura física histórica PENDIENTE; archivo nuevo PENDIENTE.
+
