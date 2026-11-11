@@ -1,4 +1,4 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.64; OBJECT_SEAL=CUSTODIA-v0.64; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.65; OBJECT_SEAL=CUSTODIA-v0.65; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
 > **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.62. Metacanon: 1.29.
@@ -1454,7 +1454,7 @@ La actualización es documental y de planificación. No modifica la generación 
 ## 32. Conciliación R2 de Neon, manifests B2 y deduplicación por checkpoint vigente · 2026-11-11 · CUSTODIA-v0.63
 
 **Evidencia de solo lectura:** [RECONCILIACION-NEON-SOLO-LECTURA-20261111-R2.md](evidencias/RECONCILIACION-NEON-SOLO-LECTURA-20261111-R2.md).  
-**Lista ejecutiva:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md) · LIST_VERSION 0.52.  
+**Lista ejecutiva:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md) · LIST_VERSION 0.53.  
 **Base consultada:** Neon Production, proyecto `still-sunset-02412999`, rama `main` (`br-gentle-band-ah23rczb`). Predicado de titularidad: `custodia_owner` / `checkpoint_usuario`, igual al usado por backend.
 
 ### 32.1 Universo actualizado
@@ -1479,8 +1479,9 @@ Cuatro manifiestos son contiguos y suman 464 partes. El quinto no satisface cont
 De las 34 sesiones sin audio:
 - Cuatro checkpoints tienen SHA del texto vacío y coinciden con Volcados de cero caracteres; no son dictados sustantivos adicionales.
 - Una contiene únicamente un salto de línea; no se promueve a dictado sustantivo sin comprobación del contenido.
-- 29 checkpoints vigentes tienen contenido potencialmente significativo y ninguno presenta coincidencia SHA exacta con un Volcado propio existente.
-- Dentro de esas 29, 17 tienen al menos una coincidencia de SHA en revisiones antiguas; el checkpoint vigente es distinto. La coincidencia de una revisión antigua no autoriza a descartar el estado vigente ni deduplicarlo automáticamente.
+- 29 checkpoints vigentes tienen contenido potencialmente significativo y ninguno presenta coincidencia SHA exacta con un Volcado propio existente. El índice por sesión, hash, tamaño de ciphertext y revisiones está en el Anexo A de la evidencia R2.
+- Hay 27 SHA vigentes distintos entre las 29 sesiones: tres sesiones (`ae423b97-3ecd-4fa2-9dbf-191a99e53995`, `0668dd82-3057-4e42-9820-50b4abc2b468` y `22f3c50d-255f-439b-af79-1aad136d4822`) comparten `932b4f49f203a40e57987f7eff34c7c489fe95883ec5e53168b444c9b418fb25`. Es una posible repetición textual exacta que debe reconciliarse por contenido y procedencia; no crear tres copias ni descartar dos sesiones automáticamente.
+- Dentro de las 29, 17 tienen al menos una coincidencia de SHA en revisiones antiguas; el checkpoint vigente es distinto. La coincidencia de una revisión antigua no autoriza a descartar el estado vigente ni deduplicarlo automáticamente.
 - Las otras 12 no tienen coincidencia de SHA entre sus revisiones y los Volcados existentes. Una carece de filas de revisión.
 
 El candidato `48586f80-63d6-4969-9691-27e55cb5d5f5` pertenece al grupo sin coincidencia y sin revisiones: 24.853 caracteres cifrados, cero partes de audio y cero Volcados vinculados. Su ciphertext y SHA están localizados en Neon; no se leyó plaintext ni se realizó archivo. La verificación final debe comparar el texto descifrado y su SHA, no confiar solo en el tamaño del ciphertext.
