@@ -1,4 +1,4 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.63; OBJECT_SEAL=CUSTODIA-v0.63; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.64; OBJECT_SEAL=CUSTODIA-v0.64; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
 > **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.62. Metacanon: 1.29.
@@ -1454,7 +1454,7 @@ La actualización es documental y de planificación. No modifica la generación 
 ## 32. Conciliación R2 de Neon, manifests B2 y deduplicación por checkpoint vigente · 2026-11-11 · CUSTODIA-v0.63
 
 **Evidencia de solo lectura:** [RECONCILIACION-NEON-SOLO-LECTURA-20261111-R2.md](evidencias/RECONCILIACION-NEON-SOLO-LECTURA-20261111-R2.md).  
-**Lista ejecutiva:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md) · LIST_VERSION 0.51.  
+**Lista ejecutiva:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md) · LIST_VERSION 0.52.  
 **Base consultada:** Neon Production, proyecto `still-sunset-02412999`, rama `main` (`br-gentle-band-ah23rczb`). Predicado de titularidad: `custodia_owner` / `checkpoint_usuario`, igual al usado por backend.
 
 ### 32.1 Universo actualizado
@@ -1495,7 +1495,7 @@ Inspección de código en `main` (`c708901caa2500eb48d6723b709cee7db0d9904b`):
 - `khora-web/lib/server/cripto.ts`, blob `92427a1cacf745142a760802247105726373faf6`: KHC1/AES-256-GCM depende de `X_KHORA_KEY` configurada en el runtime; no se extrajo ni reveló su valor.
 - `khora-web/auth.ts`, blob `dc87c3cfa142bd01f46c2a26577f7923c5e0f58a`, y `khora-web/middleware.ts`, blob `dbd01817872994a7229dcb329716fb9f724d1814`: identidad de usuario vía OIDC/NextAuth para las rutas ordinarias.
 
-No se encontró una ruta ya existente de archivo de dictados con identidad de servicio independiente. Las rutas EP/MCP tienen autorización propia para sus funciones, pero no sustituyen la identidad del propietario en Custodia. `KHORA_API_KEY` de telemetría no se convierte en identidad de usuario. No se eluden sesiones, no se fabrican tokens y no se crea una nueva ruta de producción dentro de CUSTODIA-01.
+Se localizó una ruta auxiliar de servicio en `api/main.py`, blob `bae368f07159b99c31b6c97f2bde64fb7936e57b`: `POST /api/v1/ingesta` valida una cabecera `X-Khora-Key` frente a `KHORA_API_KEY` del backend y ejecuta `ingestar()` hacia Neo4j con procedencia de `volcado_id`, versión y SHA. No crea el Volcado canónico en Neon desde un checkpoint ni recupera capturas huérfanas. La envoltura web `khora-web/app/api/ingesta/route.ts`, blob `f8b97837c1308525c0f1b6189c6fbd6dce321746`, exige NextAuth y consulta un Volcado existente con versión/SHA aprobados antes de llamar a ese servicio. Por tanto, es ingesta secundaria de un Volcado ya archivado, no un canal de archivo para CUSTODIA-01. No se invocó; no se leyeron los valores ni se presumió equivalencia entre `X_KHORA_KEY` y `KHORA_API_KEY`. Las rutas EP/MCP tampoco sustituyen la identidad del propietario en Custodia. No se eluden sesiones, no se fabrican tokens ni se crea una nueva ruta de producción dentro de CUSTODIA-01.
 
 ### 32.5 Estado operativo, residual y no-acciones
 
