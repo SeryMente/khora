@@ -1,8 +1,8 @@
-<!-- LIST_VERSION=0.62; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.63; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
-> **Actualización:** 2026-11-11 · continuidad conversacional y evidencia R11 de staging/trazas.
+> **Actualización:** 2026-11-11 · cierre operativo en tres ciclos; B2 preflight PASS y residual de identidad titular.
 > **Único objetivo activo:** archivar todos los registros históricos que puedan archivarse; dejar pendientes únicamente los que tengan un impedimento actual, concreto y documentado.
 
 **Instrucción literal:** [INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md).  
@@ -548,3 +548,13 @@ No hubo GET/list/descifrado B2/Blob, llamadas a rutas de importación/carga, esc
 ### Compuerta siguiente
 
 Comprobar de forma limitada la presencia de claves de recibo/localizador en el JSON de los eventos de la parte 317, sin revelar valores sensibles. Mantener separados los universos 216 y 993 hasta disponer de un manifiesto de origen y una conciliación autorizada.
+## 28. Cierre operativo de tres ciclos · v0.63 · 2026-11-11
+
+**Evidencia:** [Resultado operativo de CUSTODIA · tres ciclos](evidencias/CIERRE-OPERATIVO-CUSTODIA-3-CICLOS-20261111.md).  
+**OCP:** [CUSTODIA-v0.75 · §42](OBJETO-CANONICO.md).
+
+Se recuperó la autorización específica de archivo. La conciliación actual confirma 95 sesiones atribuibles, 16 vinculadas y 79 pendientes; 1.039 partes en 44 sesiones (785 B2/254 Blob). El último Production deployment pasó preflight B2 nativo; Blob sigue suspendido.
+
+No se ejecutó archivo canónico porque POST /api/dictado y los lectores de checkpoint requieren NextAuth del titular. La bóveda de agente también requiere NextAuth; MCP normativo está desactivado; las variables necesarias siguen no descifrables desde Vercel. No se usó SQL directo ni se creó identidad de servicio.
+
+**Disposición:** cierre del límite de tres ciclos, no cierre técnico de CUSTODIA-01. Permanecen 79 sesiones, B2 con read-back físico pendiente, Blob bloqueado, 216 fragmentos locales fuera del canal permitido y 216/993 sin conciliación. Cero nuevos Volcados.
