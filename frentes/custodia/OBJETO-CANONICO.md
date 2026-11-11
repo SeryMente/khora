@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.58; OBJECT_SEAL=CUSTODIA-v0.58; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.59; OBJECT_SEAL=CUSTODIA-v0.59; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.58. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.59. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1285,7 +1285,7 @@ Las otras cuatro sesiones contiguas tienen 464 partes y pasan la compuerta de me
 
 **Cierre de este ciclo:** OCP v0.57 y lista v0.45 actualizados; instrucción, salida y evidencia nuevas persistidas. Todas las consultas Neon fueron SELECT-only. No se leyeron plaintexts, no se descargaron ni descifraron bytes de audio, no se crearon Volcados, no se modificaron filas, objetos B2/Blob, código, variables, despliegues, bóvedas o perfiles de navegador. CUSTODIA-01 continúa como única tarea activa.
 
-## 28. Revalidación del gate B2 y estado Blob · 2026-11-11 · CUSTODIA-v0.58
+## 28. Revalidación del gate B2 y estado Blob · 2026-11-11 · CUSTODIA-v0.59
 
 **Evidencia:** [REVALIDACION-GATE-B2-BLOB-20261111.md](evidencias/REVALIDACION-GATE-B2-BLOB-20261111.md).  
 **Lista subordinada:** LISTA-TAREAS-PROVISIONAL.md v0.46.
@@ -1315,4 +1315,4 @@ Las consultas Neon de este ciclo se limitaron a metadatos del esquema y no modif
 3. Solo después, archivar mediante `POST /api/dictado` y verificar el Volcado y el vínculo de sesión por lectura de vuelta.
 4. Resolver el índice 317 del otro manifiesto B2 antes de intentar su archivo. Mantener Blob pendiente hasta reactivación y GET físico satisfactorio.
 
-**Cierre de este ciclo:** OCP v0.58 y lista v0.46 actualizados; la evidencia de revalidación fue persistida y leída de vuelta. Neon se consultó solo para metadatos del esquema; el store Blob se consultó solo por metadata. No hubo GET B2/Blob, escrituras de negocio, Volcados nuevos ni cambios de código/configuración/credenciales/deploy. CUSTODIA-01 permanece como única tarea activa.
+**Cierre de este ciclo:** OCP v0.59 y lista v0.47 actualizados; la evidencia de revalidación fue persistida y leída de vuelta. Neon se consultó solo para metadatos del esquema; el store Blob se consultó solo por metadata. No hubo GET B2/Blob, escrituras de negocio, Volcados nuevos ni cambios de código/configuración/credenciales/deploy. CUSTODIA-01 permanece como única tarea activa.
