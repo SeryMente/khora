@@ -1,4 +1,4 @@
-<!-- TASK_VERSION=1.7; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
+<!-- TASK_VERSION=1.8; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
 # CUSTODIA-01 · Archivo de todos los registros recuperables
 
 > **Estado:** EN CURSO · **Prioridad:** P0 · **Único expediente activo del frente CUSTODIA.**  
@@ -484,3 +484,44 @@ No se invocó MCP ni REST, no se obtuvo/consumió token, no se abrió turno norm
 ### Compuerta siguiente
 
 Inspeccionar exclusivamente fuentes alternativas server-side de la parte 317 y registros de carga de los 216 fragmentos locales: tablas de staging, manifiestos, sesiones de importación o recibos. No leer el sistema de archivos local ni IndexedDB, no acceder al navegador y no hacer GET de objetos en este ciclo. Solo identificar si existe un registro/copia persistida de origen con vínculo demostrable.
+
+## 21. Staging, trazas de carga y conciliación local · TASK_VERSION 1.8 · 2026-11-11
+
+**Evidencia:** [R11 · fuentes de staging y trazas de carga](../../evidencias/FUENTES-STAGING-Y-TRAZAS-DE-CARGA-20261111-R11.md).  
+**OCP:** §41 / CUSTODIA-v0.74.  
+**Lista:** §27 / LIST_VERSION 0.62.  
+**Registro de continuidad conversacional:** [CONTINUIDAD-OPERATIVA-CUSTODIA-20261111.md](../../originales/CONTINUIDAD-OPERATIVA-CUSTODIA-20261111.md).
+
+### Objetivo
+
+Determinar si una carga de staging o un recibo server-side puede localizar la parte 317 y aclarar el origen de los 216 fragmentos locales, sin acceder al dispositivo ni efectuar lecturas físicas.
+
+### Tareas ejecutadas
+
+1. Revisar el catálogo público de Neon para tablas de staging/importación.
+2. Inspeccionar putStagingChunk(), el procesamiento de staging y la carga directa POST /api/audio.
+3. Seguir el comportamiento del cliente: IndexedDB antes de la carga y confirmación/eliminación local solo después del evento de subida verificada.
+4. Revisar los eventos de inicio/fallo de la parte 317.
+5. Reconciliar documentalmente las cifras 216 y 993 sin acceder al sistema local.
+6. Evaluar si ejecutarReconciliacionForense(DRY_RUN) es un diagnóstico seguro.
+7. Persistir R11 y leer de vuelta cada artefacto actualizado.
+
+### Resultado
+
+No hay tabla SQL dedicada de staging. putStagingChunk() escribe en B2 con una ruta por sessionId/uploadId, pero no genera un recibo SQL independiente. La ruta de importación requiere NextAuth y propietario de sesión; obtiene/descifra staging y registra la parte original. No se ejecutó.
+
+POST /api/audio hace read-back tras la escritura; su rama audio_no_verificable puede devolver el localizador como recuperable, pero no registra la parte como confirmada en dictado_audio_parte. El cliente conserva el audio local hasta PARTE_AUDIO_SUBIDA_CONFIRMADA. Esta es una conclusión de código estático, no una inspección de IndexedDB.
+
+Para la parte 317 hay un inicio de carga (82.195 bytes) seguido de audio_no_verificable/upload_verified=false; no se encontró confirmación, uploadId ni stagingUrl en los campos consultados. No se ha probado que el objeto exista todavía en B2 ni que esté ausente.
+
+Los 216 fragmentos de dos sesiones y los 993 registros de cinco snapshots/sesiones pertenecen a fuentes y alcances distintos; no se ha demostrado una relación entre ambos. Permanecen preservados como líneas documentales separadas.
+
+ejecutarReconciliacionForense(DRY_RUN) no se ejecutó: asegurarColumnasDictado() puede modificar esquema mediante DDL y la reconciliación abarca datos/listados globales; APPLY añade escrituras.
+
+### No-acciones y estado
+
+No hubo GET/list B2/Blob, descifrado, importación, carga, escrituras de negocio, modificación de Production ni acceso al monitor, Chrome local, RDC o IndexedDB. CUSTODIA-01 sigue EN CURSO; 79 sesiones continúan sin Volcado.
+
+### Compuerta siguiente
+
+Determinar por una consulta SELECT limitada si el JSON de los eventos de la parte 317 incluye claves de localizador o recibo, sin devolver los valores. No equiparar los universos 216/993 sin manifiesto de origen y conciliación autorizada.
