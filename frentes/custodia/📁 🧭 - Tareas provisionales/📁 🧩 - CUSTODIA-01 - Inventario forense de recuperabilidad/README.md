@@ -1,4 +1,4 @@
-<!-- TASK_VERSION=1.8; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
+<!-- TASK_VERSION=1.9; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
 # CUSTODIA-01 · Archivo de todos los registros recuperables
 
 > **Estado:** EN CURSO · **Prioridad:** P0 · **Único expediente activo del frente CUSTODIA.**  
@@ -525,3 +525,24 @@ No hubo GET/list B2/Blob, descifrado, importación, carga, escrituras de negocio
 ### Compuerta siguiente
 
 Determinar por una consulta SELECT limitada si el JSON de los eventos de la parte 317 incluye claves de localizador o recibo, sin devolver los valores. No equiparar los universos 216/993 sin manifiesto de origen y conciliación autorizada.
+## 22. Ejecución consolidada y residual de acceso · TASK_VERSION 1.9 · 2026-11-11
+
+**Evidencia:** [Resultado operativo de CUSTODIA · tres ciclos](../../evidencias/CIERRE-OPERATIVO-CUSTODIA-3-CICLOS-20261111.md).  
+**OCP:** §42 / CUSTODIA-v0.75.  
+**Lista:** §28 / LIST_VERSION 0.63.
+
+### Resultado
+
+Se recuperó la autorización de archivo para los registros de titularidad demostrada: checkpoints, B2, 216 fragmentos locales de dos sesiones, Blob cuando esté accesible y escritura canónica idempotente en Neon Production. Se mantiene la exclusión de UI local/monitor/Chrome/IndexedDB/RDC.
+
+Producción B2 pasó el preflight nativo en el último deployment: autenticación, Master Key, bucket privado e SSE-B2 PASS. Blob sigue suspendido por cuota. La conciliación Neon confirma 95 atribuibles, 16 vinculadas y 79 pendientes; 1.039 partes (785 B2, 254 Blob).
+
+No se ejecutó POST /api/dictado ni lectura de checkpoint: ambos exigen NextAuth del titular. Vault Agent también exige NextAuth; MCP normativo sigue DESACTIVADO. Vercel no devolvió `X_KHORA_KEY` ni `DATABASE_URL` descifrados. No hay actor/escritor de servicio CUSTODIA activo. No se suplantó identidad, no se usó el trigger de Jules y no se ejecutó SQL directo.
+
+### Disposición
+
+El límite de tres ciclos queda completado documental y operativamente; el archivo no queda aceptado. No se crearon Volcados; 79 sesiones siguen pendientes. B2 requiere read-back por un sujeto titular, Blob requiere reactivación del proveedor, y los 216 fragmentos locales permanecen fuera del canal permitido. La discrepancia 216/993 sigue sin conciliar.
+
+### Siguiente acción necesaria para reanudar sin interfaz local
+
+Proveer un contexto de ejecución server-side autenticado como el titular y con X_KHORA_KEY disponible en el runtime permitido; ejecutar por la ruta canónica y verificar cada Volcado/parte por read-back. Esto no requiere acceder al navegador ni al dispositivo local.
