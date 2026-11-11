@@ -1,4 +1,4 @@
-<!-- LIST_VERSION=0.46; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.47; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
@@ -211,10 +211,10 @@ La salida literal se conserva íntegra como registro histórico. Sus conteos de 
 ## 15. Revalidación del gate B2 y estado Blob · 2026-11-11 · v0.46
 
 **Evidencia:** [REVALIDACION-GATE-B2-BLOB-20261111.md](evidencias/REVALIDACION-GATE-B2-BLOB-20261111.md).  
-**Objeto canónico:** [OBJETO-CANONICO.md §28](OBJETO-CANONICO.md).
+**Objeto canónico:** [OBJETO-CANONICO.md §28](OBJETO-CANONICO.md) · CUSTODIA-v0.59.
 
 - **Blob:** `khora-audio` sigue `limits-exceeded-suspended`, `billingState=suspended`, `usageQuotaExceeded=true`. Metadata actual: 636 objetos y 1.010.497.194 bytes. Sin GET/listado físico. El operador debe revisar Vercel Dashboard/soporte; no borrar ni recrear.
-- **B2:** la prioridad sigue siendo el manifiesto continuo de 77 partes. La revalidación de este ciclo confirmó tablas de esquema, no filas de negocio. No se obtuvo una sesión KHORA autenticada con bóveda desbloqueada y no se efectuó GET/read-back ni recálculo SHA.
+- **B2:** el SELECT de este ciclo identificó el manifiesto exacto: sesión `45f0cf5e-d1af-46c3-95af-e9428b8b0f90`, perteneciente al único grupo de titularidad con 84 sesiones. Tiene 77 filas, índices consecutivos 1–77, 6.251.747 bytes, 77 estados `verificado`, cero bytes no positivos y cero SHA mal formados; el endpoint observado es Backblaze B2 (`s3.us-east-005.backblazeb2.com`). Son metadatos, no un GET físico actual. No se obtuvo una sesión KHORA autenticada con bóveda desbloqueada y no se efectuó GET/read-back ni recálculo SHA.
 - **Archivo:** ningún Volcado creado o vinculado en este ciclo. No hubo escrituras de datos, cambios de credenciales/configuración, ni modificaciones de código o despliegue.
 
 **Siguiente paso único:** obtener un contexto KHORA Production autenticado como propietario y con la bóveda desbloqueada; después leer físicamente las 77 partes B2 y verificar cada SHA. Solo entonces ejecutar el POST canónico y su lectura de vuelta. Mantener el índice 317 como impedimento independiente del segundo manifiesto B2. CUSTODIA-01 sigue siendo la única tarea activa.
