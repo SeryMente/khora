@@ -1,8 +1,8 @@
-<!-- LIST_VERSION=0.59; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.60; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
-> **Actualización:** 2026-11-11 · matriz individual por sesión, hueco 317 y clasificación de SHA.
+> **Actualización:** 2026-11-11 · contrato B2/Blob, read-back y derivados MP3 históricos.
 > **Único objetivo activo:** archivar todos los registros históricos que puedan archivarse; dejar pendientes únicamente los que tengan un impedimento actual, concreto y documentado.
 
 **Instrucción literal:** [INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md).  
@@ -18,6 +18,7 @@
 **Evidencia R6:** [BARRERA-RUNTIME-PRODUCTION-IDENTIDAD-Y-SECRETOS-20261111-R6.md](evidencias/BARRERA-RUNTIME-PRODUCTION-IDENTIDAD-Y-SECRETOS-20261111-R6.md).  
 **Evidencia R7:** [MCP-OAUTH-SCOPES-Y-AUSENCIA-DE-ARCHIVO-20261111-R7.md](evidencias/MCP-OAUTH-SCOPES-Y-AUSENCIA-DE-ARCHIVO-20261111-R7.md).  
 **Evidencia R8:** [MATRIZ-RECUPERACION-POR-SESION-20261111-R8.md](evidencias/MATRIZ-RECUPERACION-POR-SESION-20261111-R8.md).  
+**Evidencia R9:** [LOCALIZADORES-READBACK-Y-DERIVADOS-MP3-20261111-R9.md](evidencias/LOCALIZADORES-READBACK-Y-DERIVADOS-MP3-20261111-R9.md).  
 **Instrucción de retoma:** [INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md](originales/INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md).  
 **Estado base:** [ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md](evidencias/ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md).  
 **Diagnóstico previo:** [DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md](evidencias/DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md).
@@ -456,3 +457,30 @@ CUSTODIA-01 permanece EN CURSO. La matriz no declara ningún registro recuperado
 ### Objetivo del siguiente ciclo
 
 Cruzar las 44 sesiones con audio con la implementación de almacenamiento y manifiestos para distinguir qué grupo es materialmente verificable desde el runtime disponible, sin descargar objetos ni usar secretos. Determinar si el marcador B2/Blob permite formar lotes de read-back y si la parte 317 tiene fuente alternativa en los registros autorizados; dejar por separado los 29 checkpoints textuales y el registro sin contenido localizado.
+
+
+## 25. Contrato de localizadores, read-back y derivados MP3 · v0.60 · 2026-11-11
+
+**Evidencia:** [R9 · localizadores y derivados](evidencias/LOCALIZADORES-READBACK-Y-DERIVADOS-MP3-20261111-R9.md).  
+**OCP:** [CUSTODIA-v0.72 · §39](OBJETO-CANONICO.md).  
+**Contrato:** [CUSTODIA-01 · TASK_VERSION 1.6 · §19](./📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20CUSTODIA-01%20-%20Inventario%20forense%20de%20recuperabilidad/README.md).
+
+### Resultado del ciclo
+
+- B2: 785 localizadores en 5 sesiones, host s3.us-east-005.backblazeb2.com, coincidente con la región por defecto del código y KHORA_OBJECT_STORAGE=b2.
+- Blob legacy: 254 localizadores en 39 sesiones; KHORA_LEGACY_BLOB_READS_ENABLED no aparece en Production y el lector falla cerrado.
+- Las claves/ID/bucket B2 figuran como entradas sensibles, pero no se obtuvieron valores ni se validó un objeto.
+- El read-back canónico exige GET, descifrado KHC1 y comprobación de bytes/SHA. La bandera verificado de Neon no ejecuta esas pruebas.
+- El export endpoint de original exige NextAuth, propiedad de sesión y Bóveda desbloqueada; solo exporta una importación audio_archivo de una parte.
+- 43 de 44 sesiones con audio tienen fila dictado_mp3: 18 disponible, 25 fallida. Hay 46 historiales en 19 sesiones; ninguno tiene captura_completa=true.
+- La sesión con el hueco 317 tiene 13 derivados históricos de 146–293 partes; todos incompletos y el estado actual MP3 está fallido con source_parts=293. No se demuestra que esos derivados contengan el índice 317.
+
+### Dictamen y no-acciones
+
+Los localizadores B2 son coherentes, no físicamente verificados. Blob legacy sigue bloqueado por configuración. Los derivados MP3 son evidencia secundaria/potencial para rescate parcial, no los originales ni un sustituto del manifiesto completo. No hubo GET/list, descifrado, exportación, transcripción, generación, escritura, copia, cambio de configuración o acceso local.
+
+CUSTODIA-01 sigue EN CURSO; los 79 Volcados pendientes no cambian y ninguna captura se declara completa o perdida.
+
+### Objetivo del siguiente ciclo
+
+Determinar si hay un camino no interactivo permitido para hacer read-back de B2 y si existe una activación de lectura Blob ya autorizada; en paralelo, evaluar qué significado probatorio tiene el historial MP3 por sesión y qué material secundario podría preservar el proceso de recuperación sin convertirlo en original. No habilitar flags, no ejecutar workers y no cambiar variables.
