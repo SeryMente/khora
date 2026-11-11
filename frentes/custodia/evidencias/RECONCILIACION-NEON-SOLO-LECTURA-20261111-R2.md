@@ -69,6 +69,12 @@ Los cuatro checkpoints vacíos ya coincidentes se clasifican como vacíos, no co
 - `fetchStoredObject()` es una función interna del servidor; no se encontró una ruta pública independiente que permita invocarla con una identidad de propietario autorizada.
 - El preflight B2 conocido verifica autenticación/configuración y la identidad/privacidad del bucket; no descarga los 785 objetos históricos.
 
+### Aclaración de la API auxiliar de ingesta a Neo4j
+
+La revisión ampliada también localizó `api/main.py`, blob `bae368f07159b99c31b6c97f2bde64fb7936e57b`: `POST /api/v1/ingesta` acepta una tupla de procedencia (`volcado_id`, versión y SHA) y envía el objeto al motor de Neo4j mediante `ingestar()`. El middleware valida una cabecera `X-Khora-Key` frente a `KHORA_API_KEY` del servicio. Es autenticación servicio-a-servicio, no identidad de usuario ni creación de un Volcado canónico en Neon.
+
+La envoltura web `khora-web/app/api/ingesta/route.ts`, blob `f8b97837c1308525c0f1b6189c6fbd6dce321746`, exige `auth()`, comprueba un Volcado existente con versión y SHA aprobados y después llama al motor. Ese flujo es ingesta secundaria de un Volcado ya archivado; no restaura un checkpoint ni sustituye `POST /api/dictado`/`guardarDictado()`. No se llamó a ninguno de esos endpoints y no se leyeron los valores de sus claves.
+
 Por tanto, este ciclo **no acredita GET físico ni archivo**. No se creó ni vinculó ningún Volcado. El estado del Blob no se reconsultó en esta consulta.
 
 ## Siguiente secuencia técnica
