@@ -1,8 +1,8 @@
-<!-- LIST_VERSION=0.55; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
+<!-- LIST_VERSION=0.56; LIST_STATUS=PROVISIONAL; NOT_A_CANONICAL_OBJECT=true -->
 # Tareas vigentes · Frente Custodia
 
 > **Estado:** PROVISIONAL · subordinado al [OCP único](OBJETO-CANONICO.md). Esta lista es el índice ejecutivo; no constituye un segundo estado canónico.
-> **Actualización:** 2026-11-11 · verificación del alcance del worker auxiliar y ruta de archivo primario.
+> **Actualización:** 2026-11-11 · contraste de endpoint genérico, escritor canónico y API key de servicio.
 > **Único objetivo activo:** archivar todos los registros históricos que puedan archivarse; dejar pendientes únicamente los que tengan un impedimento actual, concreto y documentado.
 
 **Instrucción literal:** [INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md](originales/INSTRUCCION-ARCHIVO-RECUPERABILIDAD-20261110.md).  
@@ -14,6 +14,7 @@
 **Reconciliación Neon R2 (2026-11-11):** [RECONCILIACION-NEON-SOLO-LECTURA-20261111-R2.md](evidencias/RECONCILIACION-NEON-SOLO-LECTURA-20261111-R2.md).  
 **Evidencia de repetición del ciclo:** [ESTADO-OPERATIVO-BLOQUEOS-20261110.md](evidencias/ESTADO-OPERATIVO-BLOQUEOS-20261110.md).  
 **Evidencia R4:** [RUTA-EJECUCION-SECUNDARIA-NO-ARCHIVADO-20261111-R4.md](evidencias/RUTA-EJECUCION-SECUNDARIA-NO-ARCHIVADO-20261111-R4.md).  
+**Evidencia R5:** [RUTA-ARCHIVO-PRIMARIO-Y-LIMITE-DE-API-SERVICIO-20261111-R5.md](evidencias/RUTA-ARCHIVO-PRIMARIO-Y-LIMITE-DE-API-SERVICIO-20261111-R5.md).  
 **Instrucción de retoma:** [INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md](originales/INSTRUCCION-RETOMA-ULTIMO-TRAMO-20261110.md).  
 **Estado base:** [ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md](evidencias/ESTADO-BASE-ARCHIVO-RECUPERABILIDAD-20261110.md).  
 **Diagnóstico previo:** [DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md](evidencias/DIAGNOSTICO-PANEL-RECUPERACION-CORA-CUSTODIA-01-20261110.md).
@@ -351,3 +352,26 @@ El worker es optativo, no se inicia por build/instalación y la documentación d
 ### Objetivo del siguiente ciclo
 
 Encontrar un contexto de ejecución primario autorizado que conserve la identidad del propietario y permita usar la ruta canónica de archivo, cifrado y read-back físico. Si no existe, dejar cada residual bloqueado de forma individualizada, sin afirmar pérdida ni cerrar anticipadamente.
+
+
+## 21. Límite de API genérica y ausencia de archivador con identidad de servicio · v0.56 · 2026-11-11
+
+**Evidencia:** [R5 · ruta primaria/API de servicio](evidencias/RUTA-ARCHIVO-PRIMARIO-Y-LIMITE-DE-API-SERVICIO-20261111-R5.md).  
+**OCP vigente:** [CUSTODIA-v0.68 · §35](OBJETO-CANONICO.md).  
+**Contrato:** [CUSTODIA-01 · TASK_VERSION 1.2 · §15](./📁%20🧭%20-%20Tareas%20provisionales/📁%20🧩%20-%20CUSTODIA-01%20-%20Inventario%20forense%20de%20recuperabilidad/README.md).
+
+### Hallazgo
+
+Se localizó `POST /api/volcado`, pero solo archiva texto genérico bajo NextAuth y no recibe sessionId/revisionId/manifiesto ni enlaza la sesión fuente. Cada llamada genera un ID distinto. No es idempotente ni trazable para los checkpoints pendientes.
+
+La clave `KHORA_API_KEY`/ `X-Khora-Key` autoriza el puente FastAPI para ingesta secundaria en Neo4j usando un Volcado/version/SHA preexistentes. No crea Volcados en Neon ni demuestra titularidad de sesión. El envoltorio web de ingesta también exige NextAuth.
+
+### Dictamen operativo
+
+No hay un endpoint de servicio identificado que archive checkpoints huérfanos mediante el contrato canónico. La única ruta primaria correcta sigue siendo `POST /api/dictado` con identidad NextAuth, `reclamarSesion()` y `guardarDictado()`. No se llamó a ninguna ruta, no se ejecutaron reparadores mutativos y no hubo escrituras, lecturas físicas de almacenamiento ni cambios productivos.
+
+CUSTODIA-01 continúa EN CURSO. Inventario sin cambio: 95 atribuibles; 16 enlazadas excluidas; 79 pendientes; 1.039 partes de audio; 29 checkpoints textuales potencialmente significativos; 216 fragmentos locales preservados sin acceso por el canal excluido.
+
+### Objetivo del siguiente ciclo
+
+Determinar si el runtime Production expone una identidad de titular utilizable por un canal de ejecución no interactivo y una vía server-side aprobada para obtener KHC1/almacenamiento sin revelar secretos. Si no existe ese canal, cerrar el diagnóstico de acceso y mantener las unidades residuales individualizadas, sin crear credenciales ni modificar Production.
