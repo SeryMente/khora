@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.74; OBJECT_SEAL=CUSTODIA-v0.74; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.75; OBJECT_SEAL=CUSTODIA-v0.75; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.74. Metacanon: 1.29.
+> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01 ÚNICA TAREA ACTIVA · ARCHIVO DE TODOS LOS REGISTROS QUE PUEDAN ARCHIVARSE · SOLO RESIDUALES CON BLOQUEO ACTUAL DOCUMENTADO · SIN AUDITORÍA GENERAL DE RESILIENCIA NI REPARACIÓN GENERAL.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.75. Metacanon: 1.29.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -1755,3 +1755,16 @@ No se ejecutó ejecutarReconciliacionForense(DRY_RUN|APPLY). Su inicialización 
 Se identificó el mecanismo temporal y el flujo autenticado de importación; no se halló un recibo durable SQL que resuelva el localizador de la carga fallida 317. No se puede afirmar existencia ni ausencia física del staging sin una vía de lectura autorizada. La discrepancia 216/993 queda abierta. CUSTODIA-01 continúa EN CURSO; no cambian las 79 sesiones sin Volcado, las 1.039 partes por metadata ni los 29 checkpoints textuales significativos.
 
 **No-acciones:** cero endpoints de carga/importación ejecutados; cero GET/list/descifrado B2/Blob; cero escrituras de negocio, cambios de Production o secretos; cero acceso a monitor, Chrome local, RDC o IndexedDB.
+## 42. Resultado operativo con límite de tres ciclos · 2026-11-11
+
+**Evidencia de cierre:** [Resultado operativo de CUSTODIA · tres ciclos](evidencias/CIERRE-OPERATIVO-CUSTODIA-3-CICLOS-20261111.md). Git blob `9eb88bb1ad2c0556be2b3b6d062139f8e844f586`.
+
+Se recuperó la autorización explícita CUSTODIA-ARCHIVE-AUTH-20261110: checkpoints, read-back B2, 216 fragmentos de dos sesiones, lectura Blob cuando el proveedor lo permita y creación/vínculo idempotente de Volcados en Neon Production; sin borrar/sobrescribir originales ni atribuir otros titulares. La exclusión posterior de monitor, Chrome local, IndexedDB y RDC se respeta.
+
+SELECT agregado actualizado con predicado completo: 95 sesiones atribuibles, 16 vinculadas excluidas y 79 pendientes; 44 con audio/1.039 partes (785 B2, 254 Blob).
+
+El último deployment Production `f0224c1368fb15a3452335a44305c6efa85eef79` registró preflight B2 nativo PASS (auth, Master Key, bucket identity, privacidad y SSE-B2). Blob store continúa `limits-exceeded-suspended` / `billingState=suspended` / cuota excedida. No se hizo GET/list físico.
+
+La ejecución de archivo permanece bloqueada: los endpoints canónicos `/api/dictado`, `/api/dictado/checkpoint` y Vault Agent requieren NextAuth del propietario; MCP normativo sigue desactivado y no hay scope/escritor de servicio CUSTODIA. Vercel no entrega `X_KHORA_KEY` ni `DATABASE_URL` descifrados desde el conector. `guardarDictado()` no se sustituyó por SQL directo ni se falsificó actor.
+
+**Cierre de tres ciclos:** ciclo 1 recuperó instrucciones; ciclo 2 revalidó Production y las vías de ejecución; ciclo 3 consolidó residuales. El límite operativo de tres ciclos queda satisfecho, pero CUSTODIA-01 permanece técnicamente EN CURSO: no se creó ningún Volcado nuevo ni se marcó ninguna sesión como recuperada/perdida. Los 79 pendientes quedan clasificados por bloqueo. Sin escrituras de negocio, GET/list B2/Blob, cambios de Production/secretos/deploy ni acceso local.
