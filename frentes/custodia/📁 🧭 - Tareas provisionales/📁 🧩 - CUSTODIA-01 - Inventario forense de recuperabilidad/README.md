@@ -1,4 +1,4 @@
-<!-- TASK_VERSION=1.3; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
+<!-- TASK_VERSION=1.4; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
 # CUSTODIA-01 · Archivo de todos los registros recuperables
 
 > **Estado:** EN CURSO · **Prioridad:** P0 · **Único expediente activo del frente CUSTODIA.**  
@@ -335,3 +335,40 @@ El inventario permanece en 95 sesiones atribuibles, 16 enlazadas excluidas, 79 s
 ### Compuerta siguiente
 
 Revisar mecanismos de identidad/ejecución server-side ya documentados por KHORA/EP para determinar si alguno proporciona titularidad verificable en runtime productivo. No crear ni activar credenciales o rutas por inferencia. Si no existe, cerrar el diagnóstico de acceso y mantener los residuales individualizados, bloqueados por causa concreta.
+
+
+## 17. OAuth/MCP no aporta identidad de servicio ni permiso de archivo CUSTODIA · 2026-11-11
+
+**Evidencia:** [R7 · contratos OAuth/MCP](../../evidencias/MCP-OAUTH-SCOPES-Y-AUSENCIA-DE-ARCHIVO-20261111-R7.md).  
+**OCP:** §37 / CUSTODIA-v0.70.  
+**Lista:** §23 / LIST_VERSION 0.58.
+
+### Objetivo del ciclo
+
+Comprobar si los mecanismos OAuth/MCP existentes permiten ejecutar archivo CUSTODIA como titular o mediante un actor delegado, sin reutilizar la interfaz local.
+
+### Tareas ejecutadas
+
+1. Revisar la matriz activa de herramientas/scopes MCP.
+2. Contrastar los handlers de lectura de Volcados con los escritores de archivo.
+3. Revisar la base de datos utilizada por MCP en Production.
+4. Examinar emisión de tokens manuales y flujo OAuth Authorization Code/PKCE.
+5. Confirmar la separación entre propuestas históricas y permisos implementados.
+
+### Resultado
+
+El contrato vigente expone 24 herramientas. Los scopes son lectura de Volcados/runtime, ciclo normativo y Jules read/write. No hay herramientas ni scopes de escritura CUSTODIA, volcados:write o dictado:write. Las herramientas de Volcados utilizan getMcpReadOnlyDb(); en Production, KHORA_READONLY_DATABASE_URL es obligatoria.
+
+Los scopes custodia:metadata:read y custodia:integrity:verify solo aparecen en documentación histórica/propuestas, no en el contrato productivo activo. La emisión de OAuth y tokens manuales requiere sesión NextAuth del actor; el token queda ligado a ese sujeto y no lo convierte en una identidad de servicio.
+
+MCP normativo permanece DESACTIVADO. La inspección fue estática: no se llamó al servidor MCP/OAuth, no se creó ni consultó un token y no se accedió a cookies/sesiones.
+
+### Dictamen y no-acciones
+
+No existe en el contrato vigente una herramienta de archivo primario que cree y enlace un Volcado desde un checkpoint huérfano. Tampoco existe actor no interactivo acreditado. La ruta canónica continúa siendo POST /api/dictado, con NextAuth del titular, reclamarSesion() y guardarDictado().
+
+No hubo escrituras de negocio, Volcados nuevos, lecturas físicas B2/Blob, cambios de scopes, código de producto, configuración o deployment. No se usaron monitor, Chrome local ni RDC. El inventario permanece: 95 sesiones atribuibles, 16 enlazadas excluidas, 79 sin Volcado, 1.039 partes de audio por metadata, 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados. CUSTODIA-01 sigue EN CURSO.
+
+### Compuerta siguiente
+
+Individualizar las 79 sesiones pendientes según la evidencia ya disponible y el bloqueo específico: titularidad/procedencia, checkpoint/manifest, clave KHC1, objeto B2/Blob y verificación física, o contenido fuente. Solo se considerarán ejecutables las unidades con identidad y contenido demostrables y un canal de ejecución autorizado; no se completarán vacíos mediante inferencias.
