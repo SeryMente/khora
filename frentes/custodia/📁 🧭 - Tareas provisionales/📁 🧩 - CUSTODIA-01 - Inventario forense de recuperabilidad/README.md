@@ -1,4 +1,4 @@
-<!-- TASK_VERSION=1.6; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
+<!-- TASK_VERSION=1.7; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
 # CUSTODIA-01 · Archivo de todos los registros recuperables
 
 > **Estado:** EN CURSO · **Prioridad:** P0 · **Único expediente activo del frente CUSTODIA.**  
@@ -449,3 +449,38 @@ No hubo GET/list B2, GET Blob, descifrado, exportación, transcripción, generac
 ### Compuerta siguiente
 
 Buscar una vía existente y autorizada para read-back físico B2 en un runtime de servidor; no crear una ruta de servicio o token. Revisar cómo preservar derivados MP3 si su disponibilidad puede verificarse posteriormente, sin etiquetarlos como originales. Para Blob legacy, solo avanzar si existe una habilitación ya autorizada; no cambiar el flag ni generar credenciales.
+
+
+## 20. Rutas de read-back existentes y compuerta normativa MCP · 2026-11-11
+
+**Evidencia:** [R10 · lectores server-side y compuerta](../../evidencias/RUTAS-READONLY-Y-COMPUERTA-MCP-20261111-R10.md).  
+**OCP:** §40 / CUSTODIA-v0.73.  
+**Lista:** §26 / LIST_VERSION 0.61.
+
+### Objetivo del ciclo
+
+Encontrar lectores server-side ya implementados capaces de verificar físicamente partes originales de sesiones sin Volcado, sin introducir un actor delegado ni eludir controles de NextAuth.
+
+### Tareas ejecutadas
+
+1. Rastrear todos los llamadores de leerBlobVerificado() y fetchStoredObject().
+2. Revisar herramientas MCP, scopes y compuerta normativa.
+3. Revisar REST de audio original/parte, MP3, exportación y diálogo.
+4. Diferenciar los lectores de las rutas que generan/transcriben derivados.
+5. Registrar qué capacidad existe y por qué no se invoca en el contexto actual.
+
+### Resultado
+
+Se encontró khora_leer_audio, que acepta sessionId incluso sin Volcado, filtra usando el actor propietario del token y hace read-back real a través de leerBlobVerificado: GET, descifrado KHC1 y comparación de tamaño/SHA de bytes claros. Usa el scope activo volcados:read, base de datos read-only y devuelve bytes Base64 por bloques de hasta 262.144. Las herramientas MCP sustantivas exigen turno normativo.
+
+Esta es la ruta existente más directa para verificar originales pendientes sin crear Volcados. No se invocó porque MCP normativo permanece DESACTIVADO, no hay token bearer del titular disponible en este canal y no se emite un token por inferencia. El lector no escribe datos.
+
+Las rutas REST de audio original/parte requieren NextAuth, Bóveda desbloqueada y Volcado existente. GET de diálogo puede leer pistas de una sesión mediante NextAuth/propietario, pero devuelve audio y se limita a fuente dialogo. GET MP3 permite sessionId con propietario y Bóveda, pero solo recupera derivados. POST MP3 genera/escribe derivados y no se usó. Ninguna proporciona una identidad titular no interactiva.
+
+### No-acciones y estado
+
+No se invocó MCP ni REST, no se obtuvo/consumió token, no se abrió turno normativo, no hubo GET físico, descifrado, transcripción o generación MP3. No se usaron monitor, Chrome local, RDC o IndexedDB. El inventario permanece en 79 sesiones sin Volcado, 1.039 partes por metadata, 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados. CUSTODIA-01 continúa EN CURSO.
+
+### Compuerta siguiente
+
+Inspeccionar exclusivamente fuentes alternativas server-side de la parte 317 y registros de carga de los 216 fragmentos locales: tablas de staging, manifiestos, sesiones de importación o recibos. No leer el sistema de archivos local ni IndexedDB, no acceder al navegador y no hacer GET de objetos en este ciclo. Solo identificar si existe un registro/copia persistida de origen con vínculo demostrable.
