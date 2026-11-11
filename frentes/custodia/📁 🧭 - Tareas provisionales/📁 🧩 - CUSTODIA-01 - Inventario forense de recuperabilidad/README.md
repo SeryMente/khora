@@ -1,4 +1,4 @@
-<!-- TASK_VERSION=1.1; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
+<!-- TASK_VERSION=1.2; TASK_STATUS=ACTIVE; PARENT=CUSTODIA-01; NOT_INDEPENDENT_CONTROL=true -->
 # CUSTODIA-01 · Archivo de todos los registros recuperables
 
 > **Estado:** EN CURSO · **Prioridad:** P0 · **Único expediente activo del frente CUSTODIA.**  
@@ -263,3 +263,38 @@ La documentación declara que el worker no se arranca con build/instalación y q
 CUSTODIA-01 sigue EN CURSO. El inventario R3 permanece: 95 sesiones atribuibles, 16 enlazadas, 79 sin Volcado, 1.039 metadatos de partes de audio, 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados. No hubo Volcados nuevos, lecturas físicas B2/Blob ni escrituras productivas. Tampoco hubo acceso a monitor, Chrome local o RDC.
 
 El siguiente paso requiere un contexto de ejecución de archivo primario formalmente autorizado, con clave KHC1, credenciales de almacenamiento necesarias y acreditación del titular. Si ese contexto no está disponible, no se fuerza la ejecución ni se marca como completado el registro.
+
+
+## 15. Ruta de archivo primario y credencial de servicio · 2026-11-11
+
+**Evidencia:** [R5 · archivo primario/API de servicio](../../evidencias/RUTA-ARCHIVO-PRIMARIO-Y-LIMITE-DE-API-SERVICIO-20261111-R5.md).  
+**OCP:** §35 / CUSTODIA-v0.68.  
+**Lista:** §21 / LIST_VERSION 0.56.
+
+### Objetivo del ciclo
+
+Encontrar una ruta de servicio distinta de NextAuth que cree un Volcado canónico desde un checkpoint huérfano conservando titularidad, cifrado, manifiesto, vínculo e idempotencia.
+
+### Tareas ejecutadas
+
+1. Rastrear los llamadores de `guardarDictado()` y `archivarVolcado()`.
+2. Revisar `POST /api/volcado` y el contrato de identidad que utiliza.
+3. Revisar las rutas de checkpoint/recuperación y distinguirlas de la creación de Volcado.
+4. Revisar `KHORA_API_KEY`/ `X-Khora-Key`, `/api/v1/ingesta`, `/api/ingesta` y los scripts de reparación.
+5. Registrar evidencia y lectura de vuelta sin ejecutar operaciones de negocio.
+
+### Resultado
+
+`POST /api/dictado` continúa siendo el único escritor canónico enlazado a sesión y exige NextAuth, `reclamarSesion()` y `guardarDictado()`. `POST /api/volcado` puede crear texto cifrado, pero no acepta ni vincula sessionId/revisionId/manifiesto y genera un ID nuevo por llamada; no se utiliza para las sesiones CUSTODIA porque perdería trazabilidad y permitiría duplicados.
+
+La API key del puente FastAPI solo permite la ingesta secundaria en Neo4j de un Volcado/version/SHA ya existentes. No crea el Volcado primario en Neon ni demuestra identidad del propietario. El endpoint de checkpoint y recuperación sigue bajo NextAuth y no crea Volcados.
+
+### No-acciones y estado
+
+No se llamó a ningún endpoint, script reparador o worker. No hubo secretos/plaintxt leídos, escrituras, Volcados nuevos, GET B2/Blob, cambios de código/configuración/Production, merge o deployment. No se usó monitor, Chrome local ni RDC.
+
+El inventario no cambia: 95 sesiones atribuibles, 16 enlazadas excluidas, 79 sin Volcado, 1.039 partes de audio por metadata, 29 checkpoints textuales potencialmente significativos y 216 fragmentos locales preservados. CUSTODIA-01 permanece EN CURSO.
+
+### Compuerta siguiente
+
+Comprobar si el runtime Production dispone de identidad de titular y acceso server-side aprobado a KHC1/almacenamiento desde un canal no interactivo. No crear una credencial, token o ruta de servicio nueva por inferencia; no exponer secretos al chat; no utilizar el rol Neon como identidad de usuario. Si esa ruta no existe, conservar el bloqueo individualizado.
