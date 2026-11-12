@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.30; OBJECT_VERSION=0.1.1; OBJECT_SEAL=NOTAS-RAPIDAS-v0.1.1; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.30; OBJECT_VERSION=0.1.2; OBJECT_SEAL=NOTAS-RAPIDAS-v0.1.2; SINGLE_LIVE_OBJECT=true -->
 # Notas rápidas de Khora · Objeto canónico de persistencia del frente
 
-> **ESTADO · APERTURA DOCUMENTAL · CONTROL SIN TITULAR · GENERACIÓN 0 · COMPONENTE NO DESARROLLADO.** Este documento es la única fuente viva del frente. La versión 0.1.1 corresponde al OCP, no al producto.
+> **ESTADO · FRENTE ACTIVO · CONTROL ASIGNADO · GENERACIÓN 1 · COMPONENTE NO DESARROLLADO.** Este documento es la única fuente viva del frente. La versión 0.1.2 corresponde al OCP, no al producto.
 
 ## 1. Control e identidad
 
@@ -10,9 +10,9 @@
 - **Repositorio:** `SeryMente/khora`, rama `main`.
 - **OCP:** `frentes/notas-rapidas/`.
 - **Núcleo único:** este `OBJETO-CANONICO.md`.
-- **Versión documental:** `0.1.1` · sello `NOTAS-RAPIDAS-v0.1.1`.
-- **Control:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json), `status=unassigned`, generación `0`, sin titular ni sesión activa.
-- **Folio SES:** pendiente de adjudicación por la primera conversación responsable. **FOL1:** PREPARADO, NO ACTIVO; folios globales CONV/CICLO/A/B pendientes y no asignados.
+- **Versión documental:** `0.1.2` · sello `NOTAS-RAPIDAS-v0.1.2`.
+- **Control:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json), `status=assigned`, generación `1`; alias `chatgpt-notas-rapidas-SES-20261112-4FB90722`.
+- **Folio SES activo:** `SES-20261112-4FB90722`. UUIDv7 local `01a1d0da-eebf-77de-ac25-06055602c6c2`; ID nativo no expuesto (`owner_thread=null`). **FOL1:** PREPARADO, NO ACTIVO; folios globales CONV/CICLO/A/B pendientes y no asignados.
 - **Evento de apertura documental:** `01a1d0ca-d1da-75ec-a98d-af5a96f070d1`, UUIDv7 local generado para este evento; no es ID nativo de plataforma.
 - **Origen:** instrucción directa del operador del 2026-11-12, preservada en [originales/INSTRUCCION-ORIGINAL-20261112.md](originales/INSTRUCCION-ORIGINAL-20261112.md).
 
@@ -38,7 +38,7 @@ Fuente canónica: [`SeryMente/metodologia/main`](https://github.com/SeryMente/me
 - **DUG:** Samantha v389 · NX-389m.
 - **Metacanon:** 1.30 según `INICIO.md` y metadatos estructurados del DUG.
 - **GOW:** 2.19; §ARR leído para esta apertura.
-- **Revisión `main` adquirida:** `491d6c424cd49ab48c3d7cc8f4ff67e2df145242`.
+- **Revisión `main` consultada en este ciclo:** `85b6fb48b5db03d3dfe27d10fa30b6d644f536a0`; DUG e INICIO mantienen los blobs declarados arriba.
 - **Blob del DUG:** `bcd99e72113f444a045d7f1c91b4ad36865b8ea8`.
 - **Blob de `INICIO.md`:** `f4a9b576d43380c57065c46b1f723c89ea67eb7b`.
 - **Discrepancia textual observada:** el bloque inicial del texto humano de Metacanon conserva una referencia a 1.29, mientras `INICIO.md` y el metadato estructurado señalan 1.30. Se conserva el dato y se deja la divergencia registrada, sin modificar el DUG.
@@ -86,12 +86,12 @@ Estos puntos son **pendientes de definición**, no funcionalidades aprobadas ni 
 - **Operador:** propietario del propósito, decisiones de producto, autorización de cambios materiales y aceptación final.
 - **Asistente previsto por el marco:** Claudia; coordina, mantiene el OCP, controla alcance, evidencia y continuidad.
 - **Constructor previsto por el marco:** Samantha; investiga y ejecuta las unidades técnicas aprobadas, entrega diff/pruebas/checkpoint al asistente.
-- **Estado de instancias:** aún no adjudicadas. El control permanece `unassigned`; los nombres de rol no equivalen a titularidad ni ID de plataforma.
+- **Estado de instancias:** rol asistente (Claudia) adjudicado a esta sesión mediante alias operativo local; rol constructor (Samantha) no instanciado. El alias no es ID nativo ni prueba criptográfica de identidad.
 - Mantener un solo escritor del OCP por vez. El constructor no usa RDC; su uso está reservado al asistente cuando sea estrictamente necesario, autorizado y verificable.
 
 ## 6. Autoridad
 
-La instrucción del operador autoriza inaugurar este frente, conservar el propósito y preparar su continuidad documental en KHORA. En este ciclo el alcance ejecutado es únicamente documental.
+La instrucción original autorizó la apertura documental. La instrucción directa posterior del operador —«Asue responsabilidad d efrente de trabajo Notas Rapidas de Khora»— autoriza a esta sesión a asumir la responsabilidad operativa exclusiva del frente y registrar la adjudicación. No amplía las compuertas técnicas: no autoriza cambios de código, esquema/datos, credenciales, seguridad, proveedores, despliegue ni producción.
 
 El objetivo general del frente es desarrollar Notas rápidas. La definición funcional detallada, los criterios de aceptación y las decisiones de arquitectura siguen pendientes de ratificación. No convertir propuestas del asistente/constructor en requisitos aprobados. Los cambios de producto, datos, seguridad, secretos, servicios externos y Production quedan sujetos a sus autorizaciones y compuertas específicas.
 
@@ -105,7 +105,7 @@ El objetivo general del frente es desarrollar Notas rápidas. La definición fun
 
 ## 8. Estado vivo
 
-**Acción actual:** OCP documental creado y enlazado desde el README raíz. Control inicial sin titular. Producto y código sin modificar.
+**Acción actual:** responsabilidad del frente adjudicada y verificada en `main`, generación `1`; OCP actualizado a v0.1.2. Producto y código siguen sin modificar y el comportamiento funcional permanece pendiente.
 
 **Siguiente paso de la conversación de trabajo:**
 
@@ -132,6 +132,8 @@ Aplicar el formato obligatorio de Metacanon §4 en cada ciclo sustantivo: identi
 
 - [Instrucción original del operador](originales/INSTRUCCION-ORIGINAL-20261112.md).
 - [Crónica de apertura](cronica/INICIO-20261112.md).
+- [Instrucción de asunción](originales/INSTRUCCION-ASUNCION-20261112.md).
+- [Crónica de asunción](cronica/ASUNCION-SES-20261112-4FB90722.md).
 - [Salida visible de apertura](originales/SALIDA-MODELO-20261112.md), incorporada y leída de vuelta en el cierre documental de la publicación.
 - Fuentes de gobierno: `SeryMente/metodologia/main`, DUG v389/NX-389m, Metacanon 1.30, GOW 2.19; revisiones y discrepancia documentadas en §3.
 - Fuentes de producto: `SeryMente/khora` en `main`; corte base `7781939197333efe98aea35c0fe05c7eb31dd7fb`.
@@ -141,12 +143,23 @@ Aplicar el formato obligatorio de Metacanon §4 en cada ciclo sustantivo: identi
 
 - Entrada de la nueva conversación: [prompt de asistente](prompts/ASISTENTE.md).
 - Encargo del rol constructor: [prompt de constructor](prompts/CONSTRUCTOR.md).
-- Estado inicial de control: `unassigned`, generación 0, sin titular, sin folio SES.
-- La conversación nueva comprobará el control vigente y se adjudicará por primera vez solo si sigue libre, con el procedimiento de Metacanon §§42 y 47, folio SES y UUIDv7 local propios. No reutilizar identificadores de otros frentes.
+- Control actual: `assigned`, generación 1; alias operativo `chatgpt-notas-rapidas-SES-20261112-4FB90722`; folio SES `SES-20261112-4FB90722`; UUIDv7 local `01a1d0da-eebf-77de-ac25-06055602c6c2`; `owner_thread=null`.
+- La siguiente sesión debe leer el control, respetar la titularidad activa y aplicar Metacanon §§42 y 47 ante cualquier relevo o corresponsabilidad. No reutilizar identificadores de otros frentes.
 - No hay una salida previa de Notas rápidas anterior a esta apertura. La salida visible de esta apertura se conserva en el archivo enlazado en §11 para que la siguiente conversación la recupere literalmente.
 
 ## 13. Persistencia y revisión
 
 Este directorio es el OCP único de Notas rápidas. El presente archivo es la única fuente viva; `README.md` solo facilita entrada y navegación. El control de responsabilidad es único. Originales, prompts y crónica son materiales de procedencia/continuidad, no fuentes paralelas de estado.
 
-Cada ciclo sustantivo debe actualizar este OCP, su crónica y los originales/salidas pertinentes; persistir cambios en GitHub, releerlos y cotejar rutas, SHA y contenido. No declarar sincronización por el mero hecho de escribir. No crear carpetas vacías ni duplicar tableros o controles.
+Cada ciclo sustantivo debe actualizar este OCP, su crónica y los originales/salidas pertinentes; persistir cambios en GitHub, releerlos y cotejar rutas, SHA y contenido. La adjudicación de generación 1 quedó verificada: commit del control `a3fd045c26b9682530c3d584249a6e9e7acf8751`, blob leído de vuelta `25ebd49b93e5b098d24e13cd0350b002274ebee2`. No declarar sincronización por el mero hecho de escribir. No crear carpetas vacías ni duplicar tableros o controles.
+
+
+## 14. Adjudicación de responsabilidad · generación 1 · 2026-11-12
+
+El operador instruyó expresamente asumir este frente. La sesión quedó registrada con alias operativo `chatgpt-notas-rapidas-SES-20261112-4FB90722`, UUIDv7 local `01a1d0da-eebf-77de-ac25-06055602c6c2` y folio `SES-20261112-4FB90722`. El ID nativo de conversación no fue expuesto. Se preservó el estado anterior `unassigned`, generación 0; la actualización del control se condicionó al blob observado y pasó a generación 1.
+
+La búsqueda exacta del prefijo diario en los repositorios de SeryMente expuestos devolvió cero coincidencias; la unicidad global permanece NO VERIFICADA. FOL1 está PREPARADO/NO ACTIVO, por lo que no se emiten folios globales CONV/CICLO/A/B.
+
+La instrucción, la lectura normalizada y la procedencia se conservan en [INSTRUCCION-ASUNCION-20261112.md](originales/INSTRUCCION-ASUNCION-20261112.md); la evidencia de la operación y el checkpoint están en [ASUNCION-SES-20261112-4FB90722.md](cronica/ASUNCION-SES-20261112-4FB90722.md).
+
+La asunción no implica desarrollo del producto. Siguiente trabajo: inspección en lectura de la arquitectura de KHORA y especificación funcional mínima con criterios observables, antes de modificar código.
