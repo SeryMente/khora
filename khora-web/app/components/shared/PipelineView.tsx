@@ -4,7 +4,7 @@
 import { useState } from "react";
 import * as Icons from "lucide-react";
 
-export function renderAudioStatusBadge(status: string) {
+export function renderAudioStatusBadge(status: string, explanation?: string | null) {
   switch (status) {
     case "disponible":
       return (
@@ -31,6 +31,18 @@ export function renderAudioStatusBadge(status: string) {
           🟠 Audio incompleto
         </span>
       );
+    case "no_localizado": {
+      const reason = explanation || "No se localizó un original de audio asociado en las fuentes consultadas. Procedencia del texto: no verificada. El texto se conserva sin atribuirle una fuente.";
+      return (
+        <span
+          className="text-zinc-300 font-semibold text-[10px] flex items-center gap-1"
+          title={reason}
+          aria-label={`Audio no localizado. ${reason}`}
+        >
+          ⚪ Audio no localizado
+        </span>
+      );
+    }
     case "no_aplica":
       return (
         <span className="text-sky-400 font-semibold text-[10px] flex items-center gap-1">
@@ -119,10 +131,12 @@ export function PipelineView({
   state,
   actions = {},
   isReviewMode = false,
+  title = "Custodia",
 }: {
   state: PipelineViewState;
   actions?: PipelineViewActions;
   isReviewMode?: boolean;
+  title?: string;
 }) {
   const {
     pipelineItems,
@@ -219,7 +233,7 @@ export function PipelineView({
               strokeWidth={1.75}
               style={{ color: "var(--khora-accent)" }}
             />
-            Custodia
+            {title}
           </h1>
           <p className="text-sm mt-1" style={{ color: "var(--khora-accent)" }}>
             Lectura cómoda, sincronización audio ↔ texto, corrección lingüística
@@ -414,7 +428,7 @@ export function PipelineView({
                       </span>
                     </div>
                     <div className="flex justify-between items-center text-[10px] font-mono">
-                      {renderAudioStatusBadge(item.audio_status)}
+                      {renderAudioStatusBadge(item.audio_status, item.audio_explanation)}
                       <span className="opacity-60">
                         {new Date(item.recibido_en).toLocaleDateString()}
                       </span>
@@ -546,6 +560,19 @@ export function PipelineView({
 
                 {drawerSubTab === "cockpit" ? (
                   <div className="flex-1 space-y-6">
+                    {selectedItem.audio_status === "no_localizado" && (
+                      <div
+                        data-ui-id="revision.audio-no-localizado"
+                        role="note"
+                        className="p-3 border border-zinc-700 bg-zinc-900/50 text-xs font-mono space-y-1"
+                      >
+                        <div className="font-bold text-zinc-200">Audio no localizado</div>
+                        <p className="text-zinc-300">
+                          {selectedItem.audio_explanation || "No se localizó un original de audio asociado en las fuentes consultadas. Procedencia del texto: no verificada. El texto se conserva sin atribuirle una fuente."}
+                        </p>
+                      </div>
+                    )}
+
                     {/* Audio Incident Banner */}
                     {(selectedItem.audio_status === "no_recuperable" ||
                       selectedItem.audio_status === "encontrado_no_vinculado" ||
@@ -726,7 +753,8 @@ export function PipelineView({
                       </div>
                     </div>
 
-                    {/* Audio Player Bar */}
+                    {/* Audio Player Bar: no render player controls without an audio source */}
+                    {selectedItem.audio_status !== "no_localizado" && (
                     <div
                       data-ui-id="revision.audio-player"
                       className="p-3 border bg-zinc-900 border-zinc-800 space-y-2"
@@ -737,7 +765,7 @@ export function PipelineView({
                           (Parte {currentPartIndex} /{" "}
                           {manifiestoPartes.length || 1})
                         </span>
-                        {renderAudioStatusBadge(selectedItem.audio_status)}
+                        {renderAudioStatusBadge(selectedItem.audio_status, selectedItem.audio_explanation)}
                       </div>
 
                       {manifiestoPartes.some((part: any) => part.storage_provider === "vercel_blob_legacy") && (
@@ -854,6 +882,7 @@ export function PipelineView({
                         </div>
                       )}
                     </div>
+                    )}
 
                     {/* Authoritative Approval Section */}
                     <div
