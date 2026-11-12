@@ -114,6 +114,71 @@ test("alias histórico conserva identificador y versión", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Custodia", exact: true })).toBeVisible();
 });
 
+
+test("Archivo: muestra sin audio localizado con procedencia no verificada y sin reproductor", async ({ page }) => {
+  const explanation = "No se localizó un original de audio asociado en las fuentes consultadas. Procedencia del texto: no verificada. El texto se conserva sin atribuirle una fuente.";
+  await page.route("**/api/**", async route => {
+    const req = route.request();
+    const url = new URL(req.url());
+    const p = url.pathname;
+    if (p === "/api/auth/session") {
+      return route.fulfill({ json: { user: { email: "test@example.com", name: "Test" }, expires: "2099-01-01T00:00:00Z" } });
+    }
+    if (p === "/api/volcados/pipeline") {
+      return route.fulfill({ json: {
+        total: 1,
+        counts: { en_revision: 1 },
+        integrity: { text_without_audio: 1, sync: 0 },
+        volcados: [{
+          id: "transcript-without-audio",
+          folio: 42,
+          titulo: "Transcripción recuperada",
+          estado: "en_revision",
+          recibido_en: "2026-11-12T12:00:00Z",
+          chars: 18257,
+          audio_expected: true,
+          audio_status: "no_localizado",
+          estado_transcripcion: "audio_no_localizado_procedencia_no_verificada",
+          audio_explanation: explanation,
+          audio_url: null,
+          storage_parts: [],
+          storage_summary: { legacy_pending_count: 0, legacy_unavailable_count: 0, b2_count: 0, unknown_count: 0 },
+          integrity: { status: "text_without_audio", flags: ["Audio no localizado; procedencia del texto no verificada"] },
+          transcription: { present: true, chars: 18257, sha256: "a".repeat(64) },
+          partes_count: 0,
+          version_original: 1,
+          version_actual: 1,
+          version_aprobada: null,
+        }],
+      } });
+    }
+    if (p === "/api/versiones") {
+      return route.fulfill({ json: { versiones: [{ version: 1, texto: "Texto íntegro recuperado.", sha256: "a".repeat(64) }] } });
+    }
+    if (p.endsWith("/manifiesto")) {
+      return route.fulfill({ json: { audio_status: "no_localizado", custodia: { ok: false }, bytes_totales: 0, partes: [] } });
+    }
+    if (p.includes("/compuerta")) {
+      return route.fulfill({ json: { canApprove: false, blockers: [], warnings: [], counts: {} } });
+    }
+    if (p.includes("/incidentes")) return route.fulfill({ json: { incidentes: [] } });
+    if (p.includes("/hallazgos")) return route.fulfill({ json: { hallazgos: [] } });
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto("/sistema/ingreso?modo=archivo");
+  await expect(page).toHaveURL(/\\/sistema\\/custodia\\?vista=archivo$/);
+  await expect(page.getByRole("heading", { name: "Archivo", exact: true })).toBeVisible();
+  const card = page.locator('[data-ui-id="pipeline.item-card"]');
+  await expect(card).toContainText("Transcripción recuperada");
+  const badge = card.getByText("⚪ Audio no localizado");
+  await expect(badge).toHaveAttribute("title", explanation);
+  await expect(badge).toHaveAttribute("aria-label", `Audio no localizado. ${explanation}`);
+  await expect(page.locator('[data-ui-id="revision.audio-no-localizado"]')).toContainText(explanation);
+  await expect(page.locator('[data-ui-id="revision.audio-player"]')).toHaveCount(0);
+  await expect(page.locator('[data-ui-id="revision.banner-incidente"]')).toHaveCount(0);
+});
+
 test("servidor real sigue bloqueando audio y PIN sin autorización", async ({ request }) => {
   const manifest = await request.get("/api/audio/synthetic-custodia/manifiesto"); expect(manifest.status()).toBe(423);
   const unlock = await request.post("/api/boveda", { data: { pin: "4826", unlockOnly: true } }); expect(unlock.status()).toBe(401);
