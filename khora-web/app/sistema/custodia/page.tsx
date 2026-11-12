@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   PipelineView,
   PipelineViewState,
@@ -15,6 +16,8 @@ import CustodiaUnlock from "../../components/os/CustodiaUnlock";
 import { AudioVaultLockedError, downloadCustodiaMp3 } from "../../../lib/client/export-audio-mp3";
 
 export default function CustodiaPage({ legacyEditorEntry = false }: { legacyEditorEntry?: boolean } = {}) {
+  const searchParams = useSearchParams();
+  const archiveView = searchParams.get("vista") === "archivo";
   const [pipelineItems, setPipelineItems] = useState<any[]>([]);
   const [resumen, setResumen] = useState<any>(null);
   const [loadingPipeline, setLoadingPipeline] = useState(true);
@@ -641,6 +644,7 @@ export default function CustodiaPage({ legacyEditorEntry = false }: { legacyEdit
         }}
       />}
       <PipelineView
+        title={archiveView ? "Archivo" : "Custodia"}
         state={state}
         actions={{
           onResolveHallazgo: resolveHallazgo,
