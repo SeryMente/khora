@@ -1,4 +1,4 @@
-<!-- METACANON_VERSION=1.30; OBJECT_VERSION=0.1.4; OBJECT_SEAL=NOTAS-v0.1.4; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.30; OBJECT_VERSION=0.1.5; OBJECT_SEAL=NOTAS-v0.1.5; SINGLE_LIVE_OBJECT=true -->
 # Notas de Khora · Objeto canónico de persistencia del frente
 
 > **ESTADO · FRENTE ACTIVO · CONTROL ASIGNADO · GENERACIÓN 1 · COMPONENTE NO DESARROLLADO.** Este documento es la única fuente viva del frente. La versión 0.1.3 corresponde al OCP, no al producto.
@@ -179,3 +179,16 @@ Se trasladó el directorio completo conservando los blobs de los materiales hist
 El repositorio base permanece **SeryMente/khora**. No se renombró el repositorio raíz porque contiene el código y los recursos generales de Khora; cambiar su slug a **notas** equivaldría a renombrar el repositorio del producto completo, no solo este frente. La URL base **https://github.com/SeryMente/khora** permanece vigente.
 
 El cambio de nombre no modifica el alcance funcional, no declara construido el producto y no amplía permisos técnicos. Se conserva el alias de la generación 1 como dato histórico; la responsabilidad actual se registra en el control, generación 2.
+
+## 16. Alcance del registro BMAD/OpenCode/EP y continuidad · 2026-11-12
+
+El archivo [ChatGPT-NOTAS-20261112-1630.md](originales/ChatGPT-NOTAS-20261112-1630.md) se conserva aquí por instrucción expresa del operador. Su tema principal es explorar BMAD, OpenCode, Groq y RDC para el Entorno Persistente; no define requisitos del componente Notas ni modifica el propósito de este frente.
+
+**Separación de alcance:**
+- La discusión sobre instalación y arquitectura de BMAD/OpenCode/Groq/RDC pertenece conceptualmente al OCP general de Entorno Persistente y debe contrastarse allí antes de ejecutar instalaciones o cambios.
+- Este OCP conserva una referencia de continuidad y la conversación recibida, pero no adquiere autoridad sobre la arquitectura general de EP.
+- No se considera aprobada por este registro la instalación de BMAD/OpenCode, la configuración de Groq, el alta de cuentas, cambios de credenciales ni ajustes de RDC.
+- La afirmación previa sobre especificaciones del HP ProDesk se conserva como dato reportado en la conversación, no como inspección técnica revalidada en este ciclo.
+- El alcance funcional de Notas permanece independiente: sigue pendiente de definición con el operador y no debe inferirse de la conversación archivada.
+
+**Siguiente continuidad sugerida:** retomar la evaluación BMAD/OpenCode/Groq/RDC en el OCP canónico de Entorno Persistente; verificar allí arquitectura y autorización vigentes, comprobar de nuevo el equipo mediante RDC si resulta necesario y decidir la siguiente acción concreta antes de instalar. Mantener este enlace como referencia cruzada, sin duplicar el control de EP.
