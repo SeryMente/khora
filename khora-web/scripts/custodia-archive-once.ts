@@ -9,6 +9,7 @@ import { guardarDictado, type AudioParte } from "../lib/server/dictado";
 import { generarTituloDeUltimoRecurso } from "../lib/server/titulos";
 
 const CUTOFF = "2026-11-12T00:00:00.000Z";
+const AUTHORIZED_OWNER = "the.willfreeman@gmail.com";
 const EXPECTED = { sessions: 95, pending: 79, linked: 16, unowned: 87, otherOwners: 6 };
 const EXPECTED_BLOBS = {
   control: "72d441e6bc2a25d15166d22d20c1261eb17d2efe",
@@ -169,7 +170,8 @@ async function assertAuthorization() {
   const recoveryText = recoveryBytes.toString("utf8");
   if (!archiveText.includes("Si tienes las autorizaciones que necesias.")) fail("operator_authorization_literal_missing");
   if (!archiveText.includes("Neon Production") || !archiveText.includes("216 fragmentos")) fail("archive_authorization_scope_missing");
-  if (!recoveryText.includes("ARCHIVAR TODOS LOS REGISTROS") ||
+  if (!recoveryText.includes(AUTHORIZED_OWNER) ||
+      !recoveryText.includes("ARCHIVAR TODOS LOS REGISTROS") ||
       !recoveryText.includes("Audio: No localizado") ||
       !recoveryText.includes("Procedencia: No verificada")) fail("recovery_instruction_scope_missing");
 }
@@ -193,8 +195,8 @@ async function resolveOwner(db: ReturnType<typeof getDb>): Promise<string> {
     ")" +
     " SELECT s.owner_email,s.sessions,s.pending,s.linked,t.active_read,t.active_write" +
     " FROM stats s JOIN token_stats t ON t.usuario=s.owner_email" +
-    " WHERE s.sessions=$1 AND s.pending=$2 AND s.linked=$3 AND t.active_read>0 AND t.active_write=0",
-    [EXPECTED.sessions, EXPECTED.pending, EXPECTED.linked, CUTOFF]
+    " WHERE s.sessions=$1 AND s.pending=$2 AND s.linked=$3 AND t.active_read>0 AND t.active_write=0 AND s.owner_email=$5",
+    [EXPECTED.sessions, EXPECTED.pending, EXPECTED.linked, CUTOFF, AUTHORIZED_OWNER]
   );
   if (ownership.rows.length !== 1) fail("owner_identity_not_unambiguous");
 
@@ -281,9 +283,10 @@ async function verifyWritten(
   parts: AudioParte[],
 ): Promise<boolean> {
   const r = await db.query(
-    "SELECT v.id::text id,v.texto,v.sha256,v.chars,v.usuario,v.session_id," +
+    "SELECT v.id::text id,v.texto,v.sha256,v.chars,v.usuario,v.session_id,v.estado," +
     " v.audio_partes,s.volcado_id::text linked_id,s.estado session_state," +
     " (SELECT count(*)::int FROM public.dictado_audio_parte p WHERE p.session_id=s.session_id) manifest_count," +
+    " (SELECT sha256 FROM public.volcado_version vv WHERE vv.volcado_id=v.id AND vv.version=1 LIMIT 1) version1_sha," +
     " (SELECT count(*)::int FROM public.dictado_audio_parte p WHERE p.session_id=s.session_id AND p.volcado_id=v.id) linked_parts" +
     " FROM public.volcado v JOIN public.dictado_session s ON s.session_id=v.session_id" +
     " WHERE v.id=$1::uuid AND s.session_id=$2",
@@ -297,6 +300,8 @@ async function verifyWritten(
   if (Number(row.chars) !== textValue.length) return false;
   if (row.usuario !== ownerEmail || row.session_id !== sessionId) return false;
   if (row.linked_id !== id || row.session_state !== "complete") return false;
+  if (!["archivado", "pendiente_revision", "en_revision"].includes(String(row.estado))) return false;
+  if (String(row.version1_sha ?? "").trim().toLowerCase() !== sha256(textValue)) return false;
   if (Number(row.manifest_count) !== parts.length || Number(row.linked_parts) !== parts.length) return false;
   const stored = Array.isArray(row.audio_partes) ? row.audio_partes : [];
   return signature(stored) === signature(parts);
@@ -379,7 +384,11 @@ async function main() {
         continue;
       }
 
-      const textValues = [sessionText, revisionText, typeof snapshot?.texto === "string" ? snapshot.texto : null]
+      const snapshotText = typeof snapshot?.texto === "string"
+        ? snapshot.texto + (typeof snapshot.parcial === "string" && snapshot.parcial
+          ? (snapshot.texto ? "\n\n" : "") + snapshot.parcial : "")
+        : null;
+      const textValues = [sessionText, revisionText, snapshotText]
         .filter((value): value is string => value !== null);
       if (!textValues.length) {
         summary.skippedNoCheckpoint++;
@@ -401,6 +410,10 @@ async function main() {
         summary.skippedPartialOrConflict++;
         continue;
       }
+      if (snapshot?.fuenteEntrada === "dialogo") {
+        summary.skippedDialogo++;
+        continue;
+      }
       if (!textValue.trim() && audioRows.length === 0) {
         summary.skippedEmptyText++;
         continue;
@@ -410,6 +423,10 @@ async function main() {
       let audioBytes = 0;
       let source: "texto" | "microfono" | "chrome_live_caption" | "audio_archivo" | null = null;
 
+      if (audioRows.length === 0 && Array.isArray(snapshot?.audioPartes) && snapshot.audioPartes.length > 0) {
+        summary.skippedB2Manifest++;
+        continue;
+      }
       if (audioRows.length > 0) {
         const indices = audioRows.map((p) => Number(p.part_index));
         if (indices.some((value, index) => value !== index + 1) ||
