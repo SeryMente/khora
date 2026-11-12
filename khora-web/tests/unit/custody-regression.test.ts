@@ -449,10 +449,10 @@ test("CUSTODY-09: Ingreso exposes export only for verified imported audio and se
 
 test("CUSTODY-11: transcript network failure must return the verified original locator", () => {
   const importer = readFileSync(resolve(process.cwd(), "lib/client/import-audio-file.ts"), "utf8");
-  const catchStart = importer.indexOf("catch (cause)", importer.indexOf("transcribeStoredSession"));
-  const catchEnd = importer.indexOf("\n  return {", catchStart);
-  assert.ok(catchStart >= 0 && catchEnd > catchStart);
-  const handler = importer.slice(catchStart, catchEnd);
+  const transcriptionStart = importer.indexOf("transcribeStoredSession");
+  const catchMatch = importer.slice(transcriptionStart).match(/catch\s*\(\s*cause\s*\)\s*\{[\s\S]*?return\s*\{[\s\S]*?estadoTranscripcion\s*:\s*["']fallido["'][\s\S]*?\}\s*;\s*\}/);
+  assert.ok(transcriptionStart >= 0 && catchMatch, "transcription catch must preserve original audio metadata");
+  const handler = catchMatch[0];
   assert.ok(handler.includes("audioUrl: stored.audioUrl"));
   assert.ok(handler.includes("verificado: stored.verificado === true"));
   assert.ok(handler.includes('estadoTranscripcion: "fallido"'));
