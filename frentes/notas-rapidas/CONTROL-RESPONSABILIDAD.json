@@ -1,0 +1,32 @@
+{
+  "schema": "responsabilidad-frente/1",
+  "front": "notas-rapidas",
+  "canonical_identity": "KHORA-NOTAS-RAPIDAS",
+  "repository": "SeryMente/khora",
+  "state_object": "frentes/notas-rapidas/OBJETO-CANONICO.md",
+  "status": "unassigned",
+  "owner_thread": null,
+  "owner_alias": null,
+  "owner_alias_type": null,
+  "instance": null,
+  "session_folio": null,
+  "generation": 0,
+  "expiry": null,
+  "authorization_ref": "frentes/notas-rapidas/originales/INSTRUCCION-ORIGINAL-20261112.md",
+  "authorization_event": "KHORA-NOTAS-RAPIDAS-INIT-01a1d0ca-d1da-75ec-a98d-af5a96f070d1",
+  "created_event": {
+    "event_uuidv7_local": "01a1d0ca-d1da-75ec-a98d-af5a96f070d1",
+    "date": "2026-11-12",
+    "source": "Mensaje directo del operador en esta conversación; identificador nativo no expuesto.",
+    "purpose_original_path": "frentes/notas-rapidas/originales/INSTRUCCION-ORIGINAL-20261112.md"
+  },
+  "bootstrap_scope": "Creación y persistencia documental del frente Notas rápidas de Khora. Deja preparado el relevo a una conversación nueva. No asigna titularidad a esta conversación. No implica autorización de cambios de código, esquema/datos, credenciales, seguridad, proveedores, despliegue o producción; esos pasos se resolverán en el frente conforme a sus compuertas y al alcance explícito del operador.",
+  "claim_policy": "La primera conversación que instancie el frente puede adjudicarse si el control continúa exactamente en status=unassigned y generation=0. Registrar folio SES, UUIDv7 local, alias/instancia y autorización procedente; actualizar el mismo control mediante comparación por SHA/generación y exigir lectura de vuelta. Nunca sobrescribir un titular activo. Si el control cambió, releer y aplicar P037 / Metacanon §42.",
+  "folio_collision_check": {
+    "searched_scope": "Comprobación de la ruta OCP exacta y búsqueda GitHub indexada de 'Notas rápidas', 'frentes/notas-rapidas' y términos equivalentes dentro de SeryMente/khora.",
+    "matches_found": 0,
+    "global_uniqueness": "not_verified",
+    "note": "La búsqueda de código no es un inventario exhaustivo de todos los repositorios ni de todos los recursos no indexados."
+  },
+  "enforcement": "cooperative registry; no server fencing of arbitrary writes"
+}
