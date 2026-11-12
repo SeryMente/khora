@@ -10,7 +10,7 @@
 - **Repositorio:** `SeryMente/khora`, rama `main`.
 - **OCP:** `frentes/notas/`.
 - **Núcleo único:** este `OBJETO-CANONICO.md`.
-- **Versión documental:** `0.1.3` · sello `NOTAS-RAPIDAS-v0.1.3`. 
+- **Versión documental:** `0.1.4` · sello `NOTAS-v0.1.4`. 
 - **Control:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json), `status=assigned`, generación `2`; alias `chatgpt-notas-SES-20261112-7B01D71C`.
 - **Folio SES activo:** `SES-20261112-7B01D71C`. UUIDv7 local `01a1d1e4-5a51-7122-8d4e-fa0f7b01d71c`; ID nativo no expuesto (`owner_thread=null`). **FOL1:** PREPARADO, NO ACTIVO; folios globales CONV/CICLO/A/B pendientes y no asignados.
 - **Evento de apertura documental:** `01a1d0ca-d1da-75ec-a98d-af5a96f070d1`, UUIDv7 local generado para este evento; no es ID nativo de plataforma.
@@ -134,11 +134,11 @@ Aplicar el formato obligatorio de Metacanon §4 en cada ciclo sustantivo: identi
 - [Crónica de apertura](cronica/INICIO-20261112.md).
 - [Instrucción de asunción](originales/INSTRUCCION-ASUNCION-20261112.md).
 - [Salida visible de asunción](originales/SALIDA-MODELO-20261112-ASUNCION.md).
-- [Crónica de asunción](cronica/ASUNCION-SES-20261112-7B01D71C.md).
+- [Crónica de asunción](cronica/ASUNCION-SES-20261112-4FB90722.md).
 - [Salida visible de apertura](originales/SALIDA-MODELO-20261112.md), incorporada y leída de vuelta en el cierre documental de la publicación.
 - Fuentes de gobierno: `SeryMente/metodologia/main`, DUG v389/NX-389m, Metacanon 1.30, GOW 2.19; revisiones y discrepancia documentadas en §3.
 - Fuentes de producto: `SeryMente/khora` en `main`; corte base `7781939197333efe98aea35c0fe05c7eb31dd7fb`.
-- La búsqueda indexada inicial de “Notas”, “frentes/notas-rapidas” y términos equivalentes no devolvió coincidencias. Esto no equivale a una auditoría exhaustiva de todos los recursos de la organización.
+- La búsqueda indexada inicial de “Notas rápidas”, “frentes/notas-rapidas” y términos equivalentes no devolvió coincidencias. Esto no equivale a una auditoría exhaustiva de todos los recursos de la organización.
 
 ## 12. Reinstanciación
 
