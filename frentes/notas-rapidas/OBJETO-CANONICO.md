@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.30; OBJECT_VERSION=0.1.2; OBJECT_SEAL=NOTAS-RAPIDAS-v0.1.2; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.30; OBJECT_VERSION=0.1.3; OBJECT_SEAL=NOTAS-RAPIDAS-v0.1.3; SINGLE_LIVE_OBJECT=true -->
 # Notas rápidas de Khora · Objeto canónico de persistencia del frente
 
-> **ESTADO · FRENTE ACTIVO · CONTROL ASIGNADO · GENERACIÓN 1 · COMPONENTE NO DESARROLLADO.** Este documento es la única fuente viva del frente. La versión 0.1.2 corresponde al OCP, no al producto.
+> **ESTADO · FRENTE ACTIVO · CONTROL ASIGNADO · GENERACIÓN 1 · COMPONENTE NO DESARROLLADO.** Este documento es la única fuente viva del frente. La versión 0.1.3 corresponde al OCP, no al producto.
 
 ## 1. Control e identidad
 
@@ -10,7 +10,7 @@
 - **Repositorio:** `SeryMente/khora`, rama `main`.
 - **OCP:** `frentes/notas-rapidas/`.
 - **Núcleo único:** este `OBJETO-CANONICO.md`.
-- **Versión documental:** `0.1.2` · sello `NOTAS-RAPIDAS-v0.1.2`.
+- **Versión documental:** `0.1.3` · sello `NOTAS-RAPIDAS-v0.1.3`. 
 - **Control:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json), `status=assigned`, generación `1`; alias `chatgpt-notas-rapidas-SES-20261112-4FB90722`.
 - **Folio SES activo:** `SES-20261112-4FB90722`. UUIDv7 local `01a1d0da-eebf-77de-ac25-06055602c6c2`; ID nativo no expuesto (`owner_thread=null`). **FOL1:** PREPARADO, NO ACTIVO; folios globales CONV/CICLO/A/B pendientes y no asignados.
 - **Evento de apertura documental:** `01a1d0ca-d1da-75ec-a98d-af5a96f070d1`, UUIDv7 local generado para este evento; no es ID nativo de plataforma.
@@ -133,6 +133,7 @@ Aplicar el formato obligatorio de Metacanon §4 en cada ciclo sustantivo: identi
 - [Instrucción original del operador](originales/INSTRUCCION-ORIGINAL-20261112.md).
 - [Crónica de apertura](cronica/INICIO-20261112.md).
 - [Instrucción de asunción](originales/INSTRUCCION-ASUNCION-20261112.md).
+- [Salida visible de asunción](originales/SALIDA-MODELO-20261112-ASUNCION.md).
 - [Crónica de asunción](cronica/ASUNCION-SES-20261112-4FB90722.md).
 - [Salida visible de apertura](originales/SALIDA-MODELO-20261112.md), incorporada y leída de vuelta en el cierre documental de la publicación.
 - Fuentes de gobierno: `SeryMente/metodologia/main`, DUG v389/NX-389m, Metacanon 1.30, GOW 2.19; revisiones y discrepancia documentadas en §3.
