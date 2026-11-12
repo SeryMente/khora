@@ -6,6 +6,7 @@ Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). El OCP conse
 - [Asistente](prompts/ASISTENTE.md): adquisición de gobierno, adjudicación y continuidad.
 - [Constructor](prompts/CONSTRUCTOR.md): régimen de construcción y entrega técnica.
 - [Instrucción original](originales/INSTRUCCION-ORIGINAL-20261112.md): propósito verbatim y procedencia.
+- [Salida de apertura](originales/SALIDA-MODELO-20261112.md): última salida visible preservada para reinstanciación.
 - [Crónica de apertura](cronica/INICIO-20261112.md): evento, alcance y checkpoint.
 
 ## Estado al abrir

@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.30; OBJECT_VERSION=0.1.0; OBJECT_SEAL=NOTAS-RAPIDAS-v0.1.0; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.30; OBJECT_VERSION=0.1.1; OBJECT_SEAL=NOTAS-RAPIDAS-v0.1.1; SINGLE_LIVE_OBJECT=true -->
 # Notas rápidas de Khora · Objeto canónico de persistencia del frente
 
-> **ESTADO · APERTURA DOCUMENTAL · CONTROL SIN TITULAR · GENERACIÓN 0 · COMPONENTE NO DESARROLLADO.** Este documento es la única fuente viva del frente. La versión 0.1.0 corresponde al OCP, no al producto.
+> **ESTADO · APERTURA DOCUMENTAL · CONTROL SIN TITULAR · GENERACIÓN 0 · COMPONENTE NO DESARROLLADO.** Este documento es la única fuente viva del frente. La versión 0.1.1 corresponde al OCP, no al producto.
 
 ## 1. Control e identidad
 
@@ -10,7 +10,7 @@
 - **Repositorio:** `SeryMente/khora`, rama `main`.
 - **OCP:** `frentes/notas-rapidas/`.
 - **Núcleo único:** este `OBJETO-CANONICO.md`.
-- **Versión documental:** `0.1.0` · sello `NOTAS-RAPIDAS-v0.1.0`.
+- **Versión documental:** `0.1.1` · sello `NOTAS-RAPIDAS-v0.1.1`.
 - **Control:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json), `status=unassigned`, generación `0`, sin titular ni sesión activa.
 - **Folio SES:** pendiente de adjudicación por la primera conversación responsable. **FOL1:** PREPARADO, NO ACTIVO; folios globales CONV/CICLO/A/B pendientes y no asignados.
 - **Evento de apertura documental:** `01a1d0ca-d1da-75ec-a98d-af5a96f070d1`, UUIDv7 local generado para este evento; no es ID nativo de plataforma.
@@ -132,7 +132,7 @@ Aplicar el formato obligatorio de Metacanon §4 en cada ciclo sustantivo: identi
 
 - [Instrucción original del operador](originales/INSTRUCCION-ORIGINAL-20261112.md).
 - [Crónica de apertura](cronica/INICIO-20261112.md).
-- [Salida visible de apertura](originales/SALIDA-MODELO-20261112.md), a incorporar y verificar al cerrar la publicación.
+- [Salida visible de apertura](originales/SALIDA-MODELO-20261112.md), incorporada y leída de vuelta en el cierre documental de la publicación.
 - Fuentes de gobierno: `SeryMente/metodologia/main`, DUG v389/NX-389m, Metacanon 1.30, GOW 2.19; revisiones y discrepancia documentadas en §3.
 - Fuentes de producto: `SeryMente/khora` en `main`; corte base `7781939197333efe98aea35c0fe05c7eb31dd7fb`.
 - La búsqueda indexada inicial de “Notas rápidas”, “frentes/notas-rapidas” y términos equivalentes no devolvió coincidencias. Esto no equivale a una auditoría exhaustiva de todos los recursos de la organización.
