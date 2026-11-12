@@ -1,0 +1,83 @@
+{
+  "schema": "responsabilidad-frente/1",
+  "front": "notas",
+  "canonical_identity": "KHORA-NOTAS",
+  "repository": "SeryMente/khora",
+  "state_object": "frentes/notas/OBJETO-CANONICO.md",
+  "status": "assigned",
+  "owner_thread": null,
+  "owner_alias": "chatgpt-notas-SES-20261112-7B01D71C",
+  "owner_alias_type": "operational_alias_not_native_thread_id",
+  "owner_uuidv7_local": "01a1d1e4-5a51-7122-8d4e-fa0f7b01d71c",
+  "instance": "ChatGPT · rol asistente (Claudia)",
+  "session_folio": "SES-20261112-7B01D71C",
+  "generation": 2,
+  "expiry": null,
+  "authorization_ref": "Instrucción directa del operador en ChatGPT-NOTAS-20261112-1630: persistir la conversación en la documentación del frente, renombrarlo a Notas, actualizar las rutas/enlaces y prepararlo para continuar; aplicada la regla operativa vigente de INICIO.md.",
+  "authorization_event": "NOTAS-RENAME-RETOMA-01a1d1e4-5a51-7122-8d4e-fa0f7b01d71c",
+  "created_event": {
+    "event_uuidv7_local": "01a1d0ca-d1da-75ec-a98d-af5a96f070d1",
+    "date": "2026-11-12",
+    "source": "Mensaje directo del operador en esta conversación de apertura; identificador nativo no expuesto.",
+    "purpose_original_path": "frentes/notas-rapidas/originales/INSTRUCCION-ORIGINAL-20261112.md"
+  },
+  "previous_owner": {
+    "status": "assigned",
+    "owner_thread": null,
+    "owner_alias": "chatgpt-notas-rapidas-SES-20261112-4FB90722",
+    "owner_alias_type": "operational_alias_not_native_thread_id",
+    "instance": "ChatGPT · rol asistente (Claudia)",
+    "session_folio": "SES-20261112-4FB90722",
+    "generation": 1
+  },
+  "previous_generation": 1,
+  "base_control_blob_sha1": "25ebd49b93e5b098d24e13cd0350b002274ebee2",
+  "bootstrap_scope": "Desarrollo del componente Notas de Khora, coordinación del frente, mantenimiento de su OCP, descubrimiento de arquitectura y preparación de requisitos/criterios de aceptación. No autoriza por sí sola cambios de código, esquema/datos, credenciales, seguridad, proveedores, despliegue o producción; cada modificación técnica conserva sus compuertas específicas.",
+  "claim_policy": "Titularidad adjudicada a esta sesión por instrucción explícita del operador; mantener un único escritor activo. Cambios futuros de titularidad requieren autorización expresa, comparación SHA/generación y lectura de vuelta. ID nativo no expuesto; alias y UUIDv7 son metadatos locales, no autenticación ni fencing universal.",
+  "folio_collision_check": {
+    "searched_scope": "Búsqueda exacta de «SES-20261112» en los repositorios de SeryMente expuestos por GitHub en esta sesión.",
+    "matches_found": 0,
+    "global_uniqueness": "not_verified",
+    "note": "La búsqueda indexada no certifica todos los controles ni recursos no indexados de la organización. FOL1 continúa PREPARADO/NO ACTIVO; no se asignan folios globales CV/CY/A/B."
+  },
+  "claim_record": {
+    "event_id": "NOTAS-RENAME-RETOMA-01a1d1e4-5a51-7122-8d4e-fa0f7b01d71c",
+    "event_uuidv7_local": "01a1d1e4-5a51-7122-8d4e-fa0f7b01d71c",
+    "previous_status": "assigned",
+    "previous_generation": 1,
+    "new_generation": 2,
+    "previous_owner_preserved": true,
+    "authorization": "Explicit operator instruction to persist this conversation, rename the front to Notas, update its OCP paths/links and prepare continuation; authority interpreted under current INICIO.md operational rule.",
+    "native_conversation_id": null,
+    "operational_alias": "chatgpt-notas-SES-20261112-7B01D71C",
+    "operational_alias_type": "operational_alias_not_native_thread_id",
+    "session_folio": "SES-20261112-7B01D71C",
+    "write_method": "Git tree commit from inspected main SHA with update_ref expected_sha (compare-and-swap)",
+    "readback_required": true
+  },
+  "enforcement": "cooperative registry; no server fencing of arbitrary writes",
+  "previous_claim_record": {
+    "event_id": "NOTAS-RAPIDAS-CLAIM-01a1d0da-eebf-77de-ac25-06055602c6c2",
+    "event_uuidv7_local": "01a1d0da-eebf-77de-ac25-06055602c6c2",
+    "previous_status": "unassigned",
+    "previous_generation": 0,
+    "new_generation": 1,
+    "previous_owner_preserved": true,
+    "authorization": "Explicit operator instruction to assume responsibility for Notas rápidas de Khora.",
+    "native_conversation_id": null,
+    "operational_alias": "chatgpt-notas-rapidas-SES-20261112-4FB90722",
+    "operational_alias_type": "operational_alias_not_native_thread_id",
+    "session_folio": "SES-20261112-4FB90722",
+    "write_method": "GitHub Contents update_file conditioned on the observed content SHA",
+    "readback_required": true
+  },
+  "front_name": "Notas",
+  "previous_front": {
+    "name": "Notas rápidas",
+    "slug": "notas-rapidas",
+    "canonical_identity": "KHORA-NOTAS-RAPIDAS",
+    "state_object": "frentes/notas-rapidas/OBJETO-CANONICO.md"
+  },
+  "renamed_on": "2026-11-12",
+  "name_change_scope": "OCP path, canonical front identity, documentation links and role prompts; repository root remains SeryMente/khora."
+}

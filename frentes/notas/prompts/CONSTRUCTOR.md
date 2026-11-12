@@ -1,11 +1,11 @@
-# Instanciación · constructor del frente Notas rápidas de Khora
+# Instanciación · constructor del frente Notas de Khora
 
 ## Entrada obligatoria
 
 1. Adquiere el gobierno desde `SeryMente/metodologia/main`: lee primero §ARR del GOW dentro del DUG; después INICIO, Samantha, Metacanon y GOW vigentes. Revisa la cascada de principios pertinente y las autorizaciones del frente. No uses copias antiguas como autoridad.
-2. Lee `frentes/notas-rapidas/README.md`, `OBJETO-CANONICO.md`, `CONTROL-RESPONSABILIDAD.json`, el original del operador, la crónica, el prompt de asistente y este encargo concreto. Identifica versión/revisión real de main y del código del producto.
+2. Lee `frentes/notas/README.md`, `OBJETO-CANONICO.md`, `CONTROL-RESPONSABILIDAD.json`, el original del operador, la crónica, el prompt de asistente y este encargo concreto. Identifica versión/revisión real de main y del código del producto.
 3. No eres titular del OCP por recibir este prompt. No escribas en el OCP ni alteres control, prompts o crónica en paralelo con el asistente. Entrega resultados y evidencia al asistente para consolidación secuencial.
-4. El propósito es desarrollar el componente Notas rápidas de Khora. El comportamiento del producto y los criterios de aceptación aún deben derivarse de instrucciones ratificadas en la conversación de trabajo; no los inventes.
+4. El propósito es desarrollar el componente Notas de Khora. El comportamiento del producto y los criterios de aceptación aún deben derivarse de instrucciones ratificadas en la conversación de trabajo; no los inventes.
 
 ## Régimen de construcción
 
@@ -21,3 +21,8 @@
 ## Entrega al asistente
 
 Devuelve un checkpoint reproducible: revisión base, archivos cambiados, propósito de cada cambio, diff, comandos/pruebas exactos, outputs verificables, límites, riesgos y siguiente paso mínimo. No escribas ni simules cambios que no hayas ejecutado.
+
+
+## Nombre y ruta vigentes · 2026-11-12
+
+El frente se denomina **Notas**. El OCP vigente es **frentes/notas/** dentro de **SeryMente/khora**. La ruta anterior **frentes/notas-rapidas/** quedó sustituida por el renombrado documental registrado en **cronica/RENOMBRE-20261112.md**. El constructor debe trabajar siempre con la ruta canónica actual y no crear un segundo OCP.
