@@ -453,9 +453,9 @@ test("CUSTODY-11: transcript network failure must return the verified original l
   const catchEnd = importer.indexOf("return{ok:transcription", catchStart);
   assert.ok(catchStart >= 0 && catchEnd > catchStart, "transcription catch must preserve original audio metadata");
   const handler = importer.slice(catchStart, catchEnd);
-  assert.ok(handler.includes("audioUrl: stored.audioUrl"));
-  assert.ok(handler.includes("verificado: stored.verificado === true"));
-  assert.ok(handler.includes('estadoTranscripcion: "fallido"'));
+  assert.match(handler, /audioUrl\s*:\s*stored\.audioUrl/);
+  assert.match(handler, /verificado\s*:\s*stored\.verificado\s*===\s*true/);
+  assert.match(handler, /estadoTranscripcion\s*:\s*["']fallido["']/);
 });
 
 test("CUSTODY-12: original export works from verified import custody before or after archive", () => {
