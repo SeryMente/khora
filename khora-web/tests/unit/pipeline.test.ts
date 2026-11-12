@@ -184,6 +184,7 @@ const mockVolcados = [
     fuente: "dictado",
     pulido_aplicado: false,
     audio_partes: null,
+    estado_transcripcion: "audio_no_localizado_procedencia_no_verificada",
     version_aprobada: null
   },
   // 8. audio sin texto
@@ -482,7 +483,9 @@ test("Pipeline Suite", async (t) => {
     const v = res.volcados.find(x => x.id === "uuid-7");
     assert.ok(v);
     assert.strictEqual(v.integrity.status, "text_without_audio");
-    assert.strictEqual(v.audio_status, "no_recuperable");
+    assert.strictEqual(v.audio_status, "no_localizado");
+    assert.strictEqual(v.estado_transcripcion, "audio_no_localizado_procedencia_no_verificada");
+    assert.match(v.audio_explanation || "", /Procedencia del texto: no verificada/);
   });
 
   await t.test("9. audio sin texto", async () => {
