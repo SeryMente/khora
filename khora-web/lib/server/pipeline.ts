@@ -11,7 +11,9 @@ export interface PipelineVolcado {
   folio: number | null;
   session_id: string | null;
   session_estado: string | null;
-  audio_status: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable" | "no_aplica" | "temporalmente_no_disponible";
+  audio_status: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable" | "no_localizado" | "no_aplica" | "temporalmente_no_disponible";
+  estado_transcripcion: string | null;
+  audio_explanation: string | null;
   storage_parts: Array<{ part_index: number; storage_provider: "backblaze_b2" | "vercel_blob_legacy" | "unknown"; storage_generation: "new" | "legacy" | "unknown"; availability: "not_checked" | "temporarily_unavailable"; migration_status: "not_required" | "pending" }>;
   storage_summary: { legacy_pending_count: number; legacy_unavailable_count: number; b2_count: number; unknown_count: number };
   partes_count: number;
@@ -159,7 +161,7 @@ export async function obtenerPipelineAggregated(usuario?: string): Promise<Pipel
     SELECT
       id, folio, session_id, texto, texto_original, sha256, chars, titulo, origen, driver, usuario,
       recibido_en, estado, io_id, intentos, ultimo_error, ultimo_intento,
-      audio_url, audio_bytes, duracion_seg, fuente, pulido_aplicado, audio_partes, version_aprobada
+      audio_url, audio_bytes, duracion_seg, fuente, pulido_aplicado, audio_partes, version_aprobada, estado_transcripcion
     FROM volcado
     WHERE ($1::text IS NULL OR usuario=$1)
     ORDER BY recibido_en DESC
@@ -296,7 +298,8 @@ export async function obtenerPipelineAggregated(usuario?: string): Promise<Pipel
       audioBytes = audioPartesJson.reduce((sum: number, p: any) => sum + (p.bytes || 0), 0);
     }
 
-    let audioStatus: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable" | "no_aplica" | "temporalmente_no_disponible" = "no_aplica";
+    let audioStatus: "disponible" | "encontrado_no_vinculado" | "incompleto" | "no_recuperable" | "no_localizado" | "no_aplica" | "temporalmente_no_disponible" = "no_aplica";
+    let audioExplanation: string | null = null;
     if (hasAudio) {
       if (sessionId || v.audio_url) {
         if (sesionObj?.total_partes && partesCount < sesionObj.total_partes) {
@@ -307,6 +310,9 @@ export async function obtenerPipelineAggregated(usuario?: string): Promise<Pipel
       } else {
         audioStatus = "encontrado_no_vinculado";
       }
+    } else if (audioEsperado && hasText && v.estado_transcripcion === "audio_no_localizado_procedencia_no_verificada") {
+      audioStatus = "no_localizado";
+      audioExplanation = "No se localizó un original de audio asociado en las fuentes consultadas. Procedencia del texto: no verificada. El texto se conserva sin atribuirle una fuente.";
     } else if (audioEsperado) {
       audioStatus = "no_recuperable";
     } else {
@@ -330,7 +336,9 @@ export async function obtenerPipelineAggregated(usuario?: string): Promise<Pipel
     if (status === "sync") {
       if (hasText && !hasAudio && audioEsperado) {
         status = "text_without_audio";
-        flags.push("Texto presente pero no hay audio");
+        flags.push(audioStatus === "no_localizado"
+          ? "Audio no localizado; procedencia del texto no verificada"
+          : "Texto presente pero no hay audio");
       } else if (hasAudio && !hasText) {
         status = "audio_without_text";
         flags.push("Audio presente pero no hay texto");
@@ -361,6 +369,8 @@ export async function obtenerPipelineAggregated(usuario?: string): Promise<Pipel
       session_id: sessionId,
       session_estado: sesionObj?.estado || null,
       audio_status: audioStatus,
+      estado_transcripcion: v.estado_transcripcion ?? null,
+      audio_explanation: audioExplanation,
       storage_parts: storageParts,
       storage_summary: storageSummary,
       partes_count: partesCount,
