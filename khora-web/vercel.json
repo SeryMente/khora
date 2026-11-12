@@ -1,4 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "CUSTODIA_ARCHIVE_MODE=audit node --import tsx scripts/custodia-archive-once.ts && exit 1"
+  "buildCommand": "CUSTODIA_ARCHIVE_MODE=execute node --import tsx scripts/custodia-archive-once.ts && exit 1"
 }
