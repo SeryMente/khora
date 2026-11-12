@@ -144,11 +144,11 @@ Aplicar el formato obligatorio de Metacanon §4 en cada ciclo sustantivo: identi
 
 - Entrada de la nueva conversación: [prompt de asistente](prompts/ASISTENTE.md).
 - Encargo del rol constructor: [prompt de constructor](prompts/CONSTRUCTOR.md).
-- Última conversación preservada: [ChatGPT-NOTAS-20261112-1630.md](originales/ChatGPT-NOTAS-20261112-1630.md).
+- Registro documental condensado de la conversación: [ChatGPT-NOTAS-20261112-1630.md](originales/ChatGPT-NOTAS-20261112-1630.md); conserva entradas del operador y sintetiza respuestas del asistente.
 - Control al cierre de este ciclo: **assigned**, generación **2**; alias operativo **chatgpt-notas-SES-20261112-7B01D71C**; folio SES **SES-20261112-7B01D71C**; UUIDv7 local **01a1d1e4-5a51-7122-8d4e-fa0f7b01d71c**; owner_thread=null.
 - El alias, UUID y folio de la generación 1 se conservan como antecedente; no se reutilizan como identificador nativo de esta conversación.
 - Una nueva instancia debe leer el control actual y aplicar Metacanon §§42 y 47 ante cualquier relevo o corresponsabilidad. Los identificadores locales no prueban identidad de plataforma ni sustituyen la autorización.
-- Las salidas, instrucciones y crónicas anteriores permanecen conservadas como antecedentes históricos. La transcripción de esta conversación se añade sin reemplazarlas.
+- Las salidas, instrucciones y crónicas anteriores permanecen conservadas como antecedentes históricos. El registro documental condensado de esta conversación se añade sin reemplazarlas; no es una transcripción literal íntegra ni exportación nativa.
 
 ## 13. Persistencia y revisión
 
@@ -170,7 +170,7 @@ La asunción no implica desarrollo del producto. Siguiente trabajo: inspección 
 
 El operador instruyó: «Renombra frente a solo notas, modificando la URL del repo y todo». El nombre visible vigente pasa a ser **Notas**; la identidad canónica pasa a **KHORA-NOTAS**; el slug y OCP pasan a **frentes/notas/**. El nombre anterior era **Notas rápidas**, identidad **KHORA-NOTAS-RAPIDAS**, ruta **frentes/notas-rapidas/**.
 
-Se trasladó el directorio completo conservando los blobs de los materiales históricos. Se actualizaron el OCP, el control único, el README del frente, los prompts de asistente y constructor, y el índice raíz del repositorio. Los originales, salidas y crónicas anteriores se mantienen sin reescritura para conservar su valor histórico. La nueva transcripción de la conversación queda en [originales/ChatGPT-NOTAS-20261112-1630.md](originales/ChatGPT-NOTAS-20261112-1630.md).
+Se trasladó el directorio completo conservando los blobs de los materiales históricos. Se actualizaron el OCP, el control único, el README del frente, los prompts de asistente y constructor, y el índice raíz del repositorio. Los originales, salidas y crónicas anteriores se mantienen sin reescritura para conservar su valor histórico. El nuevo registro documental condensado de la conversación queda en [originales/ChatGPT-NOTAS-20261112-1630.md](originales/ChatGPT-NOTAS-20261112-1630.md).
 
 **URL del frente antes:** https://github.com/SeryMente/khora/tree/main/frentes/notas-rapidas
 
