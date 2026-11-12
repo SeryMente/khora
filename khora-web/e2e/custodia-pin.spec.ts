@@ -167,7 +167,7 @@ test("Archivo: muestra sin audio localizado con procedencia no verificada y sin 
   });
 
   await page.goto("/sistema/ingreso?modo=archivo");
-  await expect(page).toHaveURL(/\\/sistema\\/custodia\\?vista=archivo$/);
+  await expect(page).toHaveURL(/\/sistema\/custodia\?vista=archivo$/);
   await expect(page.getByRole("heading", { name: "Archivo", exact: true })).toBeVisible();
   const card = page.locator('[data-ui-id="pipeline.item-card"]');
   await expect(card).toContainText("Transcripción recuperada");
