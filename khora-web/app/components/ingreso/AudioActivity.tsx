@@ -19,5 +19,5 @@ export function AudioActivity({stream,active,label="micrófono"}:{stream:MediaSt
   catch{setUnavailable(true);flat();}
   return()=>{cancelled=true;cancelAnimationFrame(frame);source?.disconnect();analyser?.disconnect();void audio?.close().catch(()=>undefined);};
  },[stream,active]);
- return <canvas ref={canvas} width={240} height={72} className={s.wave} role="img" aria-label={unavailable?"Actividad de audio no disponible":active&&stream?`Actividad real de ${label}`:`${label} en espera`}/>;
+ return <canvas ref={canvas} width={240} height={72} className={s.wave} role="img" aria-label={unavailable?"Actividad de audio no disponible":active&&stream?(label==="micrófono"?"Actividad real del micrófono":`Actividad real de ${label}`):`${label} en espera`}/>;
 }

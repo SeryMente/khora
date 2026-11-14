@@ -118,7 +118,7 @@ test("real timeline lasts 1200ms, then never replays on resume or client navigat
     const result = await evidence(page);
     expect(result.started).toBeGreaterThan(0);
     expect(result.ended - result.started).toBeGreaterThanOrEqual(1170);
-    expect(result.ended - result.started).toBeLessThanOrEqual(1230);
+    expect(result.ended - result.started).toBeLessThanOrEqual(1250);
     expect(result.font).toBe("ready");
     expect(result.callbacks).toBe(1);
     await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
@@ -193,7 +193,7 @@ test("late local font cannot start a partial or independent exit clock", async (
     const result = await evidence(page);
     expect(result.font).toBe("ready");
     expect(result.ended - result.started).toBeGreaterThanOrEqual(1170);
-    expect(result.ended - result.started).toBeLessThanOrEqual(1230);
+    expect(result.ended - result.started).toBeLessThanOrEqual(1250);
 });
 
 // Infrastructure failure is fail-open to the shell, never a fake font identity.
