@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="popup.css">
+  <title>Harmonia · Observabilidad</title>
+</head>
+<body>
+<main>
+  <header class="topbar">
+    <div class="brand-mark" aria-hidden="true">H</div>
+    <div class="brand-copy">
+      <h1>Harmonia</h1>
+      <p>Observabilidad local de ChatGPT</p>
+    </div>
+    <span class="version">v0.5.0</span>
+  </header>
+
+  <section class="status-card" aria-label="Estado de observación" aria-live="polite">
+    <div class="status-heading">
+      <span class="status-dot" id="dot"></span>
+      <strong id="headline">Comprobando observación…</strong>
+    </div>
+    <p id="detail">Consultando el colector local y las pestañas observadas.</p>
+    <p id="copyStatus" class="copy-status" role="status" aria-live="polite">El informe estará disponible cuando termine la lectura.</p>
+    <div class="status-actions">
+      <button id="toggle" disabled>Comprobando…</button>
+      <button id="copyReport" class="copy-button" type="button" disabled>Copiar informe</button>
+      <button id="refresh" class="icon-button" type="button" aria-label="Actualizar indicadores" title="Actualizar">↻</button>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="cyclesTitle">
+    <div class="panel-heading">
+      <div>
+        <h2 id="cyclesTitle">Tiempo de generación</h2>
+        <p>Transición visual de inicio → final</p>
+      </div>
+      <span class="live-label" id="cycleSample">Sin muestra</span>
+    </div>
+    <p class="last-cycle" id="frameworkRevision">Marco: sin etiqueta</p>
+    <div class="metric-grid">
+      <div class="metric-card primary">
+        <span>Mediana</span>
+        <strong id="median">—</strong>
+        <small>generación observada</small>
+      </div>
+      <div class="metric-card">
+        <span>Percentil 90</span>
+        <strong id="p90">—</strong>
+        <small>9 de cada 10 ≤</small>
+      </div>
+      <div class="metric-card">
+        <span>Medidos</span>
+        <strong id="measured">0</strong>
+        <small id="completed">0 ciclos cerrados</small>
+      </div>
+    </div>
+    <div class="cycle-facts">
+      <div><span>En curso</span><strong id="activeCycles">0</strong></div>
+      <div><span>Sin medición</span><strong id="unmeasured">0</strong></div>
+    </div>
+    <p class="last-cycle" id="lastCycle">Aún no hay ciclos observados.</p>
+    <p class="note">Mide el tiempo entre señales gráficas. No representa inferencia interna del modelo; la estabilización confirma el cierre y no se suma al tiempo.</p>
+    <details>
+      <summary>Ver ciclos recientes</summary>
+      <div id="recentCycles" class="recent-list">Sin registros todavía.</div>
+    </details>
+  </section>
+
+  <section class="panel" aria-labelledby="mapTitle">
+    <div class="panel-heading">
+      <div>
+        <h2 id="mapTitle">Cobertura de interfaz</h2>
+        <p>Capacidades estructurales · sin texto del chat</p>
+      </div>
+      <strong class="coverage-value" id="observedPercent">—%</strong>
+    </div>
+    <div class="coverage-bar" role="progressbar" aria-label="Cobertura observada" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="observedBar"></span></div>
+    <div class="map-grid">
+      <div><strong id="surfaces">0</strong><span>superficies únicas</span></div>
+      <div><strong id="features">0 / 0</strong><span>capacidades observadas</span></div>
+      <div><strong id="unknown">0</strong><span>controles sin clasificar</span></div>
+      <div><strong id="scans">0</strong><span>barridos registrados</span></div>
+    </div>
+    <p class="last-scan" id="lastScan">Aún no hay barridos registrados.</p>
+    <details>
+      <summary>Ver detalle de cobertura</summary>
+      <div class="coverage-split">
+        <div><span>Documentación verificada</span><strong id="docsPercent">—%</strong></div>
+        <div><span id="naturalLabel">Observación natural</span><strong id="naturalPercent">—%</strong></div>
+      </div>
+      <div id="pendingList" class="pending-list">Pendientes aún no calculados.</div>
+    </details>
+  </section>
+
+  <section class="panel" aria-labelledby="frontWorkTitle">
+    <div class="panel-heading">
+      <div>
+        <h2 id="frontWorkTitle">Frentes trabajados</h2>
+        <p>Última actividad de la conversación asociada</p>
+      </div>
+      <span class="live-label">ChatGPT</span>
+    </div>
+    <div class="front-linker">
+      <label for="frontSelect">Asociar conversación actual</label>
+      <div class="front-linker-row">
+        <select id="frontSelect" aria-label="Frente de trabajo">
+          <option value="">Selecciona un frente</option>
+        </select>
+        <button id="assignFront" type="button" disabled>Asociar</button>
+      </div>
+      <small id="frontConversation">Abre la conversación del frente que deseas asociar.</small>
+      <small id="frontStatus" role="status" aria-live="polite"></small>
+    </div>
+    <div class="front-report-controls">
+      <label for="frontWindow">Actividad en</label>
+      <select id="frontWindow">
+        <option value="24h">Últimas 24 horas</option>
+        <option value="48h">Últimas 48 horas</option>
+        <option value="72h">Últimas 72 horas</option>
+        <option value="7d">Últimos 7 días</option>
+      </select>
+      <button id="refreshFronts" class="icon-button" type="button" aria-label="Actualizar frentes">↻</button>
+    </div>
+    <div id="frontResults" class="front-results" aria-live="polite">Consultando actividad…</div>
+  </section>
+
+  <footer>
+    <span id="events">0 eventos</span>
+    <span id="storage">Almacenamiento local</span>
+  </footer>
+  <details class="diagnostics">
+    <summary>Diagnóstico técnico</summary>
+    <p id="diagnostic">Sin incidencias reportadas.</p>
+  </details>
+  <pre id="reportPayload" hidden aria-hidden="true"></pre>
+</main>
+<script src="popup.js"></script>
+</body>
+</html>

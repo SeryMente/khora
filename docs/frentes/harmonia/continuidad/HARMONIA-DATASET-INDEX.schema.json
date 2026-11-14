@@ -1,0 +1,596 @@
+{
+    "$schema":  "https://json-schema.org/draft/2020-12/schema",
+    "$id":  "harmonia-conversation-cycle-index-v1",
+    "title":  "Harmonia Ã‚Â· ÃƒÂ­ndice de metadatos de conversaciÃƒÂ³n y ciclo",
+    "type":  "object",
+    "additionalProperties":  false,
+    "required":  [
+                     "schema_version",
+                     "generated_at",
+                     "source",
+                     "coverage",
+                     "folio_policy",
+                     "conversations",
+                     "missing_sources"
+                 ],
+    "properties":  {
+                       "schema_version":  {
+                                              "const":  "1.0.0"
+                                          },
+                       "generated_at":  {
+                                            "type":  [
+                                                         "string",
+                                                         "null"
+                                                     ],
+                                            "format":  "date-time"
+                                        },
+                       "source":  {
+                                      "$ref":  "#/$defs/source"
+                                  },
+                       "coverage":  {
+                                        "$ref":  "#/$defs/coverage"
+                                    },
+                       "folio_policy":  {
+                                            "$ref":  "#/$defs/folio_policy"
+                                        },
+                       "conversations":  {
+                                             "type":  "array",
+                                             "items":  {
+                                                           "$ref":  "#/$defs/conversation"
+                                                       }
+                                         },
+                       "missing_sources":  {
+                                               "type":  "array",
+                                               "items":  {
+                                                             "$ref":  "#/$defs/missing_source"
+                                                         }
+                                           }
+                   },
+    "$defs":  {
+                  "source":  {
+                                 "type":  "object",
+                                 "additionalProperties":  false,
+                                 "required":  [
+                                                  "repository",
+                                                  "workfront",
+                                                  "ocp_path",
+                                                  "dug_version",
+                                                  "dug_signature"
+                                              ],
+                                 "properties":  {
+                                                    "repository":  {
+                                                                       "const":  "SeryMente/khora"
+                                                                   },
+                                                    "workfront":  {
+                                                                      "const":  "Harmonia"
+                                                                  },
+                                                    "ocp_path":  {
+                                                                     "const":  "docs/frentes/harmonia/OBJETO-CANONICO.md"
+                                                                 },
+                                                    "ocp_version":  {
+                                                                        "type":  [
+                                                                                     "string",
+                                                                                     "null"
+                                                                                 ]
+                                                                    },
+                                                    "dug_version":  {
+                                                                        "type":  [
+                                                                                     "string",
+                                                                                     "null"
+                                                                                 ]
+                                                                    },
+                                                    "dug_signature":  {
+                                                                          "type":  [
+                                                                                       "string",
+                                                                                       "null"
+                                                                                   ]
+                                                                      },
+                                                    "dug_main_commit":  {
+                                                                            "type":  [
+                                                                                         "string",
+                                                                                         "null"
+                                                                                     ]
+                                                                        },
+                                                    "dug_git_blob_sha1":  {
+                                                                              "type":  [
+                                                                                           "string",
+                                                                                           "null"
+                                                                                       ]
+                                                                          }
+                                                }
+                             },
+                  "coverage":  {
+                                   "type":  "object",
+                                   "additionalProperties":  false,
+                                   "required":  [
+                                                    "status",
+                                                    "earliest_known_export_at",
+                                                    "earliest_known_conversation_created_at",
+                                                    "historical_cycles_segmented"
+                                                ],
+                                   "properties":  {
+                                                      "status":  {
+                                                                     "enum":  [
+                                                                                  "COMPLETE",
+                                                                                  "PARTIAL",
+                                                                                  "NOT_ASSESSED"
+                                                                              ]
+                                                                 },
+                                                      "earliest_known_export_at":  {
+                                                                                       "type":  [
+                                                                                                    "string",
+                                                                                                    "null"
+                                                                                                ]
+                                                                                   },
+                                                      "earliest_known_conversation_created_at":  {
+                                                                                                     "type":  [
+                                                                                                                  "string",
+                                                                                                                  "null"
+                                                                                                              ]
+                                                                                                 },
+                                                      "historical_cycles_segmented":  {
+                                                                                          "type":  "boolean"
+                                                                                      },
+                                                      "notes":  {
+                                                                    "type":  "array",
+                                                                    "items":  {
+                                                                                  "type":  "string"
+                                                                              }
+                                                                }
+                                                  }
+                               },
+                  "folio_policy":  {
+                                       "type":  "object",
+                                       "additionalProperties":  false,
+                                       "required":  [
+                                                        "system",
+                                                        "state",
+                                                        "global_folios_issued",
+                                                        "local_reference_type",
+                                                        "rule"
+                                                    ],
+                                       "properties":  {
+                                                          "system":  {
+                                                                         "const":  "FOL1"
+                                                                     },
+                                                          "state":  {
+                                                                        "enum":  [
+                                                                                     "PREPARADO_PENDIENTE_ACTIVACION",
+                                                                                     "ACTIVO",
+                                                                                     "NO_DISPONIBLE"
+                                                                                 ]
+                                                                    },
+                                                          "global_folios_issued":  {
+                                                                                       "const":  false
+                                                                                   },
+                                                          "local_reference_type":  {
+                                                                                       "const":  "UUIDv7 local; no es ID nativo ni folio global"
+                                                                                   },
+                                                          "rule":  {
+                                                                       "type":  "string"
+                                                                   },
+                                                          "master_register_ref":  {
+                                                                                      "type":  [
+                                                                                                   "string",
+                                                                                                   "null"
+                                                                                               ]
+                                                                                  }
+                                                      }
+                                   },
+                  "conversation":  {
+                                       "type":  "object",
+                                       "additionalProperties":  false,
+                                       "required":  [
+                                                        "local_ref",
+                                                        "platform",
+                                                        "conversation_name",
+                                                        "name_status",
+                                                        "native_conversation_id",
+                                                        "native_id_provenance",
+                                                        "source_timestamps",
+                                                        "local_availability",
+                                                        "association",
+                                                        "source_artifact",
+                                                        "cycle_index_status",
+                                                        "cycles"
+                                                    ],
+                                       "properties":  {
+                                                          "local_ref":  {
+                                                                            "type":  [
+                                                                                         "string",
+                                                                                         "null"
+                                                                                     ],
+                                                                            "pattern":  "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                                                                        },
+                                                          "platform":  {
+                                                                           "type":  "string"
+                                                                       },
+                                                          "mode":  {
+                                                                       "type":  [
+                                                                                    "string",
+                                                                                    "null"
+                                                                                ]
+                                                                   },
+                                                          "conversation_name":  {
+                                                                                    "type":  [
+                                                                                                 "string",
+                                                                                                 "null"
+                                                                                             ]
+                                                                                },
+                                                          "name_status":  {
+                                                                              "enum":  [
+                                                                                           "VERIFIED_FROM_EXPORT_HEADER",
+                                                                                           "NOT_EXPOSED",
+                                                                                           "UNKNOWN"
+                                                                                       ]
+                                                                          },
+                                                          "native_conversation_id":  {
+                                                                                         "type":  [
+                                                                                                      "string",
+                                                                                                      "null"
+                                                                                                  ]
+                                                                                     },
+                                                          "native_id_provenance":  {
+                                                                                       "type":  [
+                                                                                                    "string",
+                                                                                                    "null"
+                                                                                                ]
+                                                                                   },
+                                                          "source_timestamps":  {
+                                                                                    "$ref":  "#/$defs/source_timestamps"
+                                                                                },
+                                                          "local_availability":  {
+                                                                                     "$ref":  "#/$defs/local_availability"
+                                                                                 },
+                                                          "association":  {
+                                                                              "$ref":  "#/$defs/association"
+                                                                          },
+                                                          "source_artifact":  {
+                                                                                  "$ref":  "#/$defs/artifact"
+                                                                              },
+                                                          "cycle_index_status":  {
+                                                                                     "enum":  [
+                                                                                                  "INDEXED",
+                                                                                                  "PENDING_SEGMENTATION",
+                                                                                                  "PARTIAL"
+                                                                                              ]
+                                                                                 },
+                                                          "cycles":  {
+                                                                         "type":  "array",
+                                                                         "items":  {
+                                                                                       "$ref":  "#/$defs/cycle"
+                                                                                   }
+                                                                     }
+                                                      }
+                                   },
+                  "source_timestamps":  {
+                                            "type":  "object",
+                                            "additionalProperties":  false,
+                                            "required":  [
+                                                             "created_at",
+                                                             "updated_at",
+                                                             "exported_at",
+                                                             "timezone",
+                                                             "provenance"
+                                                         ],
+                                            "properties":  {
+                                                               "created_at":  {
+                                                                                  "type":  [
+                                                                                               "string",
+                                                                                               "null"
+                                                                                           ]
+                                                                              },
+                                                               "updated_at":  {
+                                                                                  "type":  [
+                                                                                               "string",
+                                                                                               "null"
+                                                                                           ]
+                                                                              },
+                                                               "exported_at":  {
+                                                                                   "type":  [
+                                                                                                "string",
+                                                                                                "null"
+                                                                                            ]
+                                                                               },
+                                                               "timezone":  {
+                                                                                "type":  [
+                                                                                             "string",
+                                                                                             "null"
+                                                                                         ]
+                                                                            },
+                                                               "provenance":  {
+                                                                                  "type":  "string"
+                                                                              }
+                                                           }
+                                        },
+                  "local_availability":  {
+                                             "type":  "object",
+                                             "additionalProperties":  false,
+                                             "required":  [
+                                                              "first_local_capture_at",
+                                                              "first_worktree_persisted_at",
+                                                              "precision",
+                                                              "provenance"
+                                                          ],
+                                             "properties":  {
+                                                                "first_local_capture_at":  {
+                                                                                               "type":  [
+                                                                                                            "string",
+                                                                                                            "null"
+                                                                                                        ],
+                                                                                               "format":  "date-time"
+                                                                                           },
+                                                                "first_worktree_persisted_at":  {
+                                                                                                    "type":  [
+                                                                                                                 "string",
+                                                                                                                 "null"
+                                                                                                             ],
+                                                                                                    "format":  "date-time"
+                                                                                                },
+                                                                "precision":  {
+                                                                                  "type":  "string"
+                                                                              },
+                                                                "provenance":  {
+                                                                                   "type":  "string"
+                                                                               }
+                                                            }
+                                         },
+                  "association":  {
+                                      "type":  "object",
+                                      "additionalProperties":  false,
+                                      "required":  [
+                                                       "repository",
+                                                       "workfront",
+                                                       "ocp_path"
+                                                   ],
+                                      "properties":  {
+                                                         "repository":  {
+                                                                            "type":  "string"
+                                                                        },
+                                                         "workfront":  {
+                                                                           "type":  "string"
+                                                                       },
+                                                         "ocp_path":  {
+                                                                          "type":  "string"
+                                                                      }
+                                                     }
+                                  },
+                  "artifact":  {
+                                   "type":  "object",
+                                   "additionalProperties":  false,
+                                   "required":  [
+                                                    "path",
+                                                    "sha256",
+                                                    "bytes",
+                                                    "verification_status",
+                                                    "hash_provenance"
+                                                ],
+                                   "properties":  {
+                                                      "path":  {
+                                                                   "type":  "string"
+                                                               },
+                                                      "sha256":  {
+                                                                     "type":  [
+                                                                                  "string",
+                                                                                  "null"
+                                                                              ],
+                                                                     "pattern":  "^[A-Fa-f0-9]{64}$"
+                                                                 },
+                                                      "git_blob_sha1":  {
+                                                                            "type":  [
+                                                                                         "string",
+                                                                                         "null"
+                                                                                     ]
+                                                                        },
+                                                      "bytes":  {
+                                                                    "type":  [
+                                                                                 "integer",
+                                                                                 "null"
+                                                                             ],
+                                                                    "minimum":  0
+                                                                },
+                                                      "verification_status":  {
+                                                                                  "enum":  [
+                                                                                               "READBACK_HASH_VERIFIED",
+                                                                                               "HASH_PENDING",
+                                                                                               "NOT_VERIFIED"
+                                                                                           ]
+                                                                              },
+                                                      "hash_provenance":  {
+                                                                              "type":  "string"
+                                                                          },
+                                                      "readback_verified_at":  {
+                                                                                   "type":  [
+                                                                                                "string",
+                                                                                                "null"
+                                                                                            ],
+                                                                                   "format":  "date-time"
+                                                                               }
+                                                  }
+                               },
+                  "cycle":  {
+                                "type":  "object",
+                                "additionalProperties":  false,
+                                "required":  [
+                                                 "local_ref",
+                                                 "substantive",
+                                                 "source_event_at",
+                                                 "captured_at",
+                                                 "persisted_at",
+                                                 "parts",
+                                                 "association",
+                                                 "folios"
+                                             ],
+                                "properties":  {
+                                                   "local_ref":  {
+                                                                     "type":  "string",
+                                                                     "pattern":  "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                                                                 },
+                                                   "substantive":  {
+                                                                       "type":  "boolean"
+                                                                   },
+                                                   "source_event_at":  {
+                                                                           "type":  [
+                                                                                        "string",
+                                                                                        "null"
+                                                                                    ]
+                                                                       },
+                                                   "captured_at":  {
+                                                                       "type":  [
+                                                                                    "string",
+                                                                                    "null"
+                                                                                ],
+                                                                       "format":  "date-time"
+                                                                   },
+                                                   "persisted_at":  {
+                                                                        "type":  [
+                                                                                     "string",
+                                                                                     "null"
+                                                                                 ],
+                                                                        "format":  "date-time"
+                                                                    },
+                                                   "parts":  {
+                                                                 "type":  "object",
+                                                                 "additionalProperties":  false,
+                                                                 "required":  [
+                                                                                  "A",
+                                                                                  "B"
+                                                                              ],
+                                                                 "properties":  {
+                                                                                    "A":  {
+                                                                                              "$ref":  "#/$defs/part"
+                                                                                          },
+                                                                                    "B":  {
+                                                                                              "$ref":  "#/$defs/part"
+                                                                                          }
+                                                                                }
+                                                             },
+                                                   "association":  {
+                                                                       "$ref":  "#/$defs/association"
+                                                                   },
+                                                   "folios":  {
+                                                                  "type":  "object",
+                                                                  "additionalProperties":  false,
+                                                                  "required":  [
+                                                                                   "CV",
+                                                                                   "CY",
+                                                                                   "A",
+                                                                                   "B",
+                                                                                   "state"
+                                                                               ],
+                                                                  "properties":  {
+                                                                                     "CV":  {
+                                                                                                "type":  [
+                                                                                                             "string",
+                                                                                                             "null"
+                                                                                                         ]
+                                                                                            },
+                                                                                     "CY":  {
+                                                                                                "type":  [
+                                                                                                             "string",
+                                                                                                             "null"
+                                                                                                         ]
+                                                                                            },
+                                                                                     "A":  {
+                                                                                               "type":  [
+                                                                                                            "string",
+                                                                                                            "null"
+                                                                                                        ]
+                                                                                           },
+                                                                                     "B":  {
+                                                                                               "type":  [
+                                                                                                            "string",
+                                                                                                            "null"
+                                                                                                        ]
+                                                                                           },
+                                                                                     "state":  {
+                                                                                                   "const":  "FOL1_PREPARADO_PENDIENTE_ACTIVACION"
+                                                                                               }
+                                                                                 }
+                                                              }
+                                               }
+                            },
+                  "part":  {
+                               "type":  "object",
+                               "additionalProperties":  false,
+                               "required":  [
+                                                "status",
+                                                "source_type",
+                                                "source_ref",
+                                                "sha256",
+                                                "timestamp",
+                                                "provenance"
+                                            ],
+                               "properties":  {
+                                                  "status":  {
+                                                                 "enum":  [
+                                                                              "CAPTURED",
+                                                                              "PENDING_CAPTURE",
+                                                                              "NOT_AVAILABLE",
+                                                                              "REPORTED_NOT_VERIFIED"
+                                                                          ]
+                                                             },
+                                                  "source_type":  {
+                                                                      "type":  [
+                                                                                   "string",
+                                                                                   "null"
+                                                                               ]
+                                                                  },
+                                                  "source_ref":  {
+                                                                     "type":  [
+                                                                                  "string",
+                                                                                  "null"
+                                                                              ]
+                                                                 },
+                                                  "sha256":  {
+                                                                 "type":  [
+                                                                              "string",
+                                                                              "null"
+                                                                          ],
+                                                                 "pattern":  "^[A-Fa-f0-9]{64}$"
+                                                             },
+                                                  "timestamp":  {
+                                                                    "type":  [
+                                                                                 "string",
+                                                                                 "null"
+                                                                             ],
+                                                                    "format":  "date-time"
+                                                                },
+                                                  "provenance":  {
+                                                                     "type":  "string"
+                                                                 },
+                                                  "readback_verified_at":  {
+                                                                               "type":  [
+                                                                                            "string",
+                                                                                            "null"
+                                                                                        ],
+                                                                               "format":  "date-time"
+                                                                           }
+                                              }
+                           },
+                  "missing_source":  {
+                                         "type":  "object",
+                                         "additionalProperties":  false,
+                                         "required":  [
+                                                          "label",
+                                                          "status",
+                                                          "reason",
+                                                          "source_ref"
+                                                      ],
+                                         "properties":  {
+                                                            "label":  {
+                                                                          "type":  "string"
+                                                                      },
+                                                            "status":  {
+                                                                           "const":  "NOT_CAPTURED"
+                                                                       },
+                                                            "reason":  {
+                                                                           "type":  "string"
+                                                                       },
+                                                            "source_ref":  {
+                                                                               "type":  "string"
+                                                                           }
+                                                        }
+                                     }
+              }
+}

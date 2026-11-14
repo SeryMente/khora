@@ -1,13 +1,22 @@
 # Harmonia · carpeta canónica del frente
 
-Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). El OCP conserva estado vivo, decisiones, notas temporales, pruebas, historial breve y paquete de traspaso; no se debe crear una fuente de estado competidora.
+Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). La definición técnica integral se mantiene en [ESPECIFICACION-GENERAL.md](ESPECIFICACION-GENERAL.md); el OCP conserva el estado vivo, decisiones, backlog, pruebas, historial breve y paquete de traspaso. La especificación no sustituye ni duplica el estado del OCP.
 
 - [Asistente · instancia fresca / traspaso v1.2](prompts/ASISTENTE.md): entrada, adquisición de gobierno, compuerta de titularidad y secuencia E2E.
 - [Constructor · no instanciado](prompts/CONSTRUCTOR.md): ejecutar únicamente bajo su régimen y no utilizar Remote Desktop Commander.
 - [Control exclusivo](CONTROL-RESPONSABILIDAD.json): actualmente asignado a la instancia y generación que constan en el JSON; no es un bootstrap sin propietario. Preparar el traspaso no transfiere la titularidad.
 - [Originales](originales/PROCEDENCIA.md), [crónica](cronica/HARMONIA-INSTANCIACION-01.md) y [revisión](evidencias/HARMONIA-INSTANCIACION-01-revision.json).
 
-## Estado vigente · 2026-11-08 · generación 15
+## Snapshot operativo local · 2026-11-12 · ciclo OMM-01-040
+
+- OCP local: v0.80 / HARMONIA-v0.80; SHA-256 `5972A03A5CDD0E365BC876504F51E060017DA43902E679F2FB0057D923018403`. v0.79 preservado en `archive/OBJETO-CANONICO-v0.79-pre-spec-maintenance-20261112.md`, SHA-256 `26774C8CFFA9A38A019DC07F5D298B2EED7BCF23D906FC22C18ADEC8FD32D198`.
+- Especificación General Única: v1.0.0; SHA-256 `3C0BE96A010231F5084D1C2A6051C552289174CA9357964D25613D45DFC44D0F`, 24,391 bytes. Define arquitectura, contratos, metadatos A/B, privacidad, pruebas, aceptación y mantenimiento ciclo a ciclo.
+- Backlog activo: cuatro ejes 035–038; OMM-01-040 es descomposición del eje 038. Tareas 000–034 y 039 permanecen preservadas como descomposición y evidencia, no como otra cola activa.
+- Gobierno: Samantha v393 / NX-393m, commit `b62d99bb49c35e6cfe280ebeace5ce5dbde9a675`; Metacanon section 52 desactiva métricas temporales, que quedan bloqueadas en Harmonia.
+- Rama `work/harmonia-front-workspace-20261110`, HEAD `9fd5c18205e39b6db12c9152b07d8f880f6b256d`; trabajo local sin commit. `main` no modificado.
+- Producto: candidata MV3 0.4.9, colector 0.4.8.1. Sin aceptación natural SPA ni BMO-01; Chrome principal no intervenido.
+
+## Estado histórico · 2026-11-08 · generación 15 (snapshot supersedido)
 
 - OCP canónico main: v0.46 / HARMONIA-v0.46, secciones 46–52.
 - Control: generación 15; alias operativo chatgpt-harmonia-01a1b6ca-4543-7578-85d9-7624877c2e80; owner_thread=null (ID nativo no expuesto); session_folio=null (FOL1 no activa).
@@ -74,3 +83,71 @@ NCL-OCP queda como adaptador Playwright auxiliar, manual, opt-in, de alto alcanc
 La PR #346 continúa abierta en borrador y sin merge. La prueba productiva autorizada de un único evento sintético Cora/Neon y su lectura de vuelta continúa pendiente; no se ha escrito en producción, ni se ha modificado Chrome, fusionado o desplegado.
 
 **Nota de lectura:** los apartados históricos que siguen conservan fotografías de estados anteriores. Si discrepan con el OCP v0.39 y el control vigente, prevalece el OCP; no interpretes sus referencias de generación, dispositivo o versiones anteriores como estado actual.
+
+## Captura conversacional adicional · 2026-11-13
+
+- [Exportación completa de la conversación HARMONIA](originales/ChatGPT-HARMONIA-20261113-1145.md): copia local byte a byte del archivo descargado desde `C:\Users\fila4\Downloads`; conserva el encabezado, el ID nativo declarado por el exportador y todos los intercambios incluidos.
+- [Salida original visible del ciclo OMM-01-040](originales/HARMONIA-CICLO-20261112-OMM-01-040-SALIDA-ORIGINAL.md): extracto literal de la respuesta final tal como aparece en la exportación. No sustituye el informe técnico B previamente archivado.
+- El índice de continuidad conserva los tres ciclos ya segmentados y marca esta conversación como `PARTIAL`; los intercambios adicionales del export aún no se han segmentado.
+## Snapshot operativo local · 2026-11-13 · D-039 / OMM-FUT-004–006
+
+- OCP local: **v0.81 / HARMONIA-v0.81**; v0.80 preservado byte a byte en `archive/OBJETO-CANONICO-v0.80-pre-D039-20261113.md`.
+- Especificación general: **v1.1.0**; v1.0.0 preservada byte a byte en `archive/ESPECIFICACION-GENERAL-v1.0.0-pre-D039-20261113.md`.
+- D-039 original: `originales/HARMONIA-INSTRUCCIONES-VERBATIM-20261113-D039.md`.
+- OMM-FUT-004: reporte por ventanas móviles 24h/48h/72h/7d, asociación explícita de la conversación ChatGPT al frente, última actividad, fecha/hora, rótulo relativo y URL canónica.
+- OMM-FUT-005: registro SemVer en `REGISTRO-VERSIONES-EXTENSION.md`; 0.4.9 es baseline PRE-D039 y 0.5.0 corresponde al esfuerzo D-039.
+- OMM-FUT-006: revisión recurrente de suficiencia de observabilidad en paralelo a todo esfuerzo de desarrollo de Extension. Auditoría inicial y propuestas OBS-PROP-001/002: `evidencias/HARMONIA-AUDITORIA-DATOS-FRENTES-D039.md`; cambios del observador sujetos a autorización.
+- Extensión candidata **0.5.0**, colector **0.5.0**, catálogo 0.1.3. Sintaxis Node y suite focal de utilidades/almacén/API: **16/16 PASS**.
+- No aceptación natural del popup en Chrome; BMO-01 NO ALCANZADO. Sin commit/push/PR/merge/deploy; rama local sin cambios en main.
+- Fuente de gobierno consultada: Samantha v393 / NX-393m; DUG main commit `67014eb24244651b2e805079930d08082f0fc41c`; discrepancias de representación interna del DUG permanecen abiertas.
+
+## Snapshot operativo local · 2026-11-13 · D-040 / OMM-FUT-007
+
+- OCP local **v0.82 / HARMONIA-v0.82**; v0.81 preservado byte a byte en archive/OBJETO-CANONICO-v0.81-pre-D040-20261113.md.
+- Especificación General **v1.2.0**; v1.1.0 preservada byte a byte en archive/ESPECIFICACION-GENERAL-v1.1.0-pre-D040-20261113.md.
+- D-040 original: originales/HARMONIA-INSTRUCCIONES-VERBATIM-20261113-D040.md; SHA-256 DA1D09E58345F90162868BA01212D157AFEDF98A86FB679B85C25E52A8C4DAE6.
+- Nueva tarea provisional **OMM-FUT-007**: archivar automáticamente la conversación actual de ChatGPT en un único Markdown por ID nativo, actualizado a cada ciclo, con calidad al menos igual a los exports de Downloads. **No implementada**; objetivo Extension **0.6.0** planificado.
+- Se auditaron siete exports Markdown de Downloads; métricas, hashes, suficiencia de datos y criterios de aceptación: evidencias/HARMONIA-AUDITORIA-CALIDAD-MARKDOWN-D040.md.
+- El banco histórico de observabilidad no conserva cuerpos ni estructura de mensajes. La captura futura debe limitarse al DOM renderizado de la conversación actual y persistir el contenido solo localmente, separado del JSONL.
+- OMM-FUT-006 recurrente aplicada: se auditó el dataset antes de ampliar observabilidad; no se creó otro banco ni se modificó el observador.
+- Salida B D-040: originales/HARMONIA-CICLO-20261113-D040-MARKDOWN-ARCHIVE-B.md; SHA-256 70A3B24904982E74D7DC2371A63DD9D80EE4063B73074C3C5A5ACE0BDD5E9904.
+- Extension/Collector siguen en candidata local **0.5.0**. No cambian manifest/build-info ni se crea el directorio de salida propuesto. Sin instalación/recarga de Chrome, aceptación natural, commit/push/PR/merge/deploy.
+
+## Snapshot operativo local · 2026-11-13 · D-041 / OMM-FUT-008
+
+- OCP local **v0.83 / HARMONIA-v0.83**; v0.82 preservado byte a byte en `archive/OBJETO-CANONICO-v0.82-pre-D041-20261113.md`.
+- Especificación General **v1.3.0**; v1.2.0 preservada byte a byte en `archive/ESPECIFICACION-GENERAL-v1.2.0-pre-D041-20261113.md`.
+- D-041 original: `originales/HARMONIA-INSTRUCCIONES-VERBATIM-20261113-D041.md`; SHA-256 `39A22D73AE31F150BA1E1F6A53F3517DDFE65E82BFC7D232ADAB072C99A53A3A`.
+- OMM-FUT-008: tarea paraguas provisional P1 para monitorización multi-pestaña de ChatGPT, archivo maestro por conversación, telemetría arquitectónica allowlisted, overlay contextual LIKE/DISLIKE/comentarios y gobernanza de refuerzos/incidencias. **NO IMPLEMENTADA**; versión objetivo propuesta 0.7.0 después de OMM-FUT-007/0.6.0.
+- Regla OMM-FUT-006 reforzada con compuertas O0–O5 en OCP §46.3 y Especificación §18.5. Auditoría: `evidencias/HARMONIA-AUDITORIA-FLUJO-OBSERVABILIDAD-D041.md`.
+- Diseño detallado: `originales/HARMONIA-CICLO-20261113-D041-EXPANSION-INCIDENCIAS-B.md`.
+- LIKE se registra como refuerzo; DISLIKE como señal correctiva; una incidencia formal requiere triage. Comentarios y cuerpos de conversación se mantienen fuera del JSONL general y de servicios externos.
+- OMM-FUT-007 se mantiene inalterada como captura Markdown de una conversación actual/pestaña; no está implementada.
+- Extension/Collector permanecen en candidata 0.5.0. Sin cambios de código, manifest, permisos, build-info, instalación/recarga Chrome, aceptación natural, commit/push/PR/merge/deploy.
+
+## Auditoría complementaria D-041 · OMM-FUT-008 / OMM-FUT-009
+
+- La candidata 0.5.0 ya consulta pestañas `chatgpt.com`, restaura sesiones por tabId e inyecta observadores en pestañas existentes; esta cobertura estructural es parcial y no crea archivos Markdown completos por conversación.
+- OMM-FUT-008 se mantiene P1 PROVISIONAL / NO IMPLEMENTADA: completar y validar esa base; añadir archivo maestro por ID nativo, overlay LIKE/DISLIKE/comentarios y triage de incidencias. 0.7.0 propuesta después de OMM-FUT-007/0.6.0.
+- OMM-FUT-009 se registra P1 PROVISIONAL / NO IMPLEMENTADA: retirar telemetría temporal heredada no conforme con Metacanon §52. El banco local tiene 3,190 eventos/70 JSONL; 31/31 `capture.stopped` incluyen `durationMs`. El código activo aún puede calcular/exponer `duration_ms`, medias, medianas y percentiles.
+- No se tocaron código, permisos, manifest, collector ni los 31 registros históricos. Se requiere autorización antes de corregir productores o modificar JSONL.
+- Auditoría detallada: `evidencias/HARMONIA-AUDITORIA-FLUJO-OBSERVABILIDAD-D041.md` §8; contrato de tareas: OCP §§50–51.
+
+
+## D-041 · Matriz de normas y brecha del corpus
+
+Matriz normativa D-001…D-041: `originales/HARMONIA-MATRIZ-NORMAS-OPERATIVAS-VERBATIM-D041.md` (32 normas N-01…N-32). No se localizaron fuentes literales D-025/D-026; OMM-FUT-010 queda P2 provisional para recuperar o confirmar su procedencia sin reconstrucciones. OCP §52 mantiene esta cobertura y el backlog.
+
+## D-042 · OMM-FUT-009 / release local 0.6.0
+
+OMM-FUT-009 está implementada localmente y la CI Harmonia/CI-LOCAL.ps1 pasa: 104/104 tests, 37 módulos JS/MJS, 6 scripts PowerShell y 9 JSON; contratos del inicializador/parada y cuarentena del índice temporal validados. Se retiró T1/T2/duración/latencia y se sustituyó por estados estructurales ACTIVE/INACTIVE. JSONL histórico intacto; outbox legado en cuarentena local. GitHub Actions, PR/merge a main y aceptación natural pendientes. Roadmap: 0.6.0 OMM-FUT-009; 0.7.0 OMM-FUT-007; 0.8.0 OMM-FUT-008; OMM-FUT-010 P2 sin versión.
+
+
+## Export conversacional · 2026-11-13 · retoma 15:59
+
+- Export completo: [originales/ChatGPT-HARMONIA-20261113-1559.md](originales/ChatGPT-HARMONIA-20261113-1559.md).
+- ID nativo ChatGPT: `6af74ca4-5c60-83e8-8fdf-a79d425567ac`; UUIDv7 local: `01a1d6f2-aa1e-7659-818e-695d34fd9d4c`.
+- Created 11:45:10 · Updated 15:49:36 · Exported 15:59:28 (tal como figura en el encabezado; zona horaria no explicitada).
+- 79,003 bytes · SHA-256 `FABF7B44D82FC8F1EF99A7638DC5AE6540DBA73E45796AAAB6A805E82920F03B`; copia desde Downloads cotejada y leída de vuelta.
+- Se registra como conversación independiente: el ID nativo difiere del export anterior de las 11:45. No se fusionan conversaciones ni se duplican ciclos.
+- Segmentación de ciclos de este export: PENDING_SEGMENTATION. El último ciclo técnico completo contenido en la conversación es D-042; su B ya estaba archivado.

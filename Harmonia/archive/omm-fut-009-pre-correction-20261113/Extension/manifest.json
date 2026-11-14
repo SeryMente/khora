@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Harmonia Â· Observabilidad del trabajo con IA",
+  "version": "0.5.0",
+  "description": "Observabilidad local de estructura y actividad de conversaciones ChatGPT asociadas explícitamente a frentes, sin capturar contenido de los mensajes.",
+  "permissions": [
+    "scripting",
+    "storage",
+    "tabs",
+    "alarms",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "http://127.0.0.1:47321/*",
+    "https://raw.githubusercontent.com/SeryMente/khora/*"
+  ],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Harmonia Â· mapeo automÃ¡tico"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "web_accessible_resources": [{
+    "resources": ["history-bridge.js"],
+    "matches": ["https://chatgpt.com/*"]
+  }],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "js": [
+        "cycle-observer.js",
+        "surface-catalog.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
