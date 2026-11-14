@@ -1,6 +1,6 @@
 {
     "schema_version":  "1.0.0",
-    "generated_at":  "2026-11-14T19:03:17.0179721Z",
+    "generated_at":  "2026-11-14T19:08:24.304Z",
     "source":  {
                    "repository":  "SeryMente/khora",
                    "workfront":  "Harmonia",
@@ -700,12 +700,12 @@
                               },
                               "source_artifact": {
                                   "path": "docs/frentes/harmonia/originales/HARMONIA-INSTRUCCIONES-VERBATIM-20261114-D043.md",
-                                  "sha256": "04BB60C193FE311F063923624C2B58E3A2D0B07C63DEC345EEBEBDADBFBE8A5F",
+                                  "sha256": "6DD9276C3DC4C3B5799AAAF8B83D979F6A5ED56D9991CFAD537ECA437AB6F2EF",
                                   "git_blob_sha1": null,
-                                  "bytes": 474,
+                                  "bytes": 476,
                                   "verification_status": "READBACK_HASH_VERIFIED",
                                   "hash_provenance": "Instrucción D-043 preservada literalmente; SHA-256 calculado desde el artefacto local y cotejado.",
-                                  "readback_verified_at": "2026-11-14T19:03:17.0179721Z"
+                                  "readback_verified_at": "2026-11-14T19:06:15.3821510Z"
                               },
                               "cycle_index_status": "INDEXED",
                               "cycles": [
@@ -720,10 +720,10 @@
                                               "status": "CAPTURED",
                                               "source_type": "operator_message",
                                               "source_ref": "docs/frentes/harmonia/originales/HARMONIA-INSTRUCCIONES-VERBATIM-20261114-D043.md",
-                                              "sha256": "04BB60C193FE311F063923624C2B58E3A2D0B07C63DEC345EEBEBDADBFBE8A5F",
+                                              "sha256": "6DD9276C3DC4C3B5799AAAF8B83D979F6A5ED56D9991CFAD537ECA437AB6F2EF",
                                               "timestamp": null,
                                               "provenance": "Texto verbatim D-043 preservado en A; timestamp nativo del mensaje no expuesto.",
-                                              "readback_verified_at": "2026-11-14T19:03:17.0179721Z"
+                                              "readback_verified_at": "2026-11-14T19:06:15.3821510Z"
                                           },
                                           "B": {
                                               "status": "CAPTURED",

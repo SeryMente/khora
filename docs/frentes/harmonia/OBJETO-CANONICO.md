@@ -2888,7 +2888,7 @@ Esto es CI local. No se afirma aún GitHub Actions PASS ni aceptación natural e
 ## 54. Retoma disciplinada, consolidación de 0.6.0 y bloqueo de GitHub Actions · D-043
 
 ### 54.1. Instrucción, gobierno e identidad
-- A verbatim: `originales/HARMONIA-INSTRUCCIONES-VERBATIM-20261114-D043.md`; SHA-256 `04BB60C193FE311F063923624C2B58E3A2D0B07C63DEC345EEBEBDADBFBE8A5F`; 474 bytes.
+- A verbatim: `originales/HARMONIA-INSTRUCCIONES-VERBATIM-20261114-D043.md`; SHA-256 `6DD9276C3DC4C3B5799AAAF8B83D979F6A5ED56D9991CFAD537ECA437AB6F2EF`; 476 bytes.
 - Conversación local UUIDv7: `01a1db6a-1ce0-792e-948f-b13e09b360ab`; ciclo local UUIDv7: `01a1db6a-1ce3-7409-9534-c70e3f4e4bc8`; ID nativo no expuesto.
 - DUG adquirido de `SeryMente/metodologia/main`: Samantha v396 / NX-396m; GOW 2.24; commit `ac715e04f227ed78ec4d196bbc76d0aa464eda7d`; blob HTML `038e29762038c96afa7291b86ba4c12fab338ff0`. Metacanon metadata 1.31 frente a embedded 1.30; discrepancia abierta. §4.5 y §52 confirman desactivación de métricas temporales. Sin modificación del DUG.
 - Petición D-043: mantener el backlog ordenado y continuar el frente con método y disciplina.
@@ -2927,5 +2927,9 @@ Esto es CI local. No se afirma aún GitHub Actions PASS ni aceptación natural e
 
 ### 54.6. Índice y read-back D-043
 - Baseline anterior: `archive/HARMONIA-DATASET-INDEX-pre-D043-20261114.json`; SHA-256 `5C60153872E0E316D8D8CA3F2E629A4D31A9E2815B1E17A546B142301403A94F`; 604,052 bytes; copia verificada.
-- Índice actualizado: `continuidad/HARMONIA-DATASET-INDEX.json`; SHA-256 `F5D8A21055B4A29C5B4A480295C291E84BCF271E4CA1FEC1D8942E4B364D2651`; 10 conversaciones, un ciclo D-043, OCP 0.85 y DUG main commit `ac715e04f227ed78ec4d196bbc76d0aa464eda7d`; parse/read-back PASS.
+- Índice actualizado: `continuidad/HARMONIA-DATASET-INDEX.json`; SHA-256 `16A35B814F459876F69C07206260A099A4DF5D93D6A196E7076E0893DB67E8BB`; 10 conversaciones, un ciclo D-043, OCP 0.85 y DUG main commit `ac715e04f227ed78ec4d196bbc76d0aa464eda7d`; parse/read-back PASS.
 - A/B D-043 vinculados al ciclo local `01a1db6a-1ce3-7409-9534-c70e3f4e4bc8`; timestamps nativos no expuestos y por tanto null. La cobertura histórica permanece PARTIAL; FOL1 no asigna folios globales.
+
+- A D-043 literal corregida: dos espacios dobles originales preservados; 476 bytes; SHA-256 `6DD9276C3DC4C3B5799AAAF8B83D979F6A5ED56D9991CFAD537ECA437AB6F2EF`.
+- Índice intermedio pre-corrección A preservado: `archive/HARMONIA-DATASET-INDEX-pre-D043-A-verbatim-correction-20261114.json`; SHA-256 `F5D8A21055B4A29C5B4A480295C291E84BCF271E4CA1FEC1D8942E4B364D2651`; 609,993 bytes.
+- Índice final D-043: 609,989 bytes; SHA-256 `16A35B814F459876F69C07206260A099A4DF5D93D6A196E7076E0893DB67E8BB`; 10 conversaciones, 1 ciclo D-043, source artifact y parts.A con SHA final; parse/read-back PASS.

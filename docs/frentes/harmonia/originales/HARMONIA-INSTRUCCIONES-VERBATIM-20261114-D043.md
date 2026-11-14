@@ -8,4 +8,4 @@
 
 ## Texto original recibido
 
-Tienes tus tareas en orden, backlog para trabajar' Sigue resolviendo con metodo, y disciplina, de extremo a xxremo
+Tienes tus tareas en orden, backlog para trabajar' Sigue resolviendo con metodo, y  disciplina,  de extremo a xxremo
