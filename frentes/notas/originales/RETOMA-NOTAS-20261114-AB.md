@@ -71,7 +71,7 @@ Procesamiento del modelo de inteligencia artificial.
 
 (Nube)
 
-Con Groq, tu procesador no tiene que ejecutar el modelo de lenguaje. La carga local corresponde principalmente a OpenCode, la lectura de archivos, las herramientas y los procesos del proyecto. No necesitas una tarjeta gráfica dedicada para esta arquitectura. [[OpenCode + Groq](https://console.groq.com/docs/coding-with-groq/opencode?utm_source=chatgpt.com); [Intro | AI coding agent built for the terminal](https://opencode.ai/docs/?trk=public_profile__posts-text&utm_source=chatgpt.com)]
+Con Groq, tu procesador no tiene que ejecutar el modelo de lenguaje. La carga local corresponde principalmente a OpenCode, la lectura de archivos, las herramientas y los procesos del proyecto. No necesitas una tarjeta gráfica dedicada para esta arquitectura. \[[OpenCode \+ Groq](https://console.groq.com/docs/coding-with-groq/opencode?utm_source=chatgpt.com); [Intro \| AI coding agent built for the terminal](https://opencode.ai/docs/?trk=public_profile__posts-text&utm_source=chatgpt.com)\]
 
 ### Mi evaluación
 
@@ -87,7 +87,7 @@ La Intel UHD 630 y los 16 GB de RAM no son una buena plataforma para ejecutar lo
 
 ## Dos consideraciones para EP
 
-1. La documentación oficial recomienda WSL en Windows para obtener mejor compatibilidad y rendimiento. También admite instalación mediante npm directamente en Windows. En tu equipo empezaría evaluando la instalación nativa, evitando agregar consumo de WSL sin necesidad. [[Intro | AI coding agent built for the terminal](https://opencode.ai/docs/?trk=public_profile__posts-text&utm_source=chatgpt.com); [Windows (WSL)](https://docs.dev.opencode.ai/docs/windows-wsl/?utm_source=chatgpt.com)]
+1. La documentación oficial recomienda WSL en Windows para obtener mejor compatibilidad y rendimiento. También admite instalación mediante npm directamente en Windows. En tu equipo empezaría evaluando la instalación nativa, evitando agregar consumo de WSL sin necesidad. \[[Intro \| AI coding agent built for the terminal](https://opencode.ai/docs/?trk=public_profile__posts-text&utm_source=chatgpt.com); [Windows (WSL)](https://docs.dev.opencode.ai/docs/windows-wsl/?utm_source=chatgpt.com)\]
 2. **RDC reportó un 96 % de uso de su cuota mensual** al consultar el equipo. Esto no limita OpenCode localmente, pero sí puede limitar el trabajo remoto que realicemos desde ChatGPT hasta que se renueve o amplíe esa cuota.
 
 ## Veredicto
@@ -96,7 +96,7 @@ La Intel UHD 630 y los 16 GB de RAM no son una buena plataforma para ejecutar lo
 
 Tu HP es suficiente para instalar BMAD, OpenCode y trabajar con Groq. No recomendaría invertir en hardware adicional para esta arquitectura.
 
-**IPZ:** v0.7 · edad NO VERIFICADA
-**DUG:** Samantha v389 · NX-389m · edad NO VERIFICADA
-**CONV / CICLO / A / B:** folios globales PENDIENTES · NO ASIGNADOS
-**FOL1:** NO ACTIVO
+**IPZ\:** v0.7 · edad NO VERIFICADA
+**DUG\:** Samantha v389 · NX-389m · edad NO VERIFICADA
+**CONV / CICLO / A / B\:** folios globales PENDIENTES · NO ASIGNADOS
+**FOL1\:** NO ACTIVO
