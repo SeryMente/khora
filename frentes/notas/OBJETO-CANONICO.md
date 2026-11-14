@@ -134,6 +134,7 @@ Aplicar el formato obligatorio de Metacanon §4 en cada ciclo sustantivo: identi
 - [Instrucción de asunción](originales/INSTRUCCION-ASUNCION-20261112.md).
 - [Salida visible de asunción](originales/SALIDA-MODELO-20261112-ASUNCION.md).
 - [Crónica de asunción](cronica/ASUNCION-SES-20261112-4FB90722.md).
+- [Crónica de retoma 14-11](cronica/RETOMA-20261114.md): relevo de responsabilidad, A/B y persistencia de la exportación.
 - [Salida visible de apertura](originales/SALIDA-MODELO-20261112.md), incorporada y leída de vuelta en el cierre documental de la publicación.
 - [Conversación del 12-11](originales/ChatGPT-NOTAS-20261112-1630.md): registro documental condensado.
 - [Exportación del 14-11](originales/ChatGPT-NOTAS-20261114-1254.md): archivo recuperado de Downloads por RDC; SHA-256 de la fuente `58315C9FD78A85E5588BB9E861DEFE08E4C9470954BF37904E2CECA1B49A1A7B`.
@@ -205,6 +206,7 @@ El operador ordenó retomar el Frente NOTAS tomando el lugar del modelo anterior
 - **Fuente A:** mensaje literal del operador en la entrada A del registro A/B.
 - **Fuente del volcado:** `C:\Users\fila4\Downloads\ChatGPT-NOTAS-20261114-1254.md`, leído por RDC el 2026-11-14 12:54 (hora local); 71.289 bytes. SHA-256 de la fuente: `58315C9FD78A85E5588BB9E861DEFE08E4C9470954BF37904E2CECA1B49A1A7B`.
 - **B conservada:** respuesta final visible fechada originalmente el 2026-11-12 a las 2:37:40 p. m. Empieza «Revisé las especificaciones directamente mediante RDC»; el registro A/B conserva el texto y su formato Markdown. No se incluyeron mensajes intermedios de progreso.
+- **Crónica del ciclo:** [RETOMA-20261114.md](cronica/RETOMA-20261114.md).
 - **Persistencia comprobada en rama documental:** `docs/notas-retoma-20261114`, creada desde `main` en `3abdecfa552547851621c98fcdda4e93147f1893`. El archivo de conversación se leyó de vuelta y su texto coincide con el contenido enviado; el control también se leyó de vuelta en generación 3.
 - **Alcance:** actualización exclusivamente documental y del control de responsabilidad. Sin cambios de código, datos o infraestructura. Las afirmaciones sobre hardware y cuota RDC dentro de B son históricas, no una medición repetida en esta retoma.
 - **Continuidad del producto:** mantener separados Notas y EP. La evaluación BMAD/OpenCode/Groq/RDC pertenece al OCP de EP según §16; el desarrollo funcional de Notas continúa pendiente de definición con el operador.
