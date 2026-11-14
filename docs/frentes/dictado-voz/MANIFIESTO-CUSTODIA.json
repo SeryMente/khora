@@ -255,9 +255,9 @@
     },
     {
       "path": "OBJETO-CANONICO.md",
-      "bytes": 178372,
-      "sha256": "0DB41B2442A3F58F539346702DBE43AEC2B156FAD01BB3102ED519CC54A4D894",
-      "git_blob_sha": "a1d83ccb7fd2b222af4b8f2d7754351467436219"
+      "bytes": 179535,
+      "sha256": "AC91503300D42B9ADBE5E4113E78DD615CB66C69687A77D66953D5EC3603C600",
+      "git_blob_sha": "f135a9e14521fc62a20ef4beab2a79fe648f5395"
     },
     {
       "path": "evidencias/dialogo.test.ts",
@@ -527,7 +527,7 @@
     "receipt": "evidencias/C030-release.json",
     "state": "C045 final: original export byte identity verified; transfer control generation 6 read back; OCP v0.6.20 and manifest updated and read back. No product code, tests, PR actions, credentials, provider, deployment or production changes."
   },
-  "latestEvent": "C045 — Retoma documental, transferencia de Dictado de generación 5 a 6 e incorporación byte a byte de ChatGPT-DICTADO-20261106-1540.txt; OCP y manifiesto actualizados. Sin cambios de producto, pruebas, PR ni producción.",
+  "latestEvent": "C046 — delimitación expresa del alcance de Dictado; tareas y dependencias de Custodia excluidas del frente. OCP y manifiesto actualizados; documentos y tareas de Custodia preservados.",
   "latest_verified_release": {
     "sha": "f0dfbdcb2d79eb6289dacba272ddcc7ba2023063",
     "deploymentId": "dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr",
@@ -553,8 +553,8 @@
     "physicalAcceptance": false,
     "technicalPublicationVerified": true
   },
-  "latest_cycle": "C045",
-  "canonical_version": "0.6.20",
+  "latest_cycle": "C046",
+  "canonical_version": "0.6.21",
   "latest_candidate": {
     "pr": 335,
     "url": "https://github.com/SeryMente/khora/pull/335",
@@ -674,15 +674,15 @@
     "native_conversation_id_exposed": false,
     "complete_native_export": false
   },
-  "latest_product_event": "C045 — no code, tests, PR, deployment, data, credentials or production changes. The audio-archive defect remains under CUSTODIA-04/SCI 354Q validation; the source export's PR #354/CI status is historical in this cycle, not revalidated.",
+  "latest_product_event": "C046 — ajuste documental del alcance de Dictado: se excluyeron tareas, dependencias, contratos y criterios de aceptación de Custodia. Sin cambios de código, pruebas, PR, datos, credenciales, proveedor, despliegue ni producción. La referencia CUSTODIA-04/SCI 354Q de C045 queda solo como antecedente histórico y no integra el estado vivo de Dictado.",
   "latest_object": {
-    "version": "0.6.20",
+    "version": "0.6.21",
     "ref": "main",
-    "blob_sha": "a1d83ccb7fd2b222af4b8f2d7754351467436219",
-    "commit": "0f9369d7ee0101fc581bb2230f079aa452f2d216",
-    "bytes": 178372,
-    "sha256": "0DB41B2442A3F58F539346702DBE43AEC2B156FAD01BB3102ED519CC54A4D894",
-    "state": "C045: transfer generation 5→6 and original export preserved byte-for-byte; control, OCP and manifest read back. No product code, tests, deployment or functional acceptance."
+    "blob_sha": "f135a9e14521fc62a20ef4beab2a79fe648f5395",
+    "commit": "65216cf7ca33d728a54f6d9b5661138df3c213d2",
+    "bytes": 179535,
+    "sha256": "AC91503300D42B9ADBE5E4113E78DD615CB66C69687A77D66953D5EC3603C600",
+    "state": "C046: alcance de Dictado separado de Custodia; referencias históricas preservadas y tareas de Custodia fuera de Dictado. Sin cambios de producto, pruebas, PR, despliegue, datos, credenciales o producción."
   },
   "recent_verbatim_instruction_ingestion": {
     "path": "originales/INSTRUCCIONES-VERBATIM-TAIL-C032-20261022.jsonl",
@@ -720,13 +720,21 @@
       "dialogue multi-track capture",
       "general Ingreso/chronicle/metadata",
       "voice/symptom proposal",
-      "editorial publishing"
+      "editorial publishing",
+      "Custodia: titularidad, backlog, tareas, contratos y criterios de aceptación"
     ],
-    "notes": "All historical source/evidence remains in place; no deletion, reassignment or unapproved new OCP creation.",
+    "notes": "Los originales y evidencias históricos se conservan. No se copian ni asignan tareas de Custodia a Dictado; permanecen en el OCP y registros propios de Custodia.",
     "observability_mcp_object_blob": "a3b1335c7b3b13d5ce3e1cbf4ea50f8c0866cd36",
     "observability_mcp_control_blob": "e710b17cb5f6d793846a1ac692ec78103ed111d7",
     "dictation_object_blob": "5a83c8ca417191a37adcfc4a7e8216e0f16be06d",
-    "readback_verified": true
+    "readback_verified": true,
+    "custodia_exclusion": {
+      "status": "excluded_from_dictado",
+      "custodia_tasks_preserved": true,
+      "custodia_front_documents_modified": false,
+      "historical_references_preserved": true,
+      "cycle": "C046"
+    }
   },
   "source_export_ingestion": {
     "path": "originales/ChatGPT-DICTADO-20261106-1540.txt",
