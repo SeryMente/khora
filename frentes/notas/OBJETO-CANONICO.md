@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.30; OBJECT_VERSION=0.1.5; OBJECT_SEAL=NOTAS-v0.1.5; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.31; OBJECT_VERSION=0.1.6; OBJECT_SEAL=NOTAS-v0.1.6; SINGLE_LIVE_OBJECT=true -->
 # Notas de Khora · Objeto canónico de persistencia del frente
 
-> **ESTADO · FRENTE ACTIVO · CONTROL ASIGNADO · GENERACIÓN 1 · COMPONENTE NO DESARROLLADO.** Este documento es la única fuente viva del frente. La versión 0.1.3 corresponde al OCP, no al producto.
+> **ESTADO · FRENTE ACTIVO · CONTROL ASIGNADO · GENERACIÓN 3 · COMPONENTE NO DESARROLLADO.** Este documento es la única fuente viva del frente. La versión 0.1.6 corresponde al OCP, no al producto.
 
 ## 1. Control e identidad
 
@@ -10,9 +10,9 @@
 - **Repositorio:** `SeryMente/khora`, rama `main`.
 - **OCP:** `frentes/notas/`.
 - **Núcleo único:** este `OBJETO-CANONICO.md`.
-- **Versión documental:** `0.1.4` · sello `NOTAS-v0.1.4`. 
-- **Control:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json), `status=assigned`, generación `2`; alias `chatgpt-notas-SES-20261112-7B01D71C`.
-- **Folio SES activo:** `SES-20261112-7B01D71C`. UUIDv7 local `01a1d1e4-5a51-7122-8d4e-fa0f7b01d71c`; ID nativo no expuesto (`owner_thread=null`). **FOL1:** PREPARADO, NO ACTIVO; folios globales CONV/CICLO/A/B pendientes y no asignados.
+- **Versión documental:** `0.1.6` · sello `NOTAS-v0.1.6`.
+- **Control:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json), `status=assigned`, generación `3`; alias operativo local `chatgpt-notas-retoma-20261114-01a1db72-d52f-7bc8-bd52-56552d8ccd8d`.
+- **UUIDv7 local:** `01a1db72-d52f-7bc8-bd52-56552d8ccd8d`; ID nativo no expuesto (`owner_thread=null`). No se creó folio SES en esta retoma; conforme a ART-024, UUID/alias son metadatos locales opcionales. **FOL1:** PREPARADO, NO ACTIVO; folios globales CONV/CICLO/A/B PENDIENTES / NO ASIGNADOS.
 - **Evento de apertura documental:** `01a1d0ca-d1da-75ec-a98d-af5a96f070d1`, UUIDv7 local generado para este evento; no es ID nativo de plataforma.
 - **Origen:** instrucción directa del operador del 2026-11-12, preservada en [originales/INSTRUCCION-ORIGINAL-20261112.md](originales/INSTRUCCION-ORIGINAL-20261112.md).
 
@@ -25,7 +25,7 @@ Al reinstanciar:
 1. Adquirir desde `SeryMente/metodologia/main` la puerta [INICIO.md](https://github.com/SeryMente/metodologia/blob/main/INICIO.md) y la fuente [DUG Samantha](https://github.com/SeryMente/metodologia/blob/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html). Leer primero §ARR del GOW, después el DUG y aplicar sus principios en orden.
 2. Adquirir Metacanon y GOW vigentes desde el mismo DUG; revisar frescura, commit/blob y delta al inicio y cierre del ciclo. MCP-NORMATIVO: **DESACTIVADO**.
 3. Leer este OCP, [README](README.md), [control](CONTROL-RESPONSABILIDAD.json), [original del operador](originales/INSTRUCCION-ORIGINAL-20261112.md), [crónica](cronica/INICIO-20261112.md) y los [prompts](prompts/).
-4. Comprobar el control y adjudicar la nueva sesión solo si sigue sin titular, conforme a Metacanon §§42 y 47. Registrar el folio SES y UUIDv7 local que correspondan con comparación SHA/generación y lectura de vuelta.
+4. Ante una instrucción explícita del operador que identifica el frente y ordena retomar su continuidad, relevar al titular anterior sin pedir su consentimiento ni una segunda confirmación. Actualizar el control solo en el alcance autorizado, sobre el SHA observado y con lectura de vuelta. No abrir un ciclo burocrático separado para la retoma; FOL1 inactivo no bloquea el trabajo.
 5. Recuperar la última salida visible persistida; citarla literalmente al iniciar. Si no está disponible, declararlo, sin reconstruirla.
 6. Inspeccionar la arquitectura vigente de Khora antes de proponer diseño o código. Definir requisitos y aceptación con el operador; no inferir funciones por el nombre del componente.
 
@@ -35,15 +35,14 @@ La autoridad de este frente no absorbe ni sustituye los OCP de Dictado, Harmonia
 
 Fuente canónica: [`SeryMente/metodologia/main`](https://github.com/SeryMente/metodologia/tree/main).
 
-- **DUG:** Samantha v389 · NX-389m.
-- **Metacanon:** 1.30 según `INICIO.md` y metadatos estructurados del DUG.
-- **GOW:** 2.19; §ARR leído para esta apertura.
-- **Revisión `main` consultada en este ciclo:** `85b6fb48b5db03d3dfe27d10fa30b6d644f536a0`; DUG e INICIO mantienen los blobs declarados arriba.
-- **Blob del DUG:** `bcd99e72113f444a045d7f1c91b4ad36865b8ea8`.
-- **Blob de `INICIO.md`:** `f4a9b576d43380c57065c46b1f723c89ea67eb7b`.
-- **Discrepancia textual observada:** el bloque inicial del texto humano de Metacanon conserva una referencia a 1.29, mientras `INICIO.md` y el metadato estructurado señalan 1.30. Se conserva el dato y se deja la divergencia registrada, sin modificar el DUG.
-- **Principios revisados por pertinencia:** P001, P038, P002, P003, P004, P005, P037, P006, P007, P008, P039, P040, P041, P042 y P043, respetando su orden en la cascada.
-- **MCP-NORMATIVO:** DESACTIVADO.
+- **DUG:** Samantha v396 · NX-396m según título y metadatos estructurados; el pie HTML aún declara v395 · NX-395m.
+- **Metacanon:** 1.31; **GOW:** 2.24, según los metadatos estructurados del DUG. `INICIO.md` aún declara v389/NX-389m, Metacanon 1.30 y GOW 2.19; se conserva la discrepancia, sin modificar Metodología.
+- **Revisión canónica de `SeryMente/metodologia/main`:** commit `ac715e04f227ed78ec4d196bbc76d0aa464eda7d` (committer 2026-11-13T22:00:40Z).
+- **Blob DUG:** `038e29762038c96afa7291b86ba4c12fab338ff0`. **Blob de `INICIO.md`:** `f4a9b576d43380c57065c46b1f723c89ea67eb7b`.
+- **§ARR:** adquirido íntegramente; define vocabulario y relaciones de entrada, no reglas de gobernanza.
+- **CNP:** leídos íntegramente P044, P001, P004, P005, P038 y P043, en ese orden. Pertinentes para precedencia del operador, cascada, no simulación, autorización, fuente canónica y economía.
+- **Anexos consultados:** ART-024 (registro conversacional, A/B y FOL1), ART-025, ART-027, ART-031 (directorio taxonómico), ART-032 (lectura, ejecución y complementos). La ruta verificada del frente es `SeryMente/khora/frentes/notas/`.
+- **MCP-NORMATIVO:** **DESACTIVADO**.
 
 El Metacanon es el método para mantener este frente; KHORA `main` es la fuente del estado y código del producto. Ninguna copia externa desplaza esas fuentes.
 
@@ -86,26 +85,26 @@ Estos puntos son **pendientes de definición**, no funcionalidades aprobadas ni 
 - **Operador:** propietario del propósito, decisiones de producto, autorización de cambios materiales y aceptación final.
 - **Asistente previsto por el marco:** Claudia; coordina, mantiene el OCP, controla alcance, evidencia y continuidad.
 - **Constructor previsto por el marco:** Samantha; investiga y ejecuta las unidades técnicas aprobadas, entrega diff/pruebas/checkpoint al asistente.
-- **Estado de instancias:** rol asistente (Claudia) adjudicado a esta sesión mediante alias operativo local `chatgpt-notas-SES-20261112-7B01D71C`; rol constructor (Samantha) no instanciado. El alias no es ID nativo ni prueba criptográfica de identidad.
+- **Estado de instancias:** rol asistente (Claudia) adjudicado a esta sesión mediante alias local `chatgpt-notas-retoma-20261114-01a1db72-d52f-7bc8-bd52-56552d8ccd8d` y UUIDv7 local `01a1db72-d52f-7bc8-bd52-56552d8ccd8d`; rol constructor (Samantha) no instanciado. El alias y UUID no son ID nativo.
 - Mantener un solo escritor del OCP por vez. El constructor no usa RDC; su uso está reservado al asistente cuando sea estrictamente necesario, autorizado y verificable.
 
 ## 6. Autoridad
 
-La instrucción original autorizó la apertura documental. La instrucción directa posterior del operador —«Asue responsabilidad d efrente de trabajo Notas Rapidas de Khora»— autoriza a esta sesión a asumir la responsabilidad operativa exclusiva del frente y registrar la adjudicación. No amplía las compuertas técnicas: no autoriza cambios de código, esquema/datos, credenciales, seguridad, proveedores, despliegue ni producción.
+La instrucción original autorizó la apertura documental. La instrucción directa posterior del operador —«Asue responsabilidad d efrente de trabajo Notas Rapidas de Khora»— autorizó la asunción anterior. El 2026-11-14, el operador instruyó explícitamente a esta sesión tomar el lugar del modelo anterior, retomar el Frente NOTAS y persistir la conversación y su última salida; esta instrucción releva al titular previo y autoriza la actualización documental/control.
 
-El objetivo general del frente es desarrollar Notas. La definición funcional detallada, los criterios de aceptación y las decisiones de arquitectura siguen pendientes de ratificación. No convertir propuestas del asistente/constructor en requisitos aprobados. Los cambios de producto, datos, seguridad, secretos, servicios externos y Production quedan sujetos a sus autorizaciones y compuertas específicas.
+El objetivo general del frente es desarrollar Notas. La definición funcional detallada, los criterios de aceptación y las decisiones de arquitectura siguen pendientes de ratificación. No convertir propuestas del asistente/constructor en requisitos aprobados. Los cambios de producto, datos, seguridad, secretos, servicios externos y producción siguen sujetos a sus autorizaciones y compuertas específicas. Esta retoma no amplía esos permisos.
 
 ## 7. Perfil de entorno
 
 - Repositorio de documentación y código: `SeryMente/khora`, rama `main`.
 - Revisión base de KHORA al abrir el frente: `7781939197333efe98aea35c0fe05c7eb31dd7fb`.
-- Entorno local, terminal del operador, perfil Windows, dispositivos RDC, runtime, credenciales, bases de datos y despliegues: **NO ADQUIRIDOS / NO VERIFICADOS** para esta apertura.
-- No se utilizó RDC ni se accedió al entorno local.
+- **RDC usado en esta retoma:** equipo `PC10RCIF4EI4`, perfil `CENTRAL\fila4`; se leyó únicamente `C:\Users\fila4\Downloads\ChatGPT-NOTAS-20261114-1254.md`.
+- No se modificó el equipo ni se revalidaron hardware, espacio de disco, credenciales, bases de datos o despliegues. Las especificaciones HP del B histórico pertenecen al ciclo del 12-11-2026 y no se reexaminaron ahora.
 - El repositorio es privado; los prompts deben operar con las fuentes y permisos efectivamente disponibles en la conversación nueva.
 
 ## 8. Estado vivo
 
-**Acción actual:** el frente cambió de nombre a **Notas**, su OCP pasó de "frentes/notas-rapidas/" a "frentes/notas/" y la responsabilidad se actualizó a generación 2. La versión documental vigente es **0.1.4**, sello **NOTAS-v0.1.4**. Esta modificación es documental y de navegación; el componente sigue **NO DESARROLLADO** y sin especificación funcional detallada. No se modificó código de producto, esquema, datos, credenciales, seguridad, proveedores, despliegue ni producción.
+**Acción actual:** la retoma del 2026-11-14 se registró en generación 3; OCP documental **0.1.6**, sello **NOTAS-v0.1.6**. Se archivó la exportación completa de la conversación y una entrada A/B con la instrucción del operador y la última salida final visible del modelo anterior. Esta modificación es documental; el componente sigue **NO DESARROLLADO** y sin especificación funcional detallada. No se modificó código de producto, esquema, datos, credenciales, seguridad, proveedores, despliegue ni producción.
 
 **Siguiente paso de la conversación de trabajo:**
 
@@ -136,7 +135,10 @@ Aplicar el formato obligatorio de Metacanon §4 en cada ciclo sustantivo: identi
 - [Salida visible de asunción](originales/SALIDA-MODELO-20261112-ASUNCION.md).
 - [Crónica de asunción](cronica/ASUNCION-SES-20261112-4FB90722.md).
 - [Salida visible de apertura](originales/SALIDA-MODELO-20261112.md), incorporada y leída de vuelta en el cierre documental de la publicación.
-- Fuentes de gobierno: `SeryMente/metodologia/main`, DUG v389/NX-389m, Metacanon 1.30, GOW 2.19; revisiones y discrepancia documentadas en §3.
+- [Conversación del 12-11](originales/ChatGPT-NOTAS-20261112-1630.md): registro documental condensado.
+- [Exportación del 14-11](originales/ChatGPT-NOTAS-20261114-1254.md): archivo recuperado de Downloads por RDC; SHA-256 de la fuente `58315C9FD78A85E5588BB9E861DEFE08E4C9470954BF37904E2CECA1B49A1A7B`.
+- [Retoma A/B del 14-11](originales/RETOMA-NOTAS-20261114-AB.md): instrucción actual literal y reproducción de la última salida final visible del ciclo anterior.
+- Fuentes de gobierno: `SeryMente/metodologia/main`; estado y discrepancias documentados en §3.
 - Fuentes de producto: `SeryMente/khora` en `main`; corte base `7781939197333efe98aea35c0fe05c7eb31dd7fb`.
 - La búsqueda indexada inicial de “Notas rápidas”, “frentes/notas-rapidas” y términos equivalentes no devolvió coincidencias. Esto no equivale a una auditoría exhaustiva de todos los recursos de la organización.
 
@@ -144,11 +146,13 @@ Aplicar el formato obligatorio de Metacanon §4 en cada ciclo sustantivo: identi
 
 - Entrada de la nueva conversación: [prompt de asistente](prompts/ASISTENTE.md).
 - Encargo del rol constructor: [prompt de constructor](prompts/CONSTRUCTOR.md).
-- Registro documental condensado de la conversación: [ChatGPT-NOTAS-20261112-1630.md](originales/ChatGPT-NOTAS-20261112-1630.md); conserva entradas del operador y sintetiza respuestas del asistente.
-- Control al cierre de este ciclo: **assigned**, generación **2**; alias operativo **chatgpt-notas-SES-20261112-7B01D71C**; folio SES **SES-20261112-7B01D71C**; UUIDv7 local **01a1d1e4-5a51-7122-8d4e-fa0f7b01d71c**; owner_thread=null.
-- El alias, UUID y folio de la generación 1 se conservan como antecedente; no se reutilizan como identificador nativo de esta conversación.
-- Una nueva instancia debe leer el control actual y aplicar Metacanon §§42 y 47 ante cualquier relevo o corresponsabilidad. Los identificadores locales no prueban identidad de plataforma ni sustituyen la autorización.
-- Las salidas, instrucciones y crónicas anteriores permanecen conservadas como antecedentes históricos. El registro documental condensado de esta conversación se añade sin reemplazarlas; no es una transcripción literal íntegra ni exportación nativa.
+- Conversación condensada anterior: [ChatGPT-NOTAS-20261112-1630.md](originales/ChatGPT-NOTAS-20261112-1630.md).
+- Exportación completa recuperada: [ChatGPT-NOTAS-20261114-1254.md](originales/ChatGPT-NOTAS-20261114-1254.md).
+- Último B visible y su A de retoma: [RETOMA-NOTAS-20261114-AB.md](originales/RETOMA-NOTAS-20261114-AB.md).
+- Control actual: **assigned**, generación **3**; alias local **chatgpt-notas-retoma-20261114-01a1db72-d52f-7bc8-bd52-56552d8ccd8d**; UUIDv7 local **01a1db72-d52f-7bc8-bd52-56552d8ccd8d**; `session_folio=null`; `owner_thread=null` (ID nativo no expuesto).
+- El alias y UUID local no identifican la conversación nativa. FOL1 sigue PREPARADO/NO ACTIVO: no se emiten folios globales CV/CY/A/B.
+- La instrucción expresa del operador para tomar el lugar del modelo anterior releva el titular previo; no requiere segunda aprobación ni aceptación del titular saliente.
+- Los originales y registros previos se conservan como antecedentes; la nueva exportación se incorpora íntegra y la nueva entrada A/B distingue A literal, B final visible y procedencia.
 
 ## 13. Persistencia y revisión
 
@@ -192,3 +196,15 @@ El archivo [ChatGPT-NOTAS-20261112-1630.md](originales/ChatGPT-NOTAS-20261112-16
 - El alcance funcional de Notas permanece independiente: sigue pendiente de definición con el operador y no debe inferirse de la conversación archivada.
 
 **Siguiente continuidad sugerida:** retomar la evaluación BMAD/OpenCode/Groq/RDC en el OCP canónico de Entorno Persistente; verificar allí arquitectura y autorización vigentes, comprobar de nuevo el equipo mediante RDC si resulta necesario y decidir la siguiente acción concreta antes de instalar. Mantener este enlace como referencia cruzada, sin duplicar el control de EP.
+
+
+## 17. Retoma y persistencia · 2026-11-14
+
+El operador ordenó retomar el Frente NOTAS tomando el lugar del modelo anterior, persistir la exportación disponible en Downloads por RDC y reproducir literalmente la última salida final del ciclo previo. La instrucción se conserva en [RETOMA-NOTAS-20261114-AB.md](originales/RETOMA-NOTAS-20261114-AB.md), junto con B. Se conserva también la exportación completa en [ChatGPT-NOTAS-20261114-1254.md](originales/ChatGPT-NOTAS-20261114-1254.md).
+
+- **Fuente A:** mensaje literal del operador en la entrada A del registro A/B.
+- **Fuente del volcado:** `C:\Users\fila4\Downloads\ChatGPT-NOTAS-20261114-1254.md`, leído por RDC el 2026-11-14 12:54 (hora local); 71.289 bytes. SHA-256 de la fuente: `58315C9FD78A85E5588BB9E861DEFE08E4C9470954BF37904E2CECA1B49A1A7B`.
+- **B conservada:** respuesta final visible fechada originalmente el 2026-11-12 a las 2:37:40 p. m. Empieza «Revisé las especificaciones directamente mediante RDC»; el registro A/B conserva el texto y su formato Markdown. No se incluyeron mensajes intermedios de progreso.
+- **Persistencia comprobada en rama documental:** `docs/notas-retoma-20261114`, creada desde `main` en `3abdecfa552547851621c98fcdda4e93147f1893`. El archivo de conversación se leyó de vuelta y su texto coincide con el contenido enviado; el control también se leyó de vuelta en generación 3.
+- **Alcance:** actualización exclusivamente documental y del control de responsabilidad. Sin cambios de código, datos o infraestructura. Las afirmaciones sobre hardware y cuota RDC dentro de B son históricas, no una medición repetida en esta retoma.
+- **Continuidad del producto:** mantener separados Notas y EP. La evaluación BMAD/OpenCode/Groq/RDC pertenece al OCP de EP según §16; el desarrollo funcional de Notas continúa pendiente de definición con el operador.
