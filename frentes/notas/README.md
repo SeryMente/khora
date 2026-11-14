@@ -13,6 +13,7 @@ Entrada única de estado: [OBJETO-CANONICO.md](OBJETO-CANONICO.md). El OCP conse
 - [Retoma A/B del 14-11](originales/RETOMA-NOTAS-20261114-AB.md): instrucción actual y última salida final visible del modelo anterior, conservada literalmente.
 - [Crónica de apertura](cronica/INICIO-20261112.md): evento y checkpoint original.
 - [Crónica de renombrado](cronica/RENOMBRE-20261112.md): cambio de nombre, ruta, URLs y control.
+- [Crónica de retoma](cronica/RETOMA-20261114.md): relevo y persistencia del 14 de noviembre.
 
 ## Estado vigente
 
