@@ -1,0 +1,49 @@
+name: Custodia archive once (audit first)
+
+on:
+  push:
+    branches:
+      - ops/custodia-archive-once-20261111
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: khora-custodia-archive-once
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout isolated recovery branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: khora-web/package-lock.json
+
+      - name: Install application dependencies
+        working-directory: khora-web
+        run: npm ci
+
+      - name: Link the existing Vercel project
+        working-directory: khora-web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: npx --yes vercel@latest link --yes --project khora-web --scope victorhugotorresmendez-8991s-projects --token="$VERCEL_TOKEN"
+
+      - name: Audit authorized historical records with Production runtime variables
+        working-directory: khora-web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          CUSTODIA_ARCHIVE_MODE: audit
+        run: npx --yes vercel@latest env run --environment=production --token="$VERCEL_TOKEN" -- node --import tsx scripts/custodia-archive-once.ts
