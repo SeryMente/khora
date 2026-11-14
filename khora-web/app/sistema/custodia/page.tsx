@@ -15,6 +15,10 @@ import CustodiaUnlock from "../../components/os/CustodiaUnlock";
 import { AudioVaultLockedError, downloadCustodiaMp3 } from "../../../lib/client/export-audio-mp3";
 
 export default function CustodiaPage({ legacyEditorEntry = false }: { legacyEditorEntry?: boolean } = {}) {
+  const [archiveView, setArchiveView] = useState(false);
+  useEffect(() => {
+    setArchiveView(new URLSearchParams(window.location.search).get("vista") === "archivo");
+  }, []);
   const [pipelineItems, setPipelineItems] = useState<any[]>([]);
   const [resumen, setResumen] = useState<any>(null);
   const [loadingPipeline, setLoadingPipeline] = useState(true);
@@ -641,6 +645,7 @@ export default function CustodiaPage({ legacyEditorEntry = false }: { legacyEdit
         }}
       />}
       <PipelineView
+        title={archiveView ? "Archivo" : "Custodia"}
         state={state}
         actions={{
           onResolveHallazgo: resolveHallazgo,

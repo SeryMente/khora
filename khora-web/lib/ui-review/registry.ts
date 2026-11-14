@@ -148,14 +148,15 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     screen: "archivo",
     scenario: "selected",
     title: "Archivo · Registro Seleccionado",
-    description: "Registro archivado seleccionado con panel lateral de traza.",
+    description: "Registro archivado seleccionado, incluida la explicación cuando no se localizó un original de audio.",
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: [
       "pipeline.container",
       "pipeline.list",
       "pipeline.item-card",
-      "pipeline.drawer"
+      "pipeline.drawer",
+      "revision.audio-no-localizado"
     ]
   },
   "archivo:empty": {

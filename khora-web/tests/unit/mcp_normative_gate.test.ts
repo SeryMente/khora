@@ -8,6 +8,10 @@ import { resetDbForTesting, setDbForTesting } from "@/lib/server/neon";
 
 
 process.env.PLAYWRIGHT_TEST_RUN = "1";
+// This suite must never sign with Production secrets inherited by the build runner.
+const TEST_JWT_SECRET = "test-jwt-secret-min-32-chars-long";
+process.env.MCP_JWT_SECRET = TEST_JWT_SECRET;
+process.env.MCP_CANONICAL_URL = "http://localhost:3000/api/mcp";
 
 const actor = "test@example.com";
 const cycleId = "test-conversation/T1";
@@ -44,7 +48,7 @@ function makeToken(overrides: Record<string, unknown> = {}) {
       turn_output_format_version: REQUIRED_OUTPUT_FORMAT_VERSION,
       ...overrides,
     } as any,
-    "test-jwt-secret-min-32-chars-long",
+    TEST_JWT_SECRET,
   );
 }
 
