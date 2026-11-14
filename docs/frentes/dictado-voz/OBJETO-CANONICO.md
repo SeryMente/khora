@@ -6,12 +6,12 @@
 - Identidad canónica: `DICTADO`; `MCP-OBS-DICTADO` queda como identidad agregada histórica.
 - Repositorio: `SeryMente/khora`, rama `main`.
 - OCP heredado: `docs/frentes/dictado-voz/`.
-- Versión: **v0.6.20 · DICTADO-v0.6.20**, no es versión de producto.
+- Versión: **v0.6.21 · DICTADO-v0.6.21**, no es versión de producto.
 - Estado: titularidad transferida a esta conversación el 2026-11-06 (generación 5→6); original `ChatGPT-DICTADO-20261106-1540.txt` incorporado y cotejado; producto no revalidado funcionalmente.
 - Control: generación **6**, folio `PENDIENTE/NO ASIGNADO` (FOL1 PREPARADA, NO ACTIVA), alias operativo `chatgpt-dictado-01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`.
 - UUIDv7 local de esta conversación: `01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`; no es ID nativo de plataforma. Instancia: `chatgpt-dictado-INSTANCE-20261106-01A1B2E1A2DC7881AAC7AC9D900DD4E3`.
 - Frente independiente relacionado: Observabilidad MCP en `docs/frentes/observabilidad-mcp/`, con control propio sin titular asignado.
-- Custodia transversal conserva su propio OCP/titularidad; Dictado solo integra sus contratos.
+- Custodia es un frente independiente y ajeno a Dictado: no forma parte de su alcance, titularidad, backlog, dependencias ni aceptación.
 - Material fuera del alcance estricto se conserva en la crónica y queda clasificado en §4; no se borra ni reasigna automáticamente.
 
 ## 2. LEER PRIMERO
@@ -49,8 +49,7 @@ Mantener una experiencia fiable para introducir contenido hablando en Khora: abr
 3. Recepción del audio capturado para dictado.
 4. Transcripción a texto y estados de procesamiento/error.
 5. Edición de la transcripción y continuidad al reanudar.
-6. Persistencia y recuperación mediante contratos de Custodia, sin absorber su propiedad.
-7. Pruebas específicas de pantalla, captura, transcripción, edición y continuidad.
+6. Pruebas específicas de pantalla, captura, transcripción, edición y continuidad.
 
 ### Fuera de alcance — paquetes separados y pendientes de adjudicación
 - **Observabilidad MCP:** acceso a registros, scopes, filtros, paginación y diagnósticos; ahora tiene OCP independiente.
@@ -59,7 +58,7 @@ Mantener una experiencia fiable para introducir contenido hablando en Khora: abr
 - **Ingreso general, crónica y metadatos:** categorías de entrada, checklist U01–U06, Fecha/Hora/Lugar/Momento, crónica personal y metadatos. Compartir la ruta `Ingreso` no los convierte en Dictado.
 - **Voz y síntomas:** propuesta histórica no implementada; no autoriza inferencias de salud, ánimo o capacidad laboral.
 - **Publicación editorial:** preparación, revisión, consentimiento y publicación de contenido.
-- **Custodia transversal:** pertenece al OCP Custodia; Dictado solo integra sus contratos.
+- **Custodia:** frente independiente y fuera del alcance y backlog de Dictado. Ninguna tarea, contrato, responsabilidad ni criterio de aceptación de Custodia se incorpora a este frente; permanece en su OCP y registros propios.
 - **Instrumentación transversal:** `khora-web/docs/observability-services.md` permanece compartida, sin duplicar almacén.
 - Cambios de credenciales, seguridad, proveedores, gasto, despliegue y producción requieren autorización independiente.
 
@@ -71,7 +70,6 @@ Los originales y evidencias previos permanecen en sus ubicaciones; no se crea un
 - Asistencia responsable actual: esta instancia, control gen. 6; folio `PENDIENTE/NO ASIGNADO`; alias operativo `chatgpt-dictado-01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`; UUIDv7 local `01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`.
 - Constructor independiente: no asignado en C044; no inventar roles.
 - Observabilidad MCP: frente independiente sin titular asignado en C044.
-- Custodia: mantiene su titularidad transversal; Dictado consume sus contratos.
 - Escritura: un escritor por cambio lógico; cualquier cambio de producto conserva autorización y validación propias.
 
 ## 6. Autoridad
@@ -83,7 +81,6 @@ Los originales y evidencias previos permanecen en sus ubicaciones; no se crea un
 | Transferir Dictado gen. 4→5 | Autorizada por instrucción directa `Transfer Responsibility` del 2026-11-06 | Exclusivamente Dictado; no amplía permisos de código ni producción. |
 | Transferir Dictado gen. 5→6 | Autorizada por dos respuestas afirmativas del operador; la segunda confirmó `TRANSFER_RESPONSIBILITY` | Exclusivamente Dictado; gen. 6; sin folio porque FOL1 no está activa. |
 | Limitar Dictado a captura/transcripción/UI | Instrucción directa C044 | Benchmark, Diálogo, Ingreso general, MCP y publicación quedan fuera. |
-| Integración con Custodia | Contrato transversal existente | No transferir titularidad de Custodia. |
 | PR #335 | Candidato amplio de Ingreso U01–U06 | No se atribuye íntegramente a Dictado ni se fusiona por C044. |
 | Código/seguridad/despliegue | No autorizados por este traspaso | Requieren compuertas propias. |
 | Aceptación funcional | Pendiente | No inferir de evidencia histórica. |
@@ -97,7 +94,6 @@ La etapa mixta se conserva en la crónica y el Anexo A; sus citas no reactivan a
 - RDC utilizado para localizar, leer, obtener metadatos, calcular SHA-256 y preparar el original. No se abrió un checkout de desarrollo ni se modificó el entorno de producto.
 - Producción no consultada ni modificada.
 - Último release técnico histórico C030: main `f0dfbdcb2d79eb6289dacba272ddcc7ba2023063`, deployment `dpl_AG7NQGqD8VqjgVcJoFEaW8hHYiMr`, observado 2026-10-18; no revalidado.
-- Antes de cambios en audio/captura/checkpoints/recuperación, leer `khora-web/docs/CUSTODIA-DICTADOS.md`.
 - C044 es una separación documental; no altera código de producto.
 
 ## 8. Estado vivo
@@ -109,7 +105,7 @@ La etapa mixta se conserva en la crónica y el Anexo A; sus citas no reactivan a
 - **Control nuevo:** generación 6; titular `chatgpt-dictado-01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`; instancia `chatgpt-dictado-INSTANCE-20261106-01A1B2E1A2DC7881AAC7AC9D900DD4E3`; UUIDv7 local `01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`; evento `DICTADO-TRANSFER-20261106-900DD4E3`.
 - **Persistencia del control:** commit `d9e9e84820916dddb1ce31ba975d7f49265f9802`; blob nuevo `8fa5721013b47b88729b38869c712863bc6a69d7`. Lectura de vuelta de `main`: generación, alias, instancia, evento, generación anterior, SHA anterior y UUID cotejados.
 - **Foliación:** `PENDIENTE/NO ASIGNADO`; FOL1 PREPARADA, NO ACTIVA. No se inventa folio ni se presenta el UUID local como ID nativo.
-- **Límite:** el traspaso no amplía permisos sobre código, credenciales, Custodia, proveedor, seguridad, workflows, despliegue, producción ni aceptación funcional.
+- **Límite:** el traspaso no amplía permisos sobre código, credenciales, proveedor, seguridad, workflows, despliegue, producción ni aceptación funcional.
 
 ### Transferencia de responsabilidad gen. 4→5 — 2026-11-06
 
@@ -135,9 +131,18 @@ Observabilidad MCP dispone de OCP/control independientes; su control inicia `una
 ### Producto
 C044 no modifica código, datos, configuración, credenciales, scopes, seguridad, workflows, producción ni despliegue; tampoco ejecuta pruebas. Último corte técnico histórico C030, no revalidado. La separación documental no demuestra que el defecto de Dictado esté resuelto.
 
+### C046 · Delimitación expresa entre Dictado y Custodia — 2026-11-14
+
+- **Instrucción literal del operador:** «Elimina la transversalida ddel frente,Custodia no tien que ver contigo. No borres las stareas en frente custodia,solo borralas del frente Dictado».
+- **Alcance vigente:** Dictado queda limitado a pantalla, captura explícita, transcripción, edición y continuidad del dictado.
+- **Exclusión:** Custodia no es dependencia, colaboración, titularidad, backlog, tarea, contrato ni criterio de aceptación de Dictado. Sus tareas permanecen exclusivamente en el OCP y registros del frente Custodia.
+- **Clasificación histórica:** las menciones a Custodia conservadas en ciclos anteriores, originales y evidencias son antecedentes de procedencia; no son tareas, dependencias ni responsabilidades vigentes de Dictado. En particular, la mención de CUSTODIA-04/SCI 354Q en C045 queda como antecedente histórico, no como seguimiento de este frente.
+- **Preservación:** no se modificaron ni eliminaron el OCP, la lista provisional, el control ni las tareas del frente Custodia. Tampoco se borraron originales o evidencias históricas de Dictado.
+- **Persistencia:** este ciclo modifica únicamente el OCP y el manifiesto del frente Dictado. Sin cambios de código, pruebas, PR, configuración, credenciales, proveedor, despliegue, datos ni producción.
+
 ## 9. Aceptación y viabilidad
 
-La aceptación funcional exige evidencia actual de que: (1) el operador abre la pantalla específica e inicia/detiene el micrófono explícitamente; (2) la captura alimenta la transcripción y expone estados/errores veraces; (3) el texto aparece y puede editarse; (4) reanudar conserva texto confirmado y continúa según el contrato; (5) audio/texto se conservan y recuperan mediante Custodia; (6) el recorrido terminal se prueba en navegador y micrófono real y la aceptación humana se registra por separado.
+La aceptación funcional exige evidencia actual de que: (1) el operador abre la pantalla específica e inicia/detiene el micrófono explícitamente; (2) la captura alimenta la transcripción y expone estados/errores veraces; (3) el texto aparece y puede editarse; (4) reanudar el dictado conserva el texto confirmado dentro de la propia experiencia de Dictado; (5) el recorrido terminal se prueba en navegador y micrófono real y la aceptación humana se registra por separado.
 
 **Estado:** NO REVALIDADO EN C044. Evidencia histórica o sintética no sustituye uso físico ni aceptación del operador.
 
@@ -467,7 +472,7 @@ El operador reporta botón desactivado con rótulo de espera. Se confirma depend
 
 ### Prompt de asistencia — Dictado
 
-Eres la instancia de asistencia del frente **Dictado** de Khora. Tu alcance exclusivo es pantalla de dictado, captura de voz iniciada por el operador, transcripción, edición y continuidad. Lee `README.md`, DUG vigente, este OCP, control, manifiesto y última crónica. Verifica generación/folio. Si aparece otro titular, aplica P037/§42. No asumas Observabilidad MCP: tiene OCP/control independientes. No incorpores benchmark, feedback, Diálogo multipista, Ingreso general, crónica ni publicación. Antes de cambios de audio/captura, lee `khora-web/docs/CUSTODIA-DICTADOS.md`. Responsabilidad documental no autoriza cambios de producto, credenciales o producción.
+Eres la instancia de asistencia del frente **Dictado** de Khora. Tu alcance exclusivo es pantalla de dictado, captura de voz iniciada por el operador, transcripción, edición y continuidad. Lee `README.md`, DUG vigente, este OCP, control, manifiesto y última crónica. Verifica generación/folio. Si aparece otro titular, aplica P037/§42. No asumas Observabilidad MCP: tiene OCP/control independientes. No incorpores benchmark, feedback, Diálogo multipista, Ingreso general, crónica ni publicación. No incorpores tareas, contratos ni entregables de otros frentes; Custodia y sus tareas se mantienen fuera de Dictado. Responsabilidad documental no autoriza cambios de producto, credenciales o producción.
 
 ### Construcción
 
