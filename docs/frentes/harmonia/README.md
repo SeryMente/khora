@@ -151,3 +151,15 @@ OMM-FUT-009 está implementada localmente y la CI Harmonia/CI-LOCAL.ps1 pasa: 10
 - 79,003 bytes · SHA-256 `FABF7B44D82FC8F1EF99A7638DC5AE6540DBA73E45796AAAB6A805E82920F03B`; copia desde Downloads cotejada y leída de vuelta.
 - Se registra como conversación independiente: el ID nativo difiere del export anterior de las 11:45. No se fusionan conversaciones ni se duplican ciclos.
 - Segmentación de ciclos de este export: PENDING_SEGMENTATION. El último ciclo técnico completo contenido en la conversación es D-042; su B ya estaba archivado.
+
+
+## Snapshot operativo local · 2026-11-14 · D-043 / OMM-FUT-009
+
+- OCP local **v0.85 / HARMONIA-v0.85**; v0.84 preservado byte a byte en `archive/OBJETO-CANONICO-v0.84-pre-D043-20261114.md` (SHA-256 `5BC3D3E7D58F3C387D07AC03DE3FE19256CA243B05BF4AF1BAB570FAF146F244`).
+- D-043 original A: `originales/HARMONIA-INSTRUCCIONES-VERBATIM-20261114-D043.md`; SHA-256 `04BB60C193FE311F063923624C2B58E3A2D0B07C63DEC345EEBEBDADBFBE8A5F`; 474 bytes.
+- D-043 salida B: `originales/HARMONIA-CICLO-20261114-D043-OMM-FUT-009-B.md`; SHA-256 `A4913F8FC3C4DC5C516C9D0509441F09985CF81FDE731BCD961F07C0CF591376`; 7,056 bytes.
+- Conversación local UUIDv7 `01a1db6a-1ce0-792e-948f-b13e09b360ab`; ciclo UUIDv7 `01a1db6a-1ce3-7409-9534-c70e3f4e4bc8`; ID nativo no expuesto; FOL1 PREPARADO / NO ACTIVO.
+- OMM-FUT-009 / Harmonia 0.6.0: CI local PASS (104/104), commit `87256a41ccdb883210f4fd88a8b02a9978d81191`, rama publicada `work/harmonia-omm-fut-009-0.6.0`, PR #366 abierta contra main. GitHub Actions no asignó runner (`runner_id=0`, `steps=[]`) en el workflow Harmonia ni los gates generales; reintento reprodujo el bloqueo. No hay merge, aceptación natural ni despliegue.
+- Auditoría recurrente OMM-FUT-006 O0–O5: **observabilidad revisada / sin delta**; no se justificó crear nuevos productores o una tarea OBS adicional.
+- Backlog: siguiente OMM-FUT-007 / 0.7.0 después de cerrar 0.6.0; OMM-FUT-008 / 0.8.0 subordinada a 007; OMM-FUT-010 P2 sigue sin versión. La especificación General v1.4.0 se revisó / sin delta en D-043.
+- Índice de continuidad: 10 conversaciones, 1 ciclo D-043; SHA-256 `F5D8A21055B4A29C5B4A480295C291E84BCF271E4CA1FEC1D8942E4B364D2651`. Baseline anterior preservado en `archive/HARMONIA-DATASET-INDEX-pre-D043-20261114.json`, SHA-256 `5C60153872E0E316D8D8CA3F2E629A4D31A9E2815B1E17A546B142301403A94F`.

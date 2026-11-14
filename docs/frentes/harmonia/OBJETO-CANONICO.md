@@ -1,10 +1,10 @@
 # Harmonia · Objeto de Proyecto Canónico (OCP)
 
-**Versión local:** 0.84  
-**Sello:** HARMONIA-v0.84  
-**Corte:** 2026-11-13 · America/Mexico_City  
+**Versión local:** 0.85  
+**Sello:** HARMONIA-v0.85  
+**Corte:** 2026-11-14 · America/Mexico_City  
 **Sprint activo:** **OMM-01 — Observa · Mide · Mejora**  
-**Estado del OCP:** v0.84 actualizado en D-042; v0.83 preservado byte a byte en archive/OBJETO-CANONICO-v0.83-pre-D042-20261113.md; pendiente de CI de GitHub, PR y merge a main.
+**Estado del OCP:** v0.85 actualizado en D-043; v0.84 preservado byte a byte en archive/OBJETO-CANONICO-v0.84-pre-D043-20261114.md; OMM-FUT-009 / 0.6.0 comprometida y publicada en rama, PR #366 abierta; GitHub Actions falló antes de asignar runners; merge y aceptación Chrome pendientes.
 
 > Este documento es la fuente de verdad operativa del frente Harmonia. Las instrucciones del operador se conservan en el registro verbatim de §5. Las decisiones, tareas y criterios de aceptación deben poder rastrearse razonablemente a esas entradas. Los cortes históricos que ya no gobiernan el estado actual se preservan, sin autoridad normativa, en archive/: OCP v0.47, v0.48, v0.49, v0.50, v0.51, v0.52, v0.53 y v0.54. Esos archivos son históricos y no gobiernan el sprint.
 
@@ -2883,3 +2883,49 @@ Esto es CI local. No se afirma aún GitHub Actions PASS ni aceptación natural e
 - Workflow GitHub: .github/workflows/harmonia-validation.yml; SHA-256 3D024E1B5CFFDE453634985C5206C92CF2B0971CAE29BD5AEBBF43D1E5E5325E.
 - Índice continuidad D-042: continuidad/HARMONIA-DATASET-INDEX.json; SHA-256 58D20C3C23CF54D0145F916632AA2D6BF11FD6C4E73CAF76261F6EAEF0C0C355; 601,950 bytes; validación recursiva local contra HARMONIA-DATASET-INDEX.schema.json PASS; lectura de vuelta y hashes A/B concordantes.
 - El DUG consultado no se modifica. No se declara main actualizado hasta verificar PR y merge.
+
+
+## 54. Retoma disciplinada, consolidación de 0.6.0 y bloqueo de GitHub Actions · D-043
+
+### 54.1. Instrucción, gobierno e identidad
+- A verbatim: `originales/HARMONIA-INSTRUCCIONES-VERBATIM-20261114-D043.md`; SHA-256 `04BB60C193FE311F063923624C2B58E3A2D0B07C63DEC345EEBEBDADBFBE8A5F`; 474 bytes.
+- Conversación local UUIDv7: `01a1db6a-1ce0-792e-948f-b13e09b360ab`; ciclo local UUIDv7: `01a1db6a-1ce3-7409-9534-c70e3f4e4bc8`; ID nativo no expuesto.
+- DUG adquirido de `SeryMente/metodologia/main`: Samantha v396 / NX-396m; GOW 2.24; commit `ac715e04f227ed78ec4d196bbc76d0aa464eda7d`; blob HTML `038e29762038c96afa7291b86ba4c12fab338ff0`. Metacanon metadata 1.31 frente a embedded 1.30; discrepancia abierta. §4.5 y §52 confirman desactivación de métricas temporales. Sin modificación del DUG.
+- Petición D-043: mantener el backlog ordenado y continuar el frente con método y disciplina.
+
+### 54.2. Estado de OMM-FUT-009 / 0.6.0
+- CI local de `Harmonia/CI-LOCAL.ps1`: `HARMONIA_CI_RESULT=PASS`; 104/104 tests, 37 módulos JS/MJS, 6 scripts PowerShell y 9 JSON; contratos de inicializador/parada, migración de índice y escaneo de productores temporales PASS.
+- Se comprobó que los 172 archivos staged pertenecían únicamente a `.github/workflows/harmonia-validation.yml`, `Harmonia/` y `docs/frentes/harmonia/`. Sin archivos de secretos/credenciales detectados por el escaneo de patrones de alta confianza.
+- Commit `87256a41ccdb883210f4fd88a8b02a9978d81191`: `feat(harmonia): release structural activity 0.6.0`. Rama `work/harmonia-omm-fut-009-0.6.0` publicada en `origin`; SHA remoto cotejado.
+- PR #366 creada contra `main`: https://github.com/SeryMente/khora/pull/366. Base `3abdecfa552547851621c98fcdda4e93147f1893`; head `87256a41ccdb883210f4fd88a8b02a9978d81191`. Estado OPEN / NOT MERGED.
+
+### 54.3. GitHub Actions: bloqueo anterior a ejecución
+- El workflow Harmonia falló tanto en evento push (run `43629208118`) como en pull_request (run `43629224944`, attempt 2). Los jobs generales `CI`, `UI Quality` y `khora-ok` también fallaron en el mismo SHA.
+- Para `validate-harmonia` y los jobs generales consultados, GitHub devuelve `runner_id=0`, `runner_name=""`, `runner_group_id=0`, `steps=[]`; la descarga de logs devuelve 404. El reintento controlado reproduce el mismo estado.
+- Dictamen: los jobs no llegaron a asignarse a un runner ni ejecutaron pasos. La causa raíz del fallo de asignación no queda expuesta; no se atribuye a los tests ni se modifica código por inferencia.
+- Los contextos Vercel y Netlify del commit también figuran en failure; Vercel dirige a una actualización `github-private-org-to-hobby`. Se consideran integraciones de despliegue separadas de CI Harmonia; no hubo despliegue.
+- No fusionar mientras GitHub Actions no ejecute y apruebe los checks requeridos. `main` permanece en `3abdecfa552547851621c98fcdda4e93147f1893`.
+
+### 54.4. OMM-FUT-006 · auditoría recurrente O0–O5
+- O0: el gate de release requiere CI local, CI GitHub y aceptación natural; no requiere medición temporal.
+- O1: observador estructural, Collector, scanner, pruebas, consultas y tratamiento histórico inspeccionados; el banco JSONL no se modificó.
+- O2: SUFICIENTE para validar código local; PARCIAL para cierre de release por la ausencia de ejecución GitHub y de aceptación natural en Chrome.
+- O3: 104/104 CI local PASS; GitHub sin runner ni pasos; no se añadieron eventos, campos, permisos ni productores.
+- O4: la brecha observada pertenece a la infraestructura de ejecución remota/aceptación, no a una señal estructural faltante.
+- O5: sin propuesta de ampliación. Se registra **observabilidad revisada / sin delta**; no hay evidencia convergente para una nueva tarea OBS.
+
+### 54.5. Documentación, dependencias y estado real
+- OCP v0.84 preservado byte a byte en `archive/OBJETO-CANONICO-v0.84-pre-D043-20261114.md`; SHA-256 `5BC3D3E7D58F3C387D07AC03DE3FE19256CA243B05BF4AF1BAB570FAF146F244`; 291,922 bytes.
+- Especificación General v1.4.0: **REVISADA / SIN DELTA**; no cambió el contrato técnico en D-043.
+- B D-043: `originales/HARMONIA-CICLO-20261114-D043-OMM-FUT-009-B.md`; SHA-256 `A4913F8FC3C4DC5C516C9D0509441F09985CF81FDE731BCD961F07C0CF591376`; 7,056 bytes.
+- OMM-FUT-009: IMPLEMENTADA LOCAL / CI LOCAL PASS / COMMIT / BRANCH PUSHED / PR OPEN; GitHub Actions NO PASS; no merge ni aceptación Chrome.
+- OMM-FUT-007 / 0.7.0 sigue como siguiente tarea, no iniciada hasta cerrar 0.6.0. OMM-FUT-008 / 0.8.0 sigue subordinada a 007. OMM-FUT-010 permanece P2, sin versión y con D-025/D-026 no localizadas.
+- No hubo cambio de código adicional en D-043, instalación/recarga Chrome ni modificación del DUG. FOL1 PREPARADO / NO ACTIVO; folios globales sin asignar.
+
+**Siguiente acción:** resolver la asignación de runners de GitHub Actions, verificar PASS y fusionar PR #366 a `main`; después comprobar el commit remoto y completar la aceptación natural en Chrome antes de iniciar OMM-FUT-007.
+
+
+### 54.6. Índice y read-back D-043
+- Baseline anterior: `archive/HARMONIA-DATASET-INDEX-pre-D043-20261114.json`; SHA-256 `5C60153872E0E316D8D8CA3F2E629A4D31A9E2815B1E17A546B142301403A94F`; 604,052 bytes; copia verificada.
+- Índice actualizado: `continuidad/HARMONIA-DATASET-INDEX.json`; SHA-256 `F5D8A21055B4A29C5B4A480295C291E84BCF271E4CA1FEC1D8942E4B364D2651`; 10 conversaciones, un ciclo D-043, OCP 0.85 y DUG main commit `ac715e04f227ed78ec4d196bbc76d0aa464eda7d`; parse/read-back PASS.
+- A/B D-043 vinculados al ciclo local `01a1db6a-1ce3-7409-9534-c70e3f4e4bc8`; timestamps nativos no expuestos y por tanto null. La cobertura histórica permanece PARTIAL; FOL1 no asigna folios globales.

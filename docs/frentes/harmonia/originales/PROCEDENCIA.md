@@ -346,3 +346,16 @@ Timestamp nativo de D-042 no expuesto; las fechas anteriores son LastWriteTimeUt
 - Índice de continuidad: nueve conversaciones; esta entrada queda `PENDING_SEGMENTATION` y sin ciclos duplicados. Copia previa del índice preservada en `archive/HARMONIA-DATASET-INDEX-pre-1559.json` (SHA-256 `58D20C3C23CF54D0145F916632AA2D6BF11FD6C4E73CAF76261F6EAEF0C0C355`). Índice actualizado: SHA-256 `5C60153872E0E316D8D8CA3F2E629A4D31A9E2815B1E17A546B142301403A94F`; parse/read-back PASS.
 - No se crea ciclo técnico A/B nuevo. El último ciclo completo contenido en la exportación sigue siendo D-042, UUIDv7 local `01a1d6bd-35a3-75b1-92f8-853155f9610b`; la salida B ya estaba persistida.
 - FOL1 permanece PREPARADO / NO ACTIVO; no se asignan folios globales.
+
+
+## D-043 · Retoma disciplinada y estado de OMM-FUT-009 · 2026-11-14
+
+- Conversación local UUIDv7: `01a1db6a-1ce0-792e-948f-b13e09b360ab`; ciclo local UUIDv7: `01a1db6a-1ce3-7409-9534-c70e3f4e4bc8`; ID nativo no expuesto; FOL1 PREPARADO / NO ACTIVO.
+- A verbatim: `HARMONIA-INSTRUCCIONES-VERBATIM-20261114-D043.md`; SHA-256 `04BB60C193FE311F063923624C2B58E3A2D0B07C63DEC345EEBEBDADBFBE8A5F`; 474 bytes.
+- B: `HARMONIA-CICLO-20261114-D043-OMM-FUT-009-B.md`; SHA-256 `A4913F8FC3C4DC5C516C9D0509441F09985CF81FDE731BCD961F07C0CF591376`; 7,056 bytes.
+- OCP D-042 v0.84 archivado y cotejado: `archive/OBJETO-CANONICO-v0.84-pre-D043-20261114.md`; SHA-256 `5BC3D3E7D58F3C387D07AC03DE3FE19256CA243B05BF4AF1BAB570FAF146F244`; 291,922 bytes. OCP local actualizado a v0.85.
+- DUG canónico revisado: Samantha v396 / NX-396m; GOW 2.24; Metodología main commit `ac715e04f227ed78ec4d196bbc76d0aa464eda7d`; blob HTML `038e29762038c96afa7291b86ba4c12fab338ff0`. Metacanon metadata 1.31 / embedded 1.30 sigue discrepante; §§4.5 y 52 contienen la desactivación de métricas temporales. Sin modificación DUG.
+- OMM-FUT-009 / 0.6.0: CI local PASS 104/104; commit `87256a41ccdb883210f4fd88a8b02a9978d81191`; branch push verificado; PR #366 OPEN. GitHub Actions reintentado una vez: los jobs Harmonia y generales vuelven a fallar antes de asignar runner (`runner_id=0`, `runner_name=""`, `steps=[]`); logs no disponibles (404). La causa raíz de la asignación no está expuesta. No merge ni aceptación Chrome.
+- OMM-FUT-006: O0–O5 aplicado; observabilidad revisada / sin delta. No se modificó el banco JSONL ni se añadieron productores de observabilidad.
+- Índice: baseline preservado `archive/HARMONIA-DATASET-INDEX-pre-D043-20261114.json`; SHA-256 `5C60153872E0E316D8D8CA3F2E629A4D31A9E2815B1E17A546B142301403A94F`; 604,052 bytes. Índice actualizado: SHA-256 `F5D8A21055B4A29C5B4A480295C291E84BCF271E4CA1FEC1D8942E4B364D2651`; 10 conversaciones; 1 ciclo D-043; OCP 0.85; DUG main commit fijado; parse/read-back PASS. Cobertura histórica sigue PARTIAL.
+- Backlog conservado: OMM-FUT-007 / 0.7.0 siguiente después de la integración/aceptación de 0.6.0; OMM-FUT-008 / 0.8.0 depende de 007; OMM-FUT-010 P2 continúa sin versión. Especificación General v1.4.0 revisada / sin delta.

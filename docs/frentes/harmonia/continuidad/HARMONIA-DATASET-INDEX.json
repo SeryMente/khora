@@ -1,14 +1,14 @@
 {
     "schema_version":  "1.0.0",
-    "generated_at":  "2026-11-13T22:06:29.8417787Z",
+    "generated_at":  "2026-11-14T19:03:17.0179721Z",
     "source":  {
                    "repository":  "SeryMente/khora",
                    "workfront":  "Harmonia",
                    "ocp_path":  "docs/frentes/harmonia/OBJETO-CANONICO.md",
-                   "ocp_version":  "0.84",
+                   "ocp_version":  "0.85",
                    "dug_version":  "v396",
                    "dug_signature":  "NX-396m",
-                   "dug_main_commit":  null,
+                   "dug_main_commit":  "ac715e04f227ed78ec4d196bbc76d0aa464eda7d",
                    "dug_git_blob_sha1":  "038e29762038c96afa7291b86ba4c12fab338ff0"
                },
     "coverage":  {
@@ -36,7 +36,8 @@
                                    "D-041 B final precisa que OMM-FUT-008 completa observaciÃƒÆ’Ã‚Â³n multi-pestaÃƒÆ’Ã‚Â±a parcial existente, no inicia de cero. Incluye OMM-FUT-009 para conformidad temporal, P1 provisional.",
                                    "D-041: matriz normativa N-01..N-32 agregada, SHA-256 117DC69DC4136FB87E73109315522C805C60A584A61BFBCD680D15D4B3E6F685; OMM-FUT-010 P2 provisional para recuperar/confirmar D-025/D-026 no localizadas.",
                                    "D-042 indexado como nuevo ciclo de la conversaciÃ³n local ya existente; ID nativo no expuesto; A/B con SHA-256 y read-back verificados. OMM-FUT-009 implementada localmente como 0.6.0; CI local PASS 100/100; GitHub Actions, PR/merge y aceptaciÃ³n natural pendientes. DUG Samantha v396/NX-396m; discrepancia Metacanon 1.31 metadata vs 1.30 embebido.",
-                                   "D-042: índice actualizado y validado contra HARMONIA-DATASET-INDEX.schema.json mediante validador local recursivo; resultado PASS. A/B coinciden con sus archivos; ID nativo no expuesto; 8 conversaciones y 2 ciclos para la conversación local D041/D042. OMM-FUT-009 0.6.0: CI local PASS (100/100 tests) y pendiente GitHub Actions/main."
+                                   "D-042: índice actualizado y validado contra HARMONIA-DATASET-INDEX.schema.json mediante validador local recursivo; resultado PASS. A/B coinciden con sus archivos; ID nativo no expuesto; 8 conversaciones y 2 ciclos para la conversación local D041/D042. OMM-FUT-009 0.6.0: CI local PASS (100/100 tests) y pendiente GitHub Actions/main.",
+                                   "D-043: conversación y ciclo local indexados; A/B preservados con SHA/read-back. GitHub Actions no asignó runners; PR #366 permanece abierta. Cobertura histórica sigue PARTIAL."
                                ]
                  },
     "folio_policy":  {
@@ -670,7 +671,85 @@
             },
             "cycle_index_status": "PENDING_SEGMENTATION",
             "cycles": []
-        }
+        },
+                          {
+                              "local_ref": "01a1db6a-1ce0-792e-948f-b13e09b360ab",
+                              "platform": "ChatGPT",
+                              "mode": null,
+                              "conversation_name": null,
+                              "name_status": "NOT_EXPOSED",
+                              "native_conversation_id": null,
+                              "native_id_provenance": "No se expuso ID nativo de conversación en el turno D-043; no se inventa.",
+                              "source_timestamps": {
+                                  "created_at": null,
+                                  "updated_at": null,
+                                  "exported_at": null,
+                                  "timezone": null,
+                                  "provenance": "No hay metadatos nativos de exportación ChatGPT para este intercambio; no se infieren marcas del mensaje."
+                              },
+                              "local_availability": {
+                                  "first_local_capture_at": "2026-11-14T18:55:36.538Z",
+                                  "first_worktree_persisted_at": "2026-11-14T18:55:36.538Z",
+                                  "precision": "file_last_write_time_utc",
+                                  "provenance": "Metadatos locales del A D-043; el B de ciclo quedó persistido a 2026-11-14T18:59:07.392Z. No equivalen a timestamps nativos de ChatGPT."
+                              },
+                              "association": {
+                                  "repository": "SeryMente/khora",
+                                  "workfront": "Harmonia",
+                                  "ocp_path": "docs/frentes/harmonia/OBJETO-CANONICO.md"
+                              },
+                              "source_artifact": {
+                                  "path": "docs/frentes/harmonia/originales/HARMONIA-INSTRUCCIONES-VERBATIM-20261114-D043.md",
+                                  "sha256": "04BB60C193FE311F063923624C2B58E3A2D0B07C63DEC345EEBEBDADBFBE8A5F",
+                                  "git_blob_sha1": null,
+                                  "bytes": 474,
+                                  "verification_status": "READBACK_HASH_VERIFIED",
+                                  "hash_provenance": "Instrucción D-043 preservada literalmente; SHA-256 calculado desde el artefacto local y cotejado.",
+                                  "readback_verified_at": "2026-11-14T19:03:17.0179721Z"
+                              },
+                              "cycle_index_status": "INDEXED",
+                              "cycles": [
+                                  {
+                                      "local_ref": "01a1db6a-1ce3-7409-9534-c70e3f4e4bc8",
+                                      "substantive": true,
+                                      "source_event_at": null,
+                                      "captured_at": null,
+                                      "persisted_at": "2026-11-14T18:59:07.392Z",
+                                      "parts": {
+                                          "A": {
+                                              "status": "CAPTURED",
+                                              "source_type": "operator_message",
+                                              "source_ref": "docs/frentes/harmonia/originales/HARMONIA-INSTRUCCIONES-VERBATIM-20261114-D043.md",
+                                              "sha256": "04BB60C193FE311F063923624C2B58E3A2D0B07C63DEC345EEBEBDADBFBE8A5F",
+                                              "timestamp": null,
+                                              "provenance": "Texto verbatim D-043 preservado en A; timestamp nativo del mensaje no expuesto.",
+                                              "readback_verified_at": "2026-11-14T19:03:17.0179721Z"
+                                          },
+                                          "B": {
+                                              "status": "CAPTURED",
+                                              "source_type": "assistant_visible_cycle_output",
+                                              "source_ref": "docs/frentes/harmonia/originales/HARMONIA-CICLO-20261114-D043-OMM-FUT-009-B.md",
+                                              "sha256": "A4913F8FC3C4DC5C516C9D0509441F09985CF81FDE731BCD961F07C0CF591376",
+                                              "timestamp": null,
+                                              "provenance": "B D-043 registra CI local, commit/push, PR #366, falla de asignación de runners, auditoría O0-O5 y backlog ordenado; lectura de vuelta verificada.",
+                                              "readback_verified_at": "2026-11-14T19:03:17.0179721Z"
+                                          }
+                                      },
+                                      "association": {
+                                          "repository": "SeryMente/khora",
+                                          "workfront": "Harmonia",
+                                          "ocp_path": "docs/frentes/harmonia/OBJETO-CANONICO.md"
+                                      },
+                                      "folios": {
+                                          "CV": null,
+                                          "CY": null,
+                                          "A": null,
+                                          "B": null,
+                                          "state": "FOL1_PREPARADO_PENDIENTE_ACTIVACION"
+                                      }
+                                  }
+                              ]
+                          }
                       ],
     "missing_sources":  [
                             {
