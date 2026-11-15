@@ -20,6 +20,7 @@ const EXPECTED = {
   newest: "2026-11-13T23:25:51.849Z",
 } as const;
 const CONFIRM = "BACKUP_AND_TRUNCATE_DICTADO_CHECKPOINTS";
+const BACKUP_PATH = "backups/dictado_checkpoint/checkpoints_backup_historico-11413-fffa2e53d7674d8db69ae56a9809a088.jsonl.gz.khc";
 const PAGE_SIZE = 100;
 
 type Baseline = {
@@ -224,7 +225,7 @@ export async function POST(req: NextRequest) {
     const compressed = gzipStream(exportCheckpointJsonl(client, baseline, exportStats));
     const encrypted = cifrarStream(compressed);
     backup = await putEncryptedObjectStream(
-      `backups/dictado_checkpoint/checkpoints_backup_historico-11413-fffa2e53d7674d8db69ae56a9809a088.jsonl.gz.khc`,
+      BACKUP_PATH,
       encrypted,
       { contentType: "application/octet-stream" },
     );
@@ -338,12 +339,12 @@ export async function POST(req: NextRequest) {
       truncate_outcome: knownCommitted ? "committed" : knownPreserved ? "rolled_back_preserved" : "unknown",
       original_rows_preserved: knownPreserved,
       rows_after_error: actualRows,
-      backup: backup ? {
-        b2_key: backup.pathname,
+      backup: {
+        b2_key: backup?.pathname || BACKUP_PATH,
         bytes: backup.bytes,
         sha256: backup.sha256,
-        readback_verified: backup.readbackVerified,
-      } : null,
+        readback_verified: backup?.readbackVerified ?? false,
+      },
       exported_rows_before_failure: exportStats.rows,
     }, status);
   } finally {
