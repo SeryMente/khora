@@ -1,0 +1,35 @@
+name: Harmonia local contract and quality gates
+
+on:
+  push:
+    paths:
+      - 'Harmonia/**'
+      - '.github/workflows/harmonia-validation.yml'
+  pull_request:
+    paths:
+      - 'Harmonia/**'
+      - '.github/workflows/harmonia-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-harmonia:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify Node and PowerShell runtimes
+        shell: pwsh
+        run: |
+          node --version
+          $PSVersionTable.PSVersion.ToString()
+      - name: Run Harmonia local CI contract
+        shell: pwsh
+        run: ./Harmonia/CI-LOCAL.ps1

@@ -1,0 +1,14 @@
+{
+  "schema": "harmonia.binomial-benchmark-dataset.v1",
+  "protocol_version": "1.0",
+  "benchmark_id": "BENCH-GROQ-001",
+  "state": "design_ready_data_pending",
+  "cases": [
+    { "case_id": "CASE-01", "status": "unselected", "omm_id": null, "task_class": null, "evidence_class": null, "evidence_sha256": null, "snapshot_sha256": null, "contract_sha256": null, "verified_root_cause": null },
+    { "case_id": "CASE-02", "status": "unselected", "omm_id": null, "task_class": null, "evidence_class": null, "evidence_sha256": null, "snapshot_sha256": null, "contract_sha256": null, "verified_root_cause": null },
+    { "case_id": "CASE-03", "status": "unselected", "omm_id": null, "task_class": null, "evidence_class": null, "evidence_sha256": null, "snapshot_sha256": null, "contract_sha256": null, "verified_root_cause": null },
+    { "case_id": "CASE-04", "status": "unselected", "omm_id": null, "task_class": null, "evidence_class": null, "evidence_sha256": null, "snapshot_sha256": null, "contract_sha256": null, "verified_root_cause": null },
+    { "case_id": "CASE-05", "status": "unselected", "omm_id": null, "task_class": null, "evidence_class": null, "evidence_sha256": null, "snapshot_sha256": null, "contract_sha256": null, "verified_root_cause": null }
+  ],
+  "pairs": []
+}

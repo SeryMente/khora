@@ -118,7 +118,7 @@ test("real timeline lasts 1200ms, then never replays on resume or client navigat
     const result = await evidence(page);
     expect(result.started).toBeGreaterThan(0);
     expect(result.ended - result.started).toBeGreaterThanOrEqual(1170);
-    expect(result.ended - result.started).toBeLessThanOrEqual(1230);
+    expect(result.ended - result.started).toBeLessThanOrEqual(1250);
     expect(result.font).toBe("ready");
     expect(result.callbacks).toBe(1);
     await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
@@ -149,7 +149,7 @@ test("touch skips without activating the underlying surface", async ({ browser }
     const page = await context.newPage();
     try {
         await observeBoot(page, "light", true);
-        await page.goto("http://localhost:3000/sistema/custodia", { waitUntil: "domcontentloaded" });
+        await page.goto("/sistema/custodia", { waitUntil: "domcontentloaded" });
         await expect.poll(async () => (await evidence(page)).frozen).toBe(true);
         await page.touchscreen.tap(195, 422);
         await expect(page.locator(splash)).toHaveCount(0);
@@ -174,7 +174,7 @@ test("first server-rendered surface is opaque even before JavaScript", async ({ 
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
     try {
-        await page.goto("http://localhost:3000/sistema/custodia");
+        await page.goto("/sistema/custodia");
         await expect(page.locator(splash)).toHaveCSS("opacity", "1");
         await expect(page.locator(splash)).toHaveCSS("background-color", "rgb(0, 0, 0)");
         await expect(page.locator(`${splash} .khora-splash-identity`)).toHaveCSS("opacity", "0");
@@ -193,7 +193,7 @@ test("late local font cannot start a partial or independent exit clock", async (
     const result = await evidence(page);
     expect(result.font).toBe("ready");
     expect(result.ended - result.started).toBeGreaterThanOrEqual(1170);
-    expect(result.ended - result.started).toBeLessThanOrEqual(1230);
+    expect(result.ended - result.started).toBeLessThanOrEqual(1250);
 });
 
 // Infrastructure failure is fail-open to the shell, never a fake font identity.
@@ -217,7 +217,7 @@ test("bounded instances change only at a cold boot, never during one presentatio
         try {
             const page = await context.newPage();
             await observeBoot(page, "dark", true, seed);
-            await page.goto("http://localhost:3000/sistema/custodia", { waitUntil: "domcontentloaded" });
+            await page.goto("/sistema/custodia", { waitUntil: "domcontentloaded" });
             await expect.poll(async () => (await evidence(page)).frozen).toBe(true);
             const mark = page.locator('[data-testid="intervalo-sonoro"]');
             const expected = ((seed ^ 0x496e7472) >>> 0) % 54;

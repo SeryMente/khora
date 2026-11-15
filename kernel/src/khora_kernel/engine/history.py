@@ -2,6 +2,7 @@
 import json
 import os
 import sqlite3
+from contextlib import closing
 from dataclasses import asdict, dataclass, field
 from typing import Any, List, Optional
 
@@ -39,7 +40,7 @@ def init_db(db_path: str = "data/khora_sessions.db"):
     directory = os.path.dirname(db_path)
     if directory:
         os.makedirs(directory, exist_ok=True)
-    with sqlite3.connect(db_path) as conn:
+    with closing(sqlite3.connect(db_path)) as conn, conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS sessions (
                 session_id TEXT PRIMARY KEY,
@@ -51,7 +52,7 @@ def init_db(db_path: str = "data/khora_sessions.db"):
 def save_ht(ht: Ht, db_path: str = "data/khora_sessions.db"):
     init_db(db_path)
     from datetime import datetime, timezone
-    with sqlite3.connect(db_path) as conn:
+    with closing(sqlite3.connect(db_path)) as conn, conn:
         conn.execute(
             """
             INSERT OR REPLACE INTO sessions (session_id, ht_json, updated_at)
@@ -62,7 +63,7 @@ def save_ht(ht: Ht, db_path: str = "data/khora_sessions.db"):
 
 def load_ht(session_id: str, db_path: str = "data/khora_sessions.db") -> Optional[Ht]:
     init_db(db_path)
-    with sqlite3.connect(db_path) as conn:
+    with closing(sqlite3.connect(db_path)) as conn, conn:
         cur = conn.execute("SELECT ht_json FROM sessions WHERE session_id = ?", (session_id,))
         row = cur.fetchone()
         if row:

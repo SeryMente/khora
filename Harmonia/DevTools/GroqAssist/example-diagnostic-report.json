@@ -1,0 +1,214 @@
+{
+  "schema": "harmonia.diagnostic-report.v1",
+  "generatedAt": "2026-11-13T20:30:00.000Z",
+  "extension": {
+    "name": "Harmonia",
+    "version": "0.6.0",
+    "frameworkRevision": "HARMONIA-v0.6.0+DUG-v396-NX-396m"
+  },
+  "observation": {
+    "enabled": true,
+    "active": true,
+    "activeTabs": 2,
+    "collectorAvailable": true
+  },
+  "queue": {
+    "persistedEventCount": 30,
+    "pendingEventCount": 0,
+    "pendingBytes": 0
+  },
+  "activity": {
+    "totalCount": 4,
+    "activeStates": 1,
+    "inactiveStates": 3,
+    "transitions": {
+      "INITIALIZED": 2,
+      "ACTIVATED": 1,
+      "DEACTIVATED": 1
+    },
+    "lastState": "INACTIVE",
+    "lastTransition": "DEACTIVATED",
+    "lastCapturedAt": "2026-11-13T20:29:00.000Z"
+  },
+  "coverage": {
+    "source": "collector",
+    "scanCount": 18,
+    "uniqueSurfaceCount": 7,
+    "observedFeatureCount": 15,
+    "featureCount": 44,
+    "observedPercent": 34.1,
+    "documentationFeatureCount": 40,
+    "documentationPercent": 91,
+    "unknownControlCount": 2,
+    "lastScanAt": "2026-11-13T20:28:00.000Z",
+    "observedFeatureIds": [],
+    "pendingObservationIds": []
+  },
+  "repositorySync": {
+    "status": "ok",
+    "checkedAt": "2026-11-13T20:27:00.000Z",
+    "remoteVersion": null
+  },
+  "diagnostics": {
+    "lastError": null,
+    "activityObserver": {
+      "schema": "harmonia.activity-observer-diagnostics.v1",
+      "queriedTabCount": 2,
+      "reportingTabCount": 2,
+      "totals": {
+        "observer": {
+          "reconcileCount": 30,
+          "activitySnapshots": 8,
+          "activityTransitions": 2,
+          "activeTransitions": 1,
+          "inactiveTransitions": 1,
+          "eventSinkAttempts": 2,
+          "eventSinkAccepted": 2,
+          "eventSinkRejected": 0,
+          "eventSinkErrors": 0
+        },
+        "snapshot": {
+          "snapshotCount": 32,
+          "mainFoundCount": 32,
+          "signalPresence": {
+            "aria-busy": {
+              "matchingCount": 0,
+              "excludedCount": 0,
+              "visibleCount": 0
+            },
+            "data-is-streaming": {
+              "matchingCount": 0,
+              "excludedCount": 0,
+              "visibleCount": 0
+            },
+            "stop-control": {
+              "matchingCount": 2,
+              "excludedCount": 0,
+              "visibleCount": 2
+            },
+            "agent-progress": {
+              "matchingCount": 0,
+              "excludedCount": 0,
+              "visibleCount": 0
+            }
+          }
+        }
+      },
+      "instances": [
+        {
+          "active": false,
+          "stopped": false,
+          "lastDecision": "deactivated",
+          "observer": {
+            "reconcileCount": 16,
+            "activitySnapshots": 4,
+            "activityTransitions": 2,
+            "activeTransitions": 1,
+            "inactiveTransitions": 1,
+            "eventSinkAttempts": 2,
+            "eventSinkAccepted": 2,
+            "eventSinkRejected": 0,
+            "eventSinkErrors": 0
+          },
+          "snapshot": {
+            "snapshotCount": 16,
+            "mainFoundCount": 16,
+            "lastMainPresent": true,
+            "lastMainCandidateCount": 1,
+            "lastUserMessageCount": 1,
+            "lastAssistantMessageCount": 0,
+            "lastActivity": false,
+            "lastSignalIds": [],
+            "lastSignalPresence": {
+              "aria-busy": {
+                "matchingCount": 0,
+                "excludedCount": 0,
+                "visibleCount": 0
+              },
+              "data-is-streaming": {
+                "matchingCount": 0,
+                "excludedCount": 0,
+                "visibleCount": 0
+              },
+              "stop-control": {
+                "matchingCount": 1,
+                "excludedCount": 0,
+                "visibleCount": 1
+              },
+              "agent-progress": {
+                "matchingCount": 0,
+                "excludedCount": 0,
+                "visibleCount": 0
+              }
+            }
+          }
+        },
+        {
+          "active": false,
+          "stopped": false,
+          "lastDecision": "inactive",
+          "observer": {
+            "reconcileCount": 14,
+            "activitySnapshots": 4,
+            "activityTransitions": 0,
+            "activeTransitions": 0,
+            "inactiveTransitions": 0,
+            "eventSinkAttempts": 1,
+            "eventSinkAccepted": 1,
+            "eventSinkRejected": 0,
+            "eventSinkErrors": 0
+          },
+          "snapshot": {
+            "snapshotCount": 16,
+            "mainFoundCount": 16,
+            "lastMainPresent": true,
+            "lastMainCandidateCount": 1,
+            "lastUserMessageCount": 0,
+            "lastAssistantMessageCount": 1,
+            "lastActivity": false,
+            "lastSignalIds": [],
+            "lastSignalPresence": {
+              "aria-busy": {
+                "matchingCount": 0,
+                "excludedCount": 0,
+                "visibleCount": 0
+              },
+              "data-is-streaming": {
+                "matchingCount": 0,
+                "excludedCount": 0,
+                "visibleCount": 0
+              },
+              "stop-control": {
+                "matchingCount": 1,
+                "excludedCount": 0,
+                "visibleCount": 1
+              },
+              "agent-progress": {
+                "matchingCount": 0,
+                "excludedCount": 0,
+                "visibleCount": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "activityTrace": {
+      "totalCount": 10,
+      "byStage": {
+        "observer_started": 2,
+        "main_state": 2,
+        "signal_state": 4,
+        "activity_transition": 2
+      },
+      "lastCapturedAt": "2026-11-13T20:29:00.000Z",
+      "lastStage": "activity_transition"
+    }
+  },
+  "privacy": {
+    "messageContentIncluded": false,
+    "credentialsIncluded": false,
+    "sessionIdentifiersIncluded": false,
+    "rawEventPayloadsIncluded": false
+  }
+}

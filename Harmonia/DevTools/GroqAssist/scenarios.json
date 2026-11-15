@@ -1,0 +1,48 @@
+{
+  "schema": "harmonia.groq-scenario-catalog.v2",
+  "version": "0.2.0",
+  "scenarios": [
+    {
+      "id": "ROOT_NOT_FOUND",
+      "diagnosisCode": "root_missing",
+      "description": "The ChatGPT main region is absent in a structural snapshot.",
+      "discriminator": "Compare snapshotCount, mainFoundCount, and rootPresentInstances."
+    },
+    {
+      "id": "USER_NODE_MISSING",
+      "diagnosisCode": "user_node_missing",
+      "description": "No visible user or assistant message-role nodes are present in the structural snapshot.",
+      "discriminator": "Compare userMessageNodesLastSnapshot and assistantMessageNodesLastSnapshot."
+    },
+    {
+      "id": "SIGNAL_NOT_VISIBLE",
+      "diagnosisCode": "signal_not_visible",
+      "description": "An allowlisted activity selector matches elements, but none is visible.",
+      "discriminator": "Compare matchingCount, excludedCount, and visibleCount for each allowlisted signal."
+    },
+    {
+      "id": "ACTIVITY_NOT_OBSERVED",
+      "diagnosisCode": "activity_not_observed",
+      "description": "ChatGPT surfaces are being scanned but no allowlisted activity signal is visible.",
+      "discriminator": "Compare reportingTabCount, snapshotCount, visibleSignalCount, and observedSignalIds."
+    },
+    {
+      "id": "SINK_FAILURE",
+      "diagnosisCode": "sink_error",
+      "description": "The local activity-event sink rejects or fails to acknowledge structural state events.",
+      "discriminator": "Compare eventSinkAttempts, eventSinkAccepted, eventSinkRejected, and eventSinkErrors."
+    },
+    {
+      "id": "WORKER_PERSISTENCE",
+      "diagnosisCode": "worker_or_persistence_mismatch",
+      "description": "The activity observer emits structural transitions and the sink acknowledges them, but the collector aggregate has none.",
+      "discriminator": "Compare activityTransitions, eventSinkAccepted, and activity.totalCount."
+    },
+    {
+      "id": "INSUFFICIENT_EVIDENCE",
+      "diagnosisCode": "insufficient_evidence",
+      "description": "The available structural evidence cannot distinguish a failure safely.",
+      "discriminator": "Acquire another sanitized structural snapshot; do not speculate or request conversation content."
+    }
+  ]
+}

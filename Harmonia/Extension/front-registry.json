@@ -1,0 +1,119 @@
+{
+  "schema": "harmonia.front-registry.v1",
+  "version": "1.0.0",
+  "generated_at": "2026-11-13",
+  "repository": "SeryMente/khora",
+  "source_scope": "OCP roots under docs/frentes/ and frentes/ in KHORA main, plus local Harmonia worktree",
+  "assignment_semantics": "Associates one native ChatGPT conversation with a front for reporting. Does not assign or transfer front responsibility.",
+  "timezone": "America/Mexico_City",
+  "timezone_provenance": "The native exporter headers do not include a timezone. Historical timestamps were normalized using the current configured user timezone; the report keeps source provenance and can be corrected if the original export timezone differs.",
+  "fronts": [
+    {
+      "id": "harmonia",
+      "name": "Harmonia",
+      "ocp_path": "docs/frentes/harmonia/OBJETO-CANONICO.md",
+      "control_path": "docs/frentes/harmonia/CONTROL-RESPONSABILIDAD.json",
+      "responsibility_status": "assigned",
+      "generation": 15,
+      "aliases": [
+        "HARMONIA",
+        "Harmonia"
+      ],
+      "latest_known": {
+        "conversation_id": "6af63886-1a9c-83e8-a5ae-448392d6d61d",
+        "conversation_url": "https://chatgpt.com/c/6af63886-1a9c-83e8-a5ae-448392d6d61d",
+        "updated_at": "2026-11-13T16:50:59.000Z",
+        "source": "chatgpt_export_header",
+        "source_ref": "docs/frentes/harmonia/originales/ChatGPT-HARMONIA-20261113-1145.md",
+        "source_sha256": "5BC0508F50345EA48858DA6EA69C1A3A58B8DD7CC9A4165813CBD167ED43543B",
+        "source_updated_local": "2026-11-13 10:50:59",
+        "source_time_zone": "America/Mexico_City (normalized; exporter omitted zone)"
+      }
+    },
+    {
+      "id": "dictado-voz",
+      "name": "Dictado",
+      "ocp_path": "docs/frentes/dictado-voz/OBJETO-CANONICO.md",
+      "control_path": "docs/frentes/dictado-voz/CONTROL-RESPONSABILIDAD.json",
+      "responsibility_status": "assigned",
+      "generation": 6,
+      "aliases": [
+        "DICTADO",
+        "Dictado de voz"
+      ],
+      "latest_known": {
+        "conversation_id": "6aee2cb8-85e0-83e8-a166-6aa3890966ac",
+        "conversation_url": "https://chatgpt.com/c/6aee2cb8-85e0-83e8-a166-6aa3890966ac",
+        "updated_at": "2026-11-06T21:38:23.000Z",
+        "source": "chatgpt_export_header",
+        "source_ref": "docs/frentes/dictado-voz/originales/ChatGPT-DICTADO-20261106-1540.txt",
+        "source_blob_sha1": "a022d13920cb80280dd3c5bb89475348f8c908b7",
+        "source_updated_local": "2026-11-06 15:38:23",
+        "source_time_zone": "America/Mexico_City (normalized; exporter omitted zone)"
+      }
+    },
+    {
+      "id": "observabilidad-mcp",
+      "name": "Khora MCP",
+      "ocp_path": "docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md",
+      "control_path": "docs/frentes/observabilidad-mcp/CONTROL-RESPONSABILIDAD.json",
+      "responsibility_status": "assigned",
+      "generation": 10,
+      "aliases": [
+        "Khora MCP",
+        "Observabilidad MCP"
+      ],
+      "latest_known": {
+        "conversation_id": "6ae68c0e-384c-83e8-8829-8239cdd535cc",
+        "conversation_url": "https://chatgpt.com/c/6ae68c0e-384c-83e8-8829-8239cdd535cc",
+        "updated_at": "2026-11-02T01:04:29.000Z",
+        "source": "chatgpt_export_header",
+        "source_ref": "docs/frentes/observabilidad-mcp/historial/ChatGPT-Khora MCP-20261101-1912.md",
+        "source_updated_local": "2026-11-01 19:04:29",
+        "source_time_zone": "America/Mexico_City (normalized; exporter omitted zone)"
+      }
+    },
+    {
+      "id": "custodia",
+      "name": "Custodia",
+      "ocp_path": "frentes/custodia/OBJETO-CANONICO.md",
+      "control_path": "frentes/custodia/CONTROL-RESPONSABILIDAD.json",
+      "responsibility_status": "assigned",
+      "generation": 11,
+      "aliases": [
+        "Custodia",
+        "CUSTODIA"
+      ],
+      "reportability": "awaiting_latest_native_export",
+      "reportability_reason": "Existe un registro conversacional posterior del 2026-11-12 sin ID nativo, URL ni hora exacta; no se presenta un export anterior como si fuera la conversación más reciente."
+    },
+    {
+      "id": "notas",
+      "name": "Notas",
+      "ocp_path": "frentes/notas/OBJETO-CANONICO.md",
+      "control_path": "frentes/notas/CONTROL-RESPONSABILIDAD.json",
+      "responsibility_status": "assigned",
+      "generation": 2,
+      "aliases": [
+        "Notas",
+        "Notas de Khora",
+        "Notas rápidas"
+      ],
+      "reportability": "awaiting_native_conversation_id",
+      "reportability_reason": "El registro disponible del 2026-11-12 declara que no se expuso el ID nativo y no contiene URL de ChatGPT."
+    },
+    {
+      "id": "tareas-automaticas",
+      "name": "Tareas automáticas",
+      "ocp_path": "docs/frentes/tareas-automaticas/OBJETO-CANONICO.md",
+      "control_path": null,
+      "responsibility_status": "control_missing",
+      "generation": null,
+      "aliases": [
+        "Tareas automáticas"
+      ],
+      "reportability": "awaiting_conversation_association",
+      "reportability_reason": "OCP localizado; no se encontró CONTROL-RESPONSABILIDAD.json ni export con URL nativa para establecer asociación."
+    }
+  ]
+}

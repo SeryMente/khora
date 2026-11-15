@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "harmonia.dev-triage-input.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "contractVersion", "extension", "observation", "queue", "cycles", "coverage", "observer"],
+  "properties": {
+    "schema": { "const": "harmonia.dev-triage-input.v1" },
+    "contractVersion": { "type": "string", "const": "1.0" },
+    "extension": {
+      "type": "object", "additionalProperties": false, "required": ["version", "frameworkRevision"],
+      "properties": { "version": { "type": "string", "maxLength": 64 }, "frameworkRevision": { "type": "string", "maxLength": 96 } }
+    },
+    "observation": {
+      "type": "object", "additionalProperties": false, "required": ["enabled", "active", "activeTabCount", "collectorAvailable"],
+      "properties": { "enabled": { "type": "boolean" }, "active": { "type": "boolean" }, "activeTabCount": { "type": "integer", "minimum": 0 }, "collectorAvailable": { "type": "boolean" } }
+    },
+    "queue": {
+      "type": "object", "additionalProperties": false, "required": ["persistedEventCount", "pendingEventCount", "pendingBytes"],
+      "properties": { "persistedEventCount": { "type": "integer", "minimum": 0 }, "pendingEventCount": { "type": "integer", "minimum": 0 }, "pendingBytes": { "type": "integer", "minimum": 0 } }
+    },
+    "cycles": {
+      "type": "object", "additionalProperties": false,
+      "required": ["totalCount", "completedCount", "measuredCount", "activeCount", "unmeasuredCount", "medianMs", "p90Ms"],
+      "properties": {
+        "totalCount": { "type": "integer", "minimum": 0 }, "completedCount": { "type": "integer", "minimum": 0 },
+        "measuredCount": { "type": "integer", "minimum": 0 }, "activeCount": { "type": "integer", "minimum": 0 },
+        "unmeasuredCount": { "type": "integer", "minimum": 0 },
+        "medianMs": { "type": ["number", "null"], "minimum": 0 }, "p90Ms": { "type": ["number", "null"], "minimum": 0 }
+      }
+    },
+    "coverage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["scanCount", "uniqueSurfaceCount", "observedFeatureCount", "featureCount", "observedPercent"],
+      "properties": {
+        "scanCount": { "type": "integer", "minimum": 0 }, "uniqueSurfaceCount": { "type": "integer", "minimum": 0 },
+        "observedFeatureCount": { "type": "integer", "minimum": 0 }, "featureCount": { "type": "integer", "minimum": 0 },
+        "observedPercent": { "type": "number", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "observer": {
+      "type": "object", "additionalProperties": false,
+      "required": ["queriedTabCount", "reportingTabCount", "snapshotCount", "mainFoundCount", "rootPresentInstances",
+        "userMessageNodesLastSnapshot", "assistantMessageNodesLastSnapshot", "activityInstances", "reconcileCount",
+        "userTurnNodesObserved", "activityTrueSnapshots", "activityRisingEdges", "activityFallingEdges",
+        "unmatchedActivityEdges", "userActivityCorrelationAttempts", "successfulCorrelations", "staleActivityEdges",
+        "cycleStartAttempts", "cycleStartedEvents", "cycleStartRejectedNoSignals", "cycleCompletedEvents",
+        "eventSinkAttempts", "eventSinkAccepted", "eventSinkRejected", "eventSinkErrors",
+        "visibleSignalCount", "matchingSignalCount", "observedSignalIds", "signalPresenceTotals"],
+      "properties": {
+        "queriedTabCount": { "type": "integer", "minimum": 0 }, "reportingTabCount": { "type": "integer", "minimum": 0 },
+        "snapshotCount": { "type": "integer", "minimum": 0 }, "mainFoundCount": { "type": "integer", "minimum": 0 },
+        "rootPresentInstances": { "type": "integer", "minimum": 0 }, "userMessageNodesLastSnapshot": { "type": "integer", "minimum": 0 },
+        "assistantMessageNodesLastSnapshot": { "type": "integer", "minimum": 0 }, "activityInstances": { "type": "integer", "minimum": 0 },
+        "reconcileCount": { "type": "integer", "minimum": 0 }, "userTurnNodesObserved": { "type": "integer", "minimum": 0 },
+        "activityTrueSnapshots": { "type": "integer", "minimum": 0 }, "activityRisingEdges": { "type": "integer", "minimum": 0 },
+        "activityFallingEdges": { "type": "integer", "minimum": 0 }, "unmatchedActivityEdges": { "type": "integer", "minimum": 0 },
+        "userActivityCorrelationAttempts": { "type": "integer", "minimum": 0 }, "successfulCorrelations": { "type": "integer", "minimum": 0 },
+        "staleActivityEdges": { "type": "integer", "minimum": 0 }, "cycleStartAttempts": { "type": "integer", "minimum": 0 },
+        "cycleStartedEvents": { "type": "integer", "minimum": 0 }, "cycleStartRejectedNoSignals": { "type": "integer", "minimum": 0 },
+        "cycleCompletedEvents": { "type": "integer", "minimum": 0 }, "eventSinkAttempts": { "type": "integer", "minimum": 0 },
+        "eventSinkAccepted": { "type": "integer", "minimum": 0 }, "eventSinkRejected": { "type": "integer", "minimum": 0 },
+        "eventSinkErrors": { "type": "integer", "minimum": 0 }, "visibleSignalCount": { "type": "integer", "minimum": 0 },
+        "matchingSignalCount": { "type": "integer", "minimum": 0 },
+        "observedSignalIds": { "type": "array", "uniqueItems": true, "items": { "enum": ["aria-busy", "data-is-streaming", "stop-control", "agent-progress"] } },
+        "signalPresenceTotals": {
+          "type": "object", "additionalProperties": false,
+          "required": ["aria-busy", "data-is-streaming", "stop-control", "agent-progress"],
+          "properties": {
+            "aria-busy": { "$ref": "#/$defs/signalCount" }, "data-is-streaming": { "$ref": "#/$defs/signalCount" },
+            "stop-control": { "$ref": "#/$defs/signalCount" }, "agent-progress": { "$ref": "#/$defs/signalCount" }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "signalCount": {
+      "type": "object", "additionalProperties": false, "required": ["matchingCount", "visibleCount"],
+      "properties": { "matchingCount": { "type": "integer", "minimum": 0 }, "visibleCount": { "type": "integer", "minimum": 0 } }
+    }
+  }
+}

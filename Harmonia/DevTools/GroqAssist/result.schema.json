@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "harmonia.dev-triage-result.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "diagnosis_code", "confidence", "evidence_refs", "alternative_codes", "scenario_id", "expected_observation", "falsification_condition", "reason_summary"],
+  "properties": {
+    "schema": { "const": "harmonia.dev-triage-result.v1" },
+    "diagnosis_code": { "enum": ["root_missing", "user_node_missing", "signal_not_visible", "no_rising_edge", "correlation_timeout", "start_rejected_no_signal", "sink_rejected", "sink_error", "worker_or_persistence_mismatch", "coverage_gap", "insufficient_evidence"] },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "evidence_refs": { "type": "array", "maxItems": 6, "uniqueItems": true, "items": { "type": "string" } },
+    "alternative_codes": { "type": "array", "maxItems": 4, "uniqueItems": true, "items": { "type": "string" } },
+    "scenario_id": { "enum": ["ROOT_NOT_FOUND", "USER_NODE_MISSING", "SIGNAL_NOT_VISIBLE", "NO_RISING_EDGE", "CORRELATION_ORDER", "START_REJECTED", "SINK_FAILURE", "WORKER_PERSISTENCE", "T2_SETTLE", "INSUFFICIENT_EVIDENCE"] },
+    "expected_observation": { "type": "string", "maxLength": 220 },
+    "falsification_condition": { "type": "string", "maxLength": 220 },
+    "reason_summary": { "type": "string", "maxLength": 260 }
+  }
+}

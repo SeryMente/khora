@@ -1,0 +1,10 @@
+{
+  "schema": "harmonia.repository-build.v1",
+  "repository": "SeryMente/khora",
+  "branch": "work/harmonia-omm-fut-009-0.6.0",
+  "version": "0.6.0",
+  "sourceRevision": "3abdecfa552547851621c98fcdda4e93147f1893",
+  "catalogVersion": "0.1.3",
+  "buildKind": "local-candidate",
+  "note": "Local candidate 0.6.0 for OMM-FUT-009. Temporal cycle duration/latency/processing metrics and T1/T2 are retired under Metacanon §52. Extension records allowlisted structural activity states; the collector rejects legacy temporal events and exposes /activity. Historical JSONL is preserved unchanged; legacy pending outbox events are isolated in a local quarantine. No Chrome installation/reload, natural acceptance or publication is claimed."
+}
