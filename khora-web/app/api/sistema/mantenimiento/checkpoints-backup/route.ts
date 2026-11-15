@@ -327,7 +327,7 @@ export async function POST(req: NextRequest) {
     } catch {
       actualRows = null;
     }
-    const committedByReadback = actualRows === "0";
+    const committedByReadback = truncateCommitAttempted && actualRows === "0";
     const knownCommitted = truncateCommitted || committedByReadback;
     const knownPreserved = actualRows === EXPECTED.rows;
     const status = message === "checkpoint_backup_baseline_changed" ? 409 : 500;
