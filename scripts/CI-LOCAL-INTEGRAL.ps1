@@ -465,9 +465,10 @@ try {
         Start-LocalNeo4j
         $kernelSetupScript = Join-Path $RepoRoot 'kernel\scripts\setup_neo4j.py'
         $kernelProjectConfig = Join-Path $RepoRoot 'kernel\pyproject.toml'
-        $kernelTestRoot = Join-Path $RepoRoot 'kernel'
         Invoke-Native -FilePath $PythonExe -Arguments @($kernelSetupScript) -WorkingDirectory $kernelDataRoot
-        Invoke-Native -FilePath $PythonExe -Arguments @('-m','pytest','-c',$kernelProjectConfig,$kernelTestRoot) -WorkingDirectory $kernelDataRoot
+        $kernelSourceTests = Join-Path $RepoRoot 'kernel\src'
+        $kernelContractTests = Join-Path $RepoRoot 'kernel\tests'
+        Invoke-Native -FilePath $PythonExe -Arguments @('-m','pytest','-c',$kernelProjectConfig,$kernelSourceTests,$kernelContractTests) -WorkingDirectory $kernelDataRoot
       } finally {
         Stop-LocalNeo4j
       }
