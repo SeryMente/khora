@@ -1,6 +1,5 @@
 ﻿# KHORA EP Medio v1.0 - configuración de sesión
-$script:SCRIPT_VERSION = '7.5.3'
-$script:EP_VERSION = '1.0.1'
+if ([string]$script:SCRIPT_VERSION -ne '7.5.5' -or [string]$script:EP_VERSION -ne '1.0.3') { throw 'GATE_CONFIG_VERSION_MISMATCH: barrel y gate no coinciden.' }
 $script:SES_ACTIVE = $false
 $script:TokSecure = $null
 $script:KhoraTokenSecure = $null

@@ -30,3 +30,21 @@ jobs:
             foreach ($p in $deny) { if ($c -match [regex]::Escape($p)) { Write-Host "DENY $p in $($_.FullName)"; $fail = $true } }
           }
           if ($fail) { exit 1 } else { Write-Host "Validation passed successfully." }
+
+  validate-khora-ps51:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate canonical EP gate with Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          if ($PSVersionTable.PSVersion.Major -ne 5) { throw "Windows PowerShell 5.1 is required for this contract." }
+          python tests\validate_ep.py
+          if ($LASTEXITCODE -ne 0) { throw "Python EP validator failed." }
+          & .\scripts\khora\khora.ps1 -SelfTest
+          if ($LASTEXITCODE -ne 0) { throw "Canonical gate SelfTest failed." }
+          & .\scripts\khora\tests\Test-Arranque.ps1
+          if ($LASTEXITCODE -ne 0) { throw "Test-Arranque failed." }

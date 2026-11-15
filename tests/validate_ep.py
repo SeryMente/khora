@@ -13,8 +13,8 @@ require((ROOT/'scripts/khora/khora.ps1').is_file(),'Falta gate único')
 arch=read('ep-medio-architectura.md')
 gate=read('scripts/khora/khora.ps1','utf-8-sig')
 code='\n'.join(p.read_text(encoding='utf-8-sig') for p in (ROOT/'scripts/khora').rglob('*.ps1') if 'tests' not in p.parts)
-require("EP_VERSION = '1.0.1'" in gate,'Versión EP incorrecta')
-require("SCRIPT_VERSION = '7.5.3'" in gate,'Versión host incorrecta')
+require("EP_VERSION = '1.0.3'" in gate,'Versión EP incorrecta')
+require("SCRIPT_VERSION = '7.5.5'" in gate,'Versión host incorrecta')
 require('Enable-BitLocker' in gate,'Falta BitLocker')
 require('Rfc2898DeriveBytes' in gate and 'HashAlgorithmName]::SHA256' in gate and '200000' in gate,'La derivación de contraseña de BitLocker no usa PBKDF2-HMAC-SHA256/200000')
 require("ComputeHash($bytes)" not in gate,'La contraseña de BitLocker no debe derivarse con SHA-256 directo')
@@ -30,6 +30,16 @@ require('raw.githubusercontent.com' not in gate,'Bootstrap anónimo prohibido')
 require('Find-KhoraHostToolPath' in gate or 'Resolve-KhoraHostToolPath' in gate,'Falta descubrimiento robusto de herramientas del host')
 require('Find-KhoraHostExecutable' in code,'Falta resolvedor robusto de herramientas en dependencias')
 require('npm.cmd' in code,'El bootstrap debe usar npm.cmd para evitar bloqueo de npm.ps1')
+
+require('[switch]$SelfTest' in gate and 'function Invoke-KhoraSelfTest' in gate,'Falta self-test inocuo del gate canónico')
+require('Get-KhoraToolchainInventory' in code and 'Invoke-KhoraNativeProbe' in code,'Falta inventario y probe nativo de toolchain')
+require('npm.cmd' in code and 'npm.ps1' in code,'Falta resolución explícita de npm.cmd y exclusión de npm.ps1')
+require('KHORA_STARTUP_CLEANUP_RESIDUALS' in gate,'Limpieza al reinicio no conserva la tarea ante residuos')
+cleanup=read('scripts/khora/modules/11-cleanup.ps1','utf-8-sig')
+efs=read('scripts/khora/modules/05-efs.ps1','utf-8-sig')
+require('residuos' in cleanup.lower() and 'Unregister-ScheduledTask' in cleanup,'Cleanup no controla la compuerta de residuos')
+require('ROOT_DIR no coincide' in efs and 'VHD_PATH está fuera de ROOT_DIR' in efs,'El borrado del contenedor no valida identidad/ruta')
+
 # Sequence registry
 ids=[f'EP-IN-{n:03d}' for n in range(10,131,10)]+[f'EP-RUN-{n:03d}' for n in (10,20,30)]+[f'EP-OUT-{n:03d}' for n in range(10,101,10)]
 for event_id in ids:
@@ -94,4 +104,4 @@ for p in (ROOT/'scripts/khora').rglob('*.ps1'):
     if problem:errors.append(problem)
 if errors:
     print('\n'.join('ERROR: '+e for e in errors));sys.exit(1)
-print('EP v1.0.1 static validation: OK')
+print('EP v1.0.3 / KHORA 7.5.5 static validation: OK')

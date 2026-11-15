@@ -1,7 +1,7 @@
-# Entorno Persistente Medio · Arquitectura canónica v1.0.4
+# Entorno Persistente Medio · Arquitectura canónica v1.0.5
 
-**Estado:** normativa · actualización 1.0.4
-**Host KHORA:** 7.5.3
+**Estado:** normativa · actualización 1.0.5
+**Host KHORA:** 7.5.5
 **Repositorio:** `SeryMente/khora`, tratado como privado
 **Punto de entrada único:** `scripts/khora/khora.ps1`
 **Firma de instrucción:** NX-326m
@@ -291,7 +291,7 @@ Guardian vigila:
 
 Los blobs Guardian están cifrados mediante Protección de Datos de Windows y residen dentro de BitLocker. Permiten concluir registro y continuidad si el supervisor muere. Ante conflicto, la confidencialidad gana: aun si falla `EP-OUT-030` o `EP-OUT-040`, se ejecutan bloqueo, desmontaje y eliminación. La bitácora remota conserva el fallo y la posible pérdida de continuidad.
 
-La tarea de arranque como `SYSTEM` elimina la carpeta exterior tras un reinicio inesperado. Solo se desregistra cuando confirma que la carpeta ya no existe; si el bloqueo, desmontaje o borrado falla, permanece armada para el siguiente reinicio. No deja cuarentena local.
+La tarea de arranque como `SYSTEM` intenta eliminar el VHDX y la carpeta exterior tras un reinicio inesperado. Ejecuta con `$ErrorActionPreference='Stop'` y **solo se desregistra cuando confirma que ambos recursos ya no existen**. Si falla el borrado de cualquiera de ellos, la tarea termina con error y permanece armada para un siguiente reinicio. La limpieza interactiva no desregistra la tarea si `Get-DiskImage` confirma que el VHDX sigue adjunto, si el punto de montaje sigue presente o si el VHDX/carpeta exterior permanecen. No se declara cierre completo ni `EP-OUT-100 OK` mientras existan residuos.
 
 ## 11. API de Khora
 
@@ -352,3 +352,16 @@ Las verificaciones Linux o estáticas no sustituyen esta matriz. Cualquier resul
 ## 16. Huellas de implementación
 
 El paquete final incluye `ep-integrity-manifest.sha256`, calculado después de todas las modificaciones. El manifiesto no se incluye a sí mismo y cubre la arquitectura, gate, módulos, API, migración y pruebas. Un modelo debe verificarlo antes de atribuir comportamiento a v1.0.
+
+## 17. Gate KHORA 7.5.5 · Entorno Persistente Medio 1.0.3
+
+El punto de entrada se conserva exclusivamente en `scripts/khora/khora.ps1`; el orden de carga sigue definido por `khora.barrel.ps1` y no se crean copias `khora-v*.ps1`.
+
+- El gate declara `SCRIPT_VERSION=7.5.5` y `EP_VERSION=1.0.3`. `modules/00-config.ps1` verifica esas versiones y falla ante divergencia; el validador estático comprueba los mismos valores.
+- `-SelfTest` es una comprobación inocua: parsea el gate, barril, módulos y tests PowerShell; verifica el inventario/orden de módulos, versión y bootstrap embebido byte-equivalente. No crea VHDX, no cambia el host, no autentica, no importa secretos, no despliega ni inicia el workspace.
+- `modules/08-deps.ps1` resuelve Git, GitHub CLI, Node.js, `npm.cmd` y Python desde rutas verificables y PATH; rechaza alias Python de WindowsApps y no invoca `npm.ps1`. El inventario clasifica herramientas como `AVAILABLE_COMPATIBLE`, `MISSING` o `INCOMPATIBLE`. Las llamadas nativas capturan stdout/stderr y `$LASTEXITCODE` inmediatamente.
+- Las descargas de dependencias usan temporales parciales, reintentos acotados y validación posterior; Node se valida en pareja con `npm.cmd`, y sus descargas se cotejan contra SHA-256.
+- El borrado del VHDX exige que `ROOT_DIR` sea la carpeta de sesión `KHORA-EP-<SESSION_ID>`, que `VHD_PATH` esté dentro de ella y que el volumen no esté montado ni adjunto. La tarea al reinicio se mantiene registrada hasta confirmar ausencia de VHDX y carpeta exterior.
+- La redacción de logs incorpora secretos del entorno del proceso y formatos habituales de GitHub/Bearer/JWT; las credenciales siguen en memoria segura/DPAPI y las funciones de snapshot de tokens continúan prohibidas.
+
+**Validación de esta versión:** el modo `-SelfTest` y el validador estático verifican estructura, sintaxis, coherencia de versiones e integridad del bootstrap. No sustituyen la matriz E2E Windows de §15: la instanciación real, BitLocker, emisión/revocación, Guardian y recuperación deben certificarse por separado en un host de prueba.
