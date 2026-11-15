@@ -18,6 +18,7 @@
     "repair:volcados": "tsx scripts/repair_volcados.ts",
     "migrate:ep": "node scripts/migrate-ep.mjs",
     "migrate:runtime": "node scripts/migrate-runtime.mjs",
+    "db:migrate:notes": "node scripts/migrate-notes.mjs",
     "ui:contract": "tsx scripts/check_navigation_contract.ts"
   },
   "dependencies": {
@@ -49,6 +50,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.16",
     "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
     "@types/adm-zip": "^0.5.8",

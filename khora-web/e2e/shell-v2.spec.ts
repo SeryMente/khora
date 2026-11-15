@@ -4,7 +4,7 @@ const routes = [
   { path: '/sistema/ingreso', expectedTitle: 'Ingreso' },
   { path: '/sistema/ingreso?modo=dictado', expectedTitle: 'Ingreso' },
   { path: '/sistema/ingreso?modo=captura', expectedTitle: 'Ingreso' },
-  { path: '/sistema/ingreso?modo=archivo', expectedTitle: 'Ingreso' },
+  { path: '/sistema/ingreso?modo=archivo', expectedTitle: 'Archivo' },
   { path: '/sistema/ingreso?modo=revision', expectedTitle: 'Ingreso' },
   { path: '/sistema/ingreso?modo=ingesta', expectedTitle: 'Ingreso a memoria' },
   { path: '/sistema/custodia', expectedTitle: 'Custodia' },
@@ -62,6 +62,13 @@ test.describe('Shell Navegación v3', () => {
     await expect(page.getByRole('heading', { name: 'Ingreso a memoria', exact: true })).toBeVisible();
     await expect(page.locator('[data-ui-id="ingreso.ingesta"]')).toBeVisible();
 
+    await expect(page.getByRole('link', { name: 'Ingreso', exact: true })).toHaveAttribute('href', '/sistema/ingreso');
+    await page.getByRole('button', { name: 'Más opciones de Ingreso' }).click();
+    const ingresoMenu = page.getByRole('navigation', { name: 'Menú Ingreso' });
+    await expect(ingresoMenu.getByRole('link', { name: 'Dictado', exact: true })).toHaveAttribute('href', '/sistema/ingreso');
+    await expect(ingresoMenu.getByRole('link', { name: 'Notas rápidas', exact: true })).toHaveAttribute('href', '/notas');
+    await expect(ingresoMenu.getByRole('link', { name: 'Volcado', exact: true })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Más opciones de Ingreso' }).click();
     await page.getByRole('button', { name: 'Grafo', exact: true }).click();
     const grafoMenu = page.getByRole('navigation', { name: 'Menú Grafo' });
     await expect(grafoMenu).toBeVisible();

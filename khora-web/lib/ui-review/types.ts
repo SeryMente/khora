@@ -21,7 +21,8 @@ export type ScreenId =
   | "registro"
   | "grafo"
   | "consulta"
-  | "kpi";
+  | "kpi"
+  | "notas";
 
 export type ScenarioStatus = "active" | "absent";
 

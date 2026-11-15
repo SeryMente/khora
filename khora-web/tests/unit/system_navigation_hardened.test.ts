@@ -28,8 +28,12 @@ test("ingreso is the capture surface and volcados is the downstream archive/revi
   assert.ok(entry);
   assert.equal(entry.kind, "direct");
   assert.equal(entry.href, "/sistema/ingreso");
-  assert.deepEqual(entry.coverage, ["/sistema/ingreso"]);
-  assert.equal((entry.children ?? []).length, 0);
+  assert.deepEqual(entry.coverage, ["/sistema/ingreso", "/notas"]);
+  assert.deepEqual((entry.children ?? []).map((child) => child.id), ["dictado", "notas-rapidas"]);
+  assert.equal((entry.children ?? [])[0].href, "/sistema/ingreso");
+  assert.equal((entry.children ?? [])[0].label, "Dictado");
+  assert.equal((entry.children ?? [])[1].href, "/notas");
+  assert.equal((entry.children ?? [])[1].label, "Notas rápidas");
   assert.equal(NAVIGATION_REGISTRY.some((item) => item.id === "capturar"), false);
   assert.equal(NAVIGATION_REGISTRY.some((item) => item.id === "dictado"), false);
   assert.equal(NAVIGATION_REGISTRY.some((item) => item.id === "edicion"), false);
@@ -58,7 +62,7 @@ test("domain menus remain hierarchical while ingreso and volcados stay primary",
   const grafo = NAVIGATION_REGISTRY.find((item) => item.id === "grafo");
   assert.ok(ingreso);
   assert.ok(grafo);
-  assert.deepEqual((ingreso.children ?? []).map((child) => child.id), []);
+  assert.deepEqual((ingreso.children ?? []).map((child) => child.id), ["dictado", "notas-rapidas"]);
   assert.deepEqual((grafo.children ?? []).map((child) => child.id), ["grafo-main", "mapa"]);
 });
 

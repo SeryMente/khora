@@ -768,6 +768,30 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: ["registro.container", "registro.events-list", "registro.event-item", "registro.filter-bar", "registro.btn-copiar"]
+  },
+  "notas:default": {
+    screen: "notas", scenario: "default", title: "Notas rápidas · Vista de tarjetas",
+    description: "Captura rápida, búsqueda, filtros por estado, etiquetas y tarjetas de notas.",
+    status: "active", recommended_viewport: "desktop",
+    ui_ids: ["notas.container", "notas.toolbar", "notas.search", "notas.status", "notas.cards", "notas.card"]
+  },
+  "notas:empty": {
+    screen: "notas", scenario: "empty", title: "Notas rápidas · Estado vacío",
+    description: "Estado vacío de notas activas con invitación a crear la primera nota.",
+    status: "active", recommended_viewport: "desktop",
+    ui_ids: ["notas.container", "notas.empty"]
+  },
+  "notas:checklist": {
+    screen: "notas", scenario: "checklist", title: "Notas rápidas · Checklist",
+    description: "Nota de checklist con elementos pendientes y completados.",
+    status: "active", recommended_viewport: "desktop",
+    ui_ids: ["notas.container", "notas.toolbar", "notas.cards", "notas.checklist"]
+  },
+  "notas:error": {
+    screen: "notas", scenario: "error", title: "Notas rápidas · Error de carga",
+    description: "Estado de error de la API de notas con mensaje legible y reintentable.",
+    status: "active", recommended_viewport: "desktop",
+    ui_ids: ["notas.container", "notas.error"]
   }
 };
 
@@ -780,7 +804,8 @@ export const SCREENS: ScreenId[] = [
   "registro",
   "grafo",
   "consulta",
-  "kpi"
+  "kpi",
+  "notas"
 ];
 
 export function getScenario(screen: ScreenId, scenarioName: string): ScenarioDefinition | null {

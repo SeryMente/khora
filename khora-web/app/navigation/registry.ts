@@ -16,7 +16,8 @@ export type NavigationIcon =
   | "FileCheck2"
   | "Container"
   | "LockKeyhole"
-  | "KeyRound";
+  | "KeyRound"
+  | "NotebookPen";
 
 export type NavigationChild = {
   id: string;
@@ -52,7 +53,11 @@ export const NAVIGATION_REGISTRY: readonly NavigationEntry[] = [
     icon: "Keyboard",
     kind: "direct",
     level: 1,
-    coverage: ["/sistema/ingreso"],
+    coverage: ["/sistema/ingreso", "/notas"],
+    children: [
+      { id: "dictado", label: "Dictado", href: "/sistema/ingreso", icon: "Mic", group: "Captura" },
+      { id: "notas-rapidas", label: "Notas rápidas", href: "/notas", icon: "NotebookPen", group: "Captura" },
+    ],
   },
   {
     id: "custodia",

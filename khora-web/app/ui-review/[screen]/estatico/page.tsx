@@ -17,6 +17,7 @@ import { RegistroView } from "@/app/components/shared/RegistroView";
 import { GrafoView } from "@/app/components/shared/GrafoView";
 import { ConsultaView } from "@/app/components/shared/ConsultaView";
 import { KpiPanelView } from "@/app/components/shared/KpiPanelView";
+import { NotesReviewView } from "@/app/components/shared/NotesReviewView";
 
 export const dynamic = "force-static";
 export const dynamicParams = false;
@@ -43,6 +44,8 @@ function renderScenario(screen: ScreenId, scenario: string) {
       return <ConsultaView isReviewMode state={buildConsultaState(scenario)} />;
     case "kpi":
       return <KpiPanelView state={buildKpiState(scenario)} />;
+    case "notas":
+      return <NotesReviewView scenario={scenario} />;
     default:
       return null;
   }

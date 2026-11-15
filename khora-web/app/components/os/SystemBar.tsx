@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import * as Icons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
+import { useNotesRuntime } from "../notas/NotesProvider";
 import {
   NAVIGATION_REGISTRY,
   navigationGroupNames,
@@ -31,6 +32,7 @@ const ICONS: Record<NavigationIcon, LucideIcon> = {
   Container: Icons.Container,
   LockKeyhole: Icons.LockKeyhole,
   KeyRound: Icons.KeyRound,
+  NotebookPen: Icons.NotebookPen,
 };
 
 function normalizePath(href: string): string {
@@ -86,6 +88,7 @@ function MenuPanel({
   onNavigate: () => void;
 }) {
   const groups = navigationGroupNames(entry);
+  const { openQuickPanel, shortcut } = useNotesRuntime();
 
   return (
     <nav
@@ -109,6 +112,22 @@ function MenuPanel({
         </p>
       </div>
 
+      {entry.id === "ingreso" && (
+        <div className="border-b p-2" style={{ borderColor: "var(--khora-border)" }}>
+          <button
+            type="button"
+            onClick={() => { onNavigate(); openQuickPanel(); }}
+
+            title={"Captura rápida · " + shortcut}
+            aria-label="Abrir captura rápida"
+            className="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-xs font-bold hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]"
+          >
+            <Icons.NotebookPen size={16} />
+            <span>Captura rápida</span>
+            <span className="ml-auto text-[10px] font-normal opacity-55">{shortcut}</span>
+          </button>
+        </div>
+      )}
       <div className="max-h-[62vh] overflow-y-auto p-2">
         {groups.map((group) => (
           <section key={group} className="mb-2 last:mb-0" data-navigation-group={group}>
@@ -176,7 +195,7 @@ export default function SystemBar() {
 
           return (
             <div key={entry.id} className="relative shrink-0" data-navigation-entry={entry.id}>
-              {entry.kind === "menu" && menuOpen && (
+              {(entry.kind === "menu" || (entry.children?.length ?? 0) > 0) && menuOpen && (
                 <MenuPanel
                   entry={entry}
                   pathname={pathname}
@@ -185,15 +204,31 @@ export default function SystemBar() {
               )}
 
               {entry.kind === "direct" ? (
-                <Link
-                  href={entry.href}
-                  className="flex min-w-12 flex-col items-center justify-center rounded-lg p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)] sm:min-w-16 sm:p-2"
-                  style={{ color: active ? "var(--khora-ink)" : "var(--khora-accent)" }}
-                  aria-current={active ? "page" : undefined}
-                >
-                  <NavIcon name={entry.icon} size={24} />
-                  <span className="mt-1 whitespace-nowrap text-[10px] font-medium sm:text-xs">{entry.label}</span>
-                </Link>
+                <div className="flex items-center gap-0.5">
+                  <Link
+                    href={entry.href}
+                    className="flex min-w-12 flex-col items-center justify-center rounded-lg p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)] sm:min-w-16 sm:p-2"
+                    style={{ color: active ? "var(--khora-ink)" : "var(--khora-accent)" }}
+                    aria-current={active && normalizePath(entry.href) === normalizePath(pathname || "") ? "page" : undefined}
+                  >
+                    <NavIcon name={entry.icon} size={24} />
+                    <span className="mt-1 whitespace-nowrap text-[10px] font-medium sm:text-xs">{entry.label}</span>
+                  </Link>
+                  {(entry.children?.length ?? 0) > 0 && (
+                    <button
+                      type="button"
+                      aria-haspopup="true"
+                      aria-expanded={menuOpen}
+                      aria-controls={menuOpen ? "navigation-menu-" + entry.id : undefined}
+                      aria-label={"Más opciones de " + entry.label}
+                      onClick={() => setOpenMenuId((current) => current === entry.id ? null : entry.id)}
+                      className="flex min-h-11 min-w-8 items-center justify-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)]"
+                      style={{ color: active ? "var(--khora-ink)" : "var(--khora-accent)" }}
+                    >
+                      {menuOpen ? <Icons.ChevronUp size={14} /> : <Icons.ChevronDown size={14} />}
+                    </button>
+                  )}
+                </div>
               ) : (
                 <button
                   type="button"
