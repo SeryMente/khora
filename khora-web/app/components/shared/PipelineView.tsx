@@ -156,7 +156,6 @@ export function PipelineView({
     generatingTitle,
     titleError,
     manifiestoPartes,
-    currentPartIndex,
     audioSourceUrl,
     currentTimeMs,
     duracionTotalMs,
@@ -622,9 +621,19 @@ export function PipelineView({
                             data-ui-id="revision.reading-prose"
                             className="p-6 border bg-zinc-900/40 border-zinc-800 rounded-none max-w-prose min-h-[280px]"
                           >
-                            <span className="font-serif leading-relaxed text-base">
-                              {editableTexto}
-                            </span>
+                            {editableTexto.trim() ? (
+                              <span className="font-serif leading-relaxed text-base">
+                                {editableTexto}
+                              </span>
+                            ) : selectedItem.audio?.present ? (
+                              <p className="text-sm opacity-70 italic">
+                                Esta unidad conserva el audio original, pero todavía no tiene transcripción.
+                              </p>
+                            ) : (
+                              <p className="text-sm opacity-70 italic">
+                                Esta unidad no contiene transcripción.
+                              </p>
+                            )}
                           </div>
                         ) : (
                           <textarea
