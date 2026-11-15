@@ -33,6 +33,8 @@ export type ResultadoTranscripcion = {
   exito: boolean;
   modelo: string;
   motivo?: string;
+  statusCode?: number;
+  retryAfter?: string;
   segmentos?: SegmentoWhisper[];
 };
 
@@ -198,11 +200,11 @@ export function construirPromptSTT(glosario: Record<string, string>): string {
 export async function transcribirAudioConGroq(
   audioBuffer: Buffer,
   filename = "dictado.webm",
-  opciones?: { verboseJson?: boolean; windowOffsetMs?: number; language?: string | null; preserveVerbatim?: boolean; allowEmpty?: boolean }
+  opciones?: { verboseJson?: boolean; windowOffsetMs?: number; language?: string | null; preserveVerbatim?: boolean; allowEmpty?: boolean; mimeType?: string; model?: string }
 ): Promise<ResultadoTranscripcion> {
   const clave = process.env.GROQ_API_KEY;
   const modelo =
-    process.env.GROQ_WHISPER_MODEL ??
+    opciones?.model ?? process.env.GROQ_WHISPER_MODEL ??
     process.env.GROQ_STT_MODEL ??
     "whisper-large-v3";
 
@@ -228,7 +230,7 @@ export async function transcribirAudioConGroq(
     const prompt = opciones?.preserveVerbatim ? "" : construirPromptSTT(glosario);
 
     const formData = new FormData();
-    const audioBlob = new Blob([new Uint8Array(audioBuffer)], { type: "audio/webm" });
+    const audioBlob = new Blob([new Uint8Array(audioBuffer)], { type: opciones?.mimeType ?? "audio/webm" });
     formData.append("file", audioBlob, filename);
     formData.append("model", modelo);
     if(opciones?.language !== null) formData.append("language", opciones?.language ?? "es");
@@ -262,6 +264,8 @@ export async function transcribirAudioConGroq(
         exito: false,
         modelo,
         motivo: errorMotivo,
+        statusCode: res.status,
+        retryAfter: res.headers.get("retry-after") || undefined,
       };
     }
 

@@ -3,8 +3,13 @@ import { useState } from "react";
 import * as I from "lucide-react";
 import { AudioActivity } from "../ingreso/AudioActivity";
 import s from "../ingreso/ingreso-studio.module.css";
+import type { CronicaTrack } from "@/lib/cronica/checklist";
 export type IngresoViewState = {
   archivado?: boolean;
+  mode?: "dictado" | "cronica";
+  autoPublish?: boolean;
+  capturedAt?: string | null;
+  cronicaChecklist?: CronicaTrack[];
   procesando?: boolean;
   finalizando?: boolean;
   organizarComoDialogo?: boolean;
@@ -13,6 +18,7 @@ export type IngresoViewState = {
   archivoPendiente?: boolean;
   dialogoChrome?: boolean;
   dialogoSesion?: boolean;
+  segmentosPendientes?: number;
   chromeStream?: MediaStream | null;
   chromeExtra?: import("react").ReactNode;
   custodiaEstado?: string;
@@ -60,6 +66,7 @@ export type IngresoViewActions = {
   onPrepararChrome?: () => void;
   onDialogoChange?: (enabled:boolean) => void;
   onOrganizarDialogoChange?: (enabled:boolean) => void;
+  onAppendLiveSegments?: () => void;
   onReintentarCustodia?: () => void;
   onDetener?: () => void;
   onGuardar?: () => void;
@@ -69,6 +76,8 @@ export type IngresoViewActions = {
   onExportarMp3?: () => void;
   onLimpiar?: () => void;
   onConfirmarEdicion?: () => void;
+  onModeChange?: (mode: "dictado" | "cronica") => void;
+  onAutoPublishChange?: (enabled: boolean) => void;
 };
 
 export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:IngresoViewState;actions?:IngresoViewActions;isReviewMode?:boolean}) {
@@ -83,15 +92,34 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
    <div><p className={s.eyebrow}>ESPACIO DE CAPTURA</p><h1>Ingreso</h1><p className={s.subtitle}>Dale espacio a lo que piensas.</p></div>
    {(a.onRecuperar||isReviewMode)&&<button className={s.secondary} onClick={a.onRecuperar} disabled={busy||recording||v.editando} aria-haspopup="dialog"><I.History size={18}/><span>Recuperar capturas</span>{!!v.recuperaciones&&<span className={s.count}>{v.recuperaciones}</span>}</button>}
   </header>
+  <div className={s.modeSelector} role="group" aria-label="Modalidad de Dictado">
+   <button type="button" data-ui-id="ingreso.modalidad-dictado" className={v.mode!=="cronica"?s.modeActive:s.secondary} aria-pressed={v.mode!=="cronica"} disabled={locked} onClick={()=>a.onModeChange?.("dictado")}>Dictado</button>
+   <button type="button" data-ui-id="ingreso.modalidad-cronica" className={v.mode==="cronica"?s.modeActive:s.secondary} aria-pressed={v.mode==="cronica"} disabled={locked} onClick={()=>a.onModeChange?.("cronica")}>Crónica</button>
+  </div>
+  {v.mode==="cronica"&&<section className={s.cronicaPanel} data-ui-id="ingreso.cronica-checklist" aria-label="Checklist de Crónica">
+   <div className={s.cronicaHeading}><h2>Crónica</h2><span>{(v.cronicaChecklist||[]).filter(track=>track.resolved).length}/4 pistas</span></div>
+   <p>Guía opcional para situar el relato. Las pistas se recalculan al editar y nunca bloquean el archivo.</p>
+   <ul>
+    {(v.cronicaChecklist||[]).map(track=><li key={track.id} className={track.resolved?s.cronicaResolved:s.cronicaPending}>
+     <span aria-label={track.resolved?"Pista resuelta":"Pista pendiente"}>{track.resolved?"✓":"○"}</span>
+     <span><strong>{track.label}</strong>{track.evidence&&<small>{track.evidence}</small>}</span>
+    </li>)}
+   </ul>
+   <p className={s.cronicaTiming}>Fecha y hora se detecta solo en lo mencionado en el relato. {v.capturedAt&&<>Hora de captura, guardada aparte: {new Date(v.capturedAt).toLocaleString("es-MX")}.</>}</p>
+  </section>}
+  {v.mode==="cronica"&&<label className={s.cronicaPublish}>
+   <input type="checkbox" data-ui-id="ingreso.cronica-auto-publish" checked={v.autoPublish!==false} disabled={locked} onChange={event=>a.onAutoPublishChange?.(event.target.checked)}/>
+   <span>Publicar automáticamente al archivar (Crónica y microblog)</span>
+  </label>}
   <section className={s.sheet} aria-label="Captura actual">
    <div className={s.capturebar}>
     <div className={s.micgroup}>
-     {!recording?<button data-ui-id="ingreso.btn-iniciar" className={s.primary} disabled={locked||v.editando||v.custodiaReady===false||v.conAudio||!!v.dialogoSesion} onClick={a.onIniciar}><I.Mic size={19}/>{v.dialogoChrome?"Iniciar Chrome + micrófono":"Iniciar dictado"}</button>:
-      <button data-ui-id="ingreso.btn-detener" className={s.primary} disabled={busy} onClick={a.onDetener}><I.Square size={15}/>{v.finalizando?"Terminando captura…":v.dialogoChrome?"Detener y transcribir":v.modoEntrada==="chrome_live_caption"?"Detener captura Chrome":"Detener dictado"}</button>}
+     {!recording?<button data-ui-id="ingreso.btn-iniciar" className={s.primary} disabled={locked||v.editando||v.custodiaReady===false||v.conAudio||!!v.dialogoSesion} onClick={a.onIniciar}><I.Mic size={19}/>Iniciar dictado</button>:
+      <button data-ui-id="ingreso.btn-detener" className={s.primary} disabled={busy} onClick={a.onDetener}><I.Square size={15}/>{v.finalizando?"Terminando captura…":"Detener dictado"}</button>}
      <div className={s.signal}>{!v.dialogoChrome&&<AudioActivity stream={v.stream||null} active={recording&&!v.editando}/>}<span role="status" aria-live="polite" data-ui-id="ingreso.status-listening">{v.finalizando?"Terminando y conservando audio…":v.custodiaReady===false?(v.custodiaPreparando?"Preparando salvaguarda…":"Captura no preparada"):v.editando?"Dictado en pausa":recording?(v.dialogoChrome?"Chrome + micrófono":v.modoEntrada==="chrome_live_caption"?"Captura de pestaña":v.stream?"Micrófono activo":"Preparando audio"):v.conAudio?"Audio conservado por partes":"Micrófono en espera"}</span></div>
     </div>
     <div className={s.toolgroup}>
-     <button data-ui-id="ingreso.btn-chrome" className={s.secondary} disabled={busy||recording||v.editando} aria-expanded={chromeOpen} aria-controls="ingreso-chrome-options" onClick={()=>setChromeOpen(!chromeOpen)}><I.Monitor size={17}/>Escuchar a Chrome</button>
+     <button data-ui-id="ingreso.btn-chrome" className={s.secondary} disabled={busy||recording||v.editando} aria-expanded={chromeOpen} aria-controls="ingreso-chrome-options" onClick={()=>v.dialogoChrome?setChromeOpen(true):a.onDialogoChange?.(true)}><I.Monitor size={17}/>Escuchar a Chrome</button>
      <button data-ui-id="ingreso.btn-adjuntar" className={s.quiet} disabled={locked||recording||v.editando||v.custodiaReady===false||!!v.dialogoChrome} onClick={a.onAdjuntarClick}><I.Paperclip size={17}/>{v.adjuntandoAudio?"Adjuntando…":"Adjuntar audio"}</button>
      <button className={s.iconButton} aria-label="Más opciones de captura" aria-expanded={more} aria-controls="ingreso-options" onClick={()=>setMore(!more)}><I.Ellipsis size={21}/></button>
     </div>
@@ -102,9 +130,9 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
     {v.audioExportable&&<button data-ui-id="ingreso.btn-exportar-audio" className={s.secondary} disabled={busy||v.exportandoAudio} onClick={a.onExportarAudio}><I.Download size={17}/>Exportar audio original</button>}
    </div>}
    {chromeOpen&&<div id="ingreso-chrome-options" className={s.options} role="group" aria-label="Escuchar a Chrome">
-    <label><input data-ui-id="ingreso.btn-dialogo" type="checkbox" checked={!!v.dialogoChrome} disabled={!a.onDialogoChange||locked||recording||v.editando||!!v.dialogoSesion||(!v.dialogoChrome&&(!!v.texto.trim()||v.conAudio||!!v.titulo.trim()))} onChange={e=>a.onDialogoChange?.(e.target.checked)}/> Incluir micrófono</label>
-    <label><input data-ui-id="ingreso.organizar-dialogo" type="checkbox" checked={!!v.dialogoChrome&&v.organizarComoDialogo!==false} disabled={!v.dialogoChrome||!a.onOrganizarDialogoChange||locked||recording||!!v.dialogoSesion} onChange={e=>a.onOrganizarDialogoChange?.(e.target.checked)}/> Organizar como diálogo</label>
-    {!v.dialogoChrome&&<button className={s.secondary} disabled={locked||recording||v.editando||v.custodiaReady===false||v.conAudio||!!v.texto.trim()} onClick={a.onPrepararChrome}>Escuchar solo Chrome</button>}
+
+    {v.dialogoChrome&&<label><input data-ui-id="ingreso.organizar-dialogo" type="checkbox" checked disabled aria-disabled="true"/> Organizar como diálogo</label>}
+
     {v.dialogoChrome&&<p className={s.notice}>Comparte el audio de la pestaña y permite el micrófono. Al detener se transcribe aquí. Usa audífonos; no son subtítulos en vivo.</p>}
     {v.chromeExtra}
    </div>}
@@ -124,9 +152,10 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
     <label className={s.srOnly} htmlFor="ingreso-title">Título de la captura</label>
     <input id="ingreso-title" aria-label="Título de la captura" data-ui-id="ingreso.titulo-input" className={s.title} value={v.titulo} readOnly={locked||!!v.archivoPendiente||(!!v.dialogoChrome&&recording)} onChange={e=>a.onTituloChange?.(e.target.value)} placeholder="Sin título" maxLength={500}/>
     <label className={s.srOnly} htmlFor="ingreso-text">Texto de la captura</label>
-    <textarea id="ingreso-text" aria-label="Texto de la captura" data-ui-id="ingreso.textarea" className={s.textarea} value={v.texto} readOnly={locked||!!v.archivoPendiente||(!!v.dialogoChrome&&recording)} onFocus={()=>a.onIniciarEdicion?.()} onClick={() => actions.onIniciarEdicion?.()} onChange={e=>a.onTextoChange?.(e.target.value)} placeholder={v.dialogoChrome?(v.organizarComoDialogo===false?"La transcripción de ambas fuentes aparecerá aquí al detener. Los originales se conservan separados.":"El diálogo aparecerá aquí al detener Chrome y micrófono. Durante la captura, comprueba las dos señales de audio."):"Escribe, pega o empieza a dictar.\nEste espacio es tuyo."} spellCheck/>
+    <textarea id="ingreso-text" aria-label="Texto de la captura" data-ui-id="ingreso.textarea" className={s.textarea} value={v.texto} readOnly={locked||!!v.archivoPendiente} onFocus={()=>a.onIniciarEdicion?.()} onClick={() => actions.onIniciarEdicion?.()} onChange={e=>a.onTextoChange?.(e.target.value)} placeholder={v.dialogoChrome?"El diálogo transcrito aparecerá conforme lleguen las ventanas de audio. Puedes editar el texto en cualquier momento.": "Escribe, pegaa o empieza a dictar.\nEste espacio es tuyo."} spellCheck/>
    </div>
-   {v.editando&&<div data-ui-id="ingreso.banner-edicion" className={s.editing}><span><I.PencilLine size={16}/>Edición in situ activa · tu texto se conserva.</span><button data-ui-id="ingreso.btn-confirmar-edicion" className={s.secondary} disabled={locked} onClick={a.onConfirmarEdicion}>Confirmar edición</button></div>}
+   {!!v.segmentosPendientes&&<div className={s.options}><span>{v.segmentosPendientes} segmentos nuevos pendientes; tu edición se mantiene intacta.</span><button data-ui-id="ingreso.btn-agregar-segmentos-vivos" className={s.secondary} disabled={busy||locked} onClick={a.onAppendLiveSegments}>Añadir segmentos nuevos al final</button></div>}
+    {v.editando&&<div data-ui-id="ingreso.banner-edicion" className={s.editing}><span><I.PencilLine size={16}/>Edición in situ activa · tu texto se conserva.</span><button data-ui-id="ingreso.btn-confirmar-edicion" className={s.secondary} disabled={locked} onClick={a.onConfirmarEdicion}>Confirmar edición</button></div>}
    <footer className={s.sheetfooter}>
     <p role="status" aria-live="polite" data-ui-id="ingreso.custodia-status" className={s.storage}><I.ShieldCheck size={16}/><span>{v.audioPendiente?`Audio: ${v.audioPendiente} parte(s) con confirmación remota pendiente. Conserva esta pestaña o exporta antes de cerrarla.`:v.recuperando?"Recuperando sin sustituir el original…":v.custodiaEstado||"Salvaguarda de captura"}</span></p>
     {v.custodiaReady===false&&!v.custodiaPreparando&&a.onReintentarPreparacion&&<button className={s.secondary} onClick={a.onReintentarPreparacion}>Reintentar preparación</button>}

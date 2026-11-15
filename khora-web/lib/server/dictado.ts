@@ -7,6 +7,7 @@ import { asegurarTabla, prepararVolcadoParaRevision } from "./volcados";
 import { cifrarTexto, descifrarTexto } from "./cripto";
 import { registrarEvento } from "./eventos";
 import { evaluarCustodiaAudio } from "../audio/custodia";
+import { persistirHandoffIntegracion, type HandoffIntegracionReceipt } from "./handoff-integracion";
 
 const ALTERS = [
   "ALTER TABLE volcado ADD COLUMN IF NOT EXISTS audio_url TEXT",
@@ -124,6 +125,11 @@ export type EntradaDictado = {
   audioPartes?: AudioParte[] | null;
   estadoTranscripcion?: string | null;
   fuenteEntrada?: "texto" | "microfono" | "chrome_live_caption" | "audio_archivo" | "dialogo" | null;
+  mode?: "cronica";
+  autoPublish?: boolean;
+  publicationIntentId?: string;
+  eventTime?: string | null;
+  capturedAt?: string;
 };
 
 export async function registrarParteAudio(params: {
@@ -298,6 +304,7 @@ async function guardarDictadoConSesion(
   let enTransaccion = false;
   let volcadoIdParaEvento: string = idNuevo;
   let retorno: { id: string; sha256: string; chars: number; sessionId: string; idempotent: boolean; estado?: string } | null = null;
+  let handoffReceipt: HandoffIntegracionReceipt | null = null;
   let preparar = false;
 
   try {
@@ -465,6 +472,19 @@ async function guardarDictadoConSesion(
       titulo:entrada.titulo??null,caracteres:entrada.texto.length,
       audio:entrada.audioUrl??null,partesAudio:partesPersistidas.length,pulidoAplicado:entrada.pulidoAplicado===true,
     });
+    if (entrada.mode === "cronica") {
+      handoffReceipt = await persistirHandoffIntegracion(client, {
+        intentId: entrada.publicationIntentId!,
+        sessionId,
+        volcadoId: retorno!.id,
+        version: 1,
+        sourceSha256: sha,
+        eventTime: entrada.eventTime ?? null,
+        capturedAt: entrada.capturedAt!,
+        owner: entrada.usuario!,
+        autoPublish: entrada.autoPublish!,
+      });
+    }
     await client.query("COMMIT");
     enTransaccion = false;
   } catch (err) {
@@ -515,6 +535,7 @@ async function guardarDictadoConSesion(
     chars: retorno.chars,
     sessionId,
     idempotent: retorno.idempotent,
+    ...(handoffReceipt ? { handoff: handoffReceipt } : {}),
   };
 }
 
@@ -524,6 +545,12 @@ export async function guardarDictado(entrada: EntradaDictado) {
 
   const sessionId = typeof entrada.sessionId === "string" ? entrada.sessionId.trim() || null : null;
   if (!sessionId) throw new Error("Custodia inválida: toda captura requiere sessionId.");
+  if (entrada.mode !== undefined && entrada.mode !== "cronica") throw new Error("dictado_mode_invalid");
+  if (entrada.mode === "cronica") {
+    if (typeof entrada.autoPublish !== "boolean" || !entrada.publicationIntentId || !entrada.usuario || !entrada.capturedAt || (entrada.eventTime !== null && typeof entrada.eventTime !== "string")) {
+      throw new Error("dictado_cronica_handoff_contract_invalid");
+    }
+  }
   const correlacionId = sessionId || randomUUID();
   const requiereAudioVerificado =
     Boolean(sessionId) &&

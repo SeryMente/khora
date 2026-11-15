@@ -6,17 +6,17 @@
 - Identidad canónica: `DICTADO`; `MCP-OBS-DICTADO` queda como identidad agregada histórica.
 - Repositorio: `SeryMente/khora`, rama `main`.
 - OCP heredado: `docs/frentes/dictado-voz/`.
-- Versión: **v0.6.21 · DICTADO-v0.6.21**, no es versión de producto.
-- Estado: titularidad transferida a esta conversación el 2026-11-06 (generación 5→6); original `ChatGPT-DICTADO-20261106-1540.txt` incorporado y cotejado; producto no revalidado funcionalmente.
-- Control: generación **6**, folio `PENDIENTE/NO ASIGNADO` (FOL1 PREPARADA, NO ACTIVA), alias operativo `chatgpt-dictado-01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`.
-- UUIDv7 local de esta conversación: `01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`; no es ID nativo de plataforma. Instancia: `chatgpt-dictado-INSTANCE-20261106-01A1B2E1A2DC7881AAC7AC9D900DD4E3`.
+- Versión: **v0.6.23 · DICTADO-v0.6.23**, no es versión de producto.
+- Estado: titularidad transferida el 2026-11-15 (generación 6→7); original ChatGPT-DICTADO-20261115-1028.md incorporado y cotejado; implementación Fase 0/1 en rama aislada; no merge ni revalidación productiva.
+- Control: generación **7**, folio PENDIENTE/NO ASIGNADO (FOL1 PREPARADA, NO ACTIVA), alias operativo chatgpt-dictado-01a1e010-10d7-7c58-92f3-38c493888dc4.
+- UUIDv7 local de esta conversación: 01a1e010-10d7-7c58-92f3-38c493888dc4; no es ID nativo de plataforma. Instancia: chatgpt-dictado-INSTANCE-20261115-01A1E01010D77C5892F338C493888DC4.
 - Frente independiente relacionado: Observabilidad MCP en `docs/frentes/observabilidad-mcp/`, con control propio sin titular asignado.
 - Custodia es un frente independiente y ajeno a Dictado: no forma parte de su alcance, titularidad, backlog, dependencias ni aceptación.
 - Material fuera del alcance estricto se conserva en la crónica y queda clasificado en §4; no se borra ni reasigna automáticamente.
 
 ## 2. LEER PRIMERO
 
-Este OCP gobierna exclusivamente la experiencia de ingreso por dictado de voz en Khora: la pantalla donde se dicta, la captura iniciada explícitamente por el operador, la recepción de audio, la transcripción a texto, la edición del texto transcrito y la continuidad para seguir dictando sin perder el contenido confirmado.
+Este OCP gobierna la experiencia de Dictado dentro de Khora: modalidades Dictado normal y Crónica, y la modalidad futura «Escuchar a Chrome / Organizar como diálogo». Dictado incluye pantalla y controles, captura explícita, transcripción, edición, continuidad y cierre mediante «Archivar registro». En Crónica incluye checklist guiado y creación de handoff autenticado a Integración. La publicación externa pertenece exclusivamente al frente Integración.
 
 **No es el OCP de Observabilidad MCP.** Para acceso de modelos a registros, OAuth/scopes, filtros, cursores, salud y diagnóstico MCP, consultar `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`. Ambos frentes tienen OCP y control independientes.
 
@@ -28,12 +28,12 @@ Los contenidos de la etapa mixta permanecen como historia con procedencia; su in
 
 ## 3. Referencia metodológica
 
-Fuente: `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`.
-- **DUG:** Samantha v377 · NX-377m.
-- **Metacanon:** 1.28.
-- **GOW:** 2.17.
-- **Blob DUG:** `54064c8fe00f872023a455f06596061ed69062ae`; commit main `8ee2482866b3dd085e58e05006727256d0274376` (2026-11-01T21:57:30Z).
-- **Lectura:** 2026-11-06.
+Fuente: SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html.
+- **DUG:** Samantha v398; discrepancia de firma pendiente de resolver: header NX-398m, mención interna NX-397m.
+- **Metacanon:** 1.31.
+- **GOW:** 2.25.
+- **Blob DUG:** 410c85c9afd36202c1e56cb519c677f3bc0205a1.
+- **Lectura:** 2026-11-15; §ARR, ART-031/ART-032, Metacanon §4 y principios pertinentes consultados.
 - **MCP-NORMATIVO:** DESACTIVADO.
 
 Se leyó §ARR y se adquirió el DUG vigente; se revisaron la cascada y los principios pertinentes P001, P004, P005, P035, P037–P043, junto con Metacanon §§4, 29, 42, 46–48 y GOW 2.17. MCP-NORMATIVO permanece DESACTIVADO. El propósito original del nuevo frente Observabilidad MCP está preservado verbatim en su OCP con interpretación separada. El MCP-NORMATIVO del DUG es distinto del servidor MCP de producto de Khora.
@@ -41,33 +41,35 @@ Se leyó §ARR y se adquirió el DUG vigente; se revisaron la cascada y los prin
 ## 4. Propósito y alcance
 
 ### Propósito
-Mantener una experiencia fiable para introducir contenido hablando en Khora: abrir la pantalla de dictado, iniciar la captura de voz explícitamente, recibir la transcripción, corregirla y continuar dictando sobre el texto sin perder lo previamente confirmado.
+Mantener una experiencia fiable para introducir contenido en Khora mediante voz o texto, en dos modalidades activas: Dictado normal y Crónica. La modalidad «Escuchar a Chrome / Organizar como diálogo» se incorpora como frontera oficial de Dictado y queda implementada en Fase 2. La sesión no termina al completar el checklist: termina únicamente al confirmar «Archivar registro» y dejar asentado el handoff que corresponda.
 
-### Incluido
-1. Pantalla y controles específicos de dictado.
-2. Inicio/detención explícitos y estado visible del micrófono/captura.
-3. Recepción del audio capturado para dictado.
-4. Transcripción a texto y estados de procesamiento/error.
-5. Edición de la transcripción y continuidad al reanudar.
-6. Pruebas específicas de pantalla, captura, transcripción, edición y continuidad.
+### Modalidades incluidas
 
-### Fuera de alcance — paquetes separados y pendientes de adjudicación
-- **Observabilidad MCP:** acceso a registros, scopes, filtros, paginación y diagnósticos; ahora tiene OCP independiente.
-- **Evaluación y retroalimentación:** benchmark, métricas de experiencia, encuestas y feedback (`CONTRATO-DICTADO-EXPERIENCE.md`, `khora-web/docs/dictado-experience.md`).
-- **Captura multipista / Diálogo:** audio de Chrome + micrófono y transcripción por fuente (`originales/DIALOGO-C022.md`, `originales/DIALOGO-INTEGRADO-C027.md`).
-- **Ingreso general, crónica y metadatos:** categorías de entrada, checklist U01–U06, Fecha/Hora/Lugar/Momento, crónica personal y metadatos. Compartir la ruta `Ingreso` no los convierte en Dictado.
+1. **Dictado normal:** captura explícita, recepción y transcripción de audio, edición y continuidad. Su comportamiento vigente no se altera por la modalidad Crónica.
+2. **Crónica:** dictado o escritura guiados por cuatro pistas no obligatorias: **Fecha y hora** (solo lo mencionado en el relato), **Lugar**, **Momento** (vocabulario plano y cotidiano) y **Qué pasa** (hechos, acciones, emociones, sensaciones, observaciones e ideas). La detección es local y conservadora; no consulta Groq por tecla. No usa IP ni cabeceras para inferir lugar. eventTime representa tiempo referido en el relato y capturedAt la hora real de captura; nunca se sustituyen entre sí. Las pistas se recalculan sobre el texto visible, pueden resolverse o desmarcarse al editar y no bloquean dictado ni archivo.
+3. **Autorización de publicación en Crónica:** el checkmark «Publicar automáticamente al archivar (Crónica y microblog)» inicia activo y puede desactivarse. Activo al pulsar «Archivar registro» significa autorización del dueño de extremo a extremo y crea handoff queued, autoPublish=true, publication_authorized=true, modalidad cronica, representación { cronica_sobria: true, microblog: { requested: true, max_characters: 280 } } y destinos github_blog, facebook, x, tiktok. Desactivado crea state=disabled, autoPublish=false y publication_authorized=false; no solicita ni autoriza publicación.
+4. **Escuchar a Chrome / Organizar como diálogo:** modalidad genérica, sin dependencia de una identidad concreta. La frontera incluye captura de Chrome y micrófono con transcripción en vivo como objetivo de Fase 2. La implementación de esta fase no altera el Diálogo actual; la evolución de su captura y transcripción se hará en Fase 2 dentro de Dictado.
+
+### Contrato de cierre y handoff
+Dictado termina al confirmar «Archivar registro». En Crónica, la misma transacción que sella el volcado crea un registro idempotente de handoff para Integración ligado a (session_id, volcado_id, version, source_sha256), con intent_id estable y propietario derivado de autenticación. Dictado entrega estado y autorización; no publica, no invoca APIs externas y no duplica conectores. El consumidor, revisión operativa y publicación en GitHub Blog/Facebook/X/TikTok pertenecen al frente Integración. Una fila queued indica entrega durable pendiente de consumo, no publicación completada.
+
+### Fuera de alcance
+- **Observabilidad MCP:** acceso a registros, scopes, filtros, paginación y diagnósticos; OCP independiente.
+- **Evaluación y retroalimentación:** benchmark, métricas de experiencia, encuestas y feedback (CONTRATO-DICTADO-EXPERIENCE.md, khora-web/docs/dictado-experience.md).
+- **Ingreso general y metadatos ajenos a Crónica:** categorías U01–U06 y cualquier mecanismo general de clasificación que no sea el checklist acotado aquí.
 - **Voz y síntomas:** propuesta histórica no implementada; no autoriza inferencias de salud, ánimo o capacidad laboral.
-- **Publicación editorial:** preparación, revisión, consentimiento y publicación de contenido.
-- **Custodia:** frente independiente y fuera del alcance y backlog de Dictado. Ninguna tarea, contrato, responsabilidad ni criterio de aceptación de Custodia se incorpora a este frente; permanece en su OCP y registros propios.
-- **Instrumentación transversal:** `khora-web/docs/observability-services.md` permanece compartida, sin duplicar almacén.
+- **Publicación externa:** ejecución de conectores, manejo de credenciales/proveedores, revisión de destino y respuesta de cada plataforma; pertenece a Integración.
+- **Custodia:** frente independiente y fuera del alcance/backlog/titularidad de Dictado. Dictado solo usa los contratos de persistencia existentes sin apropiarse de sus mecanismos o datos.
+- **Chat / Open WebUI:** completamente fuera de alcance.
+- **Instrumentación transversal:** khora-web/docs/observability-services.md permanece compartida, sin duplicar almacén.
 - Cambios de credenciales, seguridad, proveedores, gasto, despliegue y producción requieren autorización independiente.
 
-Los originales y evidencias previos permanecen en sus ubicaciones; no se crea un frente nuevo por cada paquete sin propósito dictado conforme a Metacanon §39.
+No se alteran Adjuntar audio, Dictado normal, Diálogo actual, Custodia local/B2 ni Notas rápidas como parte del acuerdo de modalidad. No se incorporan llamadas a GitHub/Facebook/X/TikTok desde Dictado. Los originales y evidencias previos permanecen en sus ubicaciones.
 
 ## 5. Roles y colaboración
 
 - Operador: dueño del propósito, consentimiento, decisiones materiales y aceptación humana.
-- Asistencia responsable actual: esta instancia, control gen. 6; folio `PENDIENTE/NO ASIGNADO`; alias operativo `chatgpt-dictado-01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`; UUIDv7 local `01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`.
+- Asistencia responsable actual: esta instancia, control gen. 7; folio PENDIENTE/NO ASIGNADO; alias operativo chatgpt-dictado-01a1e010-10d7-7c58-92f3-38c493888dc4; UUIDv7 local 01a1e010-10d7-7c58-92f3-38c493888dc4.
 - Constructor independiente: no asignado en C044; no inventar roles.
 - Observabilidad MCP: frente independiente sin titular asignado en C044.
 - Escritura: un escritor por cambio lógico; cualquier cambio de producto conserva autorización y validación propias.
@@ -83,13 +85,14 @@ Los originales y evidencias previos permanecen en sus ubicaciones; no se crea un
 | Limitar Dictado a captura/transcripción/UI | Instrucción directa C044 | Benchmark, Diálogo, Ingreso general, MCP y publicación quedan fuera. |
 | PR #335 | Candidato amplio de Ingreso U01–U06 | No se atribuye íntegramente a Dictado ni se fusiona por C044. |
 | Código/seguridad/despliegue | No autorizados por este traspaso | Requieren compuertas propias. |
+| Implementar Fase 0/Fase 1 de Crónica en rama aislada desde HEAD de main | Autorizada por instrucción directa del operador del 2026-11-15 | Solo frontera documental, UI Crónica, checklist local, snapshot/checkpoint y handoff transaccional; no autoriza merge, despliegue, migración productiva ni cambios del frente Integración. |
 | Aceptación funcional | Pendiente | No inferir de evidencia histórica. |
 
 La etapa mixta se conserva en la crónica y el Anexo A; sus citas no reactivan autorizaciones previas.
 
 ## 7. Perfil de entorno
 
-- Repositorio privado `SeryMente/khora`; acceso GitHub de lectura/escritura verificado.
+- Repositorio público SeryMente/khora (visibilidad observada en GitHub); acceso GitHub de lectura/escritura verificado. No se cambió visibilidad ni configuración del repositorio.
 - Rama `main`; base C044 `43ff0ad2bed21b375c658ac80e865d92aa7fd87b`.
 - RDC utilizado para localizar, leer, obtener metadatos, calcular SHA-256 y preparar el original. No se abrió un checkout de desarrollo ni se modificó el entorno de producto.
 - Producción no consultada ni modificada.
@@ -246,7 +249,7 @@ Sí, autorizo. Luego verifica que lo que permite saber cuál fue el último desa
 - Registro central de errores actualizado de forma posterior, sin fingir cumplimiento anterior; el recibo C030 conserva incidentes del arnés. La estimación de un ciclo técnico se mantiene condicionada al merge/despliegue normal; duración humana no estimable.
 - Antes de integrar, estado/prompt sincronizados, evidencia/manifesto cotejados y lectura remota requerida. No declarar cerradas las brechas de archivo verbatim histórico ni documento paralelo ausente.
 
-### C030 — Reportes Maya/dictado, corrección causal y cierre solicitado — 2026-10-18
+### C030 — Reportes servicio de voz histórico/dictado, corrección causal y cierre solicitado — 2026-10-18
 
 - Originales literales de instrucciones nuevas: originales/C030-instrucciones.md. El operador aprueba separar captura/presentación y solicita señal de parada, observabilidad, corrección y publicación; no autoriza nuevos proveedores, diagnóstico clínico ni cambios de seguridad.
 - Navegación reactiva reproducida: la propia replaceState cambia el prop de recuperación y ejecutaba cleanup que detenía audio. Corrección: distinguir URL propia y recuperación externa, impedir cambio de sesión durante captura y liberar permisos si se desmonta antes de iniciar.
@@ -266,7 +269,7 @@ Sí, autorizo. Luego verifica que lo que permite saber cuál fue el último desa
 - Automatismo Git privado-organización/Hobby sigue fallando por restricción conocida; no se cambió identidad/plan ni se ocultó Git. Despliegue CLI normal al mismo proyecto prj_hRN86BKITXYKTnNlp0ygVhaMwFfx, con provenance de main, --prod --skip-domain y posterior promote, ambos exit 0. READY production dpl_2XowmVXt3ME2KQU41vjm6BCpiWQV; alias khora-web.vercel.app coincide. /api/version informa commit main exacto, rama main, vercel-git, production. Rutas Ingreso normal/histórica devuelven 307 a autenticación y API de diálogo 401 sin sesión: guardias conservadas, no aceptación autenticada.
 - Rollback capturado antes del despliegue: dpl_7eQpbex6hbt5B3vTmtWhAwMSbE1V, release81e571. No rollback ejecutado. Ningún servidor local requerido porque publicación sí se verificó.
 - Limpieza verificada 2026-10-18T20:22:25.666Z: logout GitHub y Vercel exit 0, dos helpers propios retirados sin tocar otros valores, github-auth/vercel-auth/build-env ausentes. Toolkit/clon/evidencias no secretas conservados; no cerrar Remote Desktop Commander del usuario.
-- Límite: publicación técnica cerrada, no se declara recuperada la conversación Maya ni aprobado el circuito humano. Sigue prueba física de pestaña/micrófono/transcriptor/custodia/reapertura de la misma sesión. C027 conserva evidencia controlada sin reetiquetarla como humana.
+- Límite: publicación técnica cerrada, no se declara recuperada la conversación servicio de voz histórico ni aprobado el circuito humano. Sigue prueba física de pestaña/micrófono/transcriptor/custodia/reapertura de la misma sesión. C027 conserva evidencia controlada sin reetiquetarla como humana.
 - Objeto v0.6.8 y recibo se guardan como delta exclusivamente documental tras el release77d8ee0; no se afirma que documentación posterior cambie binario live. Tres estados idénticos, trece bloques y anexo histórico intactos.
 
 ### C028 — Reanudación con PC-14 nuevo — 2026-10-18
@@ -275,17 +278,17 @@ Sí, autorizo. Luego verifica que lo que permite saber cuál fue el último desa
 - Respuesta real de start_process: PC-14\PC 13; SESSION_ABSENT en la ruta anterior, sin mutación. Inventario mínimo confirmó Node/npm presentes, Git/gh no resueltos y raíz KhoraSession anterior ausente.
 - Preparación aislada autorizada en LocalApplicationData del perfil actual, ACL solo usuario y SYSTEM; Git/gh oficiales con SHA-256 cotejado y Vercel 64.5.0 vía npm. TOOLKIT_READY y exit 0; no PATH global, otra identidad ni Entorno Persistente.
 - Solicitudes normales de autorización GitHub/Vercel iniciadas en configuración aislada; GitHub aún espera intervención humana. Vercel completó login y whoami con salida 0; project inspect confirma proyecto existente y configuración correcta, sin crear proyecto ni desplegar. No se extrajeron credenciales ajenas ni se publicó. Código C027 y solicitud 323 revalidados en 57c1a43a03c162c1040452b12fe3172819e71fae, base main 958162199a518ae5a01d317f1d68e3a55360836c; método main/blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f sin delta.
-- Estimación: siguiente hito tras autorizaciones humanas; duración de cierre no estimable hasta clonar y ejecutar tipos/regresión/build. No se sostiene la causa del audio de la prueba Maya como resuelta ni se presenta alternativa local como iniciada.
+- Estimación: siguiente hito tras autorizaciones humanas; duración de cierre no estimable hasta clonar y ejecutar tipos/regresión/build. No se sostiene la causa del audio de la prueba servicio de voz histórico como resuelta ni se presenta alternativa local como iniciada.
 - Evidencia C028.json y original acotado; tres estados idénticos y anexo histórico intacto. Retomar procesos de login existentes, no emitir nuevos códigos por rutina.
 
 ### C027 — Corrección explícita de experiencia y captura de Diálogo — 2026-10-18
 
-- Original completo en originales/DIALOGO-INTEGRADO-C027.md, sin corregir su texto. El operador hizo una prueba con Maya, no vio texto y tuvo que entrar mediante enlace; pide eliminar ventana adicional y colocar la capacidad como subfunción de Escuchar a Chrome en Ingreso, con archivo como volcado para ingesta.
+- Original completo en originales/DIALOGO-INTEGRADO-C027.md, sin corregir su texto. El operador hizo una prueba con servicio de voz histórico, no vio texto y tuvo que entrar mediante enlace; pide eliminar ventana adicional y colocar la capacidad como subfunción de Escuchar a Chrome en Ingreso, con archivo como volcado para ingesta.
 - Gobierno adquirido: metaprompt NX-330m del contexto, metacanon 1.5/blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f recuperado por herramienta, objeto v0.6.5/blob aeb77348c4ed4ddd50ec108a5465b5769c49f2b3 y AGENTS/CUSTODIA-DICTADOS cargados. Repositorio destino privado revalidado. Actúa Samantha como asistencia e implementación local, sin constructor delegado ni subagente; Remote Desktop Commander solo asistencia.
 - Causa confirmada de diseño: panel separado y enlace en Más opciones; transcripción manual después de detener y ausencia de acción de archivo en ese panel. La causa de falta de audio/texto en la sesión concreta no está confirmada; no se leyó audio privado ni se inventó diagnóstico.
 - Cambio preparado contra main 958162199a518ae5a01d317f1d68e3a55360836c: mismo IngresoView, Escuchar a Chrome visible, casilla integrada, controlador sin pantalla propia, rutas históricas compatibles; dos señales reales, contadores local/remoto diferenciados, transcripción automática al detener y exportación por fuente. No se inicia captura por marcar casilla ni se infieren permisos.
 - Archivo: POST /api/dictado admite fuente dialogo; guardarDictado exige manifiesto cifrado real del propietario, estado detenido/interrumpido, cantidad exacta y ambas fuentes, además del cotejo de bytes/SHA/partes existente. Driver conserva dialogo. Recibo confirmado cierra; error de limpieza local no reabre el original, y resultado incierto conserva payload de reintento sin sustituir texto/sesión. No nueva tabla, proveedor o ingesta automática; MP3 mono sigue sin mezclar contenedores.
-- Pruebas de este corte: 21/21 unitarias (13 originales de diálogo/captura más 8 barreras de archivo). Navegador local Chromium, MediaRecorder real sobre dos osciladores sintéticos, interfaz común/controlador reales y límites de red/custodia/proveedor controlados: 6/6 casos; desktop/móvil sin desbordamiento. Incluyen texto automático, recibo de archivo, audio de pestaña ausente, micrófono denegado, cero bytes y recuperación de error de proveedor/archivo con misma sesión. No equivale a IndexedDB cifrado real, sesión autenticada real, Groq real ni voz de Maya.
+- Pruebas de este corte: 21/21 unitarias (13 originales de diálogo/captura más 8 barreras de archivo). Navegador local Chromium, MediaRecorder real sobre dos osciladores sintéticos, interfaz común/controlador reales y límites de red/custodia/proveedor controlados: 6/6 casos; desktop/móvil sin desbordamiento. Incluyen texto automático, recibo de archivo, audio de pestaña ausente, micrófono denegado, cero bytes y recuperación de error de proveedor/archivo con misma sesión. No equivale a IndexedDB cifrado real, sesión autenticada real, Groq real ni voz de servicio de voz histórico.
 - Incidentes locales consultados/registrados antes de correcciones: sandbox anterior ausente, exportación de TypeScript distinta, módulo virtual sin resolveDir y ruta de Chromium no comprobada. Fallo causal de prueba por detener antes de producir bytes fue separado del caso de proveedor; nueva compuerta de cero bytes y prueba negativa. Ninguno se presentó como problema productivo confirmado.
 - Bloqueo probado: PC-14 respondió al preflight inicial, pero luego start_process agotó tiempo; read_file con call_id c574c6d7-3f55-4198-93db-703e60788348 agotó plazo sin respuesta a 2026-10-18T19:39:35.48058+00:00. Online del catálogo es insuficiente. No ejecutar otro PC, repetir llamadas pendientes ni imponer llave. Se continúa código/pruebas/persistencia por sandbox y GitHub; global/build/publicación siguen pendientes.
 - Revisión de la afirmación C026: el release efectivamente fue publicado/verificado por SHA/alias, pero su aceptación funcional estaba pendiente y el usuario ahora reporta fallo real. C027 no borra esa historia ni presenta el cambio preparado como live.
@@ -340,7 +343,7 @@ Sí, autorizo. Luego verifica que lo que permite saber cuál fue el último desa
 
 ### C022 — Canonización y construcción de modo Diálogo — 2026-10-18
 
-- Actor y autorización: operador, dos mensajes del chat actual conservados completos en originales/DIALOGO-C022.md; se distinguen literal e interpretación. Aprobó reutilizar transcripción y capturar Chrome + micrófono simultáneamente. No autorizó un nuevo proveedor ni clonación de Maya.
+- Actor y autorización: operador, dos mensajes del chat actual conservados completos en originales/DIALOGO-C022.md; se distinguen literal e interpretación. Aprobó reutilizar transcripción y capturar Chrome + micrófono simultáneamente. No autorizó un nuevo proveedor ni clonación de servicio de voz histórico.
 - Fuentes recibidas: metacanon 1.5 y objeto v0.5.3, código vigente de Ingreso/custodia/transcripción y README de Signal Interpreter. No se recibió audio real ni exportación nativa completa del chat. Signal aporta precedente, no código ni autoridad; no se reutiliza Live Caption.
 - Preflight: repositorio privado revalidado; main 4dca213; objeto blob e6a9b6be98c1d4180e89dcb20615202952c18651 y método blob 32c7a65ff2e83b3b76752ba2160427bd6e851a8f sin cambios concurrentes observados antes de persistir. Nuevo sello v0.6.1; método sin cambio.
 - Implementación: Ingreso ofrece modo Diálogo; dos MediaRecorder continuos; partes con índice global/fuente/tiempo; cifrado local existente y ACK de servidor; fallo de red abre circuito sin borrar originales; Web Locks evita escritores en la misma sesión del perfil. Al recuperar no se reanuda otra grabadora ni se aplana el diálogo.
@@ -1216,3 +1219,53 @@ El proyecto Vercel usa un Build Command propio que no invoca npm prebuild. Para 
 
 ### Controles externos no ejecutados
 GitHub Actions, ejecución 38967613218, no inició trabajos: `The job was not started because recent account payments have failed or your spending limit needs to be increased.` Los estados Vercel de integración GitHub también señalan restricción de repositorio privado de organización en plan Hobby. No se modifican facturación, plan, visibilidad, permisos ni protecciones. Las comprobaciones ejecutadas directamente y el build Vercel son evidencia independiente, no equivalencia a Actions verde. La integración solo puede usar merge normal, sin anulación administrativa de controles.
+
+## Acuerdo del frente y estado Fase 0/1 — 2026-11-15
+
+- **Fase 0 acordada:** Crónica y Escuchar a Chrome / Organizar como diálogo forman parte de Dictado según los límites de §4. La modalidad de Chrome/diálogo descrita es objetivo de Fase 2; el comportamiento del Diálogo actual no se modifica en esta fase.
+- **Fase 1 implementada en rama de trabajo:** selector Dictado/Crónica en Ingreso; checklist local reversible de cuatro pistas; eventTime separado de capturedAt; checkmark activo por defecto, desactivable y persistido en CapturaSnapshot y /api/dictado/checkpoint.
+- **Límite de archivo:** el endpoint /api/dictado sella el volcado y, para Crónica, escribe integration_handoff dentro de la misma transacción PostgreSQL. La clave durable incluye session_id, volcado_id, version y source_sha256; la idempotencia de reintento usa intent_id + session_id.
+- **Estados:** checkmark activo = queued + auto_publish=true + publication_authorized=true; checkmark inactivo = disabled + ambos flags false. El propietario se deriva de auth().user.email. event_time y captured_at se almacenan separados.
+- **Consumidor Integración:** no se identificó consumidor que ejecute destinos externos dentro de main. La fila queued queda lista para Integración; Dictado no realiza llamadas a plataformas ni declara publicación completada.
+- **Rama inicial:** feat/dictado-cronica-fase0-1-20261115, creada desde HEAD de main fae473c21985d38623d4b693c10af32176536b95. No se integran PR #335, #330, #334 ni #354.
+- **No regresión y fronteras:** no se alteran Dictado normal, Adjuntar audio, Diálogo actual, Custodia local/B2 ni Notas rápidas; Chat/Open WebUI queda fuera. No se añaden APIs externas de publicación en Dictado.
+- **Commits verificados:** Fase 0 documental `007cbf738c864b37e0e083c04338002af7da4433`; Fase 1 código/migración/pruebas `40803dec7a863c505cfa9f55e51cb1a4c0e74154`. Ambos descienden del HEAD base `fae473c21985d38623d4b693c10af32176536b95`.
+- **Verificación:** `npm run typecheck` salida 0; `npm run ui:contract` salida 0; `npm run ui-review:check` salida 0; `npm run test:unit` 615/615, cero fallos/omitidos; `npm run build` `BUILD_EXIT=0`, Next compiló, TypeScript pasó y generó 78/78 páginas; la fase prebuild ejecutó de nuevo los gates. El preflight de almacenamiento B2 quedó omitido por `KHORA_B2_PREFLIGHT` desactivado.
+- **E2E:** Chromium ejecutó `e2e/dictado-cronica.spec.ts`, `e2e/contracts/ingreso.spec.ts` y `e2e/dictado-edicion-continuidad.spec.ts`: 13/13 correctas, salida 0. Incluye checkmark activo/inactivo, checklist 4/4 y 0/4 sin bloqueo, payload normal sin handoff y regresión de continuidad/edición.
+- **Límite de evidencia:** persistencia/idempotencia del helper se verificó con dobles de PostgreSQL y pruebas de contrato; no se ejecutó contra PostgreSQL/Neon real. La migración 034 no se ha aplicado a ninguna base productiva. No se realizó despliegue.
+- **Aceptación pendiente:** no equivale a merge, migración productiva, consumidor Integración operativo, publicación de extremo a extremo ni aceptación humana.
+
+
+## Estado de implementación Fase 2/3 — Diálogo en vivo y master estéreo único (2026-11-15)
+
+### Implementación en rama acumulativa
+- Rama: feat/dialogo-live-master-audio-fase2-3-20261115, creada desde el HEAD de feat/dictado-cronica-fase0-1-20261115 (d9bd212b3b9d7bddd16b8145c898fb4ae134e132). No se modifica main ni se fusiona ninguna rama histórica de PR.
+- Controles dentro de Dictado: «Iniciar dictado» (micrófono implícito), «Escuchar a Chrome» y «Organizar como diálogo» marcado y deshabilitado cuando está activo el modo diálogo. Se elimina el control de micrófono separado.
+- Captura original: los MediaRecorder independientes por fuente permanecen como pistas originales de Custodia. El AudioWorklet consume copias derivadas, nunca sustituye ni condiciona el almacenamiento original. El micrófono se solicita con audio:true; el navegador no necesita reportar ni desactivar control de eco, supresión de ruido o ganancia automática.
+- Transcripción viva no autoritativa: AudioWorklet deriva ventanas WAV PCM16 mono de 16 kHz, duración 6.5 s y paso 6 s (500 ms de solapamiento). El downmix detecta señal estéreo en oposición de fase y evita que se cancele a silencio. USUARIO y CHROME mantienen colas FIFO independientes y acotadas, reintentos limitados, respeto acotado de Retry-After ante 429 y errores recuperables sin detener las grabadoras de custodia.
+- Servidor: /api/transcribir/dialogo/segmento exige autenticación, sesión del propietario, fuente, secuencia/timing y WAV PCM16 de tamaño y encabezado exactos; Groq Whisper whisper-large-v3 se invoca exclusivamente desde el servidor Khora. No se expone la API key en el navegador.
+- Integridad de edición: segmentosRaw conserva las transcripciones recibidas por fuente/secuencia/tiempo como evidencia inmutable dentro del snapshot cifrado. La deduplicación y reconciliación de solapamientos solo producen una proyección de pantalla. displayText permanece editable; si hay cambios humanos, los segmentos tardíos se dejan pendientes y solo se añaden al final mediante acción explícita.
+- Fallback: /api/transcribir/dialogo queda reservado a reconstrucción post-cierre de las fuentes/ventanas fallidas, a partir de pistas originales ya custodiadas. No es el carril principal ni sustituye una transcripción viva correcta.
+
+### Master descargable y límite de Custodia
+- Hay una sola descarga de audio para el diálogo: WAV PCM16 estéreo sincronizado, canal izquierdo USUARIO y canal derecho CHROME. Se genera al solicitar la descarga desde las dos pistas originales verificadas; no se guarda como reemplazo, no altera sus bytes, su SHA-256, sus metadatos ni las rutas existentes de Custodia local/B2.
+- La ruta /api/transcribir/dialogo/master autentica al dueño, vuelve a leer los blobs originales mediante la comprobación existente de tamaño y SHA, deriva el master y devuelve su SHA-256. El navegador verifica esa huella antes de iniciar la descarga. No se cambian custodia-local.ts, /api/dictado/checkpoint, /api/audio, el cifrado IndexedDB, el contrato B2 ni el protocolo de subida/read-back.
+- La transcripción nunca es requisito para conservar audio. Un fallo de Groq, de una cola o del AudioWorklet no detiene ni degrada la grabación original; las limitaciones de custodia remota continúan señalándose por el circuito existente.
+
+### Evidencia, límites y aceptación pendiente
+- Validaciones automatizadas ejecutadas para esta rama: typecheck, ui:contract, ui-review:check, test:unit, build y E2E Chromium de Dictado/Crónica/Diálogo y continuidad. Los resultados y hashes de commits se registran en la evidencia del ciclo al cerrar la rama.
+- Las pruebas unitarias cubren PCM16/WAV, duración y solapamiento de ventanas, downmix anti-fase, colas/reintentos/429, reconciliación de pantalla, raw/display, protección de edición, contrato de ventana y endpoint, codificación de master estéreo y ruta autenticada de descarga.
+- Pendiente de aceptación acústica humana: realizar una sesión real en Chrome seleccionando la pestaña y activando «Compartir audio», conceder micrófono, hablar y reproducir voz remota simultáneamente, validar atribución L/R, sincronización/desfase, deriva, latencia, clipping, cancelación por fase y estabilidad durante varios minutos. Descargar el master, comparar su SHA del cliente con el servidor y confirmar que las huellas y bytes de las pistas originales antes/después permanecen idénticos.
+- No se ejecutó prueba acústica real con hardware/navegador del operador, llamada real a Groq ni preflight B2 real. El preflight B2 quedó omitido por configuración (KHORA_B2_PREFLIGHT no habilitado). No hubo despliegue ni cambios de Neon/producción.
+- No se declara aceptado el audio en condiciones reales hasta completar la prueba descrita y registrar la aceptación humana.
+
+## 13. Evidencia de cierre de Fase 2/3 — 2026-11-15
+
+- Base inmutable de esta rama: feat/dictado-cronica-fase0-1-20261115 en d9bd212b3b9d7bddd16b8145c898fb4ae134e132. Rama acumulativa: feat/dialogo-live-master-audio-fase2-3-20261115. El commit de implementación es 7ba03c83bd3037189766f729ccb86b45a86ba2c5 (feat(dialogo): add live transcription and stereo master); las pruebas finales adicionales se registran en ed37b78d2979f262799504b5908a738c893fd428 (test(dictado): cover bounded live dialogue fallback).
+- Verificación final: npm run typecheck PASS; npm run ui:contract PASS; npm run ui-review:check PASS; npm run test:unit PASS, 636/636, 0 fallos; npm run build PASS, exit code 0, runtime 98.70 s, TypeScript 5.5 s y SSG 78/78. Playwright Chromium: 14/14 aprobadas, 44.6 s (Diálogo, Ingreso, Crónica y continuidad/edición).
+- El servidor de build incluye las rutas /api/transcribir/dialogo/segmento y /api/transcribir/dialogo/master. Los checks de contrato UI y ui-review reconocen los controles añadidos. git diff --check pasó.
+- Compilación: Next.js 16.4.0 terminó correctamente. Emitió advertencias de dependencias que usan APIs de Node no disponibles en Edge Runtime y la advertencia de la convención middleware deprecada; no impidieron la compilación.
+- Prebuild de almacenamiento: EXPERIENCE_STORAGE_PREFLIGHT=not_requested; B2 se omitió porque KHORA_B2_PREFLIGHT no estaba habilitado. No se escribió ni alteró B2. No se aplicó ninguna migración ni se realizó operación de escritura contra Neon; no hubo despliegue ni llamadas reales a Groq.
+- Integridad de Custodia: no se modificaron custodia-local.ts, /api/audio, IndexedDB cifrado, B2, ni el flujo de subida y SHA/read-back. El schema del checkpoint solo se extendió aditivamente para admitir segmentos crudos de diálogo. El master se deriva desde pistas originales que se vuelven a leer con la verificación existente; ninguna pista se sustituye por el master.
+- La rama acumula Crónica + Diálogo y no integra ramas históricas de PR. main no se modificó. La publicación remota de esta rama se verifica de forma independiente por lectura de vuelta del ref.
+- Aceptación acústica humana sigue PENDIENTE: probar en Chrome real seleccionando pestaña con Compartir audio, habilitar micrófono, hablar simultáneamente con audio remoto, medir atribución de canales, sincronía/desfase, deriva, latencia, clipping, cancelación de fase y estabilidad de varios minutos. Descargar el único master WAV, cotejar SHA-256 y comprobar que los originales mantienen sus bytes/huellas antes y después. No declarar aceptación acústica a partir de mocks, WebM sintético o E2E visual.
