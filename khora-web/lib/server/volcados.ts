@@ -117,7 +117,7 @@ export async function prepararVolcadoParaRevision(
     }
 
     if (!tieneV1) {
-      if (!textoClaro.trim()) {
+      if (textoClaro.length === 0) {
         // A unit may contain only its original audio. Promote it to review only
         // when the completed, owner-bound session has every audio part verified.
         if (!["dictado", "dialogo"].includes(String(v.fuente ?? ""))) {
