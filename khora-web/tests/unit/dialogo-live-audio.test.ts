@@ -56,3 +56,17 @@ test("master WAV has one stereo stream, user left and Chrome right with source o
   assert.equal(master.readInt16LE(52),0);
   assert.equal(master.readInt16LE(54),400);
 });
+
+
+test("PCM processor upsamples lower-rate input instead of blocking capture",()=>{
+  const processor=new Pcm16kWindowProcessor(8000);
+  let generated=0;
+  for(let start=0;start<8000*6.6;start+=128){
+    const size=Math.min(128,8000*6.6-start);
+    const chunk=new Float32Array(size);
+    for(let i=0;i<size;i++)chunk[i]=0.2*Math.sin(2*Math.PI*440*(start+i)/8000);
+    generated+=processor.push([chunk]).length;
+  }
+  generated+=processor.flush().length;
+  assert.ok(generated>=1);
+});

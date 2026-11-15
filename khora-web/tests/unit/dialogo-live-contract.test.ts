@@ -6,7 +6,7 @@ test("live window contract accepts source, sequence, time range and exact PCM16k
   assert.equal(validarVentanaLive(base).ok,true);
 });
 test("live window contract rejects invalid source, sequence, timestamps, session and size",()=>{
-  for(const patch of [{source:"maya"},{sequence:0},{sequence:3},{startMs:0},{endMs:12501},{sessionId:"invalid"},{size:500},{source:"unknown"}]){
+  for(const patch of [{source:"invalid-source"},{sequence:0},{sequence:3},{startMs:0},{endMs:12501},{sessionId:"invalid"},{size:500},{source:"unknown"}]){
     assert.equal(validarVentanaLive({...base,...patch}).ok,false);
   }
 });

@@ -80,3 +80,16 @@ test("segment endpoint propagates bounded provider 429 Retry-After",async()=>{
   assert.equal(response.status,429);
   assert.equal(response.headers.get("Retry-After"),"3");
 });
+
+
+test("segment endpoint rejects an oversized multipart request before parsing the body",async()=>{
+  const route=loadRoute();
+  const form=new FormData();
+  const request=new NextRequest(new Request(
+    "https://khora.example.test/api/transcribir/dialogo/segmento",
+    {method:"POST",body:form,headers:{"content-length":"300000"}}
+  ));
+  const response=await route.POST(request);
+  assert.equal(response.status,413);
+  assert.equal(route.groqCalls.length,0);
+});
