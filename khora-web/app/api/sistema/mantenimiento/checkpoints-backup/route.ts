@@ -224,7 +224,7 @@ export async function POST(req: NextRequest) {
     const compressed = gzipStream(exportCheckpointJsonl(client, baseline, exportStats));
     const encrypted = cifrarStream(compressed);
     backup = await putEncryptedObjectStream(
-      `backups/dictado_checkpoint/checkpoints_backup_historico-${randomUUID()}.jsonl.gz.khc`,
+      `backups/dictado_checkpoint/checkpoints_backup_historico-11413-fffa2e53d7674d8db69ae56a9809a088.jsonl.gz.khc`,
       encrypted,
       { contentType: "application/octet-stream" },
     );
@@ -264,9 +264,27 @@ export async function POST(req: NextRequest) {
     let writeProbeError: string | null = null;
     try {
       await client.query("BEGIN");
+      const probeSessionId = randomUUID();
+      const probeRevisionId = randomUUID();
+      const probeOwner = "khora-checkpoint-storage-probe@invalid";
+      const probeText = "khora-neon-storage-write-probe";
       await client.query(
         "INSERT INTO public.dictado_session(session_id, estado, custodia_owner) VALUES($1, 'checkpoint', $2)",
-        [randomUUID(), "khora-checkpoint-storage-probe@invalid"],
+        [probeSessionId, probeOwner],
+      );
+      await client.query(
+        `INSERT INTO public.dictado_checkpoint
+          (revision_id, session_id, usuario, client_at, texto, sha256, snapshot)
+         VALUES($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          probeRevisionId,
+          probeSessionId,
+          probeOwner,
+          Date.now(),
+          probeText,
+          createHash("sha256").update(probeText).digest("hex"),
+          JSON.stringify({ probe: true }),
+        ],
       );
       await client.query("ROLLBACK");
       writeProbe = true;
