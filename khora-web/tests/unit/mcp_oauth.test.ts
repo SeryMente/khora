@@ -27,6 +27,10 @@ process.env.MCP_OAUTH_REDIRECT_URIS = "https://claude.ai/api/mcp/callback,http:/
 process.env.MCP_JWT_SECRET = "test-super-secret-mcp-jwt-key-123456789";
 process.env.MCP_ALLOWED_EMAIL = "operador@khora.app";
 process.env.MCP_CANONICAL_URL = "https://khora.example.com/api/mcp";
+// The route's production guard runs during Vercel build tests (NODE_ENV=production).
+// A test-only placeholder satisfies the configuration gate; getDb() is replaced
+// below with an in-memory mock, so no database connection is opened.
+process.env.KHORA_READONLY_DATABASE_URL ??= "postgres://unit-test:unit-test@localhost:5432/khora_test";
 
 test("1. Concurrent refresh token rotation produces exactly 1 success and 1 invalid_grant", async () => {
   let tokenRotatedCount = 0;
