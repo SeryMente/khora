@@ -104,7 +104,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
   const [reconciliacionMensaje, setReconciliacionMensaje] = useState("");
 
   const [texto, setTexto] = useState("");
-  const autoTitulo = useTituloAutomatico({ texto, titulo, onTitulo: setTitulo, onGenerado: setTituloGenerado, enabled: !archivado && !guardando });
+  const autoTitulo = useTituloAutomatico({ texto, titulo, onTitulo: setTitulo, onGenerado: setTituloGenerado, enabled: !archivado && !guardando && !editando });
   const [editando, setEditando] = useState(false);
   const [estabaDictando, setEstabaDictando] = useState(false);
 

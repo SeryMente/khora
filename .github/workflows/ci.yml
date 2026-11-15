@@ -70,3 +70,6 @@ jobs:
       - run: npm run ui-review:check
       - run: npm run ui:contract
       - run: npm run test:unit
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test --project=chromium e2e/dictado-cronica.spec.ts e2e/titulo-auto.spec.ts e2e/dialogo-live.spec.ts

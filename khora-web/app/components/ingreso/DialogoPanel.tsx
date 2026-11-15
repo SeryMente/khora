@@ -53,7 +53,7 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
   const raw=useRef<ParteDialogo[]>([]),stored=useRef<ParteGuardada[]>([]),capture=useRef<CapturaDialogo|null>(null);
   const queue=useRef<Promise<void>>(Promise.resolve()),localQueue=useRef<Promise<void>>(Promise.resolve());
   const errorRemote=useRef(false),duration=useRef(0),interrupted=useRef(false),mounted=useRef(true),inProgress=useRef(false);
-  const autoTitulo=useTituloAutomatico({texto:text,titulo:title,onTitulo:setTitle,onGenerado:setTituloGenerado,initialTitle:"Conversación",enabled:ready&&!busy&&!archived&&!archivePayload.current});
+  const autoTitulo=useTituloAutomatico({texto:text,titulo:title,onTitulo:setTitle,onGenerado:setTituloGenerado,initialTitle:"Conversación",enabled:ready&&!busy&&!archived&&!archivePayload.current&&!manualEditRef.current});
   const metadataCronica=()=>{
     if(modoRegistroRef.current!=="cronica")return {};
     if(!capturedAtRef.current)capturedAtRef.current=new Date().toISOString();

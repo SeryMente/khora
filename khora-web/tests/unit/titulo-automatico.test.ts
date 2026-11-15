@@ -172,6 +172,8 @@ test("layout mantiene el textarea fuera del wrapper colapsable y fija ambos chec
   assert.match(view, /className=\{s\.bottomright\}/);
   assert.match(css, /\.cronicaPublishDisabled[^}]*opacity:\s*\.55/);
   assert.match(css, /\.bottomright\s*\{/);
+  assert.match(workspace, /enabled: !archivado && !guardando && !editando/);
+  assert.match(dialog, /enabled:ready&&!busy&&!archived&&!archivePayload\.current&&!manualEditRef\.current/);
   assert.match(workspace, /data\?\.title/);
   assert.match(workspace, /autoTitulo\.setGeneratedTitle\(data\.title\)/);
   assert.match(dialog, /\.\.\.metadataCronica\(\)/);
