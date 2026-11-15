@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.43; OBJECT_SEAL=CUSTODIA-v0.43; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.44; OBJECT_SEAL=CUSTODIA-v0.44; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 11 · CUSTODIA-01/03/04 ABIERTAS · NUEVAS ESCRITURAS B2-ONLY · READ-BACK FÍSICO Y SHA-256 IMPLEMENTADOS · PREVIEW FOCAL VALIDADO · PRODUCTION READY · PREFLIGHT B2 READ-ONLY PASS · E2E AUTENTICADO PENDIENTE · BLOB HISTÓRICO CONSERVADO · MIGRACIÓN DIFERIDA · SIN BACKFILL, CAMBIOS DE REFERENCIAS NI BORRADO.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.43. Metacanon: 1.29. La decisión operativa vigente conserva los objetos históricos Blob en sus localizadores y dirige todo contenido nuevo exclusivamente a Backblaze B2. La publicación no equivale a aceptación E2E: falta una captura autenticada, recarga y read-back de bytes.
+> **ESTADO · VIVO · GENERACIÓN 12 · CUSTODIA-01/03/04 ABIERTAS · NUEVAS ESCRITURAS B2-ONLY · READ-BACK FÍSICO Y SHA-256 IMPLEMENTADOS · PREVIEW FOCAL VALIDADO · PRODUCTION READY · PREFLIGHT B2 READ-ONLY PASS · E2E AUTENTICADO PENDIENTE · BLOB HISTÓRICO CONSERVADO · MIGRACIÓN DIFERIDA · SIN BACKFILL, CAMBIOS DE REFERENCIAS NI BORRADO.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.44. Metacanon: 1.29. La decisión operativa vigente conserva los objetos históricos Blob en sus localizadores y dirige todo contenido nuevo exclusivamente a Backblaze B2. La publicación no equivale a aceptación E2E: falta una captura autenticada, recarga y read-back de bytes.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -16,6 +16,49 @@ Esta decisión sustituye, para la ejecución actual, toda instrucción anterior 
 
 La implementación está integrada en `main` (commit `f0224c1368fb15a3452335a44305c6efa85eef79`) y publicada en Vercel Production. El preflight B2 de solo lectura y el build de producción pasaron; la aceptación E2E autenticada permanece pendiente. Esta anotación distingue código integrado, deployment READY y prueba de persistencia en sesión real: no son estados equivalentes.
 
+## Directriz operativa del operador · 2026-11-14 · recuperación por unidades
+
+Esta instrucción fija cómo se cuenta, prioriza y declara la recuperación. Prevalece sobre métricas técnicas o redacciones anteriores que mezclen transcripciones, sesiones, referencias y componentes de audio.
+
+### Unidad de custodia: definición obligatoria
+
+Una unidad de custodia es **una transcripción individual y el MP3 que le corresponde, si ese MP3 existe**. El MP3 puede no estar presente. Por tanto:
+
+- Una transcripción equivale a una unidad; sus fragmentos de audio, partes, filas, referencias, localizadores, archivos auxiliares o registros técnicos no crean unidades adicionales.
+- La falta de un MP3 solo se registra como «sin MP3 asociado» cuando la evidencia de origen confirma que no existe o no corresponde a esa transcripción. La ausencia en una pantalla, snapshot o checkpoint no basta para afirmarlo.
+- Si la transcripción está recuperada y no hay MP3 asociado, la unidad puede quedar recuperada con texto solamente.
+- Si existe un MP3 asociado pero no puede leerse, registrar el estado por componente: «transcripción recuperada; MP3 pendiente/bloqueado». No duplicar ni fraccionar la unidad.
+- Los informes de avance y cierre se expresan en unidades de transcripción. Los conteos de partes, referencias, filas, localizadores o archivos se conservan, cuando hagan falta, solo como diagnóstico técnico; nunca se presentan como número de unidades recuperables.
+
+### Objetivo y regla de cierre
+
+Recuperar todas las unidades cuyo texto y, cuando exista, MP3 asociado estén disponibles mediante fuentes y accesos autorizados. La meta es que **la única parte de contenido que quede pendiente por una limitación de proveedor sea el MP3 histórico cuyo origen permanece en Vercel Blob**.
+
+No intentar desbloquear, reactivar, sustituir ni migrar Vercel Blob desde KHORA o desde esta asistencia. Tampoco crear un almacén sustituto, cambiar referencias ni alterar los originales. El bloqueo de Blob se mantiene como excepción temporal externa; solo se reevalúa si Vercel devuelve acceso de lectura al almacén existente o habilita una exportación oficial.
+
+Una excepción adicional solo puede quedar pendiente cuando se identifique la unidad afectada y se documente la limitación concreta, la evidencia, las vías autorizadas ya evaluadas y la condición objetiva que permitiría reconsiderarla. Se clasificará como «bloqueada temporalmente por limitación», no como pérdida definitiva. No convertir una tarea sin ejecutar, una prueba pendiente o una falta de acceso actual en una declaración de irrecuperabilidad.
+
+### Clasificación y validación
+
+- **RECUPERADA:** transcripción leída de vuelta desde el destino y cotejada con su identidad/huella; si existe MP3 asociado, también debe verificarse su lectura física y su integridad.
+- **RECUPERADA CON TEXTO, MP3 BLOQUEADO:** transcripción recuperada, pero su MP3 asociado permanece inaccesible por Vercel Blob.
+- **RECUPERADA SIN MP3 ASOCIADO:** texto recuperado y evidencia suficiente de que esa unidad no tiene MP3 asociado.
+- **BLOQUEADA TEMPORALMENTE:** limitación externa o de identidad/acceso acreditada, con condición de reanudación explícita.
+- **NO DETERMINADA:** no se ha probado la identidad, la relación transcripción–MP3 o la existencia del original. No contarla como recuperada ni declararla perdida.
+
+Los metadatos, marcas históricas de verificación, referencias o un deployment READY no sustituyen la lectura de vuelta. Para B2, no declarar recuperado un MP3 por el mero hecho de que tenga localizador o estado histórico verificado.
+
+### Excepciones y barreras conocidas al corte
+
+1. **Vercel Blob histórico — limitación externa confirmada.** En el corte del 2026-11-10, el almacén `khora-audio` constaba suspendido por cuota. Las pruebas de lectura de muestra terminaron sin bytes descargados y con `blob_read_forbidden`; no se obtuvo fecha de reactivación. No es una limitación que esta asistencia pueda desbloquear. Mantener los MP3 asociados como pendientes de Blob, sin marcarlos como perdidos o corruptos. Reconsiderar únicamente ante acceso de Vercel o exportación oficial.
+2. **Unidades prioritarias identificadas el 2026-11-14.** El registro conservado informa 35 notas de dictado con texto cifrado y huella registrada, cada una con referencia de audio. Esto acredita material textual cifrado y asociación registrada, pero no equivale a haber leído el texto en claro ni a haber recuperado físicamente el MP3. Priorizar la recuperación/lectura autorizada del texto; clasificar el MP3 por separado bajo la limitación Blob. No asumir que este conjunto coincide con las tarjetas sin checkpoint del inventario del panel del 2026-11-10: la identidad entre ambos conjuntos no está demostrada.
+3. **Capturas sin propietario o sin checkpoint en el inventario del panel del 2026-11-10.** Son barreras para el flujo normal de recuperación. No reasignar propietario sin evidencia y no inferir una unidad por cada sesión o registro. No están declaradas irrecuperables: primero se debe establecer la relación con una transcripción concreta y buscar una vía autorizada de lectura/recuperación alternativa. Solo si esa vía está demostrablemente impedida se registrará una excepción temporal.
+4. **Aceptación E2E autenticada de B2 — validación pendiente, no pérdida de contenido.** El preflight de B2 y el build de producción constan aprobados, pero falta demostrar con una sesión KHORA autenticada la captura, persistencia, recarga y read-back. La falta de esa sesión impide certificar el flujo; no es una limitación de proveedor declarada irresoluble ni convierte por sí sola una unidad en perdida. Mantener la aceptación como compuerta técnica separada de la recuperación de unidades.
+5. **Registros en `en_revision`.** El conjunto ya identificado como persistido y disponible para revisión no debe reingestarse ni archivarse de nuevo por el mero hecho de estar pendiente de revisión. Mantenerlo separado de las 35 unidades prioritarias hasta cotejar identidades; revisión y recuperación son estados distintos.
+
+En consecuencia, el corte actual **no permite afirmar todavía que Blob sea el único pendiente de todo el frente**: además del bloqueo de Blob, permanecen barreras de identidad/checkpoint sin resolver y la aceptación E2E de B2 sin certificar. Ninguna de estas últimas se declara irrecuperable. La meta operativa es resolverlas por fuentes accesibles y dejar como única excepción de contenido el MP3 realmente dependiente de Blob, salvo una limitación adicional que cumpla expresamente el criterio anterior.
+
+
 
 ## 1. Control e identidad
 
@@ -24,11 +67,11 @@ La implementación está integrada en `main` (commit `f0224c1368fb15a3452335a443
 - **Propietario documental:** SeryMente/khora, rama main.
 - **Directorio OCP:** frentes/custodia/.
 - **Único núcleo operativo:** este OBJETO-CANONICO.md.
-- **Control único de responsabilidad:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json). Titularidad documental/operativa transferida de generación 10 a 11 y leída de vuelta. Titular actual: chatgpt-custodia-INSTANCE-20261109-01A1C125; alias operativo chatgpt-custodia-01a1c125-af13-79b1-87cc-f1e5fe4b0b59; UUIDv7 local de conversación 01a1c125-af13-79b1-87cc-f1e5fe4b0b59; UUIDv7 local del evento 01a1c125-af13-7825-8af1-0ff35ad87b0e; control blob c29349fc4d2e07d40cd6efe583171482578db6d3. ID nativo de plataforma no expuesto. Titular previo gen. 10 y generaciones anteriores preservados. Folio PENDIENTE/NO ASIGNADO; FOL1 no está ACTIVO/verificado.
+- **Control único de responsabilidad:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json). Titularidad documental/operativa transferida de generación 11 a 12 y leída de vuelta. Titular actual: chatgpt-custodia-INSTANCE-20261114-01A1DCEE; alias operativo chatgpt-custodia-01a1dcee-4f04-737d-874a-5c8febd20841; UUIDv7 local de conversación 01a1dcee-4f04-737d-874a-5c8febd20841; UUIDv7 local del evento 01a1dcee-4f04-7caf-a1ef-b9b809ec04dd; control blob d8477e1a4b48c7bd6161c0f2cb1660e72f1f5cef. ID nativo de plataforma no expuesto. Titular previo gen. 11 y generaciones anteriores preservados. Folio PENDIENTE/NO ASIGNADO; FOL1 no está ACTIVO/verificado.
 - **Propósito literal aprobado:** [originales/PROPOSITO-OPERADOR-2026-10-28.md](originales/PROPOSITO-OPERADOR-2026-10-28.md). La sección 4 también conserva el texto aprobado íntegro para que el propósito sea visible en el núcleo.
 - **Lista de tareas:** [LISTA-TAREAS-PROVISIONAL.md](LISTA-TAREAS-PROVISIONAL.md), materialización auxiliar provisional de los pendientes; versión 0.32, alineada con persistencia nueva B2-only, estado por archivo Blob legacy y migración histórica diferida. CUSTODIA-03 y CUSTODIA-01 continúan abiertas; CUSTODIA-02 continúa retirada y su identificador no se reutiliza.
 - **Inventario provisional de hallazgos:** [evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md](evidencias/INVENTARIO-RECUPERABILIDAD-INGRESOS.md), materialización de evidencia para CUSTODIA-01; no es un segundo estado vivo.
-- **Versión y sello vigentes:** CUSTODIA-v0.41. Es una versión documental del objeto; no es una versión del producto.
+- **Versión y sello vigentes:** CUSTODIA-v0.44. Es una versión documental del objeto; no es una versión del producto.
 - **Registro de la retoma anterior:** [originales/ChatGPT-CUSTODIA-20261106-1424.txt](originales/ChatGPT-CUSTODIA-20261106-1424.txt), instrucción textual parcial original y diagnóstico estático del límite de archivado.
 - **Original de esta retoma:** [originales/ChatGPT-CUSTODIA-20261107-1157.txt](originales/ChatGPT-CUSTODIA-20261107-1157.txt), exportación preservada en main; SHA-256 `7E256B9888F2A0227632D39D22B98E9BD1316548E057E83514ADE61376A93CC5`, 42,629 bytes; lectura de vuelta exacta.
 - **Original de esta retoma (2026-11-08 11:21):** [originales/ChatGPT-CUSTODIA-20261108-1121.md](originales/ChatGPT-CUSTODIA-20261108-1121.md), 39,896 bytes; SHA-256 `CB264E5979AA545F082B5CC9C59DEDA30CE9547100DB29B138A520C3592A866A`; Git blob `b7e13e3fe9fed70873535640e1124577f5b037e4`; commit `5d6cf7055f2ab5f0020bde220d078ffe077512a6`; lectura de vuelta idéntica.
@@ -61,6 +104,7 @@ La implementación está integrada en `main` (commit `f0224c1368fb15a3452335a443
 - **Gobierno vigente leído en la retoma 2026-11-06:** Samantha v377 · NX-377m; Metacanon 1.28; GOW 2.17; blob DUG `54064c8fe00f872023a455f06596061ed69062ae`; commit main `8ee2482866b3dd085e58e05006727256d0274376`. Se leyó §ARR como secuencia de adquisición, la cascada y P001/P004/P005/P037/P038/P039/P041/P042/P043, Metacanon §§4, 28, 29, 38, 41, 42, 44, 46–47 y entradas GOW de Persistencia documental, OCP, SPDF y ciclo. MCP-NORMATIVO: DESACTIVADO. No se modificó el DUG.
 - **Gobierno de la retoma anterior (histórico):** Samantha v379 · NX-379m; Metacanon 1.29; GOW v2.18; DUG blob `cad464717c43733aa84b49f8c9c3af0875597fbd`. Su nota de adquisición y sus límites se conservan como antecedente histórico.
 - **Gobierno vigente adquirido en la retoma actual (2026-11-09):** Samantha v384 · NX-384m; Metacanon 1.29; GOW v2.18; DUG blob `2f320e5e6e4768e9a77bc34d24b0639b47f2128d`. Se leyó §ARR completo como vocabulario de entrada; se revisaron la cascada, el CNP (P001/P004/P005/P038/P043), P012/P013, P035/P036/P039/P041/P042 y P043. MCP-NORMATIVO: DESACTIVADO.
+- **Gobierno revalidado para la actualización CUSTODIA-v0.44 (2026-11-14):** Samantha v398 · NX-398m; Metacanon 1.29; fuente `SeryMente/metodologia/main:gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`, blob `410c85c9afd36202c1e56cb519c677f3bc0205a1`. Se adquirió §ARR y se revisaron los principios pertinentes de precedencia, autorización, no simulación, canon del repositorio y anti-ineficiencia. MCP-NORMATIVO: DESACTIVADO.
 - Esta adquisición identifica la versión del canon central al momento de la lectura; no equivale a una auditoría integral de todos sus principios o anexos ni a una declaración de conformidad definitiva del diseño de lista.
 
 ## 4. Propósito y alcance
