@@ -17,6 +17,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ detail: "no autenticado" }, { status: 401 });
     }
     const c = await req.json();
+    const mode = c?.mode === "cronica" ? "cronica" : undefined;
+    if (c?.mode !== undefined && c.mode !== "cronica") return NextResponse.json({ detail: "modalidad_no_admitida" }, { status: 400 });
+    if (mode === "cronica" && (
+      typeof c?.autoPublish !== "boolean" ||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(c?.publicationIntentId ?? "")) ||
+      typeof c?.capturedAt !== "string" || !Number.isFinite(Date.parse(c.capturedAt)) ||
+      (c?.eventTime !== null && typeof c?.eventTime !== "string") ||
+      String(c?.eventTime ?? "").length > 180
+    )) return NextResponse.json({ detail: "handoff_cronica_invalido" }, { status: 400 });
     const texto = typeof c?.texto === "string" ? c.texto : "";
     const fuenteEntrada =
       c?.fuenteEntrada === "dialogo" ? "dialogo" :
@@ -63,6 +72,13 @@ export async function POST(req: Request) {
       fuenteEntrada,
       usuario: session.user.email,
       tituloAutomatico: !c?.titulo?.trim(),
+      ...(mode === "cronica" ? {
+        mode,
+        autoPublish: c.autoPublish,
+        publicationIntentId: c.publicationIntentId,
+        eventTime: c.eventTime ?? null,
+        capturedAt: c.capturedAt,
+      } : {}),
     });
 
     // Durable intents are already committed with the original. A callback is only an accelerator.

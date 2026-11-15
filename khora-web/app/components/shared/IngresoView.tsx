@@ -3,8 +3,13 @@ import { useState } from "react";
 import * as I from "lucide-react";
 import { AudioActivity } from "../ingreso/AudioActivity";
 import s from "../ingreso/ingreso-studio.module.css";
+import type { CronicaTrack } from "@/lib/cronica/checklist";
 export type IngresoViewState = {
   archivado?: boolean;
+  mode?: "dictado" | "cronica";
+  autoPublish?: boolean;
+  capturedAt?: string | null;
+  cronicaChecklist?: CronicaTrack[];
   procesando?: boolean;
   finalizando?: boolean;
   organizarComoDialogo?: boolean;
@@ -69,6 +74,8 @@ export type IngresoViewActions = {
   onExportarMp3?: () => void;
   onLimpiar?: () => void;
   onConfirmarEdicion?: () => void;
+  onModeChange?: (mode: "dictado" | "cronica") => void;
+  onAutoPublishChange?: (enabled: boolean) => void;
 };
 
 export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:IngresoViewState;actions?:IngresoViewActions;isReviewMode?:boolean}) {
@@ -83,6 +90,25 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
    <div><p className={s.eyebrow}>ESPACIO DE CAPTURA</p><h1>Ingreso</h1><p className={s.subtitle}>Dale espacio a lo que piensas.</p></div>
    {(a.onRecuperar||isReviewMode)&&<button className={s.secondary} onClick={a.onRecuperar} disabled={busy||recording||v.editando} aria-haspopup="dialog"><I.History size={18}/><span>Recuperar capturas</span>{!!v.recuperaciones&&<span className={s.count}>{v.recuperaciones}</span>}</button>}
   </header>
+  <div className={s.modeSelector} role="group" aria-label="Modalidad de Dictado">
+   <button type="button" data-ui-id="ingreso.modalidad-dictado" className={v.mode!=="cronica"?s.modeActive:s.secondary} aria-pressed={v.mode!=="cronica"} disabled={locked} onClick={()=>a.onModeChange?.("dictado")}>Dictado</button>
+   <button type="button" data-ui-id="ingreso.modalidad-cronica" className={v.mode==="cronica"?s.modeActive:s.secondary} aria-pressed={v.mode==="cronica"} disabled={locked} onClick={()=>a.onModeChange?.("cronica")}>Crónica</button>
+  </div>
+  {v.mode==="cronica"&&<section className={s.cronicaPanel} data-ui-id="ingreso.cronica-checklist" aria-label="Checklist de Crónica">
+   <div className={s.cronicaHeading}><h2>Crónica</h2><span>{(v.cronicaChecklist||[]).filter(track=>track.resolved).length}/4 pistas</span></div>
+   <p>Guía opcional para situar el relato. Las pistas se recalculan al editar y nunca bloquean el archivo.</p>
+   <ul>
+    {(v.cronicaChecklist||[]).map(track=><li key={track.id} className={track.resolved?s.cronicaResolved:s.cronicaPending}>
+     <span aria-label={track.resolved?"Pista resuelta":"Pista pendiente"}>{track.resolved?"✓":"○"}</span>
+     <span><strong>{track.label}</strong>{track.evidence&&<small>{track.evidence}</small>}</span>
+    </li>)}
+   </ul>
+   <p className={s.cronicaTiming}>Fecha y hora se detecta solo en lo mencionado en el relato. {v.capturedAt&&<>Hora de captura, guardada aparte: {new Date(v.capturedAt).toLocaleString("es-MX")}.</>}</p>
+  </section>}
+  {v.mode==="cronica"&&<label className={s.cronicaPublish}>
+   <input type="checkbox" data-ui-id="ingreso.cronica-auto-publish" checked={v.autoPublish!==false} disabled={locked} onChange={event=>a.onAutoPublishChange?.(event.target.checked)}/>
+   <span>Publicar automáticamente al archivar (Crónica y microblog)</span>
+  </label>}
   <section className={s.sheet} aria-label="Captura actual">
    <div className={s.capturebar}>
     <div className={s.micgroup}>

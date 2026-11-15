@@ -25,6 +25,24 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
       "ingreso.stats", "ingreso.custodia-status"
     ]
   },
+  "ingreso:cronica": {
+    screen: "ingreso",
+    scenario: "cronica",
+    title: "Ingreso · Modalidad Crónica",
+    description: "Checklist local de cuatro pistas y autorización reversible de handoff a Integración al archivar.",
+    status: "active",
+    recommended_viewport: "desktop",
+    ui_ids: [
+      "ingreso.container",
+      "ingreso.modalidad-dictado",
+      "ingreso.modalidad-cronica",
+      "ingreso.cronica-checklist",
+      "ingreso.cronica-auto-publish",
+      "ingreso.textarea",
+      "ingreso.btn-archivar",
+      "ingreso.custodia-status"
+    ]
+  },
   "ingreso:dialogo_chrome": {
     screen:"ingreso",scenario:"dialogo_chrome",title:"Ingreso · Chrome con micrófono",
     description:"Subfunción de Escuchar a Chrome en el mismo editor, dos señales reales, transcripción al detener y archivo como volcado sin ingesta automática.",

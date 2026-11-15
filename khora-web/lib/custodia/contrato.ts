@@ -11,6 +11,12 @@ export type CapturaSnapshot = {
   dialogo?: import("../dialogo/contrato").ManifiestoDialogo;
   corteAudio?: { hastaParte: number; finMs: number };
   recuperadaDe?: { sessionId: string; revisionId: string };
+  /** Crónica-only metadata; stored inside the same encrypted snapshot. */
+  mode?: "dictado" | "cronica";
+  autoPublish?: boolean;
+  publicationIntentId?: string;
+  eventTime?: string | null;
+  capturedAt?: string;
 };
 export function nuevaRevision(): Pick<CapturaSnapshot, "revisionId" | "clientAt"> {
   return { revisionId: crypto.randomUUID(), clientAt: Date.now() };

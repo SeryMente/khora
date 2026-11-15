@@ -532,3 +532,15 @@ Durante parada se muestra estado vivo `Terminando y conservando audio…` antes 
 Observabilidad de dictado normal: inicio, confirmación o fallo por parte con índice, HTTP, duración y confirmación local; cierre con duración y pendientes. Sin palabras dictadas, audio o mensajes privados del proveedor en métricas. La telemetría posterior al COMMIT no puede invalidar una parte ya conservada. Un reintento idéntico con nombre/MIME ausentes se acepta por igualdad PostgreSQL null-safe; otra huella, bytes, fuente o sesión sellada se siguen rechazando.
 
 Ver pruebas y límites en `docs/frentes/dictado-voz/evidencias/C030-pruebas.md`. La prueba aislada no certifica la infraestructura ni el micrófono físico de producción.
+
+## 24. Metadatos de Crónica y handoff a Integración
+
+La extensión de CapturaSnapshot para Crónica añade metadatos de modalidad y autorización dentro del snapshot cifrado existente: mode, autoPublish, publicationIntentId, eventTime y capturedAt. No requiere cambiar la estructura IndexedDB, el almacén records/keys ni la implementación de custodia-local.ts: guardarSnapshotLocal cifra y conserva el objeto completo ya definido por CapturaSnapshot. Los snapshots históricos sin estos campos siguen siendo válidos.
+
+El endpoint /api/dictado/checkpoint valida y cifra el snapshot completo. La restauración recupera los campos de modalidad y autorización junto con texto, audio y revisiones; cambiar el texto recalcula las cuatro pistas localmente, pero la checklist no es una condición de persistencia ni de cierre.
+
+En Crónica, /api/dictado usa la transacción de archivo existente y añade integration_handoff en la misma transacción PostgreSQL, mediante la migración aditiva 034_integration_handoff_cronica.sql. La fila enlaza session_id, volcado_id, version y source_sha256; además guarda event_time y captured_at separados, owner autenticado, intent_id, estado y autorización. El check activo produce queued/autorizado; el inactivo produce disabled/no autorizado. La tabla pertenece al contrato de entrega al frente Integración, no crea una tarea, titularidad ni almacén de Custodia.
+
+Dictado no llama a plataformas externas ni procesa la cola. Un registro queued es durable y espera un consumidor de Integración. Su existencia no demuestra que los conectores estén configurados, que la publicación se haya ejecutado ni que una plataforma la haya aceptado. La migración 034 debe aplicarse al entorno de base de datos de destino antes de poder crear handoffs; no se aplica automáticamente desde esta documentación.
+
+Esta extensión no altera captura de audio, cifrado, Backblaze B2, verificación de objetos, borrado local condicionado por ACK, manifiestos de partes, PIN, MP3 ni recuperación de originales. Custodia conserva su OCP y titularidad independientes.
