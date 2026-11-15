@@ -19,6 +19,7 @@ const ICONS: Record<NavigationIcon, LucideIcon> = {
   Keyboard: Icons.Keyboard,
   Network: Icons.Network,
   MessageSquareShare: Icons.MessageSquareShare,
+  Bot: Icons.Bot,
   Mic: Icons.Mic,
   ShieldCheck: Icons.ShieldCheck,
   ScrollText: Icons.ScrollText,
@@ -187,7 +188,7 @@ export default function SystemBar() {
               {entry.kind === "direct" ? (
                 <Link
                   href={entry.href}
-                  className="flex min-w-12 flex-col items-center justify-center rounded-lg p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)] sm:min-w-16 sm:p-2"
+                  className="flex min-w-10 flex-col items-center justify-center rounded-lg p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)] sm:min-w-16 sm:p-2"
                   style={{ color: active ? "var(--khora-ink)" : "var(--khora-accent)" }}
                   aria-current={active ? "page" : undefined}
                 >
@@ -204,7 +205,7 @@ export default function SystemBar() {
                   onClick={() =>
                     setOpenMenuId((current) => (current === entry.id ? null : entry.id))
                   }
-                  className="flex min-w-12 flex-col items-center justify-center rounded-lg p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)] sm:min-w-16 sm:p-2"
+                  className="flex min-w-10 flex-col items-center justify-center rounded-lg p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--khora-accent)] sm:min-w-16 sm:p-2"
                   style={{ color: active ? "var(--khora-ink)" : "var(--khora-accent)" }}
                 >
                   <NavIcon name={entry.icon} size={24} />

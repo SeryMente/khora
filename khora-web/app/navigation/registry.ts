@@ -16,7 +16,8 @@ export type NavigationIcon =
   | "FileCheck2"
   | "Container"
   | "LockKeyhole"
-  | "KeyRound";
+  | "KeyRound"
+  | "Bot";
 
 export type NavigationChild = {
   id: string;
@@ -84,6 +85,15 @@ export const NAVIGATION_REGISTRY: readonly NavigationEntry[] = [
     kind: "direct",
     level: 1,
     coverage: ["/sistema/consulta"],
+  },
+  {
+    id: "chat",
+    label: "Chat",
+    href: "/chat",
+    icon: "Bot",
+    kind: "direct",
+    level: 1,
+    coverage: ["/chat", "/chat/frame"],
   },
   {
     id: "seguridad",

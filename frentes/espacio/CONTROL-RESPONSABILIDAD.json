@@ -36,5 +36,23 @@
     "matches_found": null,
     "global_uniqueness": "not_verified"
   },
-  "folio_status_note": "FOL1 permanece PREPARADO/NO ACTIVO según ART-024 vigente; no se emite SES ni folio CV/CY/A/B. La ausencia de folio no bloquea la apertura ni la continuidad."
+  "folio_status_note": "FOL1 permanece PREPARADO/NO ACTIVO según ART-024 vigente; no se emite SES ni folio CV/CY/A/B. La ausencia de folio no bloquea la apertura ni la continuidad.",
+  "scope_extensions": [
+    {
+      "date": "2026-11-15",
+      "source_literal": "O mejor, entonces, nmo elimines CONSULTA; dejalo, y añade chat. Para que no toquemos eso todavia.",
+      "authorization_scope": [
+        "Modificar navegación, ruta /chat, página marco, proxy autenticado y pruebas/documentación necesarias para incorporar MOD-CHAT basado en Open WebUI como acceso independiente.",
+        "Conservar sin cambios menú, pantalla, API, contrato, GraphRAG, recuperador y pruebas existentes de Consulta.",
+        "Trabajar en una rama aislada y preparar un PR para revisión."
+      ],
+      "explicit_exclusions": [
+        "No borrar, redirigir, renombrar ni refactorizar Consulta o sus dependencias.",
+        "No modificar código del runtime Render en esta iteración ni actualizar su rama histórica.",
+        "No cambiar secretos ni valores de variables de entorno.",
+        "No activar KHORA_CHAT_ENABLED en producción, modificar datos, aplicar migraciones ni desplegar a producción."
+      ],
+      "status": "authorized_for_isolated_code_change; not merged or deployed"
+    }
+  ]
 }

@@ -116,7 +116,7 @@ Estos módulos son subfrentes funcionales internos; heredan el OCP, núcleo, aut
 - **Rama de referencia:** `main`.
 - **Ruta del OCP:** `frentes/espacio/`.
 - **Entorno local/host/SID/LocalPath:** NO VERIFICADO en esta apertura; no importar datos de otros frentes ni inferir rutas locales.
-- **Open WebUI:** integración reportada en el repositorio; código, instalación, versión y configuración aún no inspeccionados en esta apertura.
+- **Open WebUI:** auditoría de código realizada el 2026-11-15. Se identificó una integración nativa oficial 0.12.3 en el trabajo histórico de la rama `fix/chat-epistwin-ent01-main-20261019`; el servicio Render existente conserva un despliegue `live` del commit `5192ec3232244f8d709b7c163b4643c52afd7c0e`. No se presume que el runtime esté habilitado ni que el circuito Chat esté aceptado. La capa de acceso `/chat` se incorpora en una rama nueva que conserva Consulta; CI y aceptación pendientes.
 - **Modelos cloud/locales conectados y activos:** NO VERIFICADO.
 - **Secretos/llaves:** fuera de este OCP y de Git; no se solicitan ni registran.
 - **Persistencia/sincronización entre clientes:** no se presume; se establecerá por inspección y prueba autorizada.
@@ -128,17 +128,17 @@ Estos módulos son subfrentes funcionales internos; heredan el OCP, núcleo, aut
 - **De dónde viene:** instrucción directa del operador y prompt explicativo recibidos el 2026-11-15; preservados literalmente en `originales/INSTRUCCION-ORIGINAL-20261115.md`.
 - **Dónde está:** OCP `SeryMente/khora/frentes/espacio/`; generación inicial 1; dos módulos funcionales propuestos.
 - **A dónde va:** inventariar la integración Open WebUI, medir su cobertura de chat y distinguir sus capacidades reales de los requisitos del workspace administrativo.
-- **Qué cambió:** se creó ESPACIO como un único FT; Metodología v399 lo incorpora al directorio taxonómico y al inventario de repositorios; Notas también se añadió al corte actualizado.
+- **Qué cambió:** ESPACIO sigue siendo un solo FT. El operador autorizó añadir MOD-CHAT como superficie independiente junto a Consulta, sin retirar ni redirigir Consulta. Se prepara el acceso Open WebUI `/chat` en una rama aislada; no se altera aún producción.
 
 ### 🔄 Estado vivo
 
-**Acción en curso:** inauguración y establecimiento de la línea base documental del frente.  
-**Siguiente paso atómico:** inspeccionar en `SeryMente/khora/main` la integración Open WebUI existente y levantar un inventario de componentes/rutas sin exponer secretos.  
-**Pendientes en secuencia:** (1) inspección técnica Open WebUI; (2) matriz de capacidades de chat; (3) casos de gestión administrativa y umbral Notion; (4) matriz de brechas; (5) recomendación de arquitectura para decisión del operador.
+**Acción en curso:** incorporar MOD-CHAT como superficie separada basada en Open WebUI, manteniendo íntegra la superficie Consulta.  
+**Siguiente paso atómico:** verificar CI y los contratos del nuevo PR; comprobar el proxy contra el runtime sin habilitar producción ni exponer secretos.  
+**Pendientes en secuencia:** (1) CI/read-back de esta rama; (2) compatibilidad y disponibilidad real del runtime Render; (3) compuerta de habilitación Vercel/Render y recorrido autenticado E2E; (4) selección/operación de modelos cloud/locales; (5) matriz de capacidades Chat y análisis de MOD-WORKSPACE frente a Notion.
 
 ### ⚗️ En prueba / recién fallido
 
-Open WebUI está reportado, pero no auditado ni probado en este ciclo. No se ha demostrado equivalencia con Notion ni ejecución de modelos cloud/locales desde esta apertura.
+La integración está auditada a nivel de código y despliegues históricos. El wheel oficial 0.12.3 arrancó en una prueba aislada; ese ensayo no validó el ciclo de vida combinado, el binding autenticado en producción, persistencia durable en el despliegue actual ni conversación funcional con modelo/grafo. El servicio Render tiene un último despliegue `live` del 2026-10-20; una actualización intentada el 2026-11-08 quedó `update_failed`. El flag de Chat de Vercel en producción permanece deshabilitado. No se declara Chat E2E ni activo.
 
 ### 🔔 Recordatorios latentes
 
