@@ -177,6 +177,8 @@ export async function POST(req: NextRequest) {
 
   const client = await getDb().connect();
   let transactionOpen = false;
+  let truncateCommitAttempted = false;
+  let truncateCommitted = false;
   let backup: Awaited<ReturnType<typeof putEncryptedObjectStream>> | null = null;
   let exportStats = { rows: 0, bytes: 0, plaintextSha256: null as string | null };
 
@@ -185,7 +187,7 @@ export async function POST(req: NextRequest) {
     transactionOpen = true;
     await client.query("SET LOCAL lock_timeout = '30000ms'");
     // SHARE blocks new INSERT/UPDATE/DELETE while preserving ordinary SELECT access.
-    await client.query("LOCK TABLE public.dictado_checkpoint IN SHARE MODE");
+    await client.query("LOCK TABLE public.dictado_session, public.dictado_checkpoint IN SHARE MODE");
 
     const baselineResult = await client.query(
       `SELECT count(*)::text AS row_count,
@@ -232,7 +234,9 @@ export async function POST(req: NextRequest) {
     if (insideCount.rows[0]?.row_count !== "0") {
       throw new Error("checkpoint_truncate_postcondition_failed");
     }
+    truncateCommitAttempted = true;
     await client.query("COMMIT");
+    truncateCommitted = true;
     transactionOpen = false;
 
     const after = await client.query(
@@ -282,13 +286,25 @@ export async function POST(req: NextRequest) {
     if (transactionOpen) await client.query("ROLLBACK").catch(() => undefined);
     const code = (error as Error & { code?: string }).code || null;
     const message = error instanceof Error ? error.message : "checkpoint_backup_failed";
+    let actualRows: string | null = null;
+    try {
+      const check = await client.query("SELECT count(*)::text AS row_count FROM public.dictado_checkpoint");
+      actualRows = String(check.rows[0]?.row_count ?? "unknown");
+    } catch {
+      actualRows = null;
+    }
+    const committedByReadback = actualRows === "0";
+    const knownCommitted = truncateCommitted || committedByReadback;
+    const knownPreserved = actualRows === EXPECTED.rows;
     const status = message === "checkpoint_backup_baseline_changed" ? 409 : 500;
     return reply({
       ok: false,
       error: message,
       sqlstate: code,
-      truncate_committed: false,
-      original_rows_preserved: transactionOpen,
+      truncate_committed: knownCommitted ? true : truncateCommitAttempted ? "unknown" : false,
+      truncate_outcome: knownCommitted ? "committed" : knownPreserved ? "rolled_back_preserved" : "unknown",
+      original_rows_preserved: knownPreserved,
+      rows_after_error: actualRows,
       backup: backup ? {
         b2_key: backup.pathname,
         bytes: backup.bytes,
