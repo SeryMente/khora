@@ -30,7 +30,7 @@ Base prevista: `https://khora-web.vercel.app`
 Las rutas de UI Review permanecen **fail-closed** y requieren
 `KHORA_UI_REVIEW_MODE=1`.
 
-## 3. Las nueve pantallas registradas
+## 3. Las ocho pantallas registradas
 
 | Pantalla | Función | Componente compartido |
 |---|---|---|
@@ -41,7 +41,6 @@ Las rutas de UI Review permanecen **fail-closed** y requieren
 | `ingesta` | Envío al kernel | `PipelineView` |
 | `registro` | Registro de eventos | `RegistroView` |
 | `grafo` | Nodos y relaciones | `GrafoView` |
-| `consulta` | Consulta multi-turno y RAG | `ConsultaView` |
 | `kpi` | Métricas y benchmarks | `KpiPanelView` |
 
 Cada pantalla tiene escenarios explícitos de operación, carga, vacío, error y
@@ -91,7 +90,7 @@ La certificación E2E comprueba en escritorio y móvil:
 - navegación completa del menú Sistema;
 - acceso Seguridad → Control MCP;
 - persistencia del cambio de tema;
-- prerender de las nueve pantallas de UI Review.
+- prerender de las ocho pantallas de UI Review.
 
 ## 7. Qué es deliberadamente técnico
 

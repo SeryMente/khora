@@ -5,7 +5,7 @@ import test from "node:test";
 import fs from "fs";
 import path from "path";
 import { UI_REVIEW_SCENARIOS, SCREENS, getAllScenariosForScreen } from "../../lib/ui-review/registry";
-import { buildIngresoState, buildPipelineState, buildRegistroState, buildGrafoState, buildConsultaState, buildKpiState, PANTALLAS_PIPELINE } from "../../lib/ui-review/states";
+import { buildIngresoState, buildPipelineState, buildRegistroState, buildGrafoState, buildKpiState, PANTALLAS_PIPELINE } from "../../lib/ui-review/states";
 
 const SHARED_DIR = path.join(process.cwd(), "app", "components", "shared");
 const COMPONENTES_OBLIGATORIOS = [
@@ -13,7 +13,6 @@ const COMPONENTES_OBLIGATORIOS = [
   "PipelineView.tsx",
   "RegistroView.tsx",
   "GrafoView.tsx",
-  "ConsultaView.tsx",
   "KpiPanelView.tsx",
 ];
 
@@ -70,8 +69,6 @@ test("cada pantalla declarada tiene escenarios y estados tipados", () => {
         assert.ok(Array.isArray(buildRegistroState(def.scenario).eventos));
       } else if (def.screen === "grafo") {
         assert.ok(Array.isArray(buildGrafoState(def.scenario).nodes));
-      } else if (def.screen === "consulta") {
-        assert.ok(Array.isArray(buildConsultaState(def.scenario).mensajes));
       } else if (def.screen === "kpi") {
         assert.ok(Array.isArray(buildKpiState(def.scenario).selectedProfiles));
       }
@@ -83,7 +80,6 @@ test("los escenarios de error y vacío son deterministas", () => {
   assert.deepStrictEqual(buildPipelineState("empty").pipelineItems, []);
   assert.deepStrictEqual(buildRegistroState("empty").eventos, []);
   assert.deepStrictEqual(buildGrafoState("empty").nodes, []);
-  assert.deepStrictEqual(buildConsultaState("empty").mensajes, []);
   assert.ok(buildIngresoState("error").error.length > 0);
   assert.ok((buildRegistroState("error").error || "").length > 0);
 });

@@ -7,7 +7,7 @@ import {
   KpiPanelViewState,
   ProfileKpiResult,
 } from "@/app/components/shared/KpiPanelView";
-import { PerfilProveedor } from "@/app/components/shared/ConsultaView";
+import type { PerfilProveedor } from "@/lib/config/llm-profile";
 import { logTelemetryEvent } from "@/lib/telemetry";
 import { ejecutarInferenciaOllamaLocal } from "@/lib/client/ollamaLocal";
 

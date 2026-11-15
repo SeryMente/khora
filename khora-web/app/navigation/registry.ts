@@ -77,13 +77,13 @@ export const NAVIGATION_REGISTRY: readonly NavigationEntry[] = [
     ],
   },
   {
-    id: "consulta",
-    label: "Consulta",
-    href: "/sistema/consulta",
+    id: "chat",
+    label: "Chat",
+    href: "/chat",
     icon: "MessageSquareShare",
     kind: "direct",
     level: 1,
-    coverage: ["/sistema/consulta"],
+    coverage: ["/chat", "/chat/frame"],
   },
   {
     id: "seguridad",
@@ -142,6 +142,7 @@ export const NAVIGATION_EXEMPT_ROUTES = new Set([
 ]);
 
 export const NAVIGATION_LEGACY_ALIASES = new Map<string, string>([
+  ["/sistema/consulta", "/chat"],
   ["/sistema/volcados", "/sistema/custodia"],
   ["/sistema/boveda", "/sistema/seguridad?tab=boveda"],
   ["/sistema/entorno-persistente", "/sistema/seguridad?tab=entorno-persistente"],
