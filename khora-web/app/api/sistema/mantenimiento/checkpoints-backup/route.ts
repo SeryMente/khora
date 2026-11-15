@@ -3,7 +3,8 @@ import { cifrarStream } from "@/lib/server/cripto";
 import { getDb } from "@/lib/server/neon";
 import { putEncryptedObjectStream } from "@/lib/server/object-storage";
 import { createHash, randomUUID } from "node:crypto";
-import { Readable } from "node:stream";
+import { PassThrough, Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
 import { createGzip } from "node:zlib";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -59,6 +60,27 @@ function baselineMatches(row: Baseline) {
     iso(row.oldest) === EXPECTED.oldest &&
     iso(row.newest) === EXPECTED.newest
   );
+}
+
+
+async function* gzipStream(source: AsyncIterable<Uint8Array>): AsyncGenerator<Buffer> {
+  const input = Readable.from(source);
+  const gzip = createGzip({ level: 3 });
+  const output = new PassThrough();
+  const pumping = pipeline(input, gzip, output);
+  let completed = false;
+  try {
+    for await (const chunk of output) yield Buffer.from(chunk);
+    await pumping;
+    completed = true;
+  } finally {
+    if (!completed) {
+      input.destroy();
+      gzip.destroy();
+      output.destroy();
+      await pumping.catch(() => undefined);
+    }
+  }
 }
 
 function line(value: unknown): Buffer {
@@ -168,7 +190,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   if (!(await operatorSession())) return reply({ error: "no_autorizado" }, 401);
   const origin = req.headers.get("origin");
-  if (origin && new URL(origin).origin !== req.nextUrl.origin) return reply({ error: "origen_no_permitido" }, 403);
+  if (!origin || new URL(origin).origin !== req.nextUrl.origin) return reply({ error: "origen_no_permitido" }, 403);
 
   const form = await req.formData().catch(() => null);
   if (!form || form.get("confirm") !== CONFIRM || form.get("expectedRows") !== EXPECTED.rows) {
@@ -187,7 +209,7 @@ export async function POST(req: NextRequest) {
     transactionOpen = true;
     await client.query("SET LOCAL lock_timeout = '30000ms'");
     // SHARE blocks new INSERT/UPDATE/DELETE while preserving ordinary SELECT access.
-    await client.query("LOCK TABLE public.dictado_session, public.dictado_checkpoint IN SHARE MODE");
+    await client.query("LOCK TABLE public.dictado_checkpoint IN SHARE MODE");
 
     const baselineResult = await client.query(
       `SELECT count(*)::text AS row_count,
@@ -199,20 +221,13 @@ export async function POST(req: NextRequest) {
     const baseline = baselineResult.rows[0] as Baseline;
     if (!baselineMatches(baseline)) throw new Error("checkpoint_backup_baseline_changed");
 
-    const jsonl = Readable.from(exportCheckpointJsonl(client, baseline, exportStats));
-    const gzip = createGzip({ level: 3 });
-    jsonl.pipe(gzip);
-    try {
-      const encrypted = cifrarStream(gzip);
-      backup = await putEncryptedObjectStream(
-        `backups/dictado_checkpoint/checkpoints_backup_historico-${randomUUID()}.jsonl.gz.khc`,
-        encrypted,
-        { contentType: "application/octet-stream" },
-      );
-    } finally {
-      jsonl.destroy();
-      gzip.destroy();
-    }
+    const compressed = gzipStream(exportCheckpointJsonl(client, baseline, exportStats));
+    const encrypted = cifrarStream(compressed);
+    backup = await putEncryptedObjectStream(
+      `backups/dictado_checkpoint/checkpoints_backup_historico-${randomUUID()}.jsonl.gz.khc`,
+      encrypted,
+      { contentType: "application/octet-stream" },
+    );
 
     if (
       exportStats.rows !== Number(EXPECTED.rows) ||
