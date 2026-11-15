@@ -266,7 +266,6 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     ui_ids: [
       "pipeline.container",
       "revision.audio-player",
-      "revision.storage-parts",
       "revision.btn-play-pause",
       "revision.audio-seek-slider",
       "revision.btn-download-mp3"

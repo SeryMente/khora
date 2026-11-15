@@ -156,7 +156,6 @@ export function PipelineView({
     generatingTitle,
     titleError,
     manifiestoPartes,
-    currentPartIndex,
     audioSourceUrl,
     currentTimeMs,
     duracionTotalMs,
@@ -622,9 +621,19 @@ export function PipelineView({
                             data-ui-id="revision.reading-prose"
                             className="p-6 border bg-zinc-900/40 border-zinc-800 rounded-none max-w-prose min-h-[280px]"
                           >
-                            <span className="font-serif leading-relaxed text-base">
-                              {editableTexto}
-                            </span>
+                            {editableTexto.trim() ? (
+                              <span className="font-serif leading-relaxed text-base">
+                                {editableTexto}
+                              </span>
+                            ) : selectedItem.audio?.present ? (
+                              <p className="text-sm opacity-70 italic">
+                                Esta unidad conserva el audio original, pero todavía no tiene transcripción.
+                              </p>
+                            ) : (
+                              <p className="text-sm opacity-70 italic">
+                                Esta unidad no contiene transcripción.
+                              </p>
+                            )}
                           </div>
                         ) : (
                           <textarea
@@ -761,37 +770,12 @@ export function PipelineView({
                     >
                       <div className="flex justify-between items-center text-xs font-mono">
                         <span className="font-bold flex items-center gap-1">
-                          <Icons.Volume2 size={14} /> Reproductor Continuo
-                          (Parte {currentPartIndex} /{" "}
-                          {manifiestoPartes.length || 1})
+                          <Icons.Volume2 size={14} /> Audio de la unidad
                         </span>
                         {renderAudioStatusBadge(selectedItem.audio_status, selectedItem.audio_explanation)}
                       </div>
 
-                      {manifiestoPartes.some((part: any) => part.storage_provider === "vercel_blob_legacy") && (
-                        <div data-ui-id="revision.storage-parts" className="border border-amber-500/30 bg-amber-950/10 p-3 space-y-2">
-                          <div className="text-[10px] font-mono uppercase font-bold text-amber-200">
-                            Estado de almacenamiento por archivo
-                          </div>
-                          <div className="max-h-40 overflow-y-auto space-y-1 pr-1">
-                            {manifiestoPartes.map((part: any) => (
-                              <div key={part.part_index} className="flex flex-wrap justify-between gap-x-3 gap-y-1 text-[10px] font-mono border-b border-zinc-800/70 pb-1">
-                                <span>Parte {part.part_index}</span>
-                                <span className={part.storage_provider === "vercel_blob_legacy" ? "text-amber-200" : part.storage_provider === "backblaze_b2" ? "text-sky-300" : "text-zinc-400"}>
-                                  {part.storage_provider === "vercel_blob_legacy"
-                                    ? "Vercel Blob · temporalmente no disponible · migración pendiente"
-                                    : part.storage_provider === "backblaze_b2"
-                                      ? "Backblaze B2 · referencia registrada; disponibilidad no comprobada ahora"
-                                      : "Proveedor de almacenamiento no identificado"}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                          <p className="text-[10px] text-amber-100/80">
-                            Los objetos históricos se conservan. Su indisponibilidad no invalida el texto ni bloquea la edición del registro.
-                          </p>
-                        </div>
-                      )}
+
 
                       {audioError && (
                         <div className="p-2 border border-red-500/50 bg-red-950/30 text-xs font-mono text-red-300">
@@ -826,7 +810,7 @@ export function PipelineView({
                               onClick={() => actions.onExportMp3?.()}
                               disabled={exportingMp3 || Number(selectedItem.storage_summary?.legacy_pending_count || 0) > 0}
                               className="px-2 py-1 border border-emerald-500/50 bg-emerald-950/30 hover:bg-emerald-900/50 text-emerald-300 font-bold text-[10px] flex items-center gap-1 cursor-pointer shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
-                              title={Number(selectedItem.storage_summary?.legacy_pending_count || 0) > 0 ? "No se puede reconstruir el audio completo mientras haya partes históricas en Vercel Blob pendientes de recuperación." : "Descargar el MP3 conservado"}
+                              title={Number(selectedItem.storage_summary?.legacy_pending_count || 0) > 0 ? "No se puede reconstruir el audio completo mientras el audio histórico permanezca temporalmente no disponible." : "Descargar el MP3 conservado"}
                             >
                               <Icons.Download size={13} />
                               {exportingMp3 ? "Generando MP3..." : "Descargar MP3"}
@@ -845,36 +829,7 @@ export function PipelineView({
                             />
                           </div>
 
-                          <div className="flex justify-between items-center text-xs font-mono pt-1 border-t border-zinc-800">
-                            <button
-                              disabled={currentPartIndex <= 1}
-                              onClick={() =>
-                                actions.onManualPartChange?.(
-                                  currentPartIndex - 1,
-                                )
-                              }
-                              className="px-2 py-1 border border-zinc-700 hover:bg-zinc-800 disabled:opacity-40 cursor-pointer"
-                            >
-                              Parte anterior
-                            </button>
-                            <span className="opacity-80">
-                              Parte {currentPartIndex} de{" "}
-                              {manifiestoPartes.length || 1}
-                            </span>
-                            <button
-                              disabled={
-                                currentPartIndex >= manifiestoPartes.length
-                              }
-                              onClick={() =>
-                                actions.onManualPartChange?.(
-                                  currentPartIndex + 1,
-                                )
-                              }
-                              className="px-2 py-1 border border-zinc-700 hover:bg-zinc-800 disabled:opacity-40 cursor-pointer"
-                            >
-                              Parte siguiente
-                            </button>
-                          </div>
+
                         </div>
                       ) : (
                         <div className="text-xs font-mono opacity-60 italic">
