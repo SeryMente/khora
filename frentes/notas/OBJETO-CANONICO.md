@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.31; OBJECT_VERSION=0.1.6; OBJECT_SEAL=NOTAS-v0.1.6; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.31; OBJECT_VERSION=0.1.7; OBJECT_SEAL=NOTAS-v0.1.7; SINGLE_LIVE_OBJECT=true -->
 # Notas de Khora · Objeto canónico de persistencia del frente
 
-> **ESTADO · FRENTE ACTIVO · CONTROL ASIGNADO · GENERACIÓN 3 · COMPONENTE NO DESARROLLADO.** Este documento es la única fuente viva del frente. La versión 0.1.6 corresponde al OCP, no al producto.
+> **ESTADO · FRENTE ACTIVO · CONTROL ASIGNADO · GENERACIÓN 4 · IMPLEMENTACIÓN EN RAMA; PRODUCCIÓN PENDIENTE.** Este documento es la única fuente viva del frente. La versión 0.1.7 corresponde al OCP, no al producto.
 
 ## 1. Control e identidad
 
@@ -10,9 +10,9 @@
 - **Repositorio:** `SeryMente/khora`, rama `main`.
 - **OCP:** `frentes/notas/`.
 - **Núcleo único:** este `OBJETO-CANONICO.md`.
-- **Versión documental:** `0.1.6` · sello `NOTAS-v0.1.6`.
-- **Control:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json), `status=assigned`, generación `3`; alias operativo local `chatgpt-notas-retoma-20261114-01a1db72-d52f-7bc8-bd52-56552d8ccd8d`.
-- **UUIDv7 local:** `01a1db72-d52f-7bc8-bd52-56552d8ccd8d`; ID nativo no expuesto (`owner_thread=null`). No se creó folio SES en esta retoma; conforme a ART-024, UUID/alias son metadatos locales opcionales. **FOL1:** PREPARADO, NO ACTIVO; folios globales CONV/CICLO/A/B PENDIENTES / NO ASIGNADOS.
+- **Versión documental:** `0.1.7` · sello `NOTAS-v0.1.7`.
+- **Control:** [CONTROL-RESPONSABILIDAD.json](CONTROL-RESPONSABILIDAD.json), `status=assigned`, generación `4`; alias operativo local `chatgpt-notas-retoma-20261115-01a1e054-330a-72ce-a0c8-0bec479a50f4`.
+- **UUIDv7 local:** `01a1e054-330a-72ce-a0c8-0bec479a50f4`; ID nativo no expuesto (`owner_thread=null`). Conforme a ART-024, UUID/alias son metadatos locales, no ID nativo. **FOL1:** PREPARADO, NO ACTIVO; folios globales CONV/CICLO/A/B PENDIENTES / NO ASIGNADOS.
 - **Evento de apertura documental:** `01a1d0ca-d1da-75ec-a98d-af5a96f070d1`, UUIDv7 local generado para este evento; no es ID nativo de plataforma.
 - **Origen:** instrucción directa del operador del 2026-11-12, preservada en [originales/INSTRUCCION-ORIGINAL-20261112.md](originales/INSTRUCCION-ORIGINAL-20261112.md).
 
@@ -90,7 +90,7 @@ Estos puntos son **pendientes de definición**, no funcionalidades aprobadas ni 
 
 ## 6. Autoridad
 
-La instrucción original autorizó la apertura documental. La instrucción directa posterior del operador —«Asue responsabilidad d efrente de trabajo Notas Rapidas de Khora»— autorizó la asunción anterior. El 2026-11-14, el operador instruyó explícitamente a esta sesión tomar el lugar del modelo anterior, retomar el Frente NOTAS y persistir la conversación y su última salida; esta instrucción releva al titular previo y autoriza la actualización documental/control.
+La instrucción original autorizó la apertura documental. La instrucción directa posterior del operador —«Asue responsabilidad d efrente de trabajo Notas Rapidas de Khora»— autorizó la asunción anterior. El 2026-11-14, el operador instruyó explícitamente a esta sesión tomar el lugar del modelo anterior, retomar el Frente NOTAS y persistir la conversación y su última salida; esta instrucción relevó al titular previo. El 2026-11-15, el operador volvió a ordenar la retoma y la persistencia de `ChatGPT-NOTAS-20261115-1144.md`, con reproducción literal de la última salida visible; esta instrucción autoriza la actualización documental/control a generación 4, sin ampliar permisos de migración, merge o despliegue.
 
 El objetivo general del frente es desarrollar Notas. La definición funcional detallada, los criterios de aceptación y las decisiones de arquitectura siguen pendientes de ratificación. No convertir propuestas del asistente/constructor en requisitos aprobados. Los cambios de producto, datos, seguridad, secretos, servicios externos y producción siguen sujetos a sus autorizaciones y compuertas específicas. Esta retoma no amplía esos permisos.
 
@@ -98,23 +98,23 @@ El objetivo general del frente es desarrollar Notas. La definición funcional de
 
 - Repositorio de documentación y código: `SeryMente/khora`, rama `main`.
 - Revisión base de KHORA al abrir el frente: `7781939197333efe98aea35c0fe05c7eb31dd7fb`.
-- **RDC usado en esta retoma:** equipo `PC10RCIF4EI4`, perfil `CENTRAL\fila4`; se leyó únicamente `C:\Users\fila4\Downloads\ChatGPT-NOTAS-20261114-1254.md`.
+- **RDC usado en la retoma anterior:** equipo `PC10RCIF4EI4`, perfil `CENTRAL\fila4`; se leyó `C:\Users\fila4\Downloads\ChatGPT-NOTAS-20261114-1254.md`.
+- **RDC usado en esta retoma:** fuente `015RENTA02`, perfil `PC`, archivo `C:\Users\PC\Downloads\ChatGPT-NOTAS-20261115-1144.md`; destino de persistencia en `PC10RCIF4EI4`, perfil propietario `CENTRAL\fila4`, rama de trabajo `work/notas-quick-capture-20261114`.
 - No se modificó el equipo ni se revalidaron hardware, espacio de disco, credenciales, bases de datos o despliegues. Las especificaciones HP del B histórico pertenecen al ciclo del 12-11-2026 y no se reexaminaron ahora.
 - El repositorio es privado; los prompts deben operar con las fuentes y permisos efectivamente disponibles en la conversación nueva.
 
+
 ## 8. Estado vivo
 
-**Acción actual:** la retoma del 2026-11-14 se registró en generación 3; OCP documental **0.1.6**, sello **NOTAS-v0.1.6**. Se archivó la exportación completa de la conversación y una entrada A/B con la instrucción del operador y la última salida final visible del modelo anterior. Esta modificación es documental; el componente sigue **NO DESARROLLADO** y sin especificación funcional detallada. No se modificó código de producto, esquema, datos, credenciales, seguridad, proveedores, despliegue ni producción.
+**Acción actual (2026-11-15):** la retoma está registrada en generación 4; OCP documental **0.1.7**, sello **NOTAS-v0.1.7**. La exportación completa `ChatGPT-NOTAS-20261115-1144.md` se recuperó por RDC desde `015RENTA02` y se persistió íntegramente en `originales/`; SHA-256 `8EB1D53913A3B61214AF50685ABB6C895BCBCFE710605C305DB417D7D26FD1DC`, 115.222 bytes y 2.275 líneas, cotejados byte por byte. La instrucción del operador y la última salida final visible del modelo anterior se conservan en el registro A/B del 15-11.
 
-**Siguiente paso de la conversación de trabajo:**
+**Estado del producto:** Notas está implementado en la rama `work/notas-quick-capture-20261114`, commit `094ea8772b88d15b53154da52f40e4adb5d4da47`, con 35 archivos de implementación e integración. Las pruebas locales registradas incluyen typecheck, UI contract, UI review, unitarias 612/612, integración PostgreSQL/PGlite 13/13, build con 79 páginas y E2E de Notas 5/5. `shell-v2` queda 2/3 por una expectativa antigua en `/grafo`; esa ruta y su prueba se mantienen intactas. La instalación reportó 23 vulnerabilidades de auditoría, incluida una crítica; no se aplicó `npm audit fix`.
 
-1. Adquirir el contexto de este OCP y recuperar el archivo **originales/ChatGPT-NOTAS-20261112-1630.md**.
-2. Inspeccionar en lectura la arquitectura, componentes de interfaz, rutas, patrones y persistencia de KHORA que puedan ser pertinentes.
-3. Acordar con el operador el comportamiento mínimo de Notas y sus criterios observables de aceptación.
-4. Separar decisiones ratificadas, hipótesis y propuestas; no inferir funcionalidad por el nombre.
-5. Preparar una unidad de trabajo acotada para el constructor solo cuando existan definición y autorizaciones específicas.
+**Producción:** la migración `034_notes.sql` NO está aplicada ni verificada en Neon Production. No se ha realizado conexión a Neon, merge a `main`, despliegue ni smoke test productivo. La instrucción de producción impide expresamente merge o despliegue antes de la migración verificada. `origin/main` se observó en `fae473c21985d38623d4b693c10af32176536b95`; no se ha incorporado a la rama de Notas. Vercel tiene integración Git activa y la URL canónica es `https://khora-web.vercel.app`; el Preview de la rama reportó dos pruebas MCP con 503 en lugar de 401, pendiente de diagnóstico.
 
-**Pendientes abiertos:** definición funcional, UX/UI, modelo de estado/datos, persistencia/recuperación, integración con navegación y contratos existentes, seguridad/privacidad, pruebas y aceptación.
+**Siguiente paso:** el operador debe introducir la URL de la rama Production de Neon directamente en la terminal RDC autorizada con `Read-Host -AsSecureString`; ejecutar `npm.cmd run db:migrate:notes` con el control de destino previsto y comprobar el resultado transaccional. No pedir, imprimir ni almacenar secretos en chat o repositorio. Después: reconciliar la rama con el `main` vigente, repetir validaciones, obtener autorización para merge y solo entonces permitir el despliegue automático y smoke tests reales. La prueba `/grafo` queda fuera de alcance e intacta.
+
+**Pendientes abiertos:** aplicación y verificación de `034_notes.sql` en Neon Production; diagnóstico de las dos pruebas MCP fallidas en Preview; actualización de la rama respecto de `origin/main`; merge y smoke tests productivos sujetos a la compuerta del operador.
 
 ## 9. Aceptación y viabilidad
 
@@ -138,6 +138,9 @@ Aplicar el formato obligatorio de Metacanon §4 en cada ciclo sustantivo: identi
 - [Salida visible de apertura](originales/SALIDA-MODELO-20261112.md), incorporada y leída de vuelta en el cierre documental de la publicación.
 - [Conversación del 12-11](originales/ChatGPT-NOTAS-20261112-1630.md): registro documental condensado.
 - [Exportación del 14-11](originales/ChatGPT-NOTAS-20261114-1254.md): archivo recuperado de Downloads por RDC; SHA-256 de la fuente `58315C9FD78A85E5588BB9E861DEFE08E4C9470954BF37904E2CECA1B49A1A7B`.
+- [Exportación del 15-11](originales/ChatGPT-NOTAS-20261115-1144.md): transcript completo de 2.275 líneas; SHA-256 `8EB1D53913A3B61214AF50685ABB6C895BCBCFE710605C305DB417D7D26FD1DC`.
+- [Retoma A/B del 15-11](originales/RETOMA-NOTAS-20261115-AB.md): instrucción actual literal y salida final del ciclo previo reproducida sin reformulación.
+- [Crónica de retoma del 15-11](cronica/RETOMA-20261115.md): retoma, estado de rama y compuerta de producción.
 - [Retoma A/B del 14-11](originales/RETOMA-NOTAS-20261114-AB.md): instrucción actual literal y reproducción de la última salida final visible del ciclo anterior.
 - Fuentes de gobierno: `SeryMente/metodologia/main`; estado y discrepancias documentados en §3.
 - Fuentes de producto: `SeryMente/khora` en `main`; corte base `7781939197333efe98aea35c0fe05c7eb31dd7fb`.
@@ -150,7 +153,7 @@ Aplicar el formato obligatorio de Metacanon §4 en cada ciclo sustantivo: identi
 - Conversación condensada anterior: [ChatGPT-NOTAS-20261112-1630.md](originales/ChatGPT-NOTAS-20261112-1630.md).
 - Exportación completa recuperada: [ChatGPT-NOTAS-20261114-1254.md](originales/ChatGPT-NOTAS-20261114-1254.md).
 - Último B visible y su A de retoma: [RETOMA-NOTAS-20261114-AB.md](originales/RETOMA-NOTAS-20261114-AB.md).
-- Control actual: **assigned**, generación **3**; alias local **chatgpt-notas-retoma-20261114-01a1db72-d52f-7bc8-bd52-56552d8ccd8d**; UUIDv7 local **01a1db72-d52f-7bc8-bd52-56552d8ccd8d**; `session_folio=null`; `owner_thread=null` (ID nativo no expuesto).
+- Control actual: **assigned**, generación **4**; alias local **chatgpt-notas-retoma-20261115-01a1e054-330a-72ce-a0c8-0bec479a50f4**; UUIDv7 local **01a1e054-330a-72ce-a0c8-0bec479a50f4**; `session_folio=null`; `owner_thread=null` (ID nativo no expuesto).
 - El alias y UUID local no identifican la conversación nativa. FOL1 sigue PREPARADO/NO ACTIVO: no se emiten folios globales CV/CY/A/B.
 - La instrucción expresa del operador para tomar el lugar del modelo anterior releva el titular previo; no requiere segunda aprobación ni aceptación del titular saliente.
 - Los originales y registros previos se conservan como antecedentes; la nueva exportación se incorpora íntegra y la nueva entrada A/B distingue A literal, B final visible y procedencia.
@@ -210,3 +213,15 @@ El operador ordenó retomar el Frente NOTAS tomando el lugar del modelo anterior
 - **Persistencia comprobada en rama documental:** `docs/notas-retoma-20261114`, creada desde `main` en `3abdecfa552547851621c98fcdda4e93147f1893`. El archivo de conversación se leyó de vuelta y su texto coincide con el contenido enviado; el control también se leyó de vuelta en generación 3.
 - **Alcance:** actualización exclusivamente documental y del control de responsabilidad. Sin cambios de código, datos o infraestructura. Las afirmaciones sobre hardware y cuota RDC dentro de B son históricas, no una medición repetida en esta retoma.
 - **Continuidad del producto:** mantener separados Notas y EP. La evaluación BMAD/OpenCode/Groq/RDC pertenece al OCP de EP según §16; el desarrollo funcional de Notas continúa pendiente de definición con el operador.
+
+## 18. Retoma, implementación en rama y compuerta de producción · 2026-11-15
+
+El operador instruyó persistir la conversación exportada y conservar literalmente la última salida final visible del ciclo anterior. La instrucción y la salida B están en [RETOMA-NOTAS-20261115-AB.md](originales/RETOMA-NOTAS-20261115-AB.md); la exportación íntegra está en [ChatGPT-NOTAS-20261115-1144.md](originales/ChatGPT-NOTAS-20261115-1144.md). Fuente RDC: `015RENTA02`; SHA-256 fuente/destino `8EB1D53913A3B61214AF50685ABB6C895BCBCFE710605C305DB417D7D26FD1DC`; 115.222 bytes y 2.275 líneas, cotejados byte por byte.
+
+**Responsabilidad:** generación 4, UUIDv7 local `01a1e054-330a-72ce-a0c8-0bec479a50f4`, alias `chatgpt-notas-retoma-20261115-01a1e054-330a-72ce-a0c8-0bec479a50f4`; titular previo generación 3 relevado por instrucción expresa. ID nativo no expuesto; FOL1 PREPARADO/NO ACTIVO y folios globales no asignados.
+
+**Estado de código:** la rama `work/notas-quick-capture-20261114` contiene el módulo Notas implementado y su commit de cierre `094ea8772b88d15b53154da52f40e4adb5d4da47`; el remoto de la rama coincide. El `main` remoto observado es `fae473c21985d38623d4b693c10af32176536b95`. Esta retoma se persiste en la rama de trabajo; no se hace merge ni push a `main`.
+
+**Estado de producción:** `034_notes.sql` sigue pendiente de aplicación y verificación en Neon Production. No se conectó a Neon, no se aplicó la migración, no se hizo merge, ni se desplegó. Vercel tiene integración Git activa y la URL canónica `https://khora-web.vercel.app`; el Preview informó dos fallos MCP (503 en vez de 401). El test `shell-v2` mantiene 2/3 por expectativa antigua en `/grafo`, que el operador ordenó dejar intacta.
+
+**Regla vigente:** no hacer merge a `main` ni desplegar hasta que `034_notes.sql` esté aplicada y verificada en Neon Production. El operador debe introducir el secreto solo en la terminal autorizada mediante `Read-Host -AsSecureString`; nunca por chat ni en archivos del repositorio. Tras la migración, reconciliar con el `main` vigente, repetir validaciones y ejecutar smoke tests reales contra la URL canónica.
