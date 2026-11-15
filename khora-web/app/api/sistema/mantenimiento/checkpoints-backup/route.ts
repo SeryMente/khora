@@ -341,8 +341,8 @@ export async function POST(req: NextRequest) {
       rows_after_error: actualRows,
       backup: {
         b2_key: backup?.pathname || BACKUP_PATH,
-        bytes: backup.bytes,
-        sha256: backup.sha256,
+        bytes: backup?.bytes ?? null,
+        sha256: backup?.sha256 ?? null,
         readback_verified: backup?.readbackVerified ?? false,
       },
       exported_rows_before_failure: exportStats.rows,
