@@ -1,0 +1,40 @@
+{
+  "schema": "responsabilidad-frente/1",
+  "front": "espacio",
+  "canonical_identity": "KHORA-ESPACIO",
+  "repository": "SeryMente/khora",
+  "state_object": "frentes/espacio/OBJETO-CANONICO.md",
+  "status": "assigned",
+  "owner_thread": null,
+  "owner_alias": "chatgpt-espacio-01a1e0b4-9f9b-77b7-9a90-ca1568b927e5",
+  "owner_alias_type": "operational_alias_not_native_thread_id",
+  "owner_uuidv7_local": "01a1e0b4-9f9b-77b7-9a90-ca1568b927e5",
+  "instance": "ChatGPT · GPT-6 · mediación del Frente ESPACIO",
+  "session_folio": null,
+  "session_folio_status": "PENDIENTE/NO ASIGNADO",
+  "generation": 1,
+  "expiry": null,
+  "authorization_ref": "Instrucción directa del operador en esta conversación, 2026-11-15 (America/Mexico_City): «Inaugura y crea frente de trabajo y reigstarlo en la ametodologia». El operador nombra el frente «ESPACIO» y aporta el prompt explicativo preservado verbatim en originales/INSTRUCCION-ORIGINAL-20261115.md.",
+  "authorization_event": "ESPACIO-APERTURA-20261115-FCAE05C8",
+  "acquired_at": "2026-11-15",
+  "local_conversation_uuidv7": "01a1e0b4-9f9b-77b7-9a90-ca1568b927e5",
+  "bootstrap_scope": "Mediación y coordinación del Frente ESPACIO; descubrimiento y análisis de la integración Open WebUI reportada; levantamiento de requisitos, comparación funcional con Notion como referencia del módulo de gestión, arquitectura conceptual, priorización, documentación y preparación de criterios de aceptación. Esta asignación no autoriza por sí sola modificaciones de código, esquema o datos, credenciales, seguridad, proveedores, despliegue ni producción; cada actuación técnica o productiva conserva su autorización y compuertas específicas.",
+  "enforcement": "cooperative registry; no server fencing of arbitrary writes",
+  "claim_policy": "Apertura inicial autorizada por instrucción expresa del operador que identifica el frente y solicita crearlo y registrarlo. Esta es la generación inicial 1; no se transfiere titularidad previa ni se desplaza a otro frente. Mantener un único responsable activo. UUIDv7 y alias son metadatos locales, no ID nativo ni mecanismo de fencing. La foliación global no se emite mientras FOL1 no esté ACTIVO.",
+  "created_event": {
+    "event_uuidv7_local": "01a1e0b4-9f9b-718f-abdf-d2bbfcae05c8",
+    "event_id": "ESPACIO-APERTURA-20261115-FCAE05C8",
+    "date": "2026-11-15",
+    "source": "Mensaje directo del operador en esta conversación de apertura; ID nativo de conversación no expuesto.",
+    "original_path": "frentes/espacio/originales/INSTRUCCION-ORIGINAL-20261115.md"
+  },
+  "folio_collision_check": {
+    "searched_scope": "No se realizó búsqueda global de colisiones; alias y UUIDv7 son metadatos locales.",
+    "repositories_searched": [],
+    "alias": "chatgpt-espacio-01a1e0b4-9f9b-77b7-9a90-ca1568b927e5",
+    "uuidv7": "01a1e0b4-9f9b-77b7-9a90-ca1568b927e5",
+    "matches_found": null,
+    "global_uniqueness": "not_verified"
+  },
+  "folio_status_note": "FOL1 permanece PREPARADO/NO ACTIVO según ART-024 vigente; no se emite SES ni folio CV/CY/A/B. La ausencia de folio no bloquea la apertura ni la continuidad."
+}
