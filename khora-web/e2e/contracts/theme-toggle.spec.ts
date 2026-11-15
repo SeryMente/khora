@@ -17,7 +17,10 @@ test.describe("ThemeToggle Component Contract & E2E", () => {
   }) => {
     // 1. Go to root home page which displays SystemBar and its options
     await page.goto("/");
-    await expect(page).toHaveURL(/.*localhost:3000.*/);
+    const expectedOrigin = new URL(
+      process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000"
+    ).origin;
+    expect(new URL(page.url()).origin).toBe(expectedOrigin);
 
     // 2. Default theme should be dark (dataset.theme on <html> element)
     const htmlElement = page.locator("html");
