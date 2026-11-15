@@ -7,6 +7,7 @@ import { cifrarTexto, descifrarTexto } from "./cripto";
 import { generarTituloConGarantia, asignarTituloVolcado, esTituloGenericoOInvalido } from "./titulos";
 import { autoaplicarTildesSeguras } from "./tildesSeguras";
 import { registrarEvento } from "./eventos";
+import { evaluarCustodiaAudio } from "../audio/custodia";
 
 export type EstadoVolcado = "archivado" | "pendiente_revision" | "en_revision" | "listo_ingesta" | "ingerido" | "fallido";
 
@@ -116,10 +117,48 @@ export async function prepararVolcadoParaRevision(
     }
 
     if (!tieneV1) {
-      if (!textoClaro) {
-        throw new Error("Transcripción vacía al preparar versión v1");
+      if (!textoClaro.trim()) {
+        // A unit may contain only its original audio. Promote it to review only
+        // when the completed, owner-bound session has every audio part verified.
+        if (!["dictado", "dialogo"].includes(String(v.fuente ?? ""))) {
+          throw new Error("Transcripción vacía: la fuente no acredita una captura de audio.");
+        }
+        const sessionId = String(v.session_id ?? "").trim();
+        if (!sessionId) {
+          throw new Error("Transcripción vacía: falta la sesión que vincula el audio original.");
+        }
+        const sessionRes = await client.query(
+          "SELECT estado, total_partes FROM dictado_session WHERE session_id = $1 AND volcado_id = $2 FOR UPDATE",
+          [sessionId, volcadoId],
+        );
+        const session = sessionRes.rows[0];
+        const totalPartes = Number(session?.total_partes);
+        if (session?.estado !== "complete" || !Number.isSafeInteger(totalPartes) || totalPartes <= 0) {
+          throw new Error("Audio sin transcripción: la sesión no está completa o no declara un total de partes válido.");
+        }
+        const partesRes = await client.query(
+          `SELECT part_index, bytes, sha256, estado_verificacion
+           FROM dictado_audio_parte
+           WHERE session_id = $1 AND volcado_id = $2
+           ORDER BY part_index ASC`,
+          [sessionId, volcadoId],
+        );
+        const custodiaAudio = evaluarCustodiaAudio(
+          partesRes.rows.map((parte: any) => ({
+            part_index: Number(parte.part_index),
+            bytes: Number(parte.bytes),
+            sha256: parte.sha256,
+            estado_verificacion: parte.estado_verificacion,
+          })),
+          totalPartes,
+        );
+        if (!custodiaAudio.ok) {
+          throw new Error(`Audio sin transcripción: no se puede preparar la unidad sin custodia íntegra: ${custodiaAudio.motivo}`);
+        }
+        await crearVersion(volcadoId, "", "audio original verificado sin transcripción", client);
+      } else {
+        await crearVersion(volcadoId, textoClaro, "transcripcion original del dictado", client);
       }
-      await crearVersion(volcadoId, textoClaro, "transcripcion original del dictado", client);
     }
 
     if (!textoClaro.trim()) {
