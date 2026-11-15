@@ -234,3 +234,199 @@ export async function listB2Objects() {
   }
   throw new Error('storage_listing_limit');
 }
+
+
+/**
+ * Streams one encrypted KHC2 archive to a single native B2 large-file object.
+ * Parts are bounded in memory; the finished object is physically downloaded
+ * again and checked byte-for-byte by length and SHA-256 before success is returned.
+ */
+export async function putEncryptedObjectStream(
+  pathname: string,
+  source: AsyncIterable<Uint8Array>,
+  options: { contentType?: string; partSize?: number } = {},
+) {
+  const MIN_PART = 5 * 1024 * 1024;
+  const DEFAULT_PART = 100 * 1024 * 1024;
+  const MAX_PART = 5 * 1024 * 1024 * 1024;
+  const partSize = options.partSize ?? DEFAULT_PART;
+  if (!Number.isSafeInteger(partSize) || partSize < MIN_PART || partSize > MAX_PART) {
+    throw new Error('storage_b2_multipart_part_size_invalid');
+  }
+  if (!b2Enabled()) throw new Error('storage_b2_not_enabled');
+  const c = storageLocation();
+  if (!c.bucket || !c.bucketId) throw new Error('storage_b2_bucket_config_missing');
+  const auth = await authorize();
+  const bucket = await bucketMetadata(auth);
+  const encryption = bucket.defaultServerSideEncryption;
+  if (
+    encryption?.isClientAuthorizedToRead !== true ||
+    encryption.value?.mode !== 'SSE-B2' ||
+    encryption.value?.algorithm !== 'AES256'
+  ) throw new Error('storage_b2_sse_b2_required');
+
+  const key = safeObjectKey(
+    pathname.startsWith('khora/') ? pathname : 'khora/' + pathname,
+  );
+  const started = await b2Json<{ fileId: string }>(
+    auth,
+    'b2_start_large_file',
+    {
+      bucketId: c.bucketId,
+      fileName: key,
+      contentType: options.contentType || 'application/octet-stream',
+      fileInfo: {
+        format: 'khora-checkpoint-backup-khc2-jsonl-gzip-v1',
+        source: 'dictado_checkpoint',
+      },
+    },
+  );
+  if (!started.fileId) throw new Error('storage_b2_large_file_start_invalid');
+  const fileId = started.fileId;
+  let finished = false;
+  let totalBytes = 0;
+  let partCount = 0;
+  const sha256 = createHash('sha256');
+  const partSha1Array: string[] = [];
+
+  async function* boundedParts(): AsyncGenerator<Buffer> {
+    let chunks: Buffer[] = [];
+    let chunkBytes = 0;
+    let firstChunk = true;
+
+    for await (const raw of source) {
+      const data = Buffer.from(raw);
+      if (!data.length) continue;
+      if (firstChunk) {
+        firstChunk = false;
+        if (data.length < 4 || data.subarray(0, 4).toString('ascii') !== 'KHC2') {
+          throw new Error('storage_requires_khc2_stream_envelope');
+        }
+      }
+      sha256.update(data);
+      totalBytes += data.length;
+      let offset = 0;
+      while (offset < data.length) {
+        const take = Math.min(partSize - chunkBytes, data.length - offset);
+        chunks.push(data.subarray(offset, offset + take));
+        chunkBytes += take;
+        offset += take;
+        if (chunkBytes === partSize) {
+          yield Buffer.concat(chunks, chunkBytes);
+          chunks = [];
+          chunkBytes = 0;
+        }
+      }
+    }
+    if (chunkBytes > 0) yield Buffer.concat(chunks, chunkBytes);
+    if (firstChunk) throw new Error('storage_empty_encrypted_stream');
+  }
+
+  async function uploadPart(partNumber: number, part: Buffer): Promise<string> {
+    const digest = createHash('sha1').update(part).digest('hex');
+    const send = async (target: { uploadUrl: string; authorizationToken: string }) => {
+      const response = await fetch(target.uploadUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: target.authorizationToken,
+          'X-Bz-Part-Number': String(partNumber),
+          'Content-Type': 'application/octet-stream',
+          'Content-Length': String(part.length),
+          'X-Bz-Content-Sha1': digest,
+        },
+        body: new Uint8Array(part),
+        cache: 'no-store',
+        redirect: 'error',
+        signal: AbortSignal.timeout(120000),
+      });
+      return jsonResponse<{ fileId: string; partNumber: number; contentLength: number }>(
+        response,
+        'storage_b2_upload_part_failed',
+      );
+    };
+
+    let target = await b2Json<{ fileId: string; uploadUrl: string; authorizationToken: string }>(
+      auth,
+      'b2_get_upload_part_url',
+      { fileId },
+    );
+    try {
+      await send(target);
+    } catch (error) {
+      const status = (error as Error & { status?: number }).status;
+      if (status !== undefined && status < 500) throw new Error('storage_b2_upload_part_failed');
+      target = await b2Json(
+        auth,
+        'b2_get_upload_part_url',
+        { fileId },
+      );
+      await send(target).catch(() => {
+        throw new Error('storage_b2_upload_part_failed');
+      });
+    }
+    return digest;
+  }
+
+  try {
+    for await (const part of boundedParts()) {
+      partCount += 1;
+      if (partCount > 10000) throw new Error('storage_b2_large_file_part_limit');
+      partSha1Array.push(await uploadPart(partCount, part));
+    }
+
+    if (totalBytes < MIN_PART || partCount < 2) {
+      throw new Error('storage_b2_large_file_requires_two_parts');
+    }
+
+    const expectedSha256 = sha256.digest('hex');
+    await b2Json(
+      auth,
+      'b2_finish_large_file',
+      { fileId, partSha1Array },
+    );
+    finished = true;
+
+    const response = await fetch(fileDownloadUrl(auth, c.bucket, key), {
+      headers: { Authorization: auth.authorizationToken },
+      cache: 'no-store',
+      redirect: 'error',
+      signal: AbortSignal.timeout(240000),
+    });
+    if (!response.ok || !response.body) throw new Error('storage_b2_readback_failed');
+
+    const reader = response.body.getReader();
+    const readbackHash = createHash('sha256');
+    let readbackBytes = 0;
+    try {
+      while (true) {
+        const next = await reader.read();
+        if (next.done) break;
+        const chunk = Buffer.from(next.value);
+        readbackHash.update(chunk);
+        readbackBytes += chunk.length;
+      }
+    } finally {
+      reader.releaseLock();
+    }
+
+    const readbackSha256 = readbackHash.digest('hex');
+    if (readbackBytes !== totalBytes || readbackSha256 !== expectedSha256) {
+      throw new Error('storage_b2_readback_integrity_failed');
+    }
+
+    return {
+      url: b2ObjectUrl(key, c),
+      pathname: key.slice('khora/'.length),
+      bytes: readbackBytes,
+      sha256: readbackSha256,
+      partCount,
+      fileId,
+      readbackVerified: true as const,
+    };
+  } catch (error) {
+    if (!finished) {
+      await b2Json(auth, 'b2_cancel_large_file', { fileId }).catch(() => undefined);
+    }
+    throw error;
+  }
+}
