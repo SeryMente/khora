@@ -38,6 +38,6 @@ Se incorpora Chat como nueva entrada de navegación y ruta `/chat`, manteniendo 
 
 ## Estado y límites
 
-La incorporación de la interfaz/proxy es código en una rama, no Chat activo ni conversación E2E aceptada. CI, lectura de vuelta y revisión de PR se informarán por separado. No hubo cambio de Render, Vercel production, secretos, base de datos, flags ni despliegue.
+La incorporación de la interfaz/proxy es código en una rama, no Chat activo ni conversación E2E aceptada. A las 2026-11-15 23:51 UTC: `UI Contract` y `api-tests` pasaron; el gate web superó typecheck, revisión UI y contrato de navegación; CodeQL Python/Actions/JavaScript finalizó sin fallos. Playwright y el build completo seguían en curso. `calidad` falló antes de pyright/pytest porque Ruff detectó imports desordenados en `tests/test_graph_cycle_regressions.py` y `tests/test_runtime_leiden_contract.py`, archivos no modificados por este PR. No hubo cambio de Render, Vercel production, secretos, base de datos, flags ni despliegue.
 
 FOL1 sigue PREPARADO/NO ACTIVO; no se asignan folios CV/CY/A/B ni SES.
