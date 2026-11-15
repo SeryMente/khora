@@ -18,7 +18,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
       "ingreso.btn-archivar",
       "ingreso.btn-retranscribir",
       "ingreso.btn-adjuntar",
-      "ingreso.btn-dialogo","ingreso.organizar-dialogo",
+      "ingreso.organizar-dialogo",
       "ingreso.btn-exportar-audio",
       "ingreso.btn-limpiar",
       "ingreso.textarea",
@@ -45,9 +45,9 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
   },
   "ingreso:dialogo_chrome": {
     screen:"ingreso",scenario:"dialogo_chrome",title:"Ingreso · Chrome con micrófono",
-    description:"Subfunción de Escuchar a Chrome en el mismo editor, dos señales reales, transcripción al detener y archivo como volcado sin ingesta automática.",
+    description:"Subfunción de Escuchar a Chrome en el mismo editor, dos señales reales, transcripción en vivo independiente por fuente, edición humana protegida y archivo como volcado sin ingesta automática.",
     status:"active",recommended_viewport:"desktop",
-    ui_ids:["ingreso.container","ingreso.btn-chrome","ingreso.btn-dialogo","ingreso.organizar-dialogo","ingreso.btn-iniciar","ingreso.btn-detener","ingreso.textarea","ingreso.btn-archivar","ingreso.custodia-status"]
+    ui_ids:["ingreso.container","ingreso.btn-chrome","ingreso.organizar-dialogo","ingreso.btn-iniciar","ingreso.btn-detener","ingreso.textarea","ingreso.btn-agregar-segmentos-vivos","ingreso.btn-archivar","ingreso.custodia-status"]
   },
   "ingreso:chrome_live_caption": {
     screen: "ingreso",
