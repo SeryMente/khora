@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     const mode = c?.mode === "cronica" ? "cronica" : undefined;
     if (c?.mode !== undefined && c.mode !== "cronica") return NextResponse.json({ detail: "modalidad_no_admitida" }, { status: 400 });
     if (mode === "cronica" && (
-      typeof c?.autoPublish !== "boolean" ||
+      c?.autoPublish !== true ||
       !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(c?.publicationIntentId ?? "")) ||
       typeof c?.capturedAt !== "string" || !Number.isFinite(Date.parse(c.capturedAt)) ||
       (c?.eventTime !== null && typeof c?.eventTime !== "string") ||

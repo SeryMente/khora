@@ -21,4 +21,16 @@ test("Escuchar a Chrome abre diálogo en vivo con micrófono implícito y organi
   await expect(page.getByRole("button",{name:"Iniciar dictado",exact:true})).toBeVisible();
   await expect(page.getByLabel("Texto de la captura")).toBeEditable();
   await expect(page.getByRole("checkbox")).toHaveCount(1);
+
+  await page.locator('[data-ui-id="ingreso.modalidad-cronica"]').click();
+  const cronicaTop = page.locator('[data-ui-id="ingreso.cronica-auto-publish"]');
+  const cronicaBottom = page.locator('[data-ui-id="ingreso.cronica-auto-publish-bottom"]');
+  await expect(cronicaTop).toBeChecked();
+  await expect(cronicaTop).toBeDisabled();
+  await expect(cronicaBottom).toBeChecked();
+  await expect(cronicaBottom).toBeDisabled();
+
+  await page.locator('[data-ui-id="ingreso.modalidad-dictado"]').click();
+  await expect(cronicaTop).toHaveCount(0);
+  await expect(cronicaBottom).toHaveCount(0);
 });

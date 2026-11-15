@@ -73,12 +73,11 @@ export async function persistirHandoffIntegracion(
   if (!/^[0-9a-f]{64}$/i.test(input.sourceSha256)) throw new Error("integration_handoff_invalid_source_sha256");
   if (input.eventTime !== null && (typeof input.eventTime !== "string" || input.eventTime.length > 180)) throw new Error("integration_handoff_invalid_event_time");
   if (!Number.isFinite(Date.parse(input.capturedAt))) throw new Error("integration_handoff_invalid_captured_at");
+  if (input.autoPublish !== true) throw new Error("integration_handoff_publication_must_be_enabled");
 
-  const state = input.autoPublish ? "queued" : "disabled";
-  const representations = input.autoPublish
-    ? { cronica_sobria: true, microblog: { requested: true, max_characters: 280 } }
-    : { cronica_sobria: false, microblog: { requested: false, max_characters: 280 } };
-  const destinations = input.autoPublish ? [...DESTINATIONS] : [];
+  const state = "queued";
+  const representations = { cronica_sobria: true, microblog: { requested: true, max_characters: 280 } };
+  const destinations = [...DESTINATIONS];
   const values = [
     input.intentId, input.sessionId, input.volcadoId, input.version,
     input.sourceSha256.toLowerCase(), input.eventTime, new Date(input.capturedAt).toISOString(),

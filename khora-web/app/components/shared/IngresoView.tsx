@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as I from "lucide-react";
 import { AudioActivity } from "../ingreso/AudioActivity";
 import s from "../ingreso/ingreso-studio.module.css";
@@ -7,7 +7,7 @@ import type { CronicaTrack } from "@/lib/cronica/checklist";
 export type IngresoViewState = {
   archivado?: boolean;
   mode?: "dictado" | "cronica";
-  autoPublish?: boolean;
+  tituloGenerado?: boolean;
   capturedAt?: string | null;
   cronicaChecklist?: CronicaTrack[];
   procesando?: boolean;
@@ -77,13 +77,14 @@ export type IngresoViewActions = {
   onLimpiar?: () => void;
   onConfirmarEdicion?: () => void;
   onModeChange?: (mode: "dictado" | "cronica") => void;
-  onAutoPublishChange?: (enabled: boolean) => void;
 };
 
 export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:IngresoViewState;actions?:IngresoViewActions;isReviewMode?:boolean}) {
  const actions=a;
  const [more,setMore]=useState(false);
  const [chromeOpen,setChromeOpen]=useState(!!v.dialogoChrome);
+ const [tituloExpandido,setTituloExpandido]=useState(false);
+ useEffect(()=>{if(v.tituloGenerado&&v.titulo.trim())setTituloExpandido(true);},[v.tituloGenerado,v.titulo]);
  const busy=!!v.finalizando||!!v.procesando||v.guardando||v.adjuntandoAudio||v.retranscribiendo||!!v.recuperando;
  const locked=busy||!!v.archivado;
  const recording=v.estado==="dictando";
@@ -93,8 +94,8 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
    {(a.onRecuperar||isReviewMode)&&<button className={s.secondary} onClick={a.onRecuperar} disabled={busy||recording||v.editando} aria-haspopup="dialog"><I.History size={18}/><span>Recuperar capturas</span>{!!v.recuperaciones&&<span className={s.count}>{v.recuperaciones}</span>}</button>}
   </header>
   <div className={s.modeSelector} role="group" aria-label="Modalidad de Dictado">
-   <button type="button" data-ui-id="ingreso.modalidad-dictado" className={v.mode!=="cronica"?s.modeActive:s.secondary} aria-pressed={v.mode!=="cronica"} disabled={locked} onClick={()=>a.onModeChange?.("dictado")}>Dictado</button>
-   <button type="button" data-ui-id="ingreso.modalidad-cronica" className={v.mode==="cronica"?s.modeActive:s.secondary} aria-pressed={v.mode==="cronica"} disabled={locked} onClick={()=>a.onModeChange?.("cronica")}>Crónica</button>
+   <button type="button" data-ui-id="ingreso.modalidad-dictado" className={v.mode!=="cronica"?s.modeActive:s.secondary} aria-pressed={v.mode!=="cronica"} disabled={locked||!!v.dialogoSesion} onClick={()=>a.onModeChange?.("dictado")}>Dictado</button>
+   <button type="button" data-ui-id="ingreso.modalidad-cronica" className={v.mode==="cronica"?s.modeActive:s.secondary} aria-pressed={v.mode==="cronica"} disabled={locked||!!v.dialogoSesion} onClick={()=>a.onModeChange?.("cronica")}>Crónica</button>
   </div>
   {v.mode==="cronica"&&<section className={s.cronicaPanel} data-ui-id="ingreso.cronica-checklist" aria-label="Checklist de Crónica">
    <div className={s.cronicaHeading}><h2>Crónica</h2><span>{(v.cronicaChecklist||[]).filter(track=>track.resolved).length}/4 pistas</span></div>
@@ -107,8 +108,8 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
    </ul>
    <p className={s.cronicaTiming}>Fecha y hora se detecta solo en lo mencionado en el relato. {v.capturedAt&&<>Hora de captura, guardada aparte: {new Date(v.capturedAt).toLocaleString("es-MX")}.</>}</p>
   </section>}
-  {v.mode==="cronica"&&<label className={s.cronicaPublish}>
-   <input type="checkbox" data-ui-id="ingreso.cronica-auto-publish" checked={v.autoPublish!==false} disabled={locked} onChange={event=>a.onAutoPublishChange?.(event.target.checked)}/>
+  {v.mode==="cronica"&&<label className={`${s.cronicaPublish} ${s.cronicaPublishDisabled}`}>
+   <input type="checkbox" data-ui-id="ingreso.cronica-auto-publish" checked disabled/>
    <span>Publicar automáticamente al archivar (Crónica y microblog)</span>
   </label>}
   <section className={s.sheet} aria-label="Captura actual">
@@ -149,8 +150,17 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
    {v.reconciliacionMensaje&&<p data-ui-id="ingreso.msg-reconciliacion" className={s.notice}>{v.reconciliacionMensaje}</p>}
   </div>}
    <div className={s.editor}>
-    <label className={s.srOnly} htmlFor="ingreso-title">Título de la captura</label>
-    <input id="ingreso-title" aria-label="Título de la captura" data-ui-id="ingreso.titulo-input" className={s.title} value={v.titulo} readOnly={locked||!!v.archivoPendiente||(!!v.dialogoChrome&&recording)} onChange={e=>a.onTituloChange?.(e.target.value)} placeholder="Sin título" maxLength={500}/>
+    <div className={s.titleToggleRow}>
+     <button type="button" data-ui-id="ingreso.btn-toggle-titulo" className={s.titleToggle} aria-expanded={tituloExpandido} aria-controls="ingreso-title-wrapper" onClick={()=>setTituloExpandido(value=>!value)}>
+      <I.ChevronDown size={15}/>{tituloExpandido?"Ocultar título":v.titulo.trim()?"Mostrar título":"Añadir título"}
+     </button>
+    </div>
+    <div id="ingreso-title-wrapper" className={`${s.titleWrapper} ${tituloExpandido?s.titleExpanded:s.titleCollapsed}`} aria-hidden={!tituloExpandido}>
+     <div className={s.titleInner}>
+      <label className={s.srOnly} htmlFor="ingreso-title">Título de la captura</label>
+      <input id="ingreso-title" aria-label="Título de la captura" data-ui-id="ingreso.titulo-input" className={s.title} value={v.titulo} readOnly={locked||!!v.archivoPendiente||(!!v.dialogoChrome&&recording)} onChange={e=>a.onTituloChange?.(e.target.value)} placeholder="Sin título" maxLength={500} tabIndex={tituloExpandido?0:-1}/>
+     </div>
+    </div>
     <label className={s.srOnly} htmlFor="ingreso-text">Texto de la captura</label>
     <textarea id="ingreso-text" aria-label="Texto de la captura" data-ui-id="ingreso.textarea" className={s.textarea} value={v.texto} readOnly={locked||!!v.archivoPendiente} onFocus={()=>a.onIniciarEdicion?.()} onClick={() => actions.onIniciarEdicion?.()} onChange={e=>a.onTextoChange?.(e.target.value)} placeholder={v.dialogoChrome?"El diálogo transcrito aparecerá conforme lleguen las ventanas de audio. Puedes editar el texto en cualquier momento.": "Escribe, pegaa o empieza a dictar.\nEste espacio es tuyo."} spellCheck/>
    </div>
@@ -169,7 +179,13 @@ export function IngresoView({state:v,actions:a={},isReviewMode=false}:{state:Ing
     {!v.dialogoChrome&&v.conAudio&&v.partesContador>0&&<button className={s.quiet} disabled={busy||v.exportandoAudio} onClick={a.onExportarMp3}><I.Download size={17}/>{v.exportandoAudio?"Preparando descarga…":"Descargar MP3 conservado"}</button>}
     <button data-ui-id="ingreso.btn-limpiar" className={s.quiet} disabled={busy||recording||v.editando} onClick={a.onLimpiar}><I.Plus size={18}/>{v.archivado?"Nueva captura":"Limpiar"}</button>
    </div>
-   <button data-ui-id="ingreso.btn-archivar" className={s.archive} onClick={a.onGuardar} disabled={locked||recording||v.editando||(!v.texto.trim()&&!v.conAudio)}><I.Archive size={18}/>{v.guardando?"Archivando…":v.archivado?"Captura archivada":v.dialogoChrome?"Archivar como volcado":"Archivar registro"}</button>
+   <div className={s.bottomright}>
+    {v.mode==="cronica"&&<label className={`${s.cronicaPublish} ${s.cronicaPublishDisabled} ${s.bottomPublish}`}>
+     <input type="checkbox" data-ui-id="ingreso.cronica-auto-publish-bottom" checked disabled/>
+     <span>Publicar automáticamente</span>
+    </label>}
+    <button data-ui-id="ingreso.btn-archivar" className={s.archive} onClick={a.onGuardar} disabled={locked||recording||v.editando||(!v.texto.trim()&&!v.conAudio)}><I.Archive size={18}/>{v.guardando?"Archivando…":v.archivado?"Captura archivada":v.dialogoChrome?"Archivar como volcado":"Archivar registro"}</button>
+   </div>
   </div>
   {more&&<details className={s.diagnostics}><summary>Detalles de la captura</summary><p data-ui-id="ingreso.stats">Estado: {v.estado} · Audio: {v.partesContador} partes verificadas · {(v.bytesAcumulados/1048576).toFixed(2)} MB · Reconexiones: {v.reconexiones} · Bloques procesados: {v.pulidosOk} / pendientes: {v.pulidosNo}</p><p>Un corte conservado no demuestra que se haya registrado el último instante antes de una interrupción.</p></details>}
  </main>;

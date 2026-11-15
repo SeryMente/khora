@@ -547,7 +547,7 @@ export async function guardarDictado(entrada: EntradaDictado) {
   if (!sessionId) throw new Error("Custodia inválida: toda captura requiere sessionId.");
   if (entrada.mode !== undefined && entrada.mode !== "cronica") throw new Error("dictado_mode_invalid");
   if (entrada.mode === "cronica") {
-    if (typeof entrada.autoPublish !== "boolean" || !entrada.publicationIntentId || !entrada.usuario || !entrada.capturedAt || (entrada.eventTime !== null && typeof entrada.eventTime !== "string")) {
+    if (entrada.autoPublish !== true || !entrada.publicationIntentId || !entrada.usuario || !entrada.capturedAt || (entrada.eventTime !== null && typeof entrada.eventTime !== "string")) {
       throw new Error("dictado_cronica_handoff_contract_invalid");
     }
   }

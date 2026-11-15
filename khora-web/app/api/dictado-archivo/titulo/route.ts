@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
       await asignarTituloVolcado(volcadoId, resultado.title, session.user.email);
     }
 
+    // `title` is the canonical contract property; the client maps it to local state `titulo`.
     return NextResponse.json(resultado, { status: 200 });
   } catch (err: any) {
     return NextResponse.json({ detail: String(err?.message ?? err) }, { status: 500 });

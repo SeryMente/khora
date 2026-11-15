@@ -8,6 +8,8 @@ import { guardarAudioLocal, guardarSnapshotLocal, recuperarLocal, cerrarSnapshot
 import { subirAudioCustodiado } from "../../../lib/client/subir-audio-custodia";
 import { nuevaRevision, type CapturaSnapshot } from "../../../lib/custodia/contrato";
 import { IngresoView } from "../shared/IngresoView";
+import { useTituloAutomatico } from "./useTituloAutomatico";
+import { analizarChecklistCronica } from "@/lib/cronica/checklist";
 import s from "./ingreso-studio.module.css";
 
 type ParteGuardada=Awaited<ReturnType<typeof subirAudioCustodiado>>;
@@ -18,6 +20,8 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
   const [organizarComoDialogo,setOrganizarComoDialogo]=useState(true);
   const [ready,setReady]=useState(false),[busy,setBusy]=useState(false),[active,setActive]=useState(false);
   const [error,setError]=useState(""),[notice,setNotice]=useState(""),[text,setText]=useState("");
+  const [modoRegistro,setModoRegistro]=useState<"dictado"|"cronica">("dictado");
+  const [tituloGenerado,setTituloGenerado]=useState(false);
   const [rawSegments,setRawSegments]=useState<SegmentoCrudoDialogo[]>([]),[pendingSegments,setPendingSegments]=useState<SegmentoCrudoDialogo[]>([]);
   const [title,setTitle]=useState("Conversación"),[labels,setLabels]=useState(initial().etiquetas),[count,setCount]=useState(0);
   const [hasSession,setHasSession]=useState(false),[archived,setArchived]=useState(false),[volcadoId,setVolcadoId]=useState("");
@@ -27,6 +31,9 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
   const archivePayload=useRef<Record<string,unknown>|null>(null);
   const archiveBusy=useRef(false),stopping=useRef(false),transcribing=useRef(false);
   const rawSegmentsRef=useRef<SegmentoCrudoDialogo[]>([]),manualEditRef=useRef(false);
+  const modoRegistroRef=useRef<"dictado"|"cronica">("dictado");
+  const publicationIntentIdRef=useRef("");
+  const capturedAtRef=useRef("");
   const liveQueue=useRef<ColasDialogoVivo|null>(null),liveFailedSources=useRef(new Set<FuenteDialogo>());
   const transcriptionState=useRef<string|null>(null);
 
@@ -46,7 +53,14 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
   const raw=useRef<ParteDialogo[]>([]),stored=useRef<ParteGuardada[]>([]),capture=useRef<CapturaDialogo|null>(null);
   const queue=useRef<Promise<void>>(Promise.resolve()),localQueue=useRef<Promise<void>>(Promise.resolve());
   const errorRemote=useRef(false),duration=useRef(0),interrupted=useRef(false),mounted=useRef(true),inProgress=useRef(false);
-  const snapshot=():CapturaSnapshot=>({sessionId:id.current,...nuevaRevision(),texto:textRef.current,parcial:"",titulo:visible.current.title,fuenteEntrada:"dialogo",duracionSeg:duration.current,audioPartes:[...stored.current],dialogo:{...manifest.current,partesEsperadas:manifest.current.partesEsperadas,segmentosRaw:[...rawSegmentsRef.current]}});
+  const autoTitulo=useTituloAutomatico({texto:text,titulo:title,onTitulo:setTitle,onGenerado:setTituloGenerado,initialTitle:"Conversación",enabled:ready&&!busy&&!archived&&!archivePayload.current});
+  const metadataCronica=()=>{
+    if(modoRegistroRef.current!=="cronica")return {};
+    if(!capturedAtRef.current)capturedAtRef.current=new Date().toISOString();
+    if(!publicationIntentIdRef.current)publicationIntentIdRef.current=crypto.randomUUID();
+    return {mode:"cronica" as const,autoPublish:true as const,publicationIntentId:publicationIntentIdRef.current,eventTime:analizarChecklistCronica(textRef.current).eventTime,capturedAt:capturedAtRef.current};
+  };
+  const snapshot=():CapturaSnapshot=>({sessionId:id.current,...nuevaRevision(),texto:textRef.current,parcial:"",titulo:visible.current.title,fuenteEntrada:"dialogo",duracionSeg:duration.current,audioPartes:[...stored.current],...metadataCronica(),dialogo:{...manifest.current,partesEsperadas:manifest.current.partesEsperadas,segmentosRaw:[...rawSegmentsRef.current]}});
   const persist=async(remote=true)=>{
     const snap=snapshot();
     localQueue.current=localQueue.current.catch(()=>undefined).then(()=>guardarSnapshotLocal(owner.current,snap));await localQueue.current;
@@ -117,11 +131,13 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
           if(!selected?.dialogo)throw Error("La sesión solicitada no es un diálogo recuperable.");
           if(cancelled)return;
           id.current=recoveryTarget;manifest.current=selected.dialogo;duration.current=selected.duracionSeg;
+          modoRegistroRef.current=selected.mode==="cronica"?"cronica":"dictado";setModoRegistro(modoRegistroRef.current);
+          publicationIntentIdRef.current=selected.publicationIntentId||"";capturedAtRef.current=selected.capturedAt||"";
           rawSegmentsRef.current=[...(selected.dialogo.segmentosRaw||[])];setRawSegments(rawSegmentsRef.current);setPendingSegments([]);manualEditRef.current=false;
           stored.current=(data.recovery?.audioPartes||[]) as ParteGuardada[];
           raw.current=local.audios.filter(x=>x.sessionId===recoveryTarget).map(x=>({parte:x.part,blob:x.blob,fuente:x.meta.upload.fuenteAudio,startMs:x.meta.upload.startMs,endMs:x.meta.upload.endMs,duracionMs:x.meta.upload.duracionMs})).sort((a,b)=>a.parte-b.parte);
           if(!["detenido","interrumpido"].includes(manifest.current.estado))manifest.current.estado="interrumpido";
-          textRef.current=selected.texto;setText(selected.texto);setLabels(manifest.current.etiquetas);setOrganizarComoDialogo(manifest.current.organizarComoDialogo!==false);setTitle(selected.titulo);setCount(stored.current.length);localConfirmed.current=new Set(raw.current.map(p=>p.parte));setLocalCount(localConfirmed.current.size);setHasSession(true);
+          textRef.current=selected.texto;setText(selected.texto);setLabels(manifest.current.etiquetas);setOrganizarComoDialogo(manifest.current.organizarComoDialogo!==false);autoTitulo.setRestoredTitle(selected.titulo);setCount(stored.current.length);localConfirmed.current=new Set(raw.current.map(p=>p.parte));setLocalCount(localConfirmed.current.size);setHasSession(true);
           setNotice("Diálogo recuperado; no se reanuda ni se mezcla con otra grabadora. Los originales permanecen separados por fuente.");
         }
         setReady(true);
@@ -145,6 +161,7 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
   const start=async()=>{
     if(!ready||inProgress.current||hasSession)return;
     inProgress.current=true;setBusy(true);setError("");setNotice("Selecciona la pestaña con Compartir audio y autoriza el micrófono. Aún no se está grabando.");id.current=crypto.randomUUID();
+    if(modoRegistroRef.current==="cronica")metadataCronica();
     raw.current=[];stored.current=[];duration.current=0;errorRemote.current=false;localConfirmed.current.clear();setLocalCount(0);setCount(0);
     manifest.current={...initial(),organizarComoDialogo:true,etiquetas:{...labels},segmentosRaw:[]};interrupted.current=false;
     rawSegmentsRef.current=[];setRawSegments([]);setPendingSegments([]);manualEditRef.current=false;liveFailedSources.current.clear();
@@ -219,7 +236,7 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
       if(!archivePayload.current){
       await persist();
       const ordered=[...stored.current].sort((a,b)=>a.parte-b.parte);
-      archivePayload.current={sessionId:id.current,texto:textRef.current,titulo:visible.current.title.trim()||null,fuenteEntrada:"dialogo",audioPartes:ordered,audioUrl:ordered[0].url,audioBytes:ordered.reduce((n,p)=>n+p.bytes,0),duracionSeg:Math.ceil(duration.current),pulidoAplicado:false,estadoTranscripcion:transcriptionState.current||"pendiente"};
+      archivePayload.current={sessionId:id.current,texto:textRef.current,titulo:visible.current.title.trim()||null,fuenteEntrada:"dialogo",audioPartes:ordered,audioUrl:ordered[0].url,audioBytes:ordered.reduce((n,p)=>n+p.bytes,0),duracionSeg:Math.ceil(duration.current),pulidoAplicado:false,estadoTranscripcion:transcriptionState.current||"pendiente",...metadataCronica()};
       }
       const payload=archivePayload.current;
       const response=await fetch("/api/dictado",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),signal:AbortSignal.timeout(120000)});
@@ -246,7 +263,7 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
     }catch(e){setError(e instanceof Error?e.message:"No se pudo descargar el master estéreo.");}
     finally{setBusy(false);}
   };  return <IngresoView state={{
-    titulo:title,texto:text,estado:active?"dictando":"inactivo",modoEntrada:"chrome_live_caption",
+    titulo:title,tituloGenerado,mode:modoRegistro,capturedAt:capturedAtRef.current||null,cronicaChecklist:modoRegistro==="cronica"?analizarChecklistCronica(text).tracks:undefined,texto:text,estado:active?"dictando":"inactivo",modoEntrada:"chrome_live_caption",
     finalizando:busy&&active,organizarComoDialogo,dialogoChrome:true,dialogoSesion:hasSession,chromeStream,stream:micStream,
     chromeBridgeEstado:"captura nativa",chromeCaptionActivo:false,chromeCapturaEstado:active?"grabando":"inactiva",
     archivado:archived,archivoPendiente:!!archivePayload.current&&!archived,custodiaReady:ready,custodiaPreparando:!ready&&!error,
@@ -264,7 +281,8 @@ export function DialogoPanel({sessionId:requested,onSalir}:{sessionId?:string|nu
     onAppendLiveSegments:()=>{if(!pendingSegments.length||busy||archived)return;const next=agregarSegmentosAlFinal(textRef.current,pendingSegments,manifest.current.etiquetas);textRef.current=next;setText(next);setPendingSegments([]);},
     onDialogoChange:enabled=>{if(!enabled&&!hasSession&&!active&&!busy)onSalir?.();},
     onGuardar:()=>void archive(),onRetranscribir:undefined,
-    onTituloChange:value=>{if(!busy&&!active&&!archived&&!archivePayload.current)setTitle(value);},
+    onModeChange:next=>{if(active||busy||archived||hasSession||archivePayload.current)return;modoRegistroRef.current=next;setModoRegistro(next);},
+    onTituloChange:value=>{if(!busy&&!active&&!archived&&!archivePayload.current)autoTitulo.setManualTitle(value);},
     onTextoChange:value=>{if(!busy&&!archived&&!archivePayload.current){if(value!==textRef.current)manualEditRef.current=true;textRef.current=value;setText(value);}},
     onReintentarPreparacion:()=>setRetryPreparation(n=>n+1),
     onLimpiar:()=>{if(active||busy)return;if(hasSession&&!archived){setError("Archiva este diálogo o exporta sus originales antes de iniciar otro. No se descartó la captura.");return;}window.location.assign("/sistema/ingreso");}

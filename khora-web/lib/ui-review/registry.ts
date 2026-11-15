@@ -13,6 +13,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     ui_ids: [
       "ingreso.container",
       "ingreso.titulo-input",
+      "ingreso.btn-toggle-titulo",
       "ingreso.btn-titulo-ia",
       "ingreso.btn-iniciar",
       "ingreso.btn-archivar",
@@ -29,7 +30,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     screen: "ingreso",
     scenario: "cronica",
     title: "Ingreso · Modalidad Crónica",
-    description: "Checklist local de cuatro pistas y autorización reversible de handoff a Integración al archivar.",
+    description: "Checklist local de cuatro pistas y autorización fija de publicación a Integración al archivar.",
     status: "active",
     recommended_viewport: "desktop",
     ui_ids: [
@@ -38,6 +39,8 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
       "ingreso.modalidad-cronica",
       "ingreso.cronica-checklist",
       "ingreso.cronica-auto-publish",
+      "ingreso.cronica-auto-publish-bottom",
+      "ingreso.btn-toggle-titulo",
       "ingreso.textarea",
       "ingreso.btn-archivar",
       "ingreso.custodia-status"
@@ -47,7 +50,7 @@ export const UI_REVIEW_SCENARIOS: Record<string, ScenarioDefinition> = {
     screen:"ingreso",scenario:"dialogo_chrome",title:"Ingreso · Chrome con micrófono",
     description:"Subfunción de Escuchar a Chrome en el mismo editor, dos señales reales, transcripción en vivo independiente por fuente, edición humana protegida y archivo como volcado sin ingesta automática.",
     status:"active",recommended_viewport:"desktop",
-    ui_ids:["ingreso.container","ingreso.btn-chrome","ingreso.organizar-dialogo","ingreso.btn-iniciar","ingreso.btn-detener","ingreso.textarea","ingreso.btn-agregar-segmentos-vivos","ingreso.btn-archivar","ingreso.custodia-status"]
+    ui_ids:["ingreso.container","ingreso.btn-chrome","ingreso.organizar-dialogo","ingreso.btn-toggle-titulo","ingreso.btn-iniciar","ingreso.btn-detener","ingreso.textarea","ingreso.btn-agregar-segmentos-vivos","ingreso.btn-archivar","ingreso.custodia-status"]
   },
   "ingreso:chrome_live_caption": {
     screen: "ingreso",

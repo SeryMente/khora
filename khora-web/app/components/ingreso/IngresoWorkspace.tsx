@@ -18,6 +18,7 @@ import { IngresoIngestaPanel } from "./IngresoIngestaPanel";
 import { ensamblarParrafos, Fragmento } from "../../../lib/transcripcion/ensamblar";
 import { reconciliarSegmentos, type SegmentoReconciliado } from "../../../lib/transcripcion/reconciliar";
 import { IngresoView } from "../shared/IngresoView";
+import { useTituloAutomatico } from "./useTituloAutomatico";
 import { transcribeStoredSession } from "../../../lib/client/authoritative-transcription";
 import { importAndTranscribeAudio } from "../../../lib/client/import-audio-file";
 import { cerrarEdicionInSitu } from "../../../lib/client/edicion-in-situ";
@@ -68,6 +69,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
   const [parcial, setParcial] = useState("");
   const [estado, setEstado] = useState<Estado>("inactivo");
   const [titulo, setTitulo] = useState("");
+  const [tituloGenerado, setTituloGenerado] = useState(false);
   const [error, setError] = useState("");
   const [aviso, setAviso] = useState("");
   const [pulidosOk, setPulidosOk] = useState(0);
@@ -87,9 +89,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
   const [resultado, setResultado] = useState("");
   const [archivado, setArchivado] = useState(false);
   const [modoRegistro, setModoRegistro] = useState<"dictado" | "cronica">("dictado");
-  const [autoPublish, setAutoPublishState] = useState(true);
   const modoRegistroRef = useRef<"dictado" | "cronica">("dictado");
-  const autoPublishRef = useRef(true);
   const publicationIntentIdRef = useRef("");
   const capturedAtRef = useRef("");
   const [soportado, setSoportado] = useState(true);
@@ -104,6 +104,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
   const [reconciliacionMensaje, setReconciliacionMensaje] = useState("");
 
   const [texto, setTexto] = useState("");
+  const autoTitulo = useTituloAutomatico({ texto, titulo, onTitulo: setTitulo, onGenerado: setTituloGenerado, enabled: !archivado && !guardando });
   const [editando, setEditando] = useState(false);
   const [estabaDictando, setEstabaDictando] = useState(false);
 
@@ -134,7 +135,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
     const eventTime = analizarChecklistCronica(value + (partial ? "\n\n" + partial : "")).eventTime;
     return {
       mode: "cronica" as const,
-      autoPublish: autoPublishRef.current,
+      autoPublish: true,
       publicationIntentId: publicationIntentIdRef.current,
       eventTime,
       ...(capturedAtRef.current ? { capturedAt: capturedAtRef.current } : {}),
@@ -484,11 +485,11 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       await guardarSnapshotLocal(ownerRef.current,recovery);
       sesionIdRef.current=recovery.sessionId;recuperadaDeRef.current=recovery.recuperadaDe;
       modoRegistroRef.current=recovery.mode==="cronica"?"cronica":"dictado";setModoRegistro(modoRegistroRef.current);
-      autoPublishRef.current=recovery.autoPublish!==false;setAutoPublishState(autoPublishRef.current);
+
       publicationIntentIdRef.current=recovery.publicationIntentId||"";capturedAtRef.current=recovery.capturedAt||"";
       fuenteEntradaSesionRef.current=recovery.fuenteEntrada;partesSubidasRef.current=recovery.audioPartes as typeof partesSubidasRef.current;partesRawRef.current=[];
       parteConsecutivaRef.current=maximoIndiceConocido(partesSubidasRef.current,[])+1;
-      duracionRef.current=recovery.duracionSeg||0;setTitulo(recovery.titulo||"");
+      duracionRef.current=recovery.duracionSeg||0;autoTitulo.setRestoredTitle(recovery.titulo||"");
       const recoveredText=textoRecuperable(recovery),segment:SegmentoReconciliado={id:"recovery-"+recovery.sessionId,texto:recoveredText,estado:"pendiente_error"};
       segmentosRef.current=[segment];setSegmentos([segment]);baseDictadoRef.current=[];fragmentosRef.current=[];pendienteRef.current=recoveredText;setPendiente(recoveredText);setParcial("");setTexto(recoveredText);
       setArchivado(false);setEditando(false);setEstado("inactivo");setModoEntrada("ninguno");modoEntradaRef.current="ninguno";setStreamAudio(null);
@@ -1497,7 +1498,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       await guardarCheckpoint(true);
       setAviso("Antes de abrir otra captura, cierra esta con Archivar. No se descartó ningún contenido.");return;
     }
-    setTitulo("");recuperadaDeRef.current=undefined;setStreamAudio(null);
+    autoTitulo.resetTitle();recuperadaDeRef.current=undefined;setStreamAudio(null);
 
     observarDictado("CAPTURA_LIMPIADA", { outcome: "SUCCESS", metrics: { source_mode: modoEntradaRef.current, chars_before: texto.length, part_count: partesSubidasRef.current.length } });
     void enviarEventosObservabilidadDictado();
@@ -1535,7 +1536,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
 
     sesionIdRef.current = "";
     modoRegistroRef.current = "dictado";setModoRegistro("dictado");
-    autoPublishRef.current = true;setAutoPublishState(true);
+
     publicationIntentIdRef.current = "";capturedAtRef.current = "";
     parteConsecutivaRef.current = 1;
     partesSubidasRef.current = [];
@@ -1654,8 +1655,8 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
         body: JSON.stringify({ texto }),
       });
       const data = await r.json();
-      if (r.ok && data?.titulo) {
-        setTitulo(data.titulo);
+      if (r.ok && data?.title) {
+        autoTitulo.setGeneratedTitle(data.title);
       } else {
         setError(data.detail || "Error al generar título.");
       }
@@ -1673,12 +1674,6 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
     if (next === "cronica" && !publicationIntentIdRef.current) publicationIntentIdRef.current = generarSesionId();
     void guardarCheckpoint(true);
   };
-  const cambiarAutoPublicacion = (enabled: boolean) => {
-    if (modoRegistroRef.current !== "cronica" || guardando || archivado) return;
-    autoPublishRef.current = enabled;
-    setAutoPublishState(enabled);
-    void guardarCheckpoint(true);
-  };
   const cronicaChecklist = modoRegistro === "cronica" ? analizarChecklistCronica(texto) : null;
 
   return (
@@ -1693,7 +1688,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       />
       <IngresoView
       state={{
-        archivado,mode:modoRegistro,autoPublish,capturedAt:capturedAtRef.current||null,cronicaChecklist:cronicaChecklist?.tracks,finalizando,audioPendiente,custodiaDetalle,
+        archivado,mode:modoRegistro,tituloGenerado,capturedAt:capturedAtRef.current||null,cronicaChecklist:cronicaChecklist?.tracks,finalizando,audioPendiente,custodiaDetalle,
         custodiaEstado,custodiaReady:!!custodiaOwner,custodiaPreparando,recuperando,recuperaciones:recoveryItems.length,stream:streamAudio,
         titulo,
         texto,
@@ -1706,7 +1701,7 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
         soportado,
         escuchando,
         guardando,
-        generandoTitulo,
+        generandoTitulo:generandoTitulo||autoTitulo.generando,
         retranscribiendo,
         adjuntandoAudio,
         exportandoAudio,
@@ -1725,10 +1720,9 @@ function IngresoContenido({onDialogo}:{onDialogo:()=>void}) {
       actions={{
         onReintentarPreparacion:()=>setPreparacionIntento(n=>n+1),
         onRecuperar:()=>{setRecoveryOpen(true);void cargarRecuperaciones();},
-        onTituloChange: (value) => { if(!guardando&&!archivado&&!recuperando)setTitulo(value); },
+        onTituloChange: (value) => { if(!guardando&&!archivado&&!recuperando)autoTitulo.setManualTitle(value); },
         onIniciarEdicion: iniciarEdicionInSitu,
         onModeChange: cambiarModalidad,
-        onAutoPublishChange: cambiarAutoPublicacion,
         onTextoChange: (value) => { if(!guardando&&!archivado&&!recuperando){if(value.trim())marcarCapturaIniciada();handleTextoChange(value);} },
         onGenerarTitulo: generarTituloConIA,
         onIniciar: iniciar,

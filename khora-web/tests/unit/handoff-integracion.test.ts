@@ -64,17 +64,13 @@ test("checkmark activo crea handoff queued con autorización y destinos exactos"
   assert.deepEqual(db.rows[0].destinations, ["github_blog", "facebook", "x", "tiktok"]);
 });
 
-test("checkmark desactivado asienta disabled y no autoriza ni encola publicación", async () => {
+test("rechaza un handoff de Crónica con publicación automática desactivada", async () => {
   const db = fakeDatabase();
-  const receipt = await persistirHandoffIntegracion(db.client, { ...input, autoPublish: false });
-  assert.equal(receipt.state, "disabled");
-  assert.equal(receipt.autoPublish, false);
-  assert.equal(receipt.publicationAuthorized, false);
-  assert.deepEqual(db.rows[0].destinations, []);
-  assert.deepEqual(db.rows[0].representations, {
-    cronica_sobria: false,
-    microblog: { requested: false, max_characters: 280 },
-  });
+  await assert.rejects(
+    () => persistirHandoffIntegracion(db.client, { ...input, autoPublish: false }),
+    /integration_handoff_publication_must_be_enabled/,
+  );
+  assert.equal(db.rows.length, 0);
 });
 
 test("reintento con intent_id + session_id devuelve el mismo asiento sin duplicarlo", async () => {
@@ -91,7 +87,7 @@ test("una repetición no puede cambiar la autorización ya asentada", async () =
   await persistirHandoffIntegracion(db.client, input);
   await assert.rejects(
     () => persistirHandoffIntegracion(db.client, { ...input, autoPublish: false }),
-    /integration_handoff_idempotency_conflict/,
+    /integration_handoff_publication_must_be_enabled/,
   );
   assert.equal(db.rows.length, 1);
 });

@@ -93,17 +93,16 @@ test("/api/dictado: Crónica exige autenticación y deriva owner de auth(), no d
     assert.equal(calls[1].autoPublish, true);
 
     const disabled = await POST(request({ ...payload, sessionId: "d89cf49f-6c49-46e7-a6bc-9a3d9c292f1e", publicationIntentId: "2dff89b6-6504-4e43-b6f2-9c5dbf26f2a4", autoPublish: false, usuario: "attacker" }));
-    assert.equal(disabled.status, 201);
-    assert.equal((await disabled.json() as any).handoff.state, "disabled");
-    assert.equal(calls[2].usuario, user.email);
-    assert.equal(calls[2].autoPublish, false);
+    assert.equal(disabled.status, 400);
+    assert.equal(calls.length, 2);
+    assert.equal(sessionClaims.length, 2);
 
     const normal = await POST(request({ texto: "Dictado normal sin modalidad adicional.", titulo: "Normal", sessionId: "cb81aede-3fdd-4e91-9f41-0a7c4c5da556", fuenteEntrada: "texto", usuario: "attacker" }));
     assert.equal(normal.status, 201);
-    assert.equal(calls[3].usuario, user.email);
-    assert.equal("mode" in calls[3], false);
-    assert.equal("autoPublish" in calls[3], false);
-    assert.ok(afterCallbacks.length >= 4);
+    assert.equal(calls[2].usuario, user.email);
+    assert.equal("mode" in calls[2], false);
+    assert.equal("autoPublish" in calls[2], false);
+    assert.ok(afterCallbacks.length >= 3);
   } finally {
     user = null;
   }

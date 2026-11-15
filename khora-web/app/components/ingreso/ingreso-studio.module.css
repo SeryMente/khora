@@ -21,3 +21,17 @@
 .cronicaPublish{display:flex;align-items:flex-start;gap:10px;margin:0 0 14px;padding:10px 14px;border:1px solid var(--studio-line);border-radius:8px;font-size:13px;color:var(--studio-ink,var(--khora-ink))}
 .cronicaPublish input{width:17px;height:17px;margin:2px 0 0;accent-color:var(--khora-ink);flex-shrink:0}
 @media(max-width:680px){.modeSelector{margin-bottom:12px}.cronicaPanel{padding:14px 12px}.cronicaPanel ul{grid-template-columns:1fr}.cronicaPublish{font-size:12px}}
+
+.titleToggleRow{display:flex;justify-content:flex-start;margin:0 0 4px}
+.titleToggle{min-height:26px!important;padding:3px 4px!important;border:0!important;border-radius:5px!important;background:transparent!important;color:var(--studio-muted)!important;font-size:12px!important;font-weight:500!important}
+.titleToggle svg{transition:transform .22s ease}
+.titleToggle[aria-expanded="true"] svg{transform:rotate(180deg)}
+.titleWrapper{display:grid;grid-template-rows:0fr;opacity:0;overflow:hidden}
+.titleInner{min-height:0;overflow:hidden}
+.titleCollapsed{grid-template-rows:0fr;opacity:0;visibility:hidden;transition:grid-template-rows .22s ease,opacity .22s ease,visibility 0s linear .22s}
+.titleExpanded{grid-template-rows:1fr;opacity:1;visibility:visible;transition:grid-template-rows .22s ease,opacity .22s ease,visibility 0s}
+.bottomright{display:flex;align-items:center;justify-content:flex-end;gap:16px;min-width:0;flex-wrap:wrap}
+.bottomPublish{margin:0;padding:0;border:0;background:transparent;font-size:13px}
+.cronicaPublishDisabled{opacity:.55;cursor:not-allowed}
+.cronicaPublishDisabled input{cursor:not-allowed}
+@media(max-width:680px){.bottomright{gap:8px}.bottomPublish{font-size:12px}}

@@ -51,8 +51,12 @@ test("UI Crónica: cuatro pistas, hora relatada separada y handoff autorizado po
   await expect(page.locator('[data-ui-id="ingreso.cronica-checklist"]')).toHaveCount(0);
   await page.locator('[data-ui-id="ingreso.modalidad-cronica"]').click();
   await expect(page.locator('[data-ui-id="ingreso.cronica-checklist"]')).toBeVisible();
-  const toggle = page.getByLabel("Publicar automáticamente al archivar (Crónica y microblog)");
+  const toggle = page.locator('[data-ui-id="ingreso.cronica-auto-publish"]');
+  const bottomToggle = page.locator('[data-ui-id="ingreso.cronica-auto-publish-bottom"]');
   await expect(toggle).toBeChecked();
+  await expect(toggle).toBeDisabled();
+  await expect(bottomToggle).toBeChecked();
+  await expect(bottomToggle).toBeDisabled();
 
   await fillAndConfirm(page, textComplete);
   const checklist = page.locator('[data-ui-id="ingreso.cronica-checklist"]');
@@ -78,14 +82,17 @@ test("UI Crónica: cuatro pistas, hora relatada separada y handoff autorizado po
   await expect(page.getByText("Captura archivada", { exact: true })).toBeVisible();
 });
 
-test("UI Crónica incompleta y checkmark desactivado: permite archivar sin autorizar handoff", async ({ page }) => {
+test("UI Crónica incompleta conserva publicación fija y permite archivar con autorización", async ({ page }) => {
   const archiveRequests: any[] = [];
   const checkpointSnapshots: any[] = [];
   await openIngreso(page, archiveRequests, checkpointSnapshots);
   await page.locator('[data-ui-id="ingreso.modalidad-cronica"]').click();
-  const toggle = page.getByLabel("Publicar automáticamente al archivar (Crónica y microblog)");
+  const toggle = page.locator('[data-ui-id="ingreso.cronica-auto-publish"]');
+  const bottomToggle = page.locator('[data-ui-id="ingreso.cronica-auto-publish-bottom"]');
   await expect(toggle).toBeChecked();
-  await toggle.uncheck();
+  await expect(toggle).toBeDisabled();
+  await expect(bottomToggle).toBeChecked();
+  await expect(bottomToggle).toBeDisabled();
   await fillAndConfirm(page, "No sé si mañana pasará algo.");
   await expect(page.locator('[data-ui-id="ingreso.cronica-checklist"]').getByText("0/4 pistas")).toBeVisible();
   const archive = page.locator('[data-ui-id="ingreso.btn-archivar"]');
@@ -94,7 +101,7 @@ test("UI Crónica incompleta y checkmark desactivado: permite archivar sin autor
   await archive.click();
   await post;
   expect(archiveRequests[0].mode).toBe("cronica");
-  expect(archiveRequests[0].autoPublish).toBe(false);
+  expect(archiveRequests[0].autoPublish).toBe(true);
   expect(archiveRequests[0].publicationIntentId).toMatch(/^[0-9a-f-]{36}$/i);
   expect(archiveRequests[0].capturedAt).toBeTruthy();
   expect(archiveRequests[0].eventTime).toBeNull();
@@ -106,6 +113,7 @@ test("Dictado normal mantiene interfaz y payload sin autorización de Integraci�
   await openIngreso(page, archiveRequests, checkpointSnapshots);
   await expect(page.locator('[data-ui-id="ingreso.cronica-checklist"]')).toHaveCount(0);
   await expect(page.locator('[data-ui-id="ingreso.cronica-auto-publish"]')).toHaveCount(0);
+  await expect(page.locator('[data-ui-id="ingreso.cronica-auto-publish-bottom"]')).toHaveCount(0);
   await fillAndConfirm(page, "Texto normal de Dictado que se conserva sin cambios de modalidad.");
   const post = page.waitForResponse(response => response.url().endsWith("/api/dictado") && response.request().method() === "POST" && response.status() === 201);
   await page.locator('[data-ui-id="ingreso.btn-archivar"]').click();

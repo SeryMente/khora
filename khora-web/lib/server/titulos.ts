@@ -23,6 +23,7 @@ export interface ThreadCandidate {
 }
 
 export interface TitleGenerationResult {
+  /** Canonical API JSON property; React capture state maps it to "titulo". */
   title: string;
   mode: "single_thread" | "multi_thread";
   ideas: IdeaItem[];
