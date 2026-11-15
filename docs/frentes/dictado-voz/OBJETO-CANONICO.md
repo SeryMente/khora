@@ -6,17 +6,17 @@
 - Identidad canónica: `DICTADO`; `MCP-OBS-DICTADO` queda como identidad agregada histórica.
 - Repositorio: `SeryMente/khora`, rama `main`.
 - OCP heredado: `docs/frentes/dictado-voz/`.
-- Versión: **v0.6.21 · DICTADO-v0.6.21**, no es versión de producto.
-- Estado: titularidad transferida a esta conversación el 2026-11-06 (generación 5→6); original `ChatGPT-DICTADO-20261106-1540.txt` incorporado y cotejado; producto no revalidado funcionalmente.
-- Control: generación **6**, folio `PENDIENTE/NO ASIGNADO` (FOL1 PREPARADA, NO ACTIVA), alias operativo `chatgpt-dictado-01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`.
-- UUIDv7 local de esta conversación: `01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`; no es ID nativo de plataforma. Instancia: `chatgpt-dictado-INSTANCE-20261106-01A1B2E1A2DC7881AAC7AC9D900DD4E3`.
+- Versión: **v0.6.22 · DICTADO-v0.6.22**, no es versión de producto.
+- Estado: titularidad transferida el 2026-11-15 (generación 6→7); original ChatGPT-DICTADO-20261115-1028.md incorporado y cotejado; implementación Fase 0/1 en rama aislada; no merge ni revalidación productiva.
+- Control: generación **7**, folio PENDIENTE/NO ASIGNADO (FOL1 PREPARADA, NO ACTIVA), alias operativo chatgpt-dictado-01a1e010-10d7-7c58-92f3-38c493888dc4.
+- UUIDv7 local de esta conversación: 01a1e010-10d7-7c58-92f3-38c493888dc4; no es ID nativo de plataforma. Instancia: chatgpt-dictado-INSTANCE-20261115-01A1E01010D77C5892F338C493888DC4.
 - Frente independiente relacionado: Observabilidad MCP en `docs/frentes/observabilidad-mcp/`, con control propio sin titular asignado.
 - Custodia es un frente independiente y ajeno a Dictado: no forma parte de su alcance, titularidad, backlog, dependencias ni aceptación.
 - Material fuera del alcance estricto se conserva en la crónica y queda clasificado en §4; no se borra ni reasigna automáticamente.
 
 ## 2. LEER PRIMERO
 
-Este OCP gobierna exclusivamente la experiencia de ingreso por dictado de voz en Khora: la pantalla donde se dicta, la captura iniciada explícitamente por el operador, la recepción de audio, la transcripción a texto, la edición del texto transcrito y la continuidad para seguir dictando sin perder el contenido confirmado.
+Este OCP gobierna la experiencia de Dictado dentro de Khora: modalidades Dictado normal y Crónica, y la modalidad futura «Escuchar a Chrome / Organizar como diálogo». Dictado incluye pantalla y controles, captura explícita, transcripción, edición, continuidad y cierre mediante «Archivar registro». En Crónica incluye checklist guiado y creación de handoff autenticado a Integración. La publicación externa pertenece exclusivamente al frente Integración.
 
 **No es el OCP de Observabilidad MCP.** Para acceso de modelos a registros, OAuth/scopes, filtros, cursores, salud y diagnóstico MCP, consultar `docs/frentes/observabilidad-mcp/OBJETO-CANONICO.md`. Ambos frentes tienen OCP y control independientes.
 
@@ -28,12 +28,12 @@ Los contenidos de la etapa mixta permanecen como historia con procedencia; su in
 
 ## 3. Referencia metodológica
 
-Fuente: `SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html`.
-- **DUG:** Samantha v377 · NX-377m.
-- **Metacanon:** 1.28.
-- **GOW:** 2.17.
-- **Blob DUG:** `54064c8fe00f872023a455f06596061ed69062ae`; commit main `8ee2482866b3dd085e58e05006727256d0274376` (2026-11-01T21:57:30Z).
-- **Lectura:** 2026-11-06.
+Fuente: SeryMente/metodologia/main/gobernanza/METAPROMPT-CANONICO-SAMANTHA.html.
+- **DUG:** Samantha v398; discrepancia de firma pendiente de resolver: header NX-398m, mención interna NX-397m.
+- **Metacanon:** 1.31.
+- **GOW:** 2.25.
+- **Blob DUG:** 410c85c9afd36202c1e56cb519c677f3bc0205a1.
+- **Lectura:** 2026-11-15; §ARR, ART-031/ART-032, Metacanon §4 y principios pertinentes consultados.
 - **MCP-NORMATIVO:** DESACTIVADO.
 
 Se leyó §ARR y se adquirió el DUG vigente; se revisaron la cascada y los principios pertinentes P001, P004, P005, P035, P037–P043, junto con Metacanon §§4, 29, 42, 46–48 y GOW 2.17. MCP-NORMATIVO permanece DESACTIVADO. El propósito original del nuevo frente Observabilidad MCP está preservado verbatim en su OCP con interpretación separada. El MCP-NORMATIVO del DUG es distinto del servidor MCP de producto de Khora.
@@ -41,33 +41,35 @@ Se leyó §ARR y se adquirió el DUG vigente; se revisaron la cascada y los prin
 ## 4. Propósito y alcance
 
 ### Propósito
-Mantener una experiencia fiable para introducir contenido hablando en Khora: abrir la pantalla de dictado, iniciar la captura de voz explícitamente, recibir la transcripción, corregirla y continuar dictando sobre el texto sin perder lo previamente confirmado.
+Mantener una experiencia fiable para introducir contenido en Khora mediante voz o texto, en dos modalidades activas: Dictado normal y Crónica. La modalidad futura «Escuchar a Chrome / Organizar como diálogo» se incorpora como frontera oficial de Dictado, con objetivo de Fase 2. La sesión no termina al completar el checklist: termina únicamente al confirmar «Archivar registro» y dejar asentado el handoff que corresponda.
 
-### Incluido
-1. Pantalla y controles específicos de dictado.
-2. Inicio/detención explícitos y estado visible del micrófono/captura.
-3. Recepción del audio capturado para dictado.
-4. Transcripción a texto y estados de procesamiento/error.
-5. Edición de la transcripción y continuidad al reanudar.
-6. Pruebas específicas de pantalla, captura, transcripción, edición y continuidad.
+### Modalidades incluidas
 
-### Fuera de alcance — paquetes separados y pendientes de adjudicación
-- **Observabilidad MCP:** acceso a registros, scopes, filtros, paginación y diagnósticos; ahora tiene OCP independiente.
-- **Evaluación y retroalimentación:** benchmark, métricas de experiencia, encuestas y feedback (`CONTRATO-DICTADO-EXPERIENCE.md`, `khora-web/docs/dictado-experience.md`).
-- **Captura multipista / Diálogo:** audio de Chrome + micrófono y transcripción por fuente (`originales/DIALOGO-C022.md`, `originales/DIALOGO-INTEGRADO-C027.md`).
-- **Ingreso general, crónica y metadatos:** categorías de entrada, checklist U01–U06, Fecha/Hora/Lugar/Momento, crónica personal y metadatos. Compartir la ruta `Ingreso` no los convierte en Dictado.
+1. **Dictado normal:** captura explícita, recepción y transcripción de audio, edición y continuidad. Su comportamiento vigente no se altera por la modalidad Crónica.
+2. **Crónica:** dictado o escritura guiados por cuatro pistas no obligatorias: **Fecha y hora** (solo lo mencionado en el relato), **Lugar**, **Momento** (vocabulario plano y cotidiano) y **Qué pasa** (hechos, acciones, emociones, sensaciones, observaciones e ideas). La detección es local y conservadora; no consulta Groq por tecla. No usa IP ni cabeceras para inferir lugar. eventTime representa tiempo referido en el relato y capturedAt la hora real de captura; nunca se sustituyen entre sí. Las pistas se recalculan sobre el texto visible, pueden resolverse o desmarcarse al editar y no bloquean dictado ni archivo.
+3. **Autorización de publicación en Crónica:** el checkmark «Publicar automáticamente al archivar (Crónica y microblog)» inicia activo y puede desactivarse. Activo al pulsar «Archivar registro» significa autorización del dueño de extremo a extremo y crea handoff queued, autoPublish=true, publication_authorized=true, modalidad cronica, representación { cronica_sobria: true, microblog: { requested: true, max_characters: 280 } } y destinos github_blog, facebook, x, tiktok. Desactivado crea state=disabled, autoPublish=false y publication_authorized=false; no solicita ni autoriza publicación.
+4. **Escuchar a Chrome / Organizar como diálogo:** modalidad genérica, sin dependencia de Maya ni de otra persona específica. La frontera incluye captura de Chrome y micrófono con transcripción en vivo como objetivo de Fase 2. La implementación de esta fase no altera el Diálogo actual; la evolución de su captura y transcripción se hará en Fase 2 dentro de Dictado.
+
+### Contrato de cierre y handoff
+Dictado termina al confirmar «Archivar registro». En Crónica, la misma transacción que sella el volcado crea un registro idempotente de handoff para Integración ligado a (session_id, volcado_id, version, source_sha256), con intent_id estable y propietario derivado de autenticación. Dictado entrega estado y autorización; no publica, no invoca APIs externas y no duplica conectores. El consumidor, revisión operativa y publicación en GitHub Blog/Facebook/X/TikTok pertenecen al frente Integración. Una fila queued indica entrega durable pendiente de consumo, no publicación completada.
+
+### Fuera de alcance
+- **Observabilidad MCP:** acceso a registros, scopes, filtros, paginación y diagnósticos; OCP independiente.
+- **Evaluación y retroalimentación:** benchmark, métricas de experiencia, encuestas y feedback (CONTRATO-DICTADO-EXPERIENCE.md, khora-web/docs/dictado-experience.md).
+- **Ingreso general y metadatos ajenos a Crónica:** categorías U01–U06 y cualquier mecanismo general de clasificación que no sea el checklist acotado aquí.
 - **Voz y síntomas:** propuesta histórica no implementada; no autoriza inferencias de salud, ánimo o capacidad laboral.
-- **Publicación editorial:** preparación, revisión, consentimiento y publicación de contenido.
-- **Custodia:** frente independiente y fuera del alcance y backlog de Dictado. Ninguna tarea, contrato, responsabilidad ni criterio de aceptación de Custodia se incorpora a este frente; permanece en su OCP y registros propios.
-- **Instrumentación transversal:** `khora-web/docs/observability-services.md` permanece compartida, sin duplicar almacén.
+- **Publicación externa:** ejecución de conectores, manejo de credenciales/proveedores, revisión de destino y respuesta de cada plataforma; pertenece a Integración.
+- **Custodia:** frente independiente y fuera del alcance/backlog/titularidad de Dictado. Dictado solo usa los contratos de persistencia existentes sin apropiarse de sus mecanismos o datos.
+- **Chat / Open WebUI:** completamente fuera de alcance.
+- **Instrumentación transversal:** khora-web/docs/observability-services.md permanece compartida, sin duplicar almacén.
 - Cambios de credenciales, seguridad, proveedores, gasto, despliegue y producción requieren autorización independiente.
 
-Los originales y evidencias previos permanecen en sus ubicaciones; no se crea un frente nuevo por cada paquete sin propósito dictado conforme a Metacanon §39.
+No se alteran Adjuntar audio, Dictado normal, Diálogo actual, Custodia local/B2 ni Notas rápidas como parte del acuerdo de modalidad. No se incorporan llamadas a GitHub/Facebook/X/TikTok desde Dictado. Los originales y evidencias previos permanecen en sus ubicaciones.
 
 ## 5. Roles y colaboración
 
 - Operador: dueño del propósito, consentimiento, decisiones materiales y aceptación humana.
-- Asistencia responsable actual: esta instancia, control gen. 6; folio `PENDIENTE/NO ASIGNADO`; alias operativo `chatgpt-dictado-01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`; UUIDv7 local `01a1b2e1-a2dc-7881-aac7-ac9d900dd4e3`.
+- Asistencia responsable actual: esta instancia, control gen. 7; folio PENDIENTE/NO ASIGNADO; alias operativo chatgpt-dictado-01a1e010-10d7-7c58-92f3-38c493888dc4; UUIDv7 local 01a1e010-10d7-7c58-92f3-38c493888dc4.
 - Constructor independiente: no asignado en C044; no inventar roles.
 - Observabilidad MCP: frente independiente sin titular asignado en C044.
 - Escritura: un escritor por cambio lógico; cualquier cambio de producto conserva autorización y validación propias.
@@ -83,13 +85,14 @@ Los originales y evidencias previos permanecen en sus ubicaciones; no se crea un
 | Limitar Dictado a captura/transcripción/UI | Instrucción directa C044 | Benchmark, Diálogo, Ingreso general, MCP y publicación quedan fuera. |
 | PR #335 | Candidato amplio de Ingreso U01–U06 | No se atribuye íntegramente a Dictado ni se fusiona por C044. |
 | Código/seguridad/despliegue | No autorizados por este traspaso | Requieren compuertas propias. |
+| Implementar Fase 0/Fase 1 de Crónica en rama aislada desde HEAD de main | Autorizada por instrucción directa del operador del 2026-11-15 | Solo frontera documental, UI Crónica, checklist local, snapshot/checkpoint y handoff transaccional; no autoriza merge, despliegue, migración productiva ni cambios del frente Integración. |
 | Aceptación funcional | Pendiente | No inferir de evidencia histórica. |
 
 La etapa mixta se conserva en la crónica y el Anexo A; sus citas no reactivan autorizaciones previas.
 
 ## 7. Perfil de entorno
 
-- Repositorio privado `SeryMente/khora`; acceso GitHub de lectura/escritura verificado.
+- Repositorio público SeryMente/khora (visibilidad observada en GitHub); acceso GitHub de lectura/escritura verificado. No se cambió visibilidad ni configuración del repositorio.
 - Rama `main`; base C044 `43ff0ad2bed21b375c658ac80e865d92aa7fd87b`.
 - RDC utilizado para localizar, leer, obtener metadatos, calcular SHA-256 y preparar el original. No se abrió un checkout de desarrollo ni se modificó el entorno de producto.
 - Producción no consultada ni modificada.
@@ -1216,3 +1219,15 @@ El proyecto Vercel usa un Build Command propio que no invoca npm prebuild. Para 
 
 ### Controles externos no ejecutados
 GitHub Actions, ejecución 38967613218, no inició trabajos: `The job was not started because recent account payments have failed or your spending limit needs to be increased.` Los estados Vercel de integración GitHub también señalan restricción de repositorio privado de organización en plan Hobby. No se modifican facturación, plan, visibilidad, permisos ni protecciones. Las comprobaciones ejecutadas directamente y el build Vercel son evidencia independiente, no equivalencia a Actions verde. La integración solo puede usar merge normal, sin anulación administrativa de controles.
+
+## Acuerdo del frente y estado Fase 0/1 — 2026-11-15
+
+- **Fase 0 acordada:** Crónica y Escuchar a Chrome / Organizar como diálogo forman parte de Dictado según los límites de §4. La modalidad de Chrome/diálogo descrita es objetivo de Fase 2; el comportamiento del Diálogo actual no se modifica en esta fase.
+- **Fase 1 implementada en rama de trabajo:** selector Dictado/Crónica en Ingreso; checklist local reversible de cuatro pistas; eventTime separado de capturedAt; checkmark activo por defecto, desactivable y persistido en CapturaSnapshot y /api/dictado/checkpoint.
+- **Límite de archivo:** el endpoint /api/dictado sella el volcado y, para Crónica, escribe integration_handoff dentro de la misma transacción PostgreSQL. La clave durable incluye session_id, volcado_id, version y source_sha256; la idempotencia de reintento usa intent_id + session_id.
+- **Estados:** checkmark activo = queued + auto_publish=true + publication_authorized=true; checkmark inactivo = disabled + ambos flags false. El propietario se deriva de auth().user.email. event_time y captured_at se almacenan separados.
+- **Consumidor Integración:** no se identificó consumidor que ejecute destinos externos dentro de main. La fila queued queda lista para Integración; Dictado no realiza llamadas a plataformas ni declara publicación completada.
+- **Rama inicial:** feat/dictado-cronica-fase0-1-20261115, creada desde HEAD de main fae473c21985d38623d4b693c10af32176536b95. No se integran PR #335, #330, #334 ni #354.
+- **No regresión y fronteras:** no se alteran Dictado normal, Adjuntar audio, Diálogo actual, Custodia local/B2 ni Notas rápidas; Chat/Open WebUI queda fuera. No se añaden APIs externas de publicación en Dictado.
+- **Estado de validación:** la implementación y sus pruebas quedan sujetas a los resultados reales del ciclo de trabajo. La migración 034 debe aplicarse en el entorno de base de datos de destino antes de insertar handoffs; esta rama no modifica la BD productiva ni despliega.
+- **Aceptación:** branch implementation no equivale a merge, migración productiva, consumidor Integración operativo, publicación de extremo a extremo ni aceptación humana.

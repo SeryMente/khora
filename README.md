@@ -29,7 +29,7 @@ OCP observados en `main` (rutas vigentes, incluidas las heredadas):
 5. [Custodia transversal](frentes/custodia/OBJETO-CANONICO.md) — persistencia, seguridad y recuperación entre canales.
 6. [Notas](frentes/notas/OBJETO-CANONICO.md) — desarrollo del componente Notas de Khora.
 
-**Fronteras:** Dictado y Observabilidad MCP tienen OCP/controles independientes. Custodia conserva su titularidad transversal. Notas rápidas tiene OCP/control propios; no absorbe Dictado ni Custodia. Benchmark/feedback, Diálogo multipista, Ingreso general/crónica/metadatos, voz/síntomas y publicación editorial permanecen fuera de Dictado y pendientes de adjudicación; su clasificación está en el OCP Dictado §4.
+**Fronteras:** Dictado y Observabilidad MCP tienen OCP/controles independientes. Custodia conserva su titularidad transversal. Notas rápidas tiene OCP/control propios; no absorbe Dictado ni Custodia. Crónica forma parte de Dictado según el OCP §4; «Escuchar a Chrome / Organizar como diálogo» es la modalidad genérica prevista para Fase 2 dentro del mismo frente. Ingreso general/metadatos ajenos a Crónica, benchmark/feedback y voz/síntomas permanecen fuera. La ejecución de publicación externa pertenece a Integración, nunca a Dictado.
 
 ## Organización de frentes y recursos
 
