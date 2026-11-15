@@ -810,7 +810,7 @@ export function PipelineView({
                               onClick={() => actions.onExportMp3?.()}
                               disabled={exportingMp3 || Number(selectedItem.storage_summary?.legacy_pending_count || 0) > 0}
                               className="px-2 py-1 border border-emerald-500/50 bg-emerald-950/30 hover:bg-emerald-900/50 text-emerald-300 font-bold text-[10px] flex items-center gap-1 cursor-pointer shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
-                              title={Number(selectedItem.storage_summary?.legacy_pending_count || 0) > 0 ? "No se puede reconstruir el audio completo mientras haya partes históricas en Vercel Blob pendientes de recuperación." : "Descargar el MP3 conservado"}
+                              title={Number(selectedItem.storage_summary?.legacy_pending_count || 0) > 0 ? "No se puede reconstruir el audio completo mientras el audio histórico permanezca temporalmente no disponible." : "Descargar el MP3 conservado"}
                             >
                               <Icons.Download size={13} />
                               {exportingMp3 ? "Generando MP3..." : "Descargar MP3"}
