@@ -114,7 +114,7 @@ async function* exportCheckpointJsonl(
   while (true) {
     const result = lastRevision
       ? await client.query(
-          `SELECT revision_id::text AS revision_id, session_id, usuario, client_at, texto, sha256, snapshot, creado_en
+          `SELECT revision_id::text AS revision_id, session_id, usuario, client_at, texto, sha256, snapshot, creado_en::text AS creado_en
            FROM public.dictado_checkpoint
            WHERE revision_id > $1::uuid
            ORDER BY revision_id ASC
@@ -122,7 +122,7 @@ async function* exportCheckpointJsonl(
           [lastRevision, PAGE_SIZE],
         )
       : await client.query(
-          `SELECT revision_id::text AS revision_id, session_id, usuario, client_at, texto, sha256, snapshot, creado_en
+          `SELECT revision_id::text AS revision_id, session_id, usuario, client_at, texto, sha256, snapshot, creado_en::text AS creado_en
            FROM public.dictado_checkpoint
            ORDER BY revision_id ASC
            LIMIT $1`,
