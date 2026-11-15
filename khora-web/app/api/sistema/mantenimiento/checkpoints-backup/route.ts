@@ -209,6 +209,8 @@ export async function POST(req: NextRequest) {
     await client.query("BEGIN");
     transactionOpen = true;
     await client.query("SET LOCAL lock_timeout = '30000ms'");
+    const runLock = await client.query("SELECT pg_try_advisory_xact_lock(734561232345678901::bigint) AS acquired");
+    if (runLock.rows[0]?.acquired !== true) throw new Error("checkpoint_backup_already_running");
     // SHARE blocks new INSERT/UPDATE/DELETE while preserving ordinary SELECT access.
     await client.query("LOCK TABLE public.dictado_checkpoint IN SHARE MODE");
 
@@ -330,7 +332,7 @@ export async function POST(req: NextRequest) {
     const committedByReadback = truncateCommitAttempted && actualRows === "0";
     const knownCommitted = truncateCommitted || committedByReadback;
     const knownPreserved = actualRows === EXPECTED.rows;
-    const status = message === "checkpoint_backup_baseline_changed" ? 409 : 500;
+    const status = ["checkpoint_backup_baseline_changed", "checkpoint_backup_already_running"].includes(message) ? 409 : 500;
     return reply({
       ok: false,
       error: message,
