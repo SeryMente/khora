@@ -41,3 +41,31 @@ Se incorpora Chat como nueva entrada de navegación y ruta `/chat`, manteniendo 
 La incorporación de la interfaz/proxy es código en una rama, no Chat activo ni conversación E2E aceptada. A las 2026-11-15 23:51 UTC: `UI Contract` y `api-tests` pasaron; el gate web superó typecheck, revisión UI y contrato de navegación; CodeQL Python/Actions/JavaScript finalizó sin fallos. Playwright y el build completo seguían en curso. `calidad` falló antes de pyright/pytest porque Ruff detectó imports desordenados en `tests/test_graph_cycle_regressions.py` y `tests/test_runtime_leiden_contract.py`, archivos no modificados por este PR. No hubo cambio de Render, Vercel production, secretos, base de datos, flags ni despliegue.
 
 FOL1 sigue PREPARADO/NO ACTIVO; no se asignan folios CV/CY/A/B ni SES.
+
+## Continuidad · 2026-11-16
+
+### Correcciones realizadas en la rama
+
+- Se actualizaron los contratos Playwright de `khora-web/e2e/shell-v2.spec.ts`: la navegación principal ahora espera 7 entradas (Chat se añade sin sustituir Consulta).
+- Se corrigió el orden de imports Ruff en `kernel/tests/test_graph_cycle_regressions.py` y `kernel/tests/test_runtime_leiden_contract.py`.
+- Se acotó `import-linter` a `>=2.0,<2.16`: la versión 2.16 rechaza `unresolved_modules`, opción que la configuración vigente conserva en sus contratos.
+- Verificación de rama: `api-tests` SUCCESS; `calidad` SUCCESS (Ruff, Pyright, Neo4j setup y pytest); `G-4 Fronteras del Kernel` SUCCESS. En el último sondeo, `UI Contract`, `UI E2E` y `khora-ok` seguían en ejecución. No se declara E2E completa.
+
+### Preview Vercel
+
+Se crearon variables branch-scoped, exclusivamente para `feat/espacio-chat-openwebui-preserve-consulta-20261115`:
+- `KHORA_CHAT_ENABLED=1` (plain, Preview).
+- `KHORA_API_URL=https://khora-zy70.onrender.com` (plain, Preview).
+Producción conserva su gate deshabilitado. `KHORA_API_KEY` no se ha copiado ni descifrado; el proxy lo necesita para firmar la identidad hacia el runtime. La transferencia a Preview queda pendiente de autorización expresa y específica.
+
+### Recuperación del runtime Render
+
+Se solicitó un redeploy manual del mismo commit ya desplegado, sin modificar código ni variables: `5192ec3232244f8d709b7c163b4643c52afd7c0e`, deploy `dep-dbtib4jm8hqs73b158r0`. El build registró `KHORA_NATIVE_SLIM_BUILD_OK` y el probe de solo lectura `KHORA_E72_OWNERSHIP` confirmó conversación existente, propietario autorizado, denegación a no propietario, historial durable y cero nuevas cuentas/escrituras de grafo. El estado del deploy seguía `build_in_progress` en el último sondeo.
+
+El servicio conservó logs de una instancia anterior con fallo de arranque: resolución DNS de AuraDB para `a3883457.databases.neo4j.io:7687` devolvió `socket.gaierror`; por ello esa instancia no inició FastAPI. No se atribuye todavía el fallo a la base AuraDB en sí: falta confirmar el resultado del nuevo despliegue y la conectividad desde la instancia nueva.
+
+### Estado operativo
+
+- Consulta permanece intacta; no se tocó su ruta, API, recuperador ni GraphRAG.
+- No se hizo merge ni despliegue Vercel a producción.
+- La prueba manual del operador queda pendiente hasta tener preview READY, runtime saludable y clave de bridge autorizada/configurada.
