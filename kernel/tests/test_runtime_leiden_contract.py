@@ -8,6 +8,7 @@ import networkx as nx
 
 import khora_kernel.communities as communities
 
+
 def test_projection_revision_is_independent_of_undirected_insertion_order():
     a = nx.Graph()
     a.add_nodes_from(["alice", "bob"])
