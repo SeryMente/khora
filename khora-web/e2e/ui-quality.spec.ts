@@ -5,6 +5,7 @@ const PRODUCT_ROUTES = [
   "/sistema/custodia",
   "/sistema/ingreso",
   "/sistema/consulta",
+  "/chat",
   "/sistema/kpis",
   "/grafo",
   "/mapa",
@@ -102,11 +103,13 @@ for (const viewport of [
       await page.goto("/sistema/custodia", { waitUntil: "domcontentloaded" });
       await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
 
-      await expect(page.locator("[data-navigation-entry]")).toHaveCount(6);
+      await expect(page.locator("[data-navigation-entry]")).toHaveCount(7);
       const primaryIds = await page.locator("[data-navigation-entry]").evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-navigation-entry")));
-      expect(primaryIds).toEqual(["ingreso", "custodia", "grafo", "consulta", "seguridad", "sistema"]);
+      expect(primaryIds).toEqual(["ingreso", "custodia", "grafo", "consulta", "chat", "seguridad", "sistema"]);
       await expect(page.getByRole("link", { name: "Ingreso", exact: true })).toBeVisible();
       await expect(page.getByRole("link", { name: "Custodia", exact: true })).toBeVisible();
+      await expect(page.getByRole("link", { name: "Consulta", exact: true })).toBeVisible();
+      await expect(page.getByRole("link", { name: "Chat", exact: true })).toBeVisible();
       await expect(page.getByRole("link", { name: "Capturar", exact: true })).toHaveCount(0);
       await expect(page.getByRole("link", { name: "Dictado", exact: true })).toHaveCount(0);
       await expect(page.getByRole("link", { name: "Edición", exact: true })).toHaveCount(0);
@@ -137,6 +140,16 @@ for (const viewport of [
 
       await page.getByRole("button", { name: "Sistema", exact: true }).click();
       await expect(systemMenu).toHaveCount(0);
+    });
+
+
+    test("Chat is reachable independently and keeps its own same-origin Open WebUI frame", async ({ page }) => {
+      await page.goto("/chat", { waitUntil: "domcontentloaded" });
+      await expect(page.getByRole("heading", { name: "Chat", exact: true })).toBeVisible();
+      const frame = page.locator('iframe[title="Open WebUI"]');
+      await expect(frame).toBeVisible();
+      await expect(frame).toHaveAttribute("src", "/chat/frame");
+      await expect(page.locator('[data-navigation-entry="consulta"]')).toBeVisible();
     });
 
     test("los aliases históricos resuelven a superficies canónicas", async ({ page }) => {

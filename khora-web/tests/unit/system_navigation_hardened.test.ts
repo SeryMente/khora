@@ -8,11 +8,29 @@ const root = process.cwd();
 const bar = readFileSync(join(root, "app/components/os/SystemBar.tsx"), "utf8");
 
 test("primary navigation stays bounded and registry-driven", () => {
-  assert.equal(NAVIGATION_REGISTRY.length, 6);
+  assert.equal(NAVIGATION_REGISTRY.length, 7);
   assert.ok(NAVIGATION_REGISTRY.length <= MAX_PRIMARY_NAVIGATION_ITEMS);
   assert.deepEqual(NAVIGATION_REGISTRY.map((entry) => entry.id), [
-    "ingreso", "custodia", "grafo", "consulta", "seguridad", "sistema",
+    "ingreso", "custodia", "grafo", "consulta", "chat", "seguridad", "sistema",
   ]);
+});
+
+
+test("Chat is an additional primary surface; Consulta remains intact", () => {
+  const consulta = NAVIGATION_REGISTRY.find((item) => item.id === "consulta");
+  const chat = NAVIGATION_REGISTRY.find((item) => item.id === "chat");
+  assert.ok(consulta);
+  assert.ok(chat);
+  assert.equal(consulta.href, "/sistema/consulta");
+  assert.deepEqual(consulta.coverage, ["/sistema/consulta"]);
+  assert.equal(chat.href, "/chat");
+  assert.deepEqual(chat.coverage, ["/chat", "/chat/frame"]);
+  assert.equal(NAVIGATION_LEGACY_ALIASES.has("/sistema/consulta"), false);
+  const consultaPage = readFileSync(join(root, "app/sistema/consulta/page.tsx"), "utf8");
+  const consultaApi = readFileSync(join(root, "app/api/consulta/route.ts"), "utf8");
+  assert.match(consultaPage, /ConsultaView/);
+  assert.match(consultaApi, /\/api\/v1\/consulta/);
+  assert.ok(readFileSync(join(root, "app/chat/page.tsx"), "utf8").includes('src="/chat/frame"'));
 });
 
 test("system menu only exposes secondary surfaces", () => {

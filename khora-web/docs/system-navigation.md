@@ -9,17 +9,23 @@ Toda capacidad de producto que tenga una ruta operativa debe tener una entrada a
 
 ## Navegación principal
 
-La barra inferior contiene seis dominios primarios de uso frecuente más el control de tema:
+La barra inferior contiene siete dominios primarios de uso frecuente más el control de tema:
 
 - Custodia → `/sistema/custodia`
 - Ingreso → `/sistema/ingreso`
 - Grafo → abre Grafo / Mapa
-- Consulta → `/sistema/consulta`
+- Consulta → `/sistema/consulta` (superficie GraphRAG existente, conservada)
+- Chat → `/chat` (Open WebUI, superficie independiente)
 - Seguridad → abre Seguridad / Entorno Persistente / Bóveda / Control MCP
 - Sistema → abre Herramientas / OPI-VRI / KPIs / Roadmap / Adherencia / Evidencia normativa / Registro
 
 **Decisión semántica:** Capturar, Dictado, Edición e Ingesta no son dominios primarios independientes. Son fases/capacidades del mismo ciclo de entrada de memoria y se alojan dentro del workspace canónico **Ingreso**.
 
+## Consulta y Chat: superficies independientes
+
+**Consulta** permanece en `/sistema/consulta`. Conserva su componente, su proxy `/api/consulta`, el contrato con `/api/v1/consulta` y el recuperador GraphRAG del kernel. Esta incorporación no redirige, retira ni modifica esos componentes.
+
+**Chat** se incorpora en `/chat` como marco del Open WebUI nativo de Khora. El navegador solo habla con rutas de mismo origen; el proxy de servidor deriva la identidad desde `auth()`, firma la petición hacia el runtime y aplica una lista permitida de rutas. La ruta queda detrás de `KHORA_CHAT_ENABLED=1`; esta modificación no activa ni cambia el valor productivo de esa compuerta.
 ## Workspace Ingreso
 
 La única superficie de producto para el ciclo de entrada es:
@@ -113,6 +119,8 @@ La navegación se protege con:
 - `app/navigation/registry.ts`: fuente declarativa única.
 - `scripts/check_navigation_contract.ts`: cobertura bidireccional y clasificación de rutas.
 - `tests/unit/system_navigation_hardened.test.ts`: límites, agrupación semántica, ausencia de overflow y affordance de flechas.
+- `tests/unit/chat_proxy.test.ts`: identidad firmada, allowlist, métodos, redirecciones y redacción del proxy Open WebUI.
+- `e2e/ui-quality.spec.ts`: acceso independiente a Chat y permanencia de Consulta.
 - `e2e/shell-v2.spec.ts`: apertura real de los tres submenús restantes, bounds del viewport en 1440/1024/768/390 y cierre; Ingreso se valida como enlace directo y workspace de modos.
 - `e2e/ui-quality.spec.ts`: navegación y accesibilidad por escritorio y móvil.
 

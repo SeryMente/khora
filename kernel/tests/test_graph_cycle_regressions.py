@@ -1,20 +1,27 @@
 """Controlled regression/integration tests, NOT real-service E2E accreditation."""
 import json
 import os
-from pathlib import Path
 import tempfile
-from types import SimpleNamespace
 import unittest
+from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from khora_kernel.api import (
-    ContextoDeVisibilidad, EntidadIngresada, NivelSuficiencia, NodoSubgrafo,
-    Provenance, ResultadoDeConsulta, SubgrafoRelevante,
+    ContextoDeVisibilidad,
+    EntidadIngresada,
+    NivelSuficiencia,
+    NodoSubgrafo,
+    Provenance,
+    ResultadoDeConsulta,
+    SubgrafoRelevante,
 )
 from khora_kernel.engine import core
 from khora_kernel.engine.history import Ht, HtEvidence, load_ht, save_ht
 from khora_kernel.epistwin_audit import (
-    compare_community_ab, membership_stability, membership_stability_report,
+    compare_community_ab,
+    membership_stability,
+    membership_stability_report,
 )
 
 
