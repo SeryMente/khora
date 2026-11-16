@@ -53,6 +53,22 @@
         "No activar KHORA_CHAT_ENABLED en producción, modificar datos, aplicar migraciones ni desplegar a producción."
       ],
       "status": "authorized_for_isolated_code_change; not merged or deployed"
+    },
+    {
+      "date": "2026-11-16",
+      "source_literal": "Entonces resuelvelo de extremo a extremo. Yo hare l aprueba en el navegador.",
+      "authorization_scope": [
+        "Completar correcciones de CI directamente relacionadas con los contratos de navegación y bloqueos de lint/imports detectados al validar esta rama.",
+        "Preparar y habilitar exclusivamente el preview Vercel de esta rama con KHORA_CHAT_ENABLED=1 y KHORA_API_URL apuntando al servicio Render existente para que el operador realice la prueba manual.",
+        "Auditar y reparar la disponibilidad del runtime Open WebUI manteniendo aislada la experiencia de Chat y preservando Consulta."
+      ],
+      "explicit_exclusions": [
+        "No modificar, borrar, redirigir ni degradar Consulta, sus rutas, APIs, GraphRAG, recuperador o datos.",
+        "No activar Chat en Vercel Production ni desplegar cambios de código a producción.",
+        "No copiar ni revelar secretos de producción a Preview sin autorización expresa y específica del operador.",
+        "No ejecutar migraciones, escrituras de datos o pruebas con contenido personal."
+      ],
+      "status": "authorized_for_branch_ci_and_preview_preparation; production_and_secret_transfer_gated"
     }
   ]
 }
