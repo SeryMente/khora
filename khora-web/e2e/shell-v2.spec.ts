@@ -45,7 +45,7 @@ test.describe('Shell Navegación v3', () => {
     await page.goto('/sistema/custodia');
     await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
 
-    await expect(page.locator('[data-navigation-entry]')).toHaveCount(6);
+    await expect(page.locator('[data-navigation-entry]')).toHaveCount(7);
     await expect(page.getByRole('link', { name: 'Ingreso', exact: true })).toBeVisible();
     for (const name of ['Grafo', 'Seguridad', 'Sistema']) {
       await expect(page.getByRole('button', { name, exact: true })).toBeVisible();
@@ -97,7 +97,7 @@ test.describe('Shell Navegación v3', () => {
       await page.setViewportSize(viewport);
       await page.goto('/sistema/custodia');
       await expect(page.locator('[data-testid="khora-splash"]')).toHaveCount(0, { timeout: 3000 });
-      await expect(page.locator('[data-navigation-primary-count]')).toHaveAttribute('data-navigation-primary-count', '6');
+      await expect(page.locator('[data-navigation-primary-count]')).toHaveAttribute('data-navigation-primary-count', '7');
 
       for (const name of ['Grafo', 'Seguridad', 'Sistema']) {
         const button = page.getByRole('button', { name, exact: true });
