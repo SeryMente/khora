@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.48; OBJECT_SEAL=CUSTODIA-v0.48; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.49; OBJECT_SEAL=CUSTODIA-v0.49; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 14 · CUSTODIA-01/03/04 ABIERTAS · NUEVAS ESCRITURAS B2-ONLY · READ-BACK FÍSICO Y SHA-256 IMPLEMENTADOS · PREVIEW FOCAL VALIDADO · PRODUCTION READY · PREFLIGHT B2 READ-ONLY PASS · E2E AUTENTICADO PENDIENTE · PR #368 ABIERTO (SIN MERGE; READ-BACK LÓGICO PENDIENTE) · PERFIL OPERATIVO TEMPORAL PC-14\\PC 13 VALIDADO · RESPALDO DE CHECKPOINTS B2 NO EJECUTADO · 11,413 CHECKPOINTS PRESERVADOS (ÚLTIMA LECTURA 2026-11-15; NO REVALIDADOS EN ESTA RETOMA) · BLOB HISTÓRICO CONSERVADO · MIGRACIÓN DIFERIDA · SIN TRUNCATE, BACKFILL, CAMBIOS DE REFERENCIAS NI BORRADO.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.48. Metacanon: 1.29. La decisión operativa vigente conserva los objetos históricos Blob en sus localizadores y dirige todo contenido nuevo exclusivamente a Backblaze B2. La publicación no equivale a aceptación E2E: falta completar las compuertas de respaldo de checkpoints y la aceptación autenticada.
+> **ESTADO · VIVO · GENERACIÓN 14 · CUSTODIA-01/03/04 ABIERTAS · NUEVAS ESCRITURAS B2-ONLY · READ-BACK FÍSICO Y SHA-256 IMPLEMENTADOS · PREVIEW FOCAL VALIDADO · PRODUCTION READY · PREFLIGHT B2 READ-ONLY PASS · E2E AUTENTICADO PENDIENTE · PR #368 ABIERTO (SIN MERGE; READ-BACK LÓGICO PENDIENTE) · PERFIL OPERATIVO TEMPORAL PC-14\\PC 13 VALIDADO · RDC ONLINE RECONFIRMADO · VERCEL CLI BUILD BLOQUEADO POR PAQUETE NPM VLT INCOMPLETO · RESPALDO DE CHECKPOINTS B2 NO EJECUTADO · 11,413 CHECKPOINTS PRESERVADOS (ÚLTIMA LECTURA 2026-11-15; NO REVALIDADOS EN ESTA RETOMA) · BLOB HISTÓRICO CONSERVADO · MIGRACIÓN DIFERIDA · SIN TRUNCATE, BACKFILL, CAMBIOS DE REFERENCIAS NI BORRADO.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.49. Metacanon: 1.29. La decisión operativa vigente conserva los objetos históricos Blob en sus localizadores y dirige todo contenido nuevo exclusivamente a Backblaze B2. La publicación no equivale a aceptación E2E: falta completar las compuertas de respaldo de checkpoints y la aceptación autenticada.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -916,5 +916,39 @@ Se incorpora [GUIA-PERSISTENCIA-B2-MASTER.md](GUIA-PERSISTENCIA-B2-MASTER.md), p
 - Tras el segundo build, Remote Desktop Commander devolvió en una llamada de ejecución `No Desktop Commander device is currently online`, pese a que `list_devices` seguía reportando PC-14 como Online. No se pudo confirmar una sesión remota utilizable; queda bloqueada toda ejecución adicional en Windows hasta recuperar el canal y verificar proceso/identidad.
 - **Producción sin cambios por esta sesión:** no se ejecutó `vercel env run -e production` para el respaldo; no hubo exportación de 11,413 checkpoints, gzip/cifrado KHC2 ni upload a B2; no hubo read-back de B2, `TRUNCATE`, escritura/sonda Neon ni T-05 C1-C4.
 - **Próxima secuencia:** restaurar RDC y validar identidad/rutas; resolver el error VLT de la instalación/build local sin materializar Secret values ni `.env`; conseguir un build correcto; sólo entonces intentar `vercel deploy --prebuilt` Preview y registrar si la cuota 402 cede. Mantener intacta la compuerta de read-back lógico del objeto B2 antes de cualquier truncado. No fusionar PR #368 ni operar Production hasta que se cumplan todas las compuertas indicadas.
+
+## Reintento RDC y diagnóstico confirmado del paquete VLT · 2026-11-16 · CUSTODIA-v0.49
+
+### Recuperación del canal remoto
+
+- **RDC vuelve a estar operativo:** una nueva enumeración reportó `PC-14` Online (device ID `251fc988-671f-43dc-921b-701534abb753`), y `start_process` terminó correctamente con salida observable.
+- **Identidad efectiva comprobada en la nueva ejecución:** `PC-14\\PC 13`; SID `S-1-5-21-1094932887-1468116028-2730151477-1002`; `Win32_UserProfile.LocalPath=C:\\Users\\PC 13`, perfil cargado; `USERPROFILE=C:\\Users\\PC 13`. Runtime: Node `v24.22.3`, npm `11.19.1`. La excepción temporal del control sigue limitada a CUSTODIA-B2-006, ese perfil y ese dispositivo.
+- **Autenticación Vercel revalidada:** `vercel whoami` devolvió `victorhugotorresmendez-8991`; `vercel ls` completó y enumeró deployments del proyecto `khora-web`. No se cambió el proyecto ni su configuración.
+- El clone permanece en `C:\\Users\\PC 13\\src\\khora-pr368`; branch `ops/checkpoint-backup-b2-prune-20261115`; HEAD `25eaee16cd4cfc39a236d1f75d3138ee095a99d7`; working tree limpio. No se fusionó, rebasó ni actualizó el PR.
+
+### Causa raíz del fallo VLT observada
+
+- CLI instalada: `vercel@65.16.0`; dependencia `@vercel/cli-support@65.16.0`.
+- El código del loader VLT en `dist/chunks/chunk-4CACOKMS.js` define `GRAPH_FILE=builder-graph.json.br` e `INDEX_FILE=builder-index.json`; busca cada recurso en `dist/chunks/` y `dist/builders/`.
+- La instalación local no contiene ninguno de esos cuatro candidatos ni ningún archivo `.br` dentro del árbol `vercel/node_modules`. El paquete sí contiene el loader `vlt-builder-graph-XL2XRO4V.js` (531 bytes), que importa el módulo del loader y reexporta sus funciones.
+- **Verificación del paquete publicado:** `npm pack @vercel/cli-support@65.16.0` produjo tarball de 3,139,086 bytes, SHA-256 `A5667B6330A8BCF2140C9B4AB5D5F9E87995670E69BCED6A5C55601EDE517EF2`; el shasum npm del tarball fue `f21f68561e5007f1e929b94bcbce722000dc8e11`, idéntico a `npm view @vercel/cli-support@65.16.0 dist.shasum`. El listado completo no contiene `builder-graph.json.br` ni `builder-index.json`. Por tanto la ausencia no proviene de una extracción incompleta del ZIP/TGZ en esta máquina: está ausente del artefacto publicado que se descargó del registro.
+- Los tarballs revisados de versiones anteriores `65.15.0`, `65.14.0`, `65.12.1` y `65.3.1`, además de `65.16.1-snapshot-c7f6a2a993e4`, tampoco listaron esos assets. Degradar sin evidencia adicional no es una solución verificada.
+- El reintento `vercel env run -e preview -- vercel build` volvió a fallar con `[BUILD_FAILED] Could not load the embedded vlt Builder graphs`, código 1. El aviso de tres Secret values no transferibles a local es independiente: no se escribieron a disco ni se sustituyeron.
+- **Dictamen:** el bloqueo actual es reproducible y reside en el paquete de CLI publicado, no en RDC, el HEAD del PR ni el vínculo del proyecto. No generar un grafo artificial, no parchear manualmente `node_modules` y no desplegar una salida parcial.
+
+### Cierre del intento local
+
+- `vercel ls` continúa mostrando deployments Production recientes `Ready`; esto no prueba liberación de cuota 402.
+- No se intentó `vercel deploy --prebuilt`: no existe un `.vercel/output` válido. Se eliminó exclusivamente la salida parcial generada por el intento fallido y se conservó `.vercel/project.json` con los IDs/ajustes no secretos del proyecto.
+- La autenticación sigue activa; el vínculo de proyecto sigue siendo `khora-web` / `prj_hRN86BKITXYKTnNlp0ygVhaMwFfx` / `team_QBa5UlffJWznZ8ogFfKjaGQb`.
+- Se limpiaron los tarballs temporales de diagnóstico. El inventario de archivos de entorno solo encontró `.env.example` ya versionados. `.env.local` continúa ausente.
+- **Sin cambios productivos:** no export de checkpoints, upload B2, read-back, `TRUNCATE`, escritura/sonda Neon ni T-05. PR #368 sigue sin merge. La compuerta de read-back lógico KHC2/JSONL/manifest/count/SHA previa al truncado sigue obligatoria.
+
+### Reanudación
+
+1. Mantener la CLI autenticada y el vínculo canónico.
+2. Esperar/publicar una versión no-snapshot de `vercel`/`@vercel/cli-support` cuyo tarball incluya los recursos `builder-graph.json.br` y `builder-index.json`; antes de instalarla, inspeccionar el tarball y cotejar su shasum con npm.
+3. Repetir `vercel build`; solo si produce Build Output API íntegro, intentar `vercel deploy --prebuilt` a Preview (nunca `--prod` en esta prueba) para medir si la cuota 402 cedió.
+4. No ejecutar el respaldo ni el `TRUNCATE` hasta corregir el read-back lógico y desplegar la revisión aceptada. No ejecutar T-05 hasta que Neon acepte escrituras y la revisión final esté desplegada y validada.
 
 
