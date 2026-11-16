@@ -6,32 +6,32 @@
   "state_object": "frentes/custodia/OBJETO-CANONICO.md",
   "status": "assigned",
   "owner_thread": null,
-  "owner_alias": "chatgpt-custodia-01a1e16b-cb9e-75aa-a0d8-f01d3149651d",
+  "owner_alias": "chatgpt-custodia-01a1e517-1e60-7d86-a9ff-b1eb0dfb81e6",
   "owner_alias_type": "operational_alias_not_native_thread_id",
-  "instance": "chatgpt-custodia-INSTANCE-20261115-01A1E16B",
+  "instance": "chatgpt-custodia-INSTANCE-20261116-01A1E517",
   "session_folio": "PENDIENTE/NO ASIGNADO",
-  "generation": 13,
+  "generation": 14,
   "expiry": null,
-  "authorization_ref": "Instrucción directa del operador en esta conversación (2026-11-15): «Frente CUSTODIA. Persiste conversacion, esta en downloads, PC14, PC13 es el usuario... Adquiere cuidadosamente el contexto tomando el lugar del modelo en la conversación, adoptando su postura, su tono, su Lugar de manera que la transición sea sin costuras entre una conversación y otra». Se interpreta como TRANSFER_RESPONSIBILITY de generación 12→13, conservando el alcance y todas las exclusiones vigentes, sin ampliarlos.",
-  "authorization_event": "CUSTODIA-TRANSFER-20261115-01a1e16b-cb9e-7af6-9404-52d01ff8a27d",
+  "authorization_ref": "Instrucción directa del operador en esta conversación (2026-11-16): «Frente CUSTODIA. Persiste conversacion, esta en downloads, por RDC 01RENTA02... Adquiere cuidadosamente el contexto tomando el lugar del modelo en la conversación, adoptando su postura, su tono, su Lugar De manera que la transición sea sin costuras entre una conversación y otra». Se interpreta conforme a DUG P039 como TRANSFER_RESPONSIBILITY de generación 13→14, sin ampliar el alcance técnico ni levantar exclusiones.",
+  "authorization_event": "CUSTODIA-TRANSFER-20261116-01a1e517-1e60-7eec-ab2d-142cc2b97265",
   "previous_owner": {
     "status": "assigned",
     "owner_thread": null,
-    "owner_alias": "chatgpt-custodia-01a1dcee-4f04-737d-874a-5c8febd20841",
+    "owner_alias": "chatgpt-custodia-01a1e16b-cb9e-75aa-a0d8-f01d3149651d",
     "owner_alias_type": "operational_alias_not_native_thread_id",
-    "instance": "chatgpt-custodia-INSTANCE-20261114-01A1DCEE",
+    "instance": "chatgpt-custodia-INSTANCE-20261115-01A1E16B",
     "session_folio": "PENDIENTE/NO ASIGNADO",
-    "generation": 12,
-    "authorization_ref": "Instrucción directa del operador en esta conversación (2026-11-14): «Frente CUSTODIA. Persiste este último de la conversación... Adquiere cuidadosamente el contexto tomando el lugar del modelo en la conversación, adoptando su postura, su tono, su Lugar De manera que la transición sea sin costuras entre una conversación y otra». Confirmación posterior: «Adquiere contexto y continua». Se interpreta como TRANSFER_RESPONSIBILITY de generación 11→12 para continuar el frente y su tarea activa vigente, sin ampliar permisos ni levantar exclusiones.",
-    "authorization_event": "CUSTODIA-TRANSFER-20261114-01a1dcee-4f04-7caf-a1ef-b9b809ec04dd",
-    "record_kind": "owner_previous_to_generation_13",
-    "blob_sha": "d8477e1a4b48c7bd6161c0f2cb1660e72f1f5cef"
+    "generation": 13,
+    "authorization_ref": "Instrucción directa del operador en esta conversación (2026-11-15): «Frente CUSTODIA. Persiste conversacion, esta en downloads, PC14, PC13 es el usuario... Adquiere cuidadosamente el contexto tomando el lugar del modelo en la conversación, adoptando su postura, su tono, su Lugar de manera que la transición sea sin costuras entre una conversación y otra». Se interpreta como TRANSFER_RESPONSIBILITY de generación 12→13, conservando el alcance y todas las exclusiones vigentes, sin ampliarlos.",
+    "authorization_event": "CUSTODIA-TRANSFER-20261115-01a1e16b-cb9e-7af6-9404-52d01ff8a27d",
+    "record_kind": "owner_previous_to_generation_14",
+    "blob_sha": "6f303c8572d3ccb1c827a4e2d003593137e54977"
   },
-  "previous_authorization_ref": "Instrucción directa del operador en esta conversación (2026-11-14): «Frente CUSTODIA. Persiste este último de la conversación... Adquiere cuidadosamente el contexto tomando el lugar del modelo en la conversación, adoptando su postura, su tono, su Lugar De manera que la transición sea sin costuras entre una conversación y otra». Confirmación posterior: «Adquiere contexto y continua». Se interpreta como TRANSFER_RESPONSIBILITY de generación 11→12 para continuar el frente y su tarea activa vigente, sin ampliar permisos ni levantar exclusiones.",
-  "previous_acquired_at": "2026-11-14",
-  "prior_generation": 12,
-  "previous_blob": "d8477e1a4b48c7bd6161c0f2cb1660e72f1f5cef",
-  "base_blob_sha": "d8477e1a4b48c7bd6161c0f2cb1660e72f1f5cef",
+  "previous_authorization_ref": "Instrucción directa del operador en esta conversación (2026-11-15): «Frente CUSTODIA. Persiste conversacion, esta en downloads, PC14, PC13 es el usuario... Adquiere cuidadosamente el contexto tomando el lugar del modelo en la conversación, adoptando su postura, su tono, su Lugar de manera que la transición sea sin costuras entre una conversación y otra». Se interpreta como TRANSFER_RESPONSIBILITY de generación 12→13, conservando el alcance y todas las exclusiones vigentes, sin ampliarlos.",
+  "previous_acquired_at": "2026-11-15",
+  "prior_generation": 13,
+  "previous_blob": "6f303c8572d3ccb1c827a4e2d003593137e54977",
+  "base_blob_sha": "6f303c8572d3ccb1c827a4e2d003593137e54977",
   "assignment_method": "Transferencia documental condicionada al blob SHA vigente d8477e1a4b48c7bd6161c0f2cb1660e72f1f5cef; original exportado archivado y cotejado antes del cambio; actualización de CONTROL-RESPONSABILIDAD.json por GitHub con SHA anterior y lectura de vuelta obligatoria. Alias/UUIDv7 locales; ID nativo no expuesto.",
   "folio_collision_check": {
     "searched_scope": "Búsqueda exacta del UUIDv7 local y alias en el repositorio SeryMente/khora; 0 coincidencias. No acredita unicidad fuera del repositorio.",
@@ -43,16 +43,16 @@
     "matches_found": 0,
     "global_uniqueness": "not_verified"
   },
-  "acquired_at": "2026-11-15",
-  "bootstrap_scope": "Responsabilidad documental y operativa del frente CUSTODIA y continuidad exclusiva de la tarea activa CUSTODIA-B2-006. Se heredan sin ampliación las exclusiones del control vigente. Las acciones de respaldo, read-back, TRUNCATE condicionado y T-05 son únicamente las expresamente autorizadas en el original de 2026-11-15 16:12; el TRUNCATE no se ejecutará hasta completar y verificar el respaldo físico B2, y T-05 no se reanudará sin capacidad Neon y despliegue validado.",
+  "acquired_at": "2026-11-16",
+  "bootstrap_scope": "Responsabilidad documental/operativa del frente CUSTODIA y continuidad exclusiva de CUSTODIA-B2-006. Transferencia generacional 13→14 sin ampliar las autorizaciones técnicas ya registradas. El respaldo de checkpoints a B2 y el TRUNCATE condicionado siguen sujetos a todas las compuertas existentes; no ejecutar TRUNCATE antes del respaldo cifrado, read-back físico y SHA-256 coincidente. No reanudar T-05 hasta que Neon acepte escrituras y la revisión final esté desplegada y validada.",
   "enforcement": "cooperative registry; no server fencing of arbitrary writes",
   "readback_required": true,
-  "transcript_scope": "Exportación completa de la conversación anterior preservada en originales/ChatGPT-CUSTODIA-20261115-1641.md (2,799 líneas; 158,744 bytes; SHA-256 cotejado). Contiene instrucciones literales y la última salida visible del modelo anterior. La plataforma no expone ID nativo de conversación.",
+  "transcript_scope": "Copia de continuidad sanitizada preservada en frentes/custodia/originales/ChatGPT-CUSTODIA-20261116-1000-SANITIZADO.md (2,801 líneas; 158,943 bytes; SHA-256 42BF0B51CBD59BB278B9FCA7C35C5A8881C5B07C2CB435A2B2864D936C3979D6; Git blob 05fb273e4958839e9db28b056ecc83f3f978f775; commit adb9f443f36650459935037bc07572667f5d324d; read-back exacto). La exportación original completa permanece en Downloads, sin modificar (2,799 líneas; 158,836 bytes; SHA-256 7B42070718E37207BF14B7281068685E1DD633743C8F0A5BEC8B3C637C8BCB0C); la copia de repositorio omite el enlace privado de conversación y dos UUID internos de filas checkpoint. ID nativo de conversación no expuesto.",
   "authorization_original": {
-    "path": "frentes/custodia/originales/ChatGPT-CUSTODIA-20261115-1641.md",
-    "blob_sha": "a29809023efa67ad4f6147e703be50d8778f2774",
-    "sha256": "4A386F6BEE4198235CA33AE8F3B910A8AA1F7152065669F746DE4EFDD95D8DFD",
-    "scope": "Exportación conversacional completa que conserva instrucciones y salida final del ciclo anterior."
+    "path": "frentes/custodia/originales/ChatGPT-CUSTODIA-20261116-1000-SANITIZADO.md",
+    "blob_sha": "05fb273e4958839e9db28b056ecc83f3f978f775",
+    "sha256": "42BF0B51CBD59BB278B9FCA7C35C5A8881C5B07C2CB435A2B2864D936C3979D6",
+    "scope": "Copia de continuidad sanitizada de la exportación completa del 2026-11-16; conserva la última salida del modelo anterior y el contexto del frente."
   },
   "prior_visible_output_original": {
     "path": "frentes/custodia/originales/SALIDA-MODELO-CUSTODIA-ANTERIOR-RECUPERABILIDAD-INGRESOS-2026-10-28.md",
@@ -82,12 +82,12 @@
     },
     "previous_authorization_ref": "Instrucción directa del operador, 2026-10-28, preservada en originales/INSTRUCCION-INVENTARIO-RECUPERABILIDAD-INGRESOS-2026-10-28.md (blob 357f3c1cc9081a47f47dc3fa0b838e8f8eeed5a5). Autoriza inventariar provisionalmente los hallazgos sobre recuperabilidad dentro del OCP; no autoriza cambios de código, alteraciones de producción ni recuperaciones que puedan sobrescribir/eliminar originales. Asignación inicial desde control sin titular previo asignado. ID nativo de conversación no expuesto."
   },
-  "transfer_generation": 13,
-  "transfer_authority": "Samantha v399 · NX-399m; Metacanon 1.29; GOW v2.25; DUG blob 04741e3d77564db586faaa3bffa78b681c92886a; P039 habilita TRANSFER_RESPONSIBILITY cuando el operador identifica el frente y pide asumirlo.",
+  "transfer_generation": 14,
+  "transfer_authority": "Samantha v399 · NX-399m; Metacanon 1.29; GOW 2.25; DUG blob 04741e3d77564db586faaa3bffa78b681c92886a; P039 Reinstanciación del Frente, P006 Autonomía Ejecutiva. La instrucción identifica el frente y solicita asumir el lugar del modelo anterior.",
   "previous_owner_observed_on": "2026-11-14",
-  "local_conversation_uuidv7": "01a1e16b-cb9e-75aa-a0d8-f01d3149651d",
-  "local_conversation_uuidv7_type": "local_registry_identity_not_native_platform_id",
-  "authorization_event_uuidv7": "01a1e16b-cb9e-7af6-9404-52d01ff8a27d",
+  "local_conversation_uuidv7": "01a1e517-1e60-7d86-a9ff-b1eb0dfb81e6",
+  "local_conversation_uuidv7_type": "local_registry_identity_not_native_thread_id",
+  "authorization_event_uuidv7": "01a1e517-1e60-7eec-ab2d-142cc2b97265",
   "instance_collision_check": {
     "searched_scope": "Búsqueda exacta previa en SeryMente/khora del identificador de instancia; 0 coincidencias. No acredita unicidad global fuera del repositorio.",
     "repositories_searched": [
@@ -99,7 +99,7 @@
   },
   "session_folio_status": "PENDIENTE/NO ASIGNADO",
   "folio_status_note": "FOL1 continúa inactivo/no verificado; no se emiten folios globales CV/CY/A/B ni de sesión.",
-  "transfer_scope": "TRANSFER_RESPONSIBILITY: asumir la continuidad documental y operativa del frente CUSTODIA, mantener su OCP único y continuar CUSTODIA-B2-006. Heredar sin ampliación restricciones previas. La autorización técnica adicional del 2026-11-15 16:12 se conserva como condicional: PR #368 no integrado/desplegado, respaldo B2 y read-back aún no ejecutados, TRUNCATE no ejecutado, T-05 detenido hasta recuperar capacidad y validar deployment.",
+  "transfer_scope": "TRANSFER_RESPONSIBILITY: sustituir la titularidad documental/operativa de generación 13 por esta conversación, mantener el OCP único y continuar CUSTODIA-B2-006. Heredar sin ampliación las exclusiones previas. La autorización técnica del 2026-11-15 16:12 se mantiene condicional; PR #368 sigue sin merge, respaldo B2/read-back no ejecutados, TRUNCATE no ejecutado y T-05 detenido hasta cumplir las compuertas.",
   "previous_owner_generation_4": {
     "status": "assigned",
     "owner_thread": null,
@@ -278,6 +278,25 @@
         "No ampliar permisos de producción, credenciales, proveedores ni Neon.",
         "No ejecutar TRUNCATE antes de respaldo cifrado B2 con read-back físico y SHA-256 coincidente.",
         "No reanudar T-05 mientras Neon no acepte escrituras y el despliegue de la revisión final no esté validado."
+      ]
+    },
+    {
+      "event": "CUSTODIA-TRANSFER-20261116-01a1e517-1e60-7eec-ab2d-142cc2b97265",
+      "local_event_uuidv7": "01a1e517-1e60-7eec-ab2d-142cc2b97265",
+      "acquired_at": "2026-11-16",
+      "authorization_source": "Instrucción directa del operador en esta conversación (2026-11-16): «Frente CUSTODIA. Persiste conversacion, esta en downloads, por RDC 01RENTA02... Adquiere cuidadosamente el contexto tomando el lugar del modelo en la conversación, adoptando su postura, su tono, su Lugar De manera que la transición sea sin costuras entre una conversación y otra». Se interpreta conforme a DUG P039 como TRANSFER_RESPONSIBILITY de generación 13→14, sin ampliar el alcance técnico ni levantar exclusiones.",
+      "original": {
+        "path": "frentes/custodia/originales/ChatGPT-CUSTODIA-20261116-1000-SANITIZADO.md",
+        "blob_sha": "05fb273e4958839e9db28b056ecc83f3f978f775",
+        "sha256": "42BF0B51CBD59BB278B9FCA7C35C5A8881C5B07C2CB435A2B2864D936C3979D6"
+      },
+      "scope": "TRANSFER_RESPONSIBILITY generation 13→14: assume CUSTODIA, preserve the prior context and visible last-cycle output, maintain the canonical OCP, and continue only the existing active task CUSTODIA-B2-006.",
+      "exclusions": [
+        "No ampliar permisos de producción, credenciales, proveedores ni Neon.",
+        "No ejecutar TRUNCATE antes de respaldo cifrado B2 con read-back físico y SHA-256 coincidente.",
+        "No reanudar T-05 mientras Neon no acepte escrituras y el despliegue de la revisión final no esté validado.",
+        "No realizar backfill, migración histórica Blob→B2 ni cambios de referencias.",
+        "No operar fuera del ámbito de CUSTODIA-B2-006 ni alterar las demás tareas abiertas o diferidas."
       ]
     }
   ],
@@ -482,7 +501,20 @@
     "record_kind": "owner_previous_to_generation_13",
     "blob_sha": "d8477e1a4b48c7bd6161c0f2cb1660e72f1f5cef"
   },
-  "local_cycle_uuidv7": "01a1e16b-cb9e-777d-b7cf-2f2e15b3b338",
-  "local_input_uuidv7": "01a1e16b-cb9e-763f-8deb-d0d867a27abb",
-  "local_output_uuidv7": "01a1e16b-cb9e-7f34-bb99-504a8a6c809f"
+  "local_cycle_uuidv7": "01a1e517-1e60-7ff2-8052-cf35fd587420",
+  "local_input_uuidv7": "01a1e517-1e60-7cd3-9a44-7c37c0f8e0ec",
+  "local_output_uuidv7": "01a1e517-1e60-7df0-bf07-913ce8e51158",
+  "previous_owner_generation_13": {
+    "status": "assigned",
+    "owner_thread": null,
+    "owner_alias": "chatgpt-custodia-01a1e16b-cb9e-75aa-a0d8-f01d3149651d",
+    "owner_alias_type": "operational_alias_not_native_thread_id",
+    "instance": "chatgpt-custodia-INSTANCE-20261115-01A1E16B",
+    "session_folio": "PENDIENTE/NO ASIGNADO",
+    "generation": 13,
+    "authorization_ref": "Instrucción directa del operador en esta conversación (2026-11-15): «Frente CUSTODIA. Persiste conversacion, esta en downloads, PC14, PC13 es el usuario... Adquiere cuidadosamente el contexto tomando el lugar del modelo en la conversación, adoptando su postura, su tono, su Lugar de manera que la transición sea sin costuras entre una conversación y otra». Se interpreta como TRANSFER_RESPONSIBILITY de generación 12→13, conservando el alcance y todas las exclusiones vigentes, sin ampliarlos.",
+    "authorization_event": "CUSTODIA-TRANSFER-20261115-01a1e16b-cb9e-7af6-9404-52d01ff8a27d",
+    "record_kind": "owner_previous_to_generation_14",
+    "blob_sha": "6f303c8572d3ccb1c827a4e2d003593137e54977"
+  }
 }
