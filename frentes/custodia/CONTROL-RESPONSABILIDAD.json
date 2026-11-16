@@ -298,6 +298,23 @@
         "No realizar backfill, migración histórica Blob→B2 ni cambios de referencias.",
         "No operar fuera del ámbito de CUSTODIA-B2-006 ni alterar las demás tareas abiertas o diferidas."
       ]
+    },
+    {
+      "event": "CUSTODIA-PC-PROFILE-OVERRIDE-20261116-01a1e5b0-32c4-7153-b094-1a986251a618",
+      "local_event_uuidv7": "01a1e5b0-32c4-7153-b094-1a986251a618",
+      "acquired_at": "2026-11-16",
+      "authorization_source": "Respuesta literal del operador el 2026-11-16 a la confirmación expresa sobre el perfil Windows actual: «Si olvidate de fila 4 por ahora». Se interpreta como autorización para suspender temporalmente, en esta operación de CUSTODIA-B2-006, la restricción de uso exclusivo de C:\\Users\\fila4 y continuar desde el perfil ya observado PC-14\\PC 13 en el dispositivo RDC PC-14. No autoriza suplantar identidades, cambiar USERPROFILE, usar MantenimientoRCI como workspace ni operar desde otros dispositivos/perfiles.",
+      "scope": "Excepción temporal a la última restricción de scope_limits: permite continuar esta operación de CUSTODIA-B2-006 desde el perfil real PC-14\\PC 13, raíz C:\\Users\\PC 13, en el dispositivo RDC PC-14 (251fc988-671f-43dc-921b-701534abb753). Se mantiene la restricción para cualquier otro perfil/dispositivo.",
+      "exclusions": [
+        "No suplantar la identidad de fila4 ni modificar USERPROFILE para fingirla.",
+        "No utilizar el perfil o cuenta elevada CENTRAL\\MantenimientoRCI como workspace.",
+        "No extender esta excepción a otros perfiles, dispositivos, repositorios o frentes.",
+        "No ampliar permisos técnicos de producción, credenciales, Neon, B2, despliegues ni operaciones destructivas."
+      ],
+      "supersedes": "La última entrada de scope_limits que exige materializar repositorios, archivos, temporales y logs exclusivamente bajo C:\\Users\\fila4.",
+      "temporal_status": "vigente por instrucción del operador «por ahora»; sin fecha de expiración explícita",
+      "device_id": "251fc988-671f-43dc-921b-701534abb753",
+      "windows_identity_observed": "PC-14\\PC 13"
     }
   ],
   "previous_control_snapshot": {
@@ -516,5 +533,19 @@
     "authorization_event": "CUSTODIA-TRANSFER-20261115-01a1e16b-cb9e-7af6-9404-52d01ff8a27d",
     "record_kind": "owner_previous_to_generation_14",
     "blob_sha": "6f303c8572d3ccb1c827a4e2d003593137e54977"
-  }
+  },
+  "temporary_scope_overrides": [
+    {
+      "event": "CUSTODIA-PC-PROFILE-OVERRIDE-20261116-01a1e5b0-32c4-7153-b094-1a986251a618",
+      "local_event_uuidv7": "01a1e5b0-32c4-7153-b094-1a986251a618",
+      "status": "active",
+      "applies_to": "CUSTODIA-B2-006",
+      "supersedes": "La última entrada de scope_limits que exige materializar repositorios, archivos, temporales y logs exclusivamente bajo C:\\Users\\fila4.",
+      "authorized_profile": "PC-14\\PC 13",
+      "authorized_root": "C:\\Users\\PC 13",
+      "device_id": "251fc988-671f-43dc-921b-701534abb753",
+      "authorization_source": "Respuesta literal del operador el 2026-11-16 a la confirmación expresa sobre el perfil Windows actual: «Si olvidate de fila 4 por ahora». Se interpreta como autorización para suspender temporalmente, en esta operación de CUSTODIA-B2-006, la restricción de uso exclusivo de C:\\Users\\fila4 y continuar desde el perfil ya observado PC-14\\PC 13 en el dispositivo RDC PC-14. No autoriza suplantar identidades, cambiar USERPROFILE, usar MantenimientoRCI como workspace ni operar desde otros dispositivos/perfiles.",
+      "no_expiry_specified": true
+    }
+  ]
 }
