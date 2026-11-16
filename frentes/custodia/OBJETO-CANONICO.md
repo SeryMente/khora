@@ -1,7 +1,7 @@
-<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.47; OBJECT_SEAL=CUSTODIA-v0.47; SINGLE_LIVE_OBJECT=true -->
+<!-- METACANON_VERSION=1.29; OBJECT_VERSION=0.48; OBJECT_SEAL=CUSTODIA-v0.48; SINGLE_LIVE_OBJECT=true -->
 # Custodia · Objeto canónico de persistencia del frente de trabajo
 
-> **ESTADO · VIVO · GENERACIÓN 14 · CUSTODIA-01/03/04 ABIERTAS · NUEVAS ESCRITURAS B2-ONLY · READ-BACK FÍSICO Y SHA-256 IMPLEMENTADOS · PREVIEW FOCAL VALIDADO · PRODUCTION READY · PREFLIGHT B2 READ-ONLY PASS · E2E AUTENTICADO PENDIENTE · PR #368 ABIERTO (SIN MERGE; READ-BACK LÓGICO PENDIENTE) · PERFIL OPERATIVO TEMPORAL PC-14\\PC 13 VALIDADO · RESPALDO DE CHECKPOINTS B2 NO EJECUTADO · 11,413 CHECKPOINTS PRESERVADOS (ÚLTIMA LECTURA 2026-11-15; NO REVALIDADOS EN ESTA RETOMA) · BLOB HISTÓRICO CONSERVADO · MIGRACIÓN DIFERIDA · SIN TRUNCATE, BACKFILL, CAMBIOS DE REFERENCIAS NI BORRADO.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.47. Metacanon: 1.29. La decisión operativa vigente conserva los objetos históricos Blob en sus localizadores y dirige todo contenido nuevo exclusivamente a Backblaze B2. La publicación no equivale a aceptación E2E: falta completar las compuertas de respaldo de checkpoints y la aceptación autenticada.
+> **ESTADO · VIVO · GENERACIÓN 14 · CUSTODIA-01/03/04 ABIERTAS · NUEVAS ESCRITURAS B2-ONLY · READ-BACK FÍSICO Y SHA-256 IMPLEMENTADOS · PREVIEW FOCAL VALIDADO · PRODUCTION READY · PREFLIGHT B2 READ-ONLY PASS · E2E AUTENTICADO PENDIENTE · PR #368 ABIERTO (SIN MERGE; READ-BACK LÓGICO PENDIENTE) · PERFIL OPERATIVO TEMPORAL PC-14\\PC 13 VALIDADO · RESPALDO DE CHECKPOINTS B2 NO EJECUTADO · 11,413 CHECKPOINTS PRESERVADOS (ÚLTIMA LECTURA 2026-11-15; NO REVALIDADOS EN ESTA RETOMA) · BLOB HISTÓRICO CONSERVADO · MIGRACIÓN DIFERIDA · SIN TRUNCATE, BACKFILL, CAMBIOS DE REFERENCIAS NI BORRADO.** Identidad: CUSTODIA. Versión documental: CUSTODIA-v0.48. Metacanon: 1.29. La decisión operativa vigente conserva los objetos históricos Blob en sus localizadores y dirige todo contenido nuevo exclusivamente a Backblaze B2. La publicación no equivale a aceptación E2E: falta completar las compuertas de respaldo de checkpoints y la aceptación autenticada.
  
 ## Decisión operativa vigente · 2026-11-10
 
@@ -892,4 +892,29 @@ Se incorpora [GUIA-PERSISTENCIA-B2-MASTER.md](GUIA-PERSISTENCIA-B2-MASTER.md), p
 2. Vincular localmente solo el proyecto canónico `khora-web` bajo el scope `victorhugotorresmendez-8991s-projects`; usar CLI para revisar deployments, build y un deploy Preview `--prebuilt` (sin `--prod`) para observar la respuesta actual al posible 402.
 3. Corregir primero la ausencia de read-back lógico y probarla localmente. No ejecutar el endpoint de respaldo ni el `TRUNCATE` hasta tener el código revisado y desplegado y las compuertas físicas y lógicas completas.
 4. No materializar valores secretos, archivos `.env` ni volcados de variables; los valores sensibles no se imprimirán ni copiarán a la conversación.
+
+## Corte de CLI Vercel y límite RDC · 2026-11-16 · CUSTODIA-v0.48
+
+### Herramientas, identidad y repositorio local
+
+- **Windows operativo verificado:** dispositivo RDC `PC-14`, perfil `PC-14\\PC 13`, SID `S-1-5-21-1094932887-1468116028-2730151477-1002`, perfil Win32 cargado en `C:\\Users\\PC 13`. No se modificó `USERPROFILE`; la excepción temporal de perfil sigue limitada a CUSTODIA-B2-006 y a este dispositivo/perfil.
+- **Runtime:** Node `v24.22.3`; npm `11.19.1`; Vercel CLI `65.16.0`, autenticada como `victorhugotorresmendez-8991`.
+- **Git:** MinGit portable `2.56.1.windows.1` en `C:\\Users\\PC 13\\AppData\\Local\\Programs\\MinGit-2.56.1`; ZIP oficial SHA-256 `4a92850b6e917da4fd010669b614b55dccf5b0ec333a534cc4be4700dfefdafd`; entrypoint `cmd\\git.exe` comprobado. Un intento con WinGet instaló Git bajo `C:\\Program Files\\Git` pese a `--scope user`; ese paquete fue desinstalado con código 0 y se verificó que `C:\\Program Files\\Git` dejó de existir. No persistió Git machine-wide.
+- **Clon local:** `C:\\Users\\PC 13\\src\\khora-pr368`; rama `ops/checkpoint-backup-b2-prune-20261115`; HEAD `25eaee16cd4cfc39a236d1f75d3138ee095a99d7`, coincidente con el HEAD observado del PR #368; working tree limpio al clonar. Comparación con `main` al corte `531ea0abb9f4b3946b5f6a8fdbb7c598c7664683`: PR 12 commits adelante y 14 detrás; merge base `d56391a772fde4da9dbfb5368e37ea8bb3e7e03d`. No se fusionó ni rebasó.
+
+### Vercel CLI y pruebas de build
+
+- **Proyecto canónico:** `khora-web`; projectId `prj_hRN86BKITXYKTnNlp0ygVhaMwFfx`; teamId `team_QBa5UlffJWznZ8ogFfKjaGQb`; scope `victorhugotorresmendez-8991s-projects`. El enlace se cotejó contra ambos IDs. La raíz del proyecto en el monorepo es `khora-web`.
+- `vercel ls` completó correctamente y devolvió despliegues Production recientes en estado `Ready`. Esto no prueba que la cuota de deploy haya sido liberada.
+- `vercel build` se intentó sobre el PR. El primer intento no tenía ajustes locales y fue detenido; luego se obtuvo por API únicamente metadata no secreta de proyecto y se escribió `.vercel/project.json` en la raíz del repositorio, con read-back exacto. No se descargaron variables a archivos.
+- Segundo intento: `vercel env run -e preview -- vercel build`. La CLI indicó que tres valores de tipo Secret de Preview no son transferibles al entorno local y se omitieron; el build terminó con `[BUILD_FAILED] Could not load the embedded vlt Builder graphs`. Código de salida 1. Se generó contenido diagnóstico parcial bajo `.vercel/output`, pero no se obtuvo build válido ni artefacto prebuilt aceptable.
+- `vercel link` creó transitoriamente un `.env.local` de 1,439 bytes asociado al enlace; se eliminó inmediatamente sin leerlo. No se copió ni expuso ningún valor. Inventarios posteriores mostraron solamente `.env.example` versionados; `vercel env run` no creó un archivo de variables.
+- **Cuota 402:** no probada. No se ejecutó `vercel deploy --prebuilt` porque el build válido requerido no se generó. No se creó deployment nuevo en esta sesión.
+
+### Límite operativo y estado de producción
+
+- Tras el segundo build, Remote Desktop Commander devolvió en una llamada de ejecución `No Desktop Commander device is currently online`, pese a que `list_devices` seguía reportando PC-14 como Online. No se pudo confirmar una sesión remota utilizable; queda bloqueada toda ejecución adicional en Windows hasta recuperar el canal y verificar proceso/identidad.
+- **Producción sin cambios por esta sesión:** no se ejecutó `vercel env run -e production` para el respaldo; no hubo exportación de 11,413 checkpoints, gzip/cifrado KHC2 ni upload a B2; no hubo read-back de B2, `TRUNCATE`, escritura/sonda Neon ni T-05 C1-C4.
+- **Próxima secuencia:** restaurar RDC y validar identidad/rutas; resolver el error VLT de la instalación/build local sin materializar Secret values ni `.env`; conseguir un build correcto; sólo entonces intentar `vercel deploy --prebuilt` Preview y registrar si la cuota 402 cede. Mantener intacta la compuerta de read-back lógico del objeto B2 antes de cualquier truncado. No fusionar PR #368 ni operar Production hasta que se cumplan todas las compuertas indicadas.
+
 
